@@ -7,47 +7,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Optional;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import dev.theagameplayer.puresuffering.PSConfig;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
-import dev.theagameplayer.puresuffering.util.InvasionSpawnerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.DefaultBiomeMagnifier;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class InvasionType {
+public final class InvasionType {
 	private final ResourceLocation id;
 	private final Map<Integer, InvasionSkyRenderer> skyRenderer;
 	private final Map<Integer, List<Spawners>> mobSpawnList;
@@ -64,9 +39,6 @@ public class InvasionType {
 	private final int tickDelay;
 	private final int rarity;
 	private final ITextComponent component;
-	private final ArrayList<InvasionSpawnerEntity> spawnPotentials = new ArrayList<>();
-	private InvasionSpawnerEntity nextSpawnData = new InvasionSpawnerEntity();
-	private int spawnDelay;
 
 	public InvasionType(ResourceLocation idIn, Map<Integer, InvasionSkyRenderer> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean changesDarknessIn, boolean isRepeatingIn, boolean isEnvironmentalIn, boolean onlyDuringNightIn, float brightnessIn, int lightLevelIn, int maxSeverityIn, int tickDelayIn, int rarityIn) {
 		this.id = idIn;
@@ -156,116 +128,6 @@ public class InvasionType {
 	
 	public ITextComponent getComponent() {
 		return this.component;
-	}
-	
-	public void tick(ServerWorld worldIn, ArrayList<Pair<InvasionType, Integer>> invasionListIn, Pair<InvasionType, Integer> pairIn) {
-		this.tickEntitySpawn(worldIn, pairIn.getRight());
-	}
-	
-	private final void tickEntitySpawn(ServerWorld worldIn, int severityIn) {
-		if (this.getMobSpawnList() != null && this.getTickDelay() > -1) {
-			if (this.spawnDelay < 0) {
-				this.delay(worldIn, severityIn);
-			}
-			if (this.spawnDelay > 0) {
-				--this.spawnDelay;
-				return;
-			}
-			boolean flag1 = false;
-			List<Spawners> mobs;
-			int index;
-			Spawners spawners;
-			ChunkPos chunkPos = this.getSpawnChunk(worldIn);
-			if (this.getMobSpawnList().isEmpty()) {
-				BlockPos pos = this.getSpawnPos(worldIn, chunkPos);
-				mobs = this.getRoughBiome(pos, worldIn.getChunk(pos)).getMobSettings().getMobs(EntityClassification.MONSTER);
-				if (mobs.size() < 1) return;
-			} else {
-				mobs = this.getMobSpawnList().get(severityIn - 1);
-			}
-			index = worldIn.random.nextInt(mobs.size());
-			spawners = mobs.get(index);
-			int groupSize = worldIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-			this.nextSpawnData.getTag().putString("id", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
-			for(int count = 0; count < groupSize; ++count) {
-				CompoundNBT compoundNBT = this.nextSpawnData.getTag();
-				Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
-				if (!optional.isPresent()) {
-					this.delay(worldIn, severityIn);
-					return;
-				}
-				BlockPos pos = this.getSpawnPos(worldIn, chunkPos);
-				if (pos != null && EntitySpawnPlacementRegistry.checkSpawnRules(optional.get(), worldIn, SpawnReason.EVENT, pos, worldIn.getRandom())) {
-					Entity entity = EntityType.loadEntityRecursive(compoundNBT, worldIn, (e) -> {
-						e.moveTo(pos.getX(), pos.getY(), pos.getZ(), e.yRot, e.xRot);
-						return e;
-					});
-					if (entity == null) {
-						this.delay(worldIn, severityIn);
-						return;
-					}
-					entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), worldIn.random.nextFloat() * 360.0F, 0.0F);
-					if (entity instanceof MobEntity) {
-						MobEntity mobEntity = (MobEntity)entity;
-						if (this.nextSpawnData.getTag().size() == 1 && this.nextSpawnData.getTag().contains("id", 8)) {
-							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
-								mobEntity.getPersistentData().putString("InvasionMob", this.id.toString());
-								mobEntity.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
-								mobEntity.setTarget(worldIn.getNearestPlayer(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ(), Integer.MAX_VALUE, true));
-								if (PSConfig.COMMON.shouldMobsSpawnWithInfiniteRange.get())
-									mobEntity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
-							}
-						}
-					}
-					if (!worldIn.tryAddFreshEntityWithPassengers(entity)) {
-						this.delay(worldIn, severityIn);
-						return;
-					}
-					worldIn.levelEvent(Constants.WorldEvents.MOB_SPAWNER_PARTICLES, pos, 0);
-					if (entity instanceof MobEntity) {
-						((MobEntity)entity).spawnAnim();
-					}
-					flag1 = true;
-				}
-			}
-			if (flag1) {
-				this.delay(worldIn, severityIn);
-			}
-		}
-	}
-	
-	private void delay(ServerWorld worldIn, int severityIn) {
-		int delay = this.tickDelay;
-		this.spawnDelay = (delay * (this.getMaxSeverity() + 1)) - (delay * severityIn);
-		if (!this.spawnPotentials.isEmpty()) {
-			this.nextSpawnData = WeightedRandom.getRandomItem(worldIn.random, this.spawnPotentials);;
-		}
-	}
-	
-	private Biome getRoughBiome(BlockPos posIn, IChunk chunkIn) {
-		return DefaultBiomeMagnifier.INSTANCE.getBiome(0L, posIn.getX(), posIn.getY(), posIn.getZ(), chunkIn.getBiomes());
-	}
-	
-	private ChunkPos getSpawnChunk(ServerWorld worldIn) {
-		ServerPlayerEntity player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
-		ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
-		int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
-		int chunkZ = chunkPos.z - 8 + worldIn.random.nextInt(17);
-		boolean flag = chunkPos.x == chunkX && chunkPos.z == chunkZ;
-		ChunkPos chunkPos1 = new ChunkPos(flag ? chunkX + this.getChunkOffset(worldIn) : chunkX, flag ? chunkZ + this.getChunkOffset(worldIn) : chunkZ);
-		return chunkPos1;
-	}
-	
-	private int getChunkOffset(ServerWorld worldIn) {
-		int offSet = worldIn.random.nextInt(8) + 1;
-		boolean flag = worldIn.random.nextBoolean();
-		return flag ? offSet : -offSet;
-	}
-	
-	private BlockPos getSpawnPos(ServerWorld worldIn, ChunkPos chunkPosIn) {
-		int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
-		int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
-		return new BlockPos(x, worldIn.getHeight(Heightmap.Type.MOTION_BLOCKING, x, z), z);
 	}
 	
 	@Override

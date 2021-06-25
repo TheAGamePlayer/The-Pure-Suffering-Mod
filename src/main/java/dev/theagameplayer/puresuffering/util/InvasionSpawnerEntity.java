@@ -4,7 +4,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
 
-public class InvasionSpawnerEntity extends WeightedRandom.Item {
+public final class InvasionSpawnerEntity extends WeightedRandom.Item {
 	private final CompoundNBT tag;
 
 	public InvasionSpawnerEntity() {

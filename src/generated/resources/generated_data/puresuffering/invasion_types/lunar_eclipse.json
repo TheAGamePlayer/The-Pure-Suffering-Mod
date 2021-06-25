@@ -17,6 +17,6 @@
   "IsRepeatable": false,
   "OnlyDuringNight": true,
   "MaxSeverity": 1,
-  "TickDelay": 6,
+  "TickDelay": 9,
   "Rarity": 7
 }

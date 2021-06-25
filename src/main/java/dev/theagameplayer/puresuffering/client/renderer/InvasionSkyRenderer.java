@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.util.ResourceLocation;
 
-public class InvasionSkyRenderer {
+public final class InvasionSkyRenderer {
 	private final ResourceLocation id;
 	private final InvasionFogRenderer fogRenderer;
 	private final ResourceLocation sun;

@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 
 import net.minecraft.util.ResourceLocation;
 
-public class InvasionFogRenderer {
+public final class InvasionFogRenderer {
 	private final ResourceLocation id;
 	private final boolean fogDensityChanged;
 	private final boolean fogColorChanged;

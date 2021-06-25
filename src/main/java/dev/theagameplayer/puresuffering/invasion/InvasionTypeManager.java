@@ -22,7 +22,7 @@ import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 
-public class InvasionTypeManager extends JsonReloadListener {
+public final class InvasionTypeManager extends JsonReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).create();
 	private HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();

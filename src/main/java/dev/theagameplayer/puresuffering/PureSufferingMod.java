@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
+import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(value = PureSufferingMod.MODID)
-public class PureSufferingMod {
+public final class PureSufferingMod {
 	public static final String MODID = "puresuffering";
 	private static final Logger LOGGER = LogManager.getLogger(MODID);
 
@@ -46,6 +47,7 @@ public class PureSufferingMod {
 	}
 	
 	private void commonSetup(final FMLCommonSetupEvent eventIn) {
+		PSPacketHandler.registerPackets();
 		LOGGER.info("Finished common setup.");
 	}
 	

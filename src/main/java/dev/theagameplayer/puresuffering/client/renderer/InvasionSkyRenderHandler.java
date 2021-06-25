@@ -1,13 +1,12 @@
 package dev.theagameplayer.puresuffering.client.renderer;
 
 import java.util.ArrayList;
-import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.theagameplayer.puresuffering.invasion.InvasionType;
+import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.spawner.InvasionSpawner;
 import dev.theagameplayer.puresuffering.util.TimeUtil;
 import net.minecraft.client.Minecraft;
@@ -26,14 +25,14 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.ISkyRenderHandler;
 
-public class InvasionSkyRenderHandler implements ISkyRenderHandler {
+public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 	private static final ResourceLocation DEFAULT_SUN = new ResourceLocation("textures/environment/sun.png");
 	private static final ResourceLocation DEFAULT_MOON = new ResourceLocation("textures/environment/moon_phases.png");
-	private static final ArrayList<Pair<InvasionType, Integer>> INVASION_LIST = new ArrayList<>(); //All Invasions
-	private static final ArrayList<Pair<InvasionType, Integer>> SUN_LIST = new ArrayList<>(); //Invasions that change the sun
-	private static final ArrayList<Pair<InvasionType, Integer>> MOON_LIST = new ArrayList<>(); //Invasions that change the moon
-	private static final ArrayList<Pair<InvasionType, Integer>> WEATHER_VISIBILITY_LIST = new ArrayList<>(); //Invasions that are visible in weather
-	private static final ArrayList<Pair<InvasionType, Integer>> SKY_COLOR_LIST = new ArrayList<>(); //Invasions that change the sky color
+	private static final ArrayList<Invasion> INVASION_LIST = new ArrayList<>(); //All Invasions
+	private static final ArrayList<Invasion> SUN_LIST = new ArrayList<>(); //Invasions that change the sun
+	private static final ArrayList<Invasion> MOON_LIST = new ArrayList<>(); //Invasions that change the moon
+	private static final ArrayList<Invasion> WEATHER_VISIBILITY_LIST = new ArrayList<>(); //Invasions that are visible in weather
+	private static final ArrayList<Invasion> SKY_COLOR_LIST = new ArrayList<>(); //Invasions that change the sky color
 	private final ISkyRenderHandler skyRenderer;
 	
 	public InvasionSkyRenderHandler(ISkyRenderHandler skyRendererIn) {
@@ -44,13 +43,13 @@ public class InvasionSkyRenderHandler implements ISkyRenderHandler {
 	public void render(int ticksIn, float partialTicksIn, MatrixStack matrixStackIn, ClientWorld worldIn, Minecraft mcIn) {
 		INVASION_LIST.clear();
 		if (!worldIn.players().isEmpty()) {
-			if (TimeUtil.isDay(worldIn) && !InvasionSpawner.getDayInvasions().isEmpty()) {
-				INVASION_LIST.addAll(ImmutableList.copyOf(InvasionSpawner.getDayInvasions().stream().filter(pair -> { 
-					return pair.getLeft().isEnvironmental();
+			if (TimeUtil.isClientDay() && !InvasionSpawner.getDayInvasions().isEmpty()) {
+				INVASION_LIST.addAll(ImmutableList.copyOf(InvasionSpawner.getDayInvasions().stream().filter(invasion -> { 
+					return invasion.getType().isEnvironmental();
 				}).iterator()));
-			} else if (TimeUtil.isNight(worldIn) && !InvasionSpawner.getNightInvasions().isEmpty()) {
-				INVASION_LIST.addAll(ImmutableList.copyOf(InvasionSpawner.getNightInvasions().stream().filter(pair -> { 
-					return pair.getLeft().isEnvironmental();
+			} else if (TimeUtil.isClientNight() && !InvasionSpawner.getNightInvasions().isEmpty()) {
+				INVASION_LIST.addAll(ImmutableList.copyOf(InvasionSpawner.getNightInvasions().stream().filter(invasion -> { 
+					return invasion.getType().isEnvironmental();
 				}).iterator()));
 			}
 		}
@@ -59,16 +58,16 @@ public class InvasionSkyRenderHandler implements ISkyRenderHandler {
 				SUN_LIST.clear();
 				MOON_LIST.clear();
 				WEATHER_VISIBILITY_LIST.clear();
-				for (Pair<InvasionType, Integer> pair : INVASION_LIST) {
-					if (!pair.getLeft().getSkyRenderer().isEmpty()) {
-						if (pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).getSunTexture() != null)
-							SUN_LIST.add(pair);
-						if (pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).getMoonTexture() != null)
-							MOON_LIST.add(pair);
-						if (pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).isWeatherVisibilityChanged())
-							WEATHER_VISIBILITY_LIST.add(pair);
-						if (pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).isSkyColorChanged())
-							SKY_COLOR_LIST.add(pair);
+				for (Invasion invasion : INVASION_LIST) {
+					if (!invasion.getType().getSkyRenderer().isEmpty()) {
+						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getSunTexture() != null)
+							SUN_LIST.add(invasion);
+						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getMoonTexture() != null)
+							MOON_LIST.add(invasion);
+						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).isWeatherVisibilityChanged())
+							WEATHER_VISIBILITY_LIST.add(invasion);
+						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).isSkyColorChanged())
+							SKY_COLOR_LIST.add(invasion);
 					}
 				}
 				this.renderInvasionSky(matrixStackIn, mcIn, worldIn, partialTicksIn);
@@ -92,8 +91,8 @@ public class InvasionSkyRenderHandler implements ISkyRenderHandler {
 		float f = (float)vector3d.x;
 		float f1 = (float)vector3d.y;
 		float f2 = (float)vector3d.z;
-		for (Pair<InvasionType, Integer> pair : SKY_COLOR_LIST) {
-			InvasionSkyRenderer skyRenderer = pair.getLeft().getSkyRenderer().get(pair.getRight() - 1);
+		for (Invasion invasion : SKY_COLOR_LIST) {
+			InvasionSkyRenderer skyRenderer = invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1);
 			f += skyRenderer.getRedOffset() / SKY_COLOR_LIST.size();
 			f1 += skyRenderer.getGreenOffset() / SKY_COLOR_LIST.size();
 			f2 += skyRenderer.getBlueOffset() / SKY_COLOR_LIST.size();
@@ -143,8 +142,8 @@ public class InvasionSkyRenderHandler implements ISkyRenderHandler {
 		matrixStackIn.pushPose();
 		float f11 = 1.0F - worldIn.getRainLevel(partialTicksIn);
 		float f12 = 0.0F;
-		for (Pair<InvasionType, Integer> pair : WEATHER_VISIBILITY_LIST) {
-			f12 = pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).getWeatherVisibilityIn() / WEATHER_VISIBILITY_LIST.size();
+		for (Invasion invasion : WEATHER_VISIBILITY_LIST) {
+			f12 = invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getWeatherVisibilityIn() / WEATHER_VISIBILITY_LIST.size();
 		}
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, f11 + MathHelper.clamp(f12, 0.0F, 1.0F));
 		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
@@ -155,8 +154,8 @@ public class InvasionSkyRenderHandler implements ISkyRenderHandler {
 			renderSun(mcIn, bufferbuilder, matrix4f1, f13, DEFAULT_SUN);
 		}
 		else {
-			for (Pair<InvasionType, Integer> pair : SUN_LIST) {
-				renderSun(mcIn, bufferbuilder, matrix4f1, f13, pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).getSunTexture());
+			for (Invasion invasion : SUN_LIST) {
+				renderSun(mcIn, bufferbuilder, matrix4f1, f13, invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getSunTexture());
 			}
 		}
 		f13 = 20.0F;
@@ -164,8 +163,8 @@ public class InvasionSkyRenderHandler implements ISkyRenderHandler {
 			renderMoon(mcIn, bufferbuilder, matrix4f1, worldIn, f13, DEFAULT_MOON);
 		}
 		else {
-			for (Pair<InvasionType, Integer> pair : MOON_LIST) {
-				renderMoon(mcIn, bufferbuilder, matrix4f1, worldIn, f13, pair.getLeft().getSkyRenderer().get(pair.getRight() - 1).getMoonTexture());
+			for (Invasion invasion : MOON_LIST) {
+				renderMoon(mcIn, bufferbuilder, matrix4f1, worldIn, f13, invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getMoonTexture());
 			}
 		}
 		RenderSystem.disableTexture();

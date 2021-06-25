@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import net.minecraft.command.CommandSource;
 
-public class PSCommands {
+public final class PSCommands {
 	public static void build(CommandDispatcher<CommandSource> dispatcherIn) {
 		dispatcherIn.register(LiteralArgumentBuilder.<CommandSource>literal("puresuffering")
 				.then(ClearInvasionsCommand.register())

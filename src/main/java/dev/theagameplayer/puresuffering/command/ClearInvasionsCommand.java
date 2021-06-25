@@ -10,16 +10,16 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 
-public class ClearInvasionsCommand {
+public final class ClearInvasionsCommand {
 	public static ArgumentBuilder<CommandSource, ?> register() {
 		return Commands.literal("clear")
 				.requires(player -> {
 					return player.hasPermission(2);
 				}).then(Commands.literal("current").executes(ctx -> {
-					if (TimeUtil.isDay(ctx.getSource().getServer().overworld())) {
+					if (TimeUtil.isServerDay(ctx.getSource().getServer().overworld())) {
 						InvasionSpawner.getDayInvasions().clear();
 						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
-					} else if (TimeUtil.isNight(ctx.getSource().getServer().overworld())) {
+					} else if (TimeUtil.isServerNight(ctx.getSource().getServer().overworld())) {
 						InvasionSpawner.getNightInvasions().clear();
 						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					} else {
@@ -39,11 +39,15 @@ public class ClearInvasionsCommand {
 					InvasionSpawner.getNightInvasions().clear();
 					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					return 0;
-				})).then(Commands.literal("queued").executes(ctx -> {
-					InvasionSpawner.getQueuedInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+				})).then(Commands.literal("queued").then(Commands.literal("day").executes(ctx -> {
+					InvasionSpawner.getQueuedDayInvasions().clear();
+					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					return 0;
-				}));
+				})).then(Commands.literal("night").executes(ctx -> {
+					InvasionSpawner.getQueuedNightInvasions().clear();
+					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					return 0;
+				})));
 	}
 
 }

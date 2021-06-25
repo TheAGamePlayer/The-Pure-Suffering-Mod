@@ -13,7 +13,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 
-public class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
+public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 	@Override
 	public void accept(Consumer<InvasionType> consumerIn) {
 		InvasionType.Builder.invasionType().skyRenderer(ImmutableMap.of(
@@ -23,7 +23,7 @@ public class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 		InvasionType.Builder.invasionType().skyRenderer(ImmutableMap.of(
 				1, InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().density(0.085F).withRGB(0.05F, 0, 0))
 				.moonTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/lunar_eclipse_moon.png")).weatherVisibility(0.1F)
-				)).mobSpawnList(ImmutableMap.of()).setNonRepeatable().setOnlyDuringNight().maxSeverity(1).withRarity(7).save(consumerIn, "lunar_eclipse");
+				)).mobSpawnList(ImmutableMap.of()).setNonRepeatable().setOnlyDuringNight().maxSeverity(1).tickDelay(9).withRarity(7).save(consumerIn, "lunar_eclipse");
 		InvasionType.Builder.invasionType().mobSpawnList(ImmutableMap.of(
 				1, ImmutableList.of(new Spawners(EntityType.ZOMBIE, 20, 1, 4), new Spawners(EntityType.ZOMBIE_VILLAGER, 5, 1, 1)),
 				2, ImmutableList.of(new Spawners(EntityType.ZOMBIE, 20, 2, 4), new Spawners(EntityType.ZOMBIE_VILLAGER, 5, 1, 1)),
