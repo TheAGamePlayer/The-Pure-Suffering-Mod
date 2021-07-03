@@ -2,8 +2,10 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.util.TimeUtil;
+import dev.theagameplayer.puresuffering.util.ClientTimeUtil;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public final class UpdateTimePacket {
@@ -26,12 +28,18 @@ public final class UpdateTimePacket {
 
 	public static class Handler {
 		public static boolean handle(UpdateTimePacket msgIn, Supplier<Context> ctxIn) {
-			if (msgIn.forDay) {
-				TimeUtil.updateClientDay(msgIn.isTime);
-			} else {
-				TimeUtil.updateClientNight(msgIn.isTime);
-			}
+			ctxIn.get().enqueueWork(() -> {
+				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
+			});
 			return true;
+		}
+		
+		private static void handlePacket(UpdateTimePacket msgIn, Supplier<Context> ctxIn) {
+			if (msgIn.forDay) {
+				ClientTimeUtil.updateClientDay(msgIn.isTime);
+			} else {
+				ClientTimeUtil.updateClientNight(msgIn.isTime);
+			}
 		}
 	}
 }

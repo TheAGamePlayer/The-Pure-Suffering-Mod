@@ -29,31 +29,23 @@ public final class InvasionType {
 	private final boolean isDayInvasion;
 	private final boolean forceNoSleep;
 	private final boolean setsToNight;
-	private final boolean changesDarkness;
 	private final boolean isRepeating;
-	private final boolean isEnvironmental;
 	private final boolean onlyDuringNight;
-	private final float brightness;
 	private final int lightLevel;
-	private final int maxSeverity;
 	private final int tickDelay;
 	private final int rarity;
 	private final ITextComponent component;
 
-	public InvasionType(ResourceLocation idIn, Map<Integer, InvasionSkyRenderer> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean changesDarknessIn, boolean isRepeatingIn, boolean isEnvironmentalIn, boolean onlyDuringNightIn, float brightnessIn, int lightLevelIn, int maxSeverityIn, int tickDelayIn, int rarityIn) {
+	public InvasionType(ResourceLocation idIn, Map<Integer, InvasionSkyRenderer> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean isRepeatingIn, boolean onlyDuringNightIn, int lightLevelIn, int tickDelayIn, int rarityIn) {
 		this.id = idIn;
 		this.skyRenderer = skyRendererIn;
 		this.mobSpawnList = mobSpawnListIn;
 		this.isDayInvasion = isDayInvasionIn;
 		this.forceNoSleep = forceNoSleepIn;
 		this.setsToNight = setsToNightIn;
-		this.changesDarkness = changesDarknessIn;
 		this.isRepeating = isRepeatingIn;
-		this.isEnvironmental = isEnvironmentalIn;
 		this.onlyDuringNight = onlyDuringNightIn;
-		this.brightness = brightnessIn;
 		this.lightLevel = lightLevelIn;
-		this.maxSeverity = maxSeverityIn;
 		this.tickDelay = tickDelayIn;
 		this.rarity = rarityIn;
 		this.component = new TranslationTextComponent("invasion." + idIn.getNamespace() + "." + idIn.getPath());
@@ -63,7 +55,7 @@ public final class InvasionType {
 		Map<Integer, InvasionSkyRenderer.Builder> skyRenderer = new HashMap<>();
 		for (Entry<Integer, InvasionSkyRenderer> entry : this.skyRenderer.entrySet())
 			skyRenderer.put(entry.getKey(), entry.getValue().deconstruct());
-		return new InvasionType.Builder(skyRenderer, this.mobSpawnList, this.isDayInvasion, this.forceNoSleep, this.setsToNight, this.changesDarkness, this.isRepeating, this.isEnvironmental, this.onlyDuringNight, this.brightness, this.lightLevel, this.maxSeverity, this.tickDelay, this.rarity);
+		return new InvasionType.Builder(skyRenderer, this.mobSpawnList, this.isDayInvasion, this.forceNoSleep, this.setsToNight, this.isRepeating, this.onlyDuringNight, this.lightLevel, this.tickDelay, this.rarity);
 	}
 	
 	public ResourceLocation getId() {
@@ -90,32 +82,16 @@ public final class InvasionType {
 		return this.setsToNight;
 	}
 	
-	public boolean changesDarkness() {
-		return this.changesDarkness;
-	}
-	
 	public boolean isRepeatable() {
 		return this.isRepeating;
-	}
-	
-	public boolean isEnvironmental() {
-		return this.isEnvironmental;
 	}
 	
 	public boolean isOnlyDuringNight() {
 		return this.onlyDuringNight;
 	}
 	
-	public float getBrightness() {
-		return this.brightness;
-	}
-	
 	public int getLightLevel() {
 		return this.lightLevel;
-	}
-	
-	public int getMaxSeverity() {
-		return this.maxSeverity;
 	}
 	
 	public int getTickDelay() {
@@ -130,6 +106,10 @@ public final class InvasionType {
 		return this.component;
 	}
 	
+	public int getMaxSeverity() {
+		return this.mobSpawnList.isEmpty() ? 1 : this.mobSpawnList.size();
+	}
+	
 	@Override
 	public String toString() {
 		return this.getId().toString();
@@ -142,29 +122,21 @@ public final class InvasionType {
 		private boolean isDayInvasion = false;
 		private boolean forceNoSleep = false;
 		private boolean setsToNight = false;
-		private boolean changesDarkness = false;
 		private boolean isRepeating = true;
-		private boolean isEnvironmental = false;
 		private boolean onlyDuringNight = false;
-		private float brightness;
 		private int lightLevel; 
-		private int maxSeverity = 0;
 		private int tickDelay = 6;
 		private int rarity = 0;
 		
-		private Builder(Map<Integer, InvasionSkyRenderer.Builder> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean changesDarknessIn, boolean isRepeatingIn, boolean isEnvironmentalIn, boolean onlyDuringNightIn, float brightnessIn, int lightLevelIn, int maxSeverityIn, int tickDelayIn, int rarityIn) {
+		private Builder(Map<Integer, InvasionSkyRenderer.Builder> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean isRepeatingIn, boolean onlyDuringNightIn, int lightLevelIn, int tickDelayIn, int rarityIn) {
 			this.skyRenderer = skyRendererIn;
 			this.mobSpawnList = mobSpawnListIn;
 			this.isDayInvasion = isDayInvasionIn;
 			this.forceNoSleep = forceNoSleepIn;
 			this.setsToNight = setsToNightIn;
-			this.changesDarkness = changesDarknessIn;
 			this.isRepeating = isRepeatingIn;
-			this.isEnvironmental = isEnvironmentalIn;
 			this.onlyDuringNight = onlyDuringNightIn;
-			this.brightness = brightnessIn;
 			this.lightLevel = lightLevelIn;
-			this.maxSeverity = maxSeverityIn;
 			this.tickDelay = tickDelayIn;
 			this.rarity = rarityIn;
 		}
@@ -177,7 +149,6 @@ public final class InvasionType {
 		
 		public InvasionType.Builder skyRenderer(Map<Integer, InvasionSkyRenderer.Builder> skyRendererIn) {
 			this.skyRenderer = skyRendererIn;
-			this.isEnvironmental = true;
 			return this;
 		}
 		
@@ -201,10 +172,8 @@ public final class InvasionType {
 			return this;
 		}
 		
-		public InvasionType.Builder withLight(float brightnessIn, int lightLevelIn) {
-			this.brightness = brightnessIn;
+		public InvasionType.Builder withLight(int lightLevelIn) {
 			this.lightLevel = lightLevelIn;
-			this.changesDarkness = true;
 			return this;
 		}
 		
@@ -215,11 +184,6 @@ public final class InvasionType {
 		
 		public InvasionType.Builder setOnlyDuringNight() {
 			this.onlyDuringNight = true;
-			return this;
-		}
-		
-		public InvasionType.Builder maxSeverity(int severityIn) {
-			this.maxSeverity = severityIn;
 			return this;
 		}
 		
@@ -244,7 +208,7 @@ public final class InvasionType {
 			if (this.skyRenderer != null)
 				for (Entry<Integer, InvasionSkyRenderer.Builder> entry : this.skyRenderer.entrySet())
 					skyRenderer.put(entry.getKey(), entry.getValue().build(idIn));
-			return new InvasionType(idIn, skyRenderer, this.mobSpawnList, this.isDayInvasion, this.forceNoSleep, this.setsToNight, this.changesDarkness, this.isRepeating, this.isEnvironmental, this.onlyDuringNight, this.brightness, this.lightLevel, this.maxSeverity, this.tickDelay, this.rarity);
+			return new InvasionType(idIn, skyRenderer, this.mobSpawnList, this.isDayInvasion, this.forceNoSleep, this.setsToNight, this.isRepeating, this.onlyDuringNight, this.lightLevel, this.tickDelay, this.rarity);
 		}
 		
 		public JsonObject serializeToJson() {
@@ -276,14 +240,12 @@ public final class InvasionType {
 			jsonObject.addProperty("ForceNoSleep", this.forceNoSleep);
 			if (this.isDayInvasion)
 				jsonObject.addProperty("SetsEventsToNight", this.setsToNight);
-			if (this.changesDarkness) {
-				jsonObject.addProperty("Brightness", this.brightness);
+			if (this.lightLevel != 0.0F) {
 				jsonObject.addProperty("LightLevel", this.lightLevel);
 			}
 			jsonObject.addProperty("IsRepeatable", this.isRepeating);
 			if (!this.isDayInvasion)
 				jsonObject.addProperty("OnlyDuringNight", this.onlyDuringNight);
-			jsonObject.addProperty("MaxSeverity", this.maxSeverity);
 			jsonObject.addProperty("TickDelay", this.tickDelay);
 			jsonObject.addProperty("Rarity", this.rarity);
 			return jsonObject;
@@ -293,13 +255,9 @@ public final class InvasionType {
 			boolean isDayInvasion = jsonObjectIn.get("IsDayInvasion").getAsBoolean();
 			boolean forceNoSleep = jsonObjectIn.has("ForceNoSleep") ? jsonObjectIn.get("ForceNoSleep").getAsBoolean() : false;
 			boolean setsToNight = jsonObjectIn.has("SetsEventsToNight") ? jsonObjectIn.get("SetsEventsToNight").getAsBoolean() : false;
-			boolean isDarkInDay = jsonObjectIn.has("Brightness") && jsonObjectIn.has("LightLevel");
 			boolean isRepeating = jsonObjectIn.get("IsRepeatable").getAsBoolean();
-			boolean isEnvironmental = jsonObjectIn.has("SkyRenderer");
 			boolean onlyDuringNight = jsonObjectIn.has("OnlyDuringNight") ? jsonObjectIn.get("OnlyDuringNight").getAsBoolean() : false;
-			float brightness = jsonObjectIn.has("Brightness") ? jsonObjectIn.get("Brightness").getAsFloat() : 0.0F;
 			int lightLevel = jsonObjectIn.has("LightLevel") ? jsonObjectIn.get("LightLevel").getAsInt() : 0;
-			int maxSeverity = jsonObjectIn.get("MaxSeverity").getAsInt();
 			int tickDelay = jsonObjectIn.get("TickDelay").getAsInt();
 			int rarity = jsonObjectIn.get("Rarity").getAsInt();
 			boolean errored = false;
@@ -353,7 +311,7 @@ public final class InvasionType {
 			if (errored) {
 				LOGGER.error("JsonElement is incorrectly setup: " + jsonElement.toString() + ". Therefore InvasionType wasn't registered!");
 			}
-			return new InvasionType.Builder(skyRenderer, mobSpawnList, isDayInvasion, forceNoSleep, setsToNight, isDarkInDay, isRepeating, isEnvironmental, onlyDuringNight, brightness, lightLevel, maxSeverity, tickDelay, rarity);
+			return new InvasionType.Builder(skyRenderer, mobSpawnList, isDayInvasion, forceNoSleep, setsToNight, isRepeating, onlyDuringNight, lightLevel, tickDelay, rarity);
 		}
 	}
 }

@@ -2,6 +2,7 @@ package dev.theagameplayer.puresuffering.client.renderer;
 
 import com.google.gson.JsonObject;
 
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 
 public final class InvasionFogRenderer {
@@ -112,6 +113,25 @@ public final class InvasionFogRenderer {
 			float red = jsonObjectIn.has("RedOffset") ? jsonObjectIn.get("RedOffset").getAsFloat() : 0.0F;
 			float green = jsonObjectIn.has("GreenOffset") ? jsonObjectIn.get("GreenOffset").getAsFloat() : 0.0F;
 			float blue = jsonObjectIn.has("BlueOffset") ? jsonObjectIn.get("BlueOffset").getAsFloat() : 0.0F;
+			return new InvasionFogRenderer.Builder(fogDensityChanged, fogColorChanged, density, red, green, blue);
+		}
+		
+		public void serializeToNetwork(PacketBuffer bufIn) {
+			bufIn.writeBoolean(this.fogDensityChanged);
+			bufIn.writeBoolean(this.fogColorChanged);
+			bufIn.writeFloat(this.density);
+			bufIn.writeFloat(this.red);
+			bufIn.writeFloat(this.green);
+			bufIn.writeFloat(this.blue);
+		}
+		
+		public static InvasionFogRenderer.Builder fromNetwork(PacketBuffer bufIn) {
+			boolean fogDensityChanged = bufIn.readBoolean();
+			boolean fogColorChanged = bufIn.readBoolean();
+			float density = bufIn.readFloat();
+			float red = bufIn.readFloat();
+			float green = bufIn.readFloat();
+			float blue = bufIn.readFloat();
 			return new InvasionFogRenderer.Builder(fogDensityChanged, fogColorChanged, density, red, green, blue);
 		}
 	}

@@ -16,7 +16,6 @@
   "ForceNoSleep": false,
   "IsRepeatable": false,
   "OnlyDuringNight": true,
-  "MaxSeverity": 1,
-  "TickDelay": 9,
+  "TickDelay": 15,
   "Rarity": 7
 }

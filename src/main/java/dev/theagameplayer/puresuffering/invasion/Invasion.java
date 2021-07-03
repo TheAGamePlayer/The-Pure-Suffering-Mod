@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import dev.theagameplayer.puresuffering.PSConfig;
+import dev.theagameplayer.puresuffering.util.InvasionList;
 import dev.theagameplayer.puresuffering.util.InvasionSpawnerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
@@ -33,13 +34,15 @@ public class Invasion {
 	public static final ArrayList<MobEntity> INVASION_MOBS = new ArrayList<>();
 	private final InvasionType invasionType;
 	private final int severity;
+	private final boolean shouldTick;
 	private final ArrayList<InvasionSpawnerEntity> spawnPotentials = new ArrayList<>();
 	private InvasionSpawnerEntity nextSpawnData = new InvasionSpawnerEntity();
 	private int spawnDelay;
 	
-	public Invasion(InvasionType invasionTypeIn, int severityIn) {
+	public Invasion(final InvasionType invasionTypeIn, final int severityIn) {
 		this.invasionType = invasionTypeIn;
 		this.severity = severityIn;
+		this.shouldTick = invasionTypeIn.getTickDelay() > -1 && invasionTypeIn.getMobSpawnList() != null;
 	}
 	
 	public InvasionType getType() {
@@ -50,15 +53,16 @@ public class Invasion {
 		return this.severity;
 	}
 	
-	public void tick(ServerWorld worldIn, ArrayList<Invasion> invasionListIn) {
-		this.tickEntitySpawn(worldIn);
+	public void tick(final ServerWorld worldIn, final InvasionList invasionListIn) {
+		if (this.shouldTick)
+			this.tickEntitySpawn(worldIn);
 	}
 	
 	private final void tickEntitySpawn(ServerWorld worldIn) {
 		INVASION_MOBS.removeIf(mobEntity -> {
 			return mobEntity == null || !mobEntity.isAlive();
 		});
-		if (this.invasionType.getMobSpawnList() != null && INVASION_MOBS.size() <= PSConfig.COMMON.invasionMobCap.get()) {
+		if (INVASION_MOBS.size() <= PSConfig.COMMON.invasionMobCap.get()) {
 			if (this.spawnDelay < 0) {
 				this.delay(worldIn);
 			}
@@ -106,7 +110,8 @@ public class Invasion {
 							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
 								mobEntity.getPersistentData().putString("InvasionMob", this.invasionType.toString());
 								mobEntity.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
-								mobEntity.setTarget(worldIn.getNearestPlayer(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ(), Integer.MAX_VALUE, true));
+								if (PSConfig.COMMON.autoAgro.get())
+									mobEntity.setTarget(worldIn.getNearestPlayer(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ(), Integer.MAX_VALUE, true));
 								if (PSConfig.COMMON.shouldMobsSpawnWithMaxRange.get())
 									mobEntity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
 								INVASION_MOBS.add(mobEntity);
@@ -130,7 +135,7 @@ public class Invasion {
 		}
 	}
 
-	private void delay(ServerWorld worldIn) {
+	private final void delay(ServerWorld worldIn) {
 		int delay = this.invasionType.getTickDelay();
 		this.spawnDelay = (delay * (this.invasionType.getMaxSeverity() + 1)) - (delay * this.severity);
 		if (!this.spawnPotentials.isEmpty()) {
@@ -138,11 +143,11 @@ public class Invasion {
 		}
 	}
 
-	private Biome getRoughBiome(BlockPos posIn, IChunk chunkIn) {
+	private final Biome getRoughBiome(BlockPos posIn, IChunk chunkIn) {
 		return DefaultBiomeMagnifier.INSTANCE.getBiome(0L, posIn.getX(), posIn.getY(), posIn.getZ(), chunkIn.getBiomes());
 	}
 
-	private ChunkPos getSpawnChunk(ServerWorld worldIn) {
+	private final ChunkPos getSpawnChunk(ServerWorld worldIn) {
 		ServerPlayerEntity player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
 		ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
 		int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
@@ -152,13 +157,13 @@ public class Invasion {
 		return chunkPos1;
 	}
 
-	private int getChunkOffset(ServerWorld worldIn) {
+	private final int getChunkOffset(ServerWorld worldIn) {
 		int offSet = worldIn.random.nextInt(8) + 1;
 		boolean flag = worldIn.random.nextBoolean();
 		return flag ? offSet : -offSet;
 	}
 
-	private BlockPos getSpawnPos(ServerWorld worldIn, ChunkPos chunkPosIn) {
+	private final BlockPos getSpawnPos(ServerWorld worldIn, ChunkPos chunkPosIn) {
 		int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
 		int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
 		return new BlockPos(x, worldIn.getHeight(Heightmap.Type.MOTION_BLOCKING, x, z), z);

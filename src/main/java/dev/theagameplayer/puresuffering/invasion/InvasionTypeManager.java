@@ -25,7 +25,9 @@ import net.minecraft.util.ResourceLocation;
 public final class InvasionTypeManager extends JsonReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).create();
-	private HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
+	private HashMap<ResourceLocation, InvasionType> allInvasionTypeMap = new HashMap<>();
+	private HashMap<ResourceLocation, InvasionType> dayInvasionTypeMap = new HashMap<>();
+	private HashMap<ResourceLocation, InvasionType> nightInvasionTypeMap = new HashMap<>();
 
 	public InvasionTypeManager() {
 		super(GSON, "invasion_types");
@@ -33,7 +35,9 @@ public final class InvasionTypeManager extends JsonReloadListener {
 
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
-		HashMap<ResourceLocation, InvasionType> map = new HashMap<>();
+		this.allInvasionTypeMap.clear();
+		this.dayInvasionTypeMap.clear();
+		this.nightInvasionTypeMap.clear();
 		objectIn.forEach((conditions, invasionType) -> {
 			try {
 				JsonObject jsonObject = JSONUtils.convertToJsonObject(invasionType, "invasion_type");
@@ -42,21 +46,33 @@ public final class InvasionTypeManager extends JsonReloadListener {
 					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met", conditions);
 					return;
 				}
-				map.put(conditions, invasionType1);
+				this.allInvasionTypeMap.put(conditions, invasionType1);
+				if (invasionType1.isDayInvasion()) {
+					this.dayInvasionTypeMap.put(conditions, invasionType1);
+				} else {
+					this.nightInvasionTypeMap.put(conditions, invasionType1);
+				}
 			} catch (IllegalArgumentException | JsonParseException jsonParseExceptionIn) {
 				LOGGER.error("Parsing error loading custom invasion types {}: {}", conditions, jsonParseExceptionIn.getMessage());	
 			}
 		});
-		this.invasionTypeMap = map;
-		LOGGER.info("Loaded {} invasion types", (int)map.size());
+		LOGGER.info("Loaded {} invasion types", (int)this.allInvasionTypeMap.size());
 	}
 	
 	@Nullable
 	public InvasionType getInvasionType(ResourceLocation idIn) {
-		return this.invasionTypeMap.get(idIn);
+		return this.allInvasionTypeMap.get(idIn);
 	}
 
 	public Collection<InvasionType> getAllInvasionTypes() {
-		return this.invasionTypeMap.values();
+		return this.allInvasionTypeMap.values();
+	}
+	
+	public Collection<InvasionType> getDayInvasionTypes() {
+		return this.dayInvasionTypeMap.values();
+	}
+	
+	public Collection<InvasionType> getNightInvasionTypes() {
+		return this.nightInvasionTypeMap.values();
 	}
 }

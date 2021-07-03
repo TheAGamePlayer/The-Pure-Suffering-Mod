@@ -3,7 +3,8 @@ package dev.theagameplayer.puresuffering.command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 
 import dev.theagameplayer.puresuffering.spawner.InvasionSpawner;
-import dev.theagameplayer.puresuffering.util.TimeUtil;
+import dev.theagameplayer.puresuffering.util.ServerInvasionUtil;
+import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.Style;
@@ -16,11 +17,13 @@ public final class ClearInvasionsCommand {
 				.requires(player -> {
 					return player.hasPermission(2);
 				}).then(Commands.literal("current").executes(ctx -> {
-					if (TimeUtil.isServerDay(ctx.getSource().getServer().overworld())) {
+					if (ServerTimeUtil.isServerDay(ctx.getSource().getServer().overworld())) {
 						InvasionSpawner.getDayInvasions().clear();
+						ServerInvasionUtil.getLightInvasions().clear();
 						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
-					} else if (TimeUtil.isServerNight(ctx.getSource().getServer().overworld())) {
+					} else if (ServerTimeUtil.isServerNight(ctx.getSource().getServer().overworld())) {
 						InvasionSpawner.getNightInvasions().clear();
+						ServerInvasionUtil.getLightInvasions().clear();
 						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					} else {
 						ctx.getSource().sendFailure(new TranslationTextComponent("commands.puresuffering.clear.failure").withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)));
@@ -28,15 +31,22 @@ public final class ClearInvasionsCommand {
 					return 0;
 				})).then(Commands.literal("day").executes(ctx -> {
 					InvasionSpawner.getDayInvasions().clear();
+					if (ServerTimeUtil.isServerDay(ctx.getSource().getServer().overworld())) {
+						ServerInvasionUtil.getLightInvasions().clear();
+					}
 					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					return 0;
 				})).then(Commands.literal("night").executes(ctx -> {
 					InvasionSpawner.getNightInvasions().clear();
+					if (ServerTimeUtil.isServerNight(ctx.getSource().getServer().overworld())) {
+						ServerInvasionUtil.getLightInvasions().clear();
+					}
 					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					return 0;
 				})).then(Commands.literal("all").executes(ctx -> {
 					InvasionSpawner.getDayInvasions().clear();
 					InvasionSpawner.getNightInvasions().clear();
+					ServerInvasionUtil.getLightInvasions().clear();
 					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					return 0;
 				})).then(Commands.literal("queued").then(Commands.literal("day").executes(ctx -> {

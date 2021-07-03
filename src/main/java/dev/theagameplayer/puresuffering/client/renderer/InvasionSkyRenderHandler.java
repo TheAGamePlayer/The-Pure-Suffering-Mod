@@ -1,14 +1,13 @@
 package dev.theagameplayer.puresuffering.client.renderer;
 
 import java.util.ArrayList;
-import com.google.common.collect.ImmutableList;
+
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import dev.theagameplayer.puresuffering.invasion.Invasion;
-import dev.theagameplayer.puresuffering.spawner.InvasionSpawner;
-import dev.theagameplayer.puresuffering.util.TimeUtil;
+import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
+import dev.theagameplayer.puresuffering.util.ClientTimeUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.FogRenderer;
@@ -28,11 +27,11 @@ import net.minecraftforge.client.ISkyRenderHandler;
 public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 	private static final ResourceLocation DEFAULT_SUN = new ResourceLocation("textures/environment/sun.png");
 	private static final ResourceLocation DEFAULT_MOON = new ResourceLocation("textures/environment/moon_phases.png");
-	private static final ArrayList<Invasion> INVASION_LIST = new ArrayList<>(); //All Invasions
-	private static final ArrayList<Invasion> SUN_LIST = new ArrayList<>(); //Invasions that change the sun
-	private static final ArrayList<Invasion> MOON_LIST = new ArrayList<>(); //Invasions that change the moon
-	private static final ArrayList<Invasion> WEATHER_VISIBILITY_LIST = new ArrayList<>(); //Invasions that are visible in weather
-	private static final ArrayList<Invasion> SKY_COLOR_LIST = new ArrayList<>(); //Invasions that change the sky color
+	private static final ArrayList<InvasionSkyRenderer> RENDERER_LIST = new ArrayList<>(); //All Invasions
+	private static final ArrayList<InvasionSkyRenderer> SUN_LIST = new ArrayList<>(); //Invasions that change the sun
+	private static final ArrayList<InvasionSkyRenderer> MOON_LIST = new ArrayList<>(); //Invasions that change the moon
+	private static final ArrayList<InvasionSkyRenderer> WEATHER_VISIBILITY_LIST = new ArrayList<>(); //Invasions that are visible in weather
+	private static final ArrayList<InvasionSkyRenderer> SKY_COLOR_LIST = new ArrayList<>(); //Invasions that change the sky color
 	private final ISkyRenderHandler skyRenderer;
 	
 	public InvasionSkyRenderHandler(ISkyRenderHandler skyRendererIn) {
@@ -41,34 +40,28 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 	
 	@Override
 	public void render(int ticksIn, float partialTicksIn, MatrixStack matrixStackIn, ClientWorld worldIn, Minecraft mcIn) {
-		INVASION_LIST.clear();
+		RENDERER_LIST.clear();
 		if (!worldIn.players().isEmpty()) {
-			if (TimeUtil.isClientDay() && !InvasionSpawner.getDayInvasions().isEmpty()) {
-				INVASION_LIST.addAll(ImmutableList.copyOf(InvasionSpawner.getDayInvasions().stream().filter(invasion -> { 
-					return invasion.getType().isEnvironmental();
-				}).iterator()));
-			} else if (TimeUtil.isClientNight() && !InvasionSpawner.getNightInvasions().isEmpty()) {
-				INVASION_LIST.addAll(ImmutableList.copyOf(InvasionSpawner.getNightInvasions().stream().filter(invasion -> { 
-					return invasion.getType().isEnvironmental();
-				}).iterator()));
+			if (ClientTimeUtil.isClientDay() && !ClientInvasionUtil.getDayRenderers().isEmpty()) {
+				RENDERER_LIST.addAll(ClientInvasionUtil.getDayRenderers());
+			} else if (ClientTimeUtil.isClientNight() && !ClientInvasionUtil.getNightRenderers().isEmpty()) {
+				RENDERER_LIST.addAll(ClientInvasionUtil.getNightRenderers());
 			}
 		}
-		if (!INVASION_LIST.isEmpty()) {
+		if (!RENDERER_LIST.isEmpty()) {
 			if (worldIn.effects().skyType() == FogType.NORMAL) {
 				SUN_LIST.clear();
 				MOON_LIST.clear();
 				WEATHER_VISIBILITY_LIST.clear();
-				for (Invasion invasion : INVASION_LIST) {
-					if (!invasion.getType().getSkyRenderer().isEmpty()) {
-						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getSunTexture() != null)
-							SUN_LIST.add(invasion);
-						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getMoonTexture() != null)
-							MOON_LIST.add(invasion);
-						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).isWeatherVisibilityChanged())
-							WEATHER_VISIBILITY_LIST.add(invasion);
-						if (invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).isSkyColorChanged())
-							SKY_COLOR_LIST.add(invasion);
-					}
+				for (InvasionSkyRenderer renderer : RENDERER_LIST) {
+					if (renderer.getSunTexture() != null)
+						SUN_LIST.add(renderer);
+					if (renderer.getMoonTexture() != null)
+						MOON_LIST.add(renderer);
+					if (renderer.getWeatherVisibility() != 0.0F)
+						WEATHER_VISIBILITY_LIST.add(renderer);
+					if (renderer.getRedOffset() != 0.0F || renderer.getGreenOffset() != 0.0F || renderer.getBlueOffset() != 0.0F)
+						SKY_COLOR_LIST.add(renderer);
 				}
 				this.renderInvasionSky(matrixStackIn, mcIn, worldIn, partialTicksIn);
 				return;
@@ -91,11 +84,10 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 		float f = (float)vector3d.x;
 		float f1 = (float)vector3d.y;
 		float f2 = (float)vector3d.z;
-		for (Invasion invasion : SKY_COLOR_LIST) {
-			InvasionSkyRenderer skyRenderer = invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1);
-			f += skyRenderer.getRedOffset() / SKY_COLOR_LIST.size();
-			f1 += skyRenderer.getGreenOffset() / SKY_COLOR_LIST.size();
-			f2 += skyRenderer.getBlueOffset() / SKY_COLOR_LIST.size();
+		for (InvasionSkyRenderer renderer : SKY_COLOR_LIST) {
+			f += renderer.getRedOffset() / SKY_COLOR_LIST.size();
+			f1 += renderer.getGreenOffset() / SKY_COLOR_LIST.size();
+			f2 += renderer.getBlueOffset() / SKY_COLOR_LIST.size();
 		}
 		FogRenderer.levelFogColor();
 		BufferBuilder bufferbuilder = Tessellator.getInstance().getBuilder();
@@ -125,7 +117,7 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 			float f6 = afloat[2];
 			Matrix4f matrix4f = matrixStackIn.last().pose();
 			bufferbuilder.begin(6, DefaultVertexFormats.POSITION_COLOR);
-			bufferbuilder.vertex(matrix4f, 0.0F, 100.0F, 0.0F).color(f4, f5, f6, afloat[3] / INVASION_LIST.size()).endVertex();
+			bufferbuilder.vertex(matrix4f, 0.0F, 100.0F, 0.0F).color(f4, f5, f6, afloat[3] / RENDERER_LIST.size()).endVertex();
 			for(int j = 0; j <= 16; ++j) {
 				float f7 = (float)j * ((float)Math.PI * 2F) / 16.0F;
 				float f8 = MathHelper.sin(f7);
@@ -142,8 +134,8 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 		matrixStackIn.pushPose();
 		float f11 = 1.0F - worldIn.getRainLevel(partialTicksIn);
 		float f12 = 0.0F;
-		for (Invasion invasion : WEATHER_VISIBILITY_LIST) {
-			f12 = invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getWeatherVisibilityIn() / WEATHER_VISIBILITY_LIST.size();
+		for (InvasionSkyRenderer renderer : WEATHER_VISIBILITY_LIST) {
+			f12 = renderer.getWeatherVisibility() / WEATHER_VISIBILITY_LIST.size();
 		}
 		RenderSystem.color4f(1.0F, 1.0F, 1.0F, f11 + MathHelper.clamp(f12, 0.0F, 1.0F));
 		matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
@@ -154,8 +146,8 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 			renderSun(mcIn, bufferbuilder, matrix4f1, f13, DEFAULT_SUN);
 		}
 		else {
-			for (Invasion invasion : SUN_LIST) {
-				renderSun(mcIn, bufferbuilder, matrix4f1, f13, invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getSunTexture());
+			for (InvasionSkyRenderer renderer : SUN_LIST) {
+				renderSun(mcIn, bufferbuilder, matrix4f1, f13, renderer.getSunTexture());
 			}
 		}
 		f13 = 20.0F;
@@ -163,14 +155,14 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 			renderMoon(mcIn, bufferbuilder, matrix4f1, worldIn, f13, DEFAULT_MOON);
 		}
 		else {
-			for (Invasion invasion : MOON_LIST) {
-				renderMoon(mcIn, bufferbuilder, matrix4f1, worldIn, f13, invasion.getType().getSkyRenderer().get(invasion.getSeverity() - 1).getMoonTexture());
+			for (InvasionSkyRenderer renderer : MOON_LIST) {
+				renderMoon(mcIn, bufferbuilder, matrix4f1, worldIn, f13, renderer.getMoonTexture());
 			}
 		}
 		RenderSystem.disableTexture();
 		float f10 = worldIn.getStarBrightness(partialTicksIn) * f11;
 		if (f10 > 0.0F) {
-			RenderSystem.color4f(f10, f10, f10, f10 / INVASION_LIST.size());
+			RenderSystem.color4f(f10, f10, f10, f10 / RENDERER_LIST.size());
 			mcIn.levelRenderer.starBuffer.bind();
 			mcIn.levelRenderer.skyFormat.setupBufferState(0L);
 			mcIn.levelRenderer.starBuffer.draw(matrixStackIn.last().pose(), 7);

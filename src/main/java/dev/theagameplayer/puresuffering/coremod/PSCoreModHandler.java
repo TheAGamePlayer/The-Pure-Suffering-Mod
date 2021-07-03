@@ -1,32 +1,17 @@
 package dev.theagameplayer.puresuffering.coremod;
 
-import java.util.ArrayList;
-
-import dev.theagameplayer.puresuffering.invasion.Invasion;
+import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
+import dev.theagameplayer.puresuffering.util.ServerInvasionUtil;
 import net.minecraft.world.World;
 
 public final class PSCoreModHandler {
-	public static final ArrayList<Invasion> LIGHT_INVASIONS = new ArrayList<>();
-	
-	public static float clientDayBrightness(float brightnessIn, World worldIn) {
-		if (worldIn.dimension() == World.OVERWORLD && !LIGHT_INVASIONS.isEmpty()) {
-			float brightness = 0.0F;
-			for (Invasion invasion : LIGHT_INVASIONS) {
-				brightness += invasion.getType().getBrightness() / LIGHT_INVASIONS.size();
-			}
-			return brightness;
-		}
-		return brightnessIn;
+	//CLIENT
+	public static float handleBrightness(float brightnessIn, World worldIn) {
+		return ClientInvasionUtil.handleBrightness(brightnessIn, worldIn);
 	}
 	
-	public static int serverDayBrightness(int lightLevelIn, World worldIn) {
-		if (worldIn.dimension() == World.OVERWORLD && !LIGHT_INVASIONS.isEmpty()) {
-			int lightLevel = 0;
-			for (Invasion invasion : LIGHT_INVASIONS) {
-				lightLevel += invasion.getType().getLightLevel() / LIGHT_INVASIONS.size();
-			}
-			return lightLevel;
-		}
-		return lightLevelIn;
+	//SERVER
+	public static int handleLightLevel(int lightLevelIn, World worldIn) {
+		return ServerInvasionUtil.handleLightLevel(lightLevelIn, worldIn);
 	}
 }

@@ -15,15 +15,20 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-public class PSConfig {
+public final class PSConfig {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final String CONFIG = PureSufferingMod.MODID + ".config.";
 	
 	public static final class CommonConfig {
 		public final ForgeConfigSpec.IntValue invasionMobCap;
-		public final ForgeConfigSpec.IntValue difficultyIncreaseDelay;
+		public final ForgeConfigSpec.IntValue naturalSpawnChance;
+		public final ForgeConfigSpec.BooleanValue autoAgro;
+		public final ForgeConfigSpec.IntValue dayDifficultyIncreaseDelay;
+		public final ForgeConfigSpec.IntValue nightDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue maxDayInvasions;
 		public final ForgeConfigSpec.IntValue maxNightInvasions;
+		public final ForgeConfigSpec.IntValue dayInvasionRarity;
+		public final ForgeConfigSpec.IntValue nightInvasionRarity;
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
 		public final ForgeConfigSpec.DoubleValue dayChanceMultiplier;
@@ -33,56 +38,91 @@ public class PSConfig {
 		
 		
 		CommonConfig(ForgeConfigSpec.Builder builderIn) {
-			builderIn.comment("Gameplay modifications").push("common");
+			builderIn.push("Gameplay Modifications");
+			
 			invasionMobCap = builderIn
 					.translation(CONFIG + "invasion_mob_cap")
-					.comment("The Max amount of mobs that can spawn from Invasions at once.")
 					.worldRestart()
+					.comment("The Max amount of mobs that can spawn from Invasions at once.", "NOTE: Reduce for increased performance!")
 					.defineInRange("invasionMobCap", 150, 0, Integer.MAX_VALUE);
-			difficultyIncreaseDelay = builderIn
-					.translation(CONFIG + "difficulty_increase_delay")
-					.comment("How many days should pass when the Invasion Difficulty increases.")
+			
+			naturalSpawnChance = builderIn
+					.translation(CONFIG + "natural_spawn_chance")
 					.worldRestart()
-					.defineInRange("difficultyIncreaseDelay", 100, 0, Integer.MAX_VALUE);
+					.comment("The Chance of a naturally spawning mob has of spawning during an Invasion.", "NOTE: May affect performance at higher numbers!")
+					.defineInRange("naturalSpawnChance", 1, 0, 100);
+			
+			autoAgro = builderIn
+					.translation(CONFIG + "auto_agro")
+					.worldRestart()
+					.comment("Should neutral invasion mobs agro the player when spawned.")
+					.define("autoAgro", true);
+			
+			dayDifficultyIncreaseDelay = builderIn
+					.translation(CONFIG + "day_difficulty_increase_delay")
+					.worldRestart()
+					.comment("How many days should pass when the Day Invasion Difficulty increases.")
+					.defineInRange("dayDifficultyIncreaseDelay", 125, 0, Integer.MAX_VALUE);
+			nightDifficultyIncreaseDelay = builderIn
+					.translation(CONFIG + "night_difficulty_increase_delay")
+					.worldRestart()
+					.comment("How many days should pass when the Night Invasion Difficulty increases.")
+					.defineInRange("nightDifficultyIncreaseDelay", 100, 0, Integer.MAX_VALUE);
+			
 			maxDayInvasions = builderIn
 					.translation(CONFIG + "max_day_invasions")
-					.comment("Max Day Invasions that can occur.")
 					.worldRestart()
-					.defineInRange("maxDayInvasions", 100, 0, Integer.MAX_VALUE);
+					.comment("Max Day Invasions that can occur.")
+					.defineInRange("maxDayInvasions", 75, 0, Integer.MAX_VALUE);
 			maxNightInvasions = builderIn
 					.translation(CONFIG + "max_night_invasions")
-					.comment("Max Night Invasions that can occur.")
 					.worldRestart()
+					.comment("Max Night Invasions that can occur.")
 					.defineInRange("maxNightInvasions", 100, 0, Integer.MAX_VALUE);
+			
+			dayInvasionRarity = builderIn
+					.translation(CONFIG + "day_invasion_rarity")
+					.worldRestart()
+					.comment("How often should Day Invasions occur.")
+					.defineInRange("dayInvasionRarity", 7, 1, 100);
+			nightInvasionRarity = builderIn
+					.translation(CONFIG + "night_invasion_rarity")
+					.worldRestart()
+					.comment("How often should Night Invasions occur.")
+					.defineInRange("nightInvasionRarity", 1, 1, 100);
+			
 			canDayInvasionsBeCanceled = builderIn
 					.translation(CONFIG + "can_day_invasions_be_canceled")
-					.comment("Can Day Invasions have a random chance to be canceled.")
 					.worldRestart()
+					.comment("Can Day Invasions have a random chance to be canceled.")
 					.define("canDayInvasionsBeCanceled", true);
 			canNightInvasionsBeCanceled = builderIn
 					.translation(CONFIG + "can_night_invasions_be_canceled")
-					.comment("Can Night Invasions have a random chance to be canceled.")
 					.worldRestart()
+					.comment("Can Night Invasions have a random chance to be canceled.")
 					.define("canNightInvasionsBeCanceled", true);
+			
 			dayChanceMultiplier = builderIn
 					.translation(CONFIG + "day_chance_multiplier")
-					.comment("Chance for Day Invasions to be canceled.", "NOTE: Difficulty Increase Delay is base value!")
 					.worldRestart()
+					.comment("Chance for Day Invasions to be canceled.", "NOTE: Multiplied by Day Difficulty Increase Delay.")
 					.defineInRange("dayChanceMultiplier", 1.0D, 0.0D, 10.0D);
 			nightChanceMultiplier = builderIn
 					.translation(CONFIG + "night_chance_multiplier")
-					.comment("Chance for Night Invasions to be canceled.", "NOTE: Difficulty Increase Delay is base value!")
 					.worldRestart()
+					.comment("Chance for Night Invasions to be canceled.", "NOTE: Multiplied by Night Difficulty Increase Delay.")
 					.defineInRange("nightChanceMultiplier", 1.0D, 0.0D, 10.0D);
+			
 			shouldMobsDieAtEndOfInvasions = builderIn
 					.translation(CONFIG + "should_mobs_die_at_end_of_invasions")
-					.comment("Should Invasion Mobs die when the Invasions are over.", "NOTE: Can be used to reduce server lag.")
 					.worldRestart()
+					.comment("Should Invasion Mobs die when the Invasions are over.", "NOTE: Can be used to reduce server lag.")
 					.define("shouldMobsDieAtEndOfInvasions", false);
+			
 			shouldMobsSpawnWithMaxRange = builderIn
 					.translation(CONFIG + "should_mobs_spawn_with_max_range")
-					.comment("Should Invasion Mobs spawn with max follow range.", "NOTE: Very Taxing on server performance!")
 					.worldRestart()
+					.comment("Should Invasion Mobs spawn with max follow range.", "NOTE: Very Taxing on server performance!")
 					.define("shouldMobsSpawnWithMaxRange", false);
 			builderIn.pop();
 		}

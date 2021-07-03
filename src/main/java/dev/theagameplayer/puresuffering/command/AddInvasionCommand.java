@@ -28,16 +28,14 @@ public final class AddInvasionCommand {
 		return new TranslationTextComponent("commands.puresuffering.invasion_type.invasionTypeNotFound", resourceLocation);
 	});
 	private static final SuggestionProvider<CommandSource> SUGGEST_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		Collection<InvasionType> collection = containsDayChangingInvasion(InvasionSpawner.getQueuedDayInvasions()) ? BaseEvents.getInvasionTypeManager().getNightInvasionTypes() : BaseEvents.getInvasionTypeManager().getDayInvasionTypes();
 		return ISuggestionProvider.suggestResource(collection.stream().filter(invasionType -> {
-			return containsDayChangingInvasion(InvasionSpawner.getQueuedDayInvasions()) ? !invasionType.isDayInvasion() && !invasionType.isOnlyDuringNight() : invasionType.isDayInvasion();
+			return !invasionType.isOnlyDuringNight();
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSource> SUGGEST_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		return ISuggestionProvider.suggestResource(collection.stream().filter(invasionType -> {
-			return !invasionType.isDayInvasion();
-		}).map(InvasionType::getId), suggestionsBuilder);
+		Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getNightInvasionTypes();
+		return ISuggestionProvider.suggestResource(collection.stream().map(InvasionType::getId), suggestionsBuilder);
 	};
 	
 	public static ArgumentBuilder<CommandSource, ?> register() {
