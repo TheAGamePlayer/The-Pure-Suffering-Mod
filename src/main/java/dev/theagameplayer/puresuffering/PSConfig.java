@@ -23,6 +23,7 @@ public final class PSConfig {
 		public final ForgeConfigSpec.IntValue invasionMobCap;
 		public final ForgeConfigSpec.IntValue naturalSpawnChance;
 		public final ForgeConfigSpec.BooleanValue autoAgro;
+		public final ForgeConfigSpec.BooleanValue explosionsDestroyBlocks;
 		public final ForgeConfigSpec.IntValue dayDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue nightDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue maxDayInvasions;
@@ -58,6 +59,12 @@ public final class PSConfig {
 					.comment("Should neutral invasion mobs agro the player when spawned.")
 					.define("autoAgro", true);
 			
+			explosionsDestroyBlocks = builderIn
+					.translation(CONFIG + "explosions_destroy_blocks")
+					.worldRestart()
+					.comment("Should explosions caused by invasion mobs break blocks.")
+					.define("explosionsDestroy", false);
+			
 			dayDifficultyIncreaseDelay = builderIn
 					.translation(CONFIG + "day_difficulty_increase_delay")
 					.worldRestart()
@@ -84,12 +91,12 @@ public final class PSConfig {
 					.translation(CONFIG + "day_invasion_rarity")
 					.worldRestart()
 					.comment("How often should Day Invasions occur.")
-					.defineInRange("dayInvasionRarity", 7, 1, 100);
+					.defineInRange("dayInvasionRarity", 21, 1, 100);
 			nightInvasionRarity = builderIn
 					.translation(CONFIG + "night_invasion_rarity")
 					.worldRestart()
 					.comment("How often should Night Invasions occur.")
-					.defineInRange("nightInvasionRarity", 1, 1, 100);
+					.defineInRange("nightInvasionRarity", 3, 1, 100);
 			
 			canDayInvasionsBeCanceled = builderIn
 					.translation(CONFIG + "can_day_invasions_be_canceled")

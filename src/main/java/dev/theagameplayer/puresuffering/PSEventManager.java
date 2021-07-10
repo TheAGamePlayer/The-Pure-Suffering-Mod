@@ -1,6 +1,7 @@
 package dev.theagameplayer.puresuffering;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +18,8 @@ import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
 import dev.theagameplayer.puresuffering.util.ClientTimeUtil;
 import dev.theagameplayer.puresuffering.util.ServerInvasionUtil;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
+import dev.theagameplayer.puresuffering.util.text.InvasionListTextComponent;
+import dev.theagameplayer.puresuffering.util.text.InvasionText;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.world.DimensionRenderInfo.FogType;
@@ -42,6 +45,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
@@ -74,6 +78,8 @@ public final class PSEventManager {
 		//Player
 		forgeBusIn.addListener(PlayerEvents::playerLoggedIn);
 		forgeBusIn.addListener(PlayerEvents::playerSleepInBed);
+		//World
+		forgeBusIn.addListener(WorldEvents::explosionDetonation);
 		//Server
 		forgeBusIn.addListener(ServerEvents::serverStarting);
 		forgeBusIn.addListener(ServerEvents::serverStarted);
@@ -221,19 +227,18 @@ public final class PSEventManager {
 									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
 									continue;
 								}
-								TranslationTextComponent component = new TranslationTextComponent("invasion.puresuffering.message2");
-								ArrayList<InvasionType> invasionList = new ArrayList<>();
+								HashMap<InvasionType, InvasionText> invasionMap = new HashMap<>();
 								for (Invasion invasion : InvasionSpawner.getDayInvasions()) {
-									if (!invasionList.contains(invasion.getType())) {
-										if (!invasionList.isEmpty())
-											component.append(", ");
-										invasionList.add(invasion.getType());
-										component.append(invasion.getType().getComponent());
+									if (!invasionMap.containsKey(invasion.getType())) {
+										invasionMap.put(invasion.getType(), new InvasionText(invasion.getSeverity()));
+									} else if (invasionMap.get(invasion.getType()).getSeverity() < invasion.getSeverity()) {
+										invasionMap.get(invasion.getType()).setSeverity(invasion.getSeverity());
 									}
+									invasionMap.get(invasion.getType()).incrementAmount();
 								};
 								player.sendMessage(new TranslationTextComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), player.getUUID());
-								player.sendMessage(component.withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)), player.getUUID());
-								invasionList.clear();
+								player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", invasionMap).withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)), player.getUUID());
+								invasionMap.clear();
 							}
 							for (Invasion invasion : InvasionSpawner.getDayInvasions()) {
 								if (invasion.getType().getLightLevel() != 0) {
@@ -258,19 +263,18 @@ public final class PSEventManager {
 									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
 									continue;
 								}
-								TranslationTextComponent component = new TranslationTextComponent("invasion.puresuffering.message2");
-								ArrayList<InvasionType> invasionList = new ArrayList<>();
+								HashMap<InvasionType, InvasionText> invasionMap = new HashMap<>();
 								for (Invasion invasion : InvasionSpawner.getNightInvasions()) {
-									if (!invasionList.contains(invasion.getType())) {
-										if (!invasionList.isEmpty())
-											component.append(", ");
-										invasionList.add(invasion.getType());
-										component.append(invasion.getType().getComponent());
+									if (!invasionMap.containsKey(invasion.getType())) {
+										invasionMap.put(invasion.getType(), new InvasionText(invasion.getSeverity()));
+									} else if (invasionMap.get(invasion.getType()).getSeverity() < invasion.getSeverity()) {
+										invasionMap.get(invasion.getType()).setSeverity(invasion.getSeverity());
 									}
+									invasionMap.get(invasion.getType()).incrementAmount();
 								};
 								player.sendMessage(new TranslationTextComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), player.getUUID());
-								player.sendMessage(component.withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)), player.getUUID());
-								invasionList.clear();
+								player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", invasionMap).withStyle(TextFormatting.DARK_RED), player.getUUID());
+								invasionMap.clear();
 							}
 							for (Invasion invasion : InvasionSpawner.getNightInvasions()) {
 								if (invasion.getType().getLightLevel() != 0) {
@@ -344,6 +348,16 @@ public final class PSEventManager {
 						eventIn.setResult(SleepResult.NOT_POSSIBLE_NOW);
 						return;
 					}
+				}
+			}
+		}
+	}
+	
+	public static final class WorldEvents {
+		public static void explosionDetonation(ExplosionEvent.Detonate eventIn) {
+			if (!PSConfig.COMMON.explosionsDestroyBlocks.get()) {
+				if (eventIn.getExplosion().getSourceMob().getPersistentData().contains("InvasionMob")) {
+					eventIn.getAffectedBlocks().clear();
 				}
 			}
 		}

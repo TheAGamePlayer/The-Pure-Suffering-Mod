@@ -9,7 +9,7 @@
       },
       {
         "EntityType": "minecraft:zombie_villager",
-        "Weight": 5,
+        "Weight": 2,
         "MinCount": 1,
         "MaxCount": 1
       }
@@ -23,7 +23,7 @@
       },
       {
         "EntityType": "minecraft:zombie_villager",
-        "Weight": 5,
+        "Weight": 3,
         "MinCount": 1,
         "MaxCount": 1
       }
@@ -37,7 +37,7 @@
       },
       {
         "EntityType": "minecraft:zombie_villager",
-        "Weight": 5,
+        "Weight": 3,
         "MinCount": 1,
         "MaxCount": 2
       }
@@ -51,7 +51,7 @@
       },
       {
         "EntityType": "minecraft:zombie_villager",
-        "Weight": 5,
+        "Weight": 4,
         "MinCount": 1,
         "MaxCount": 3
       }

@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -34,7 +33,7 @@ public final class InvasionType {
 	private final int lightLevel;
 	private final int tickDelay;
 	private final int rarity;
-	private final ITextComponent component;
+	private final TranslationTextComponent component;
 
 	public InvasionType(ResourceLocation idIn, Map<Integer, InvasionSkyRenderer> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean isRepeatingIn, boolean onlyDuringNightIn, int lightLevelIn, int tickDelayIn, int rarityIn) {
 		this.id = idIn;
@@ -102,7 +101,7 @@ public final class InvasionType {
 		return this.rarity;
 	}
 	
-	public ITextComponent getComponent() {
+	public TranslationTextComponent getComponent() {
 		return this.component;
 	}
 	

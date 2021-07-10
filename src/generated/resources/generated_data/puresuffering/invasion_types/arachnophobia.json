@@ -3,13 +3,21 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 20,
+        "Weight": 3,
         "MinCount": 1,
         "MaxCount": 2
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:spider",
+        "Weight": 3,
+        "MinCount": 1,
+        "MaxCount": 3
       },
       {
         "EntityType": "minecraft:cave_spider",
-        "Weight": 10,
+        "Weight": 1,
         "MinCount": 1,
         "MaxCount": 1
       }
@@ -17,13 +25,13 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 20,
-        "MinCount": 1,
-        "MaxCount": 3
+        "Weight": 3,
+        "MinCount": 2,
+        "MaxCount": 4
       },
       {
         "EntityType": "minecraft:cave_spider",
-        "Weight": 10,
+        "Weight": 1,
         "MinCount": 1,
         "MaxCount": 2
       }
@@ -31,13 +39,13 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 20,
+        "Weight": 3,
         "MinCount": 2,
-        "MaxCount": 4
+        "MaxCount": 5
       },
       {
         "EntityType": "minecraft:cave_spider",
-        "Weight": 10,
+        "Weight": 2,
         "MinCount": 1,
         "MaxCount": 3
       }
@@ -45,29 +53,15 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 20,
-        "MinCount": 2,
-        "MaxCount": 5
-      },
-      {
-        "EntityType": "minecraft:cave_spider",
-        "Weight": 10,
-        "MinCount": 2,
-        "MaxCount": 4
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:spider",
-        "Weight": 20,
+        "Weight": 3,
         "MinCount": 3,
         "MaxCount": 7
       },
       {
         "EntityType": "minecraft:cave_spider",
-        "Weight": 10,
+        "Weight": 2,
         "MinCount": 2,
-        "MaxCount": 5
+        "MaxCount": 4
       }
     ]
   ],

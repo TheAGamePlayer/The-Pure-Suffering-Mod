@@ -9,9 +9,9 @@
       },
       {
         "EntityType": "minecraft:husk",
-        "Weight": 10,
+        "Weight": 7,
         "MinCount": 1,
-        "MaxCount": 3
+        "MaxCount": 2
       },
       {
         "EntityType": "minecraft:skeleton",
@@ -21,9 +21,9 @@
       },
       {
         "EntityType": "minecraft:stray",
-        "Weight": 8,
+        "Weight": 5,
         "MinCount": 1,
-        "MaxCount": 2
+        "MaxCount": 1
       }
     ],
     [
@@ -31,11 +31,11 @@
         "EntityType": "minecraft:zombie",
         "Weight": 20,
         "MinCount": 2,
-        "MaxCount": 4
+        "MaxCount": 5
       },
       {
         "EntityType": "minecraft:husk",
-        "Weight": 10,
+        "Weight": 8,
         "MinCount": 1,
         "MaxCount": 3
       },
@@ -47,7 +47,7 @@
       },
       {
         "EntityType": "minecraft:stray",
-        "Weight": 8,
+        "Weight": 6,
         "MinCount": 1,
         "MaxCount": 2
       }
@@ -61,7 +61,7 @@
       },
       {
         "EntityType": "minecraft:husk",
-        "Weight": 10,
+        "Weight": 9,
         "MinCount": 2,
         "MaxCount": 4
       },
@@ -73,7 +73,7 @@
       },
       {
         "EntityType": "minecraft:stray",
-        "Weight": 8,
+        "Weight": 7,
         "MinCount": 1,
         "MaxCount": 3
       }
@@ -87,7 +87,7 @@
       },
       {
         "EntityType": "minecraft:husk",
-        "Weight": 10,
+        "Weight": 9,
         "MinCount": 2,
         "MaxCount": 5
       },
@@ -99,7 +99,7 @@
       },
       {
         "EntityType": "minecraft:stray",
-        "Weight": 8,
+        "Weight": 7,
         "MinCount": 2,
         "MaxCount": 4
       }
@@ -137,5 +137,5 @@
   "IsRepeatable": true,
   "OnlyDuringNight": false,
   "TickDelay": 6,
-  "Rarity": 0
+  "Rarity": 1
 }

@@ -3,7 +3,7 @@
     [
       {
         "EntityType": "minecraft:phantom",
-        "Weight": 20,
+        "Weight": 1,
         "MinCount": 1,
         "MaxCount": 1
       }
@@ -11,7 +11,7 @@
     [
       {
         "EntityType": "minecraft:phantom",
-        "Weight": 20,
+        "Weight": 1,
         "MinCount": 1,
         "MaxCount": 2
       }
@@ -19,7 +19,7 @@
     [
       {
         "EntityType": "minecraft:phantom",
-        "Weight": 20,
+        "Weight": 1,
         "MinCount": 1,
         "MaxCount": 3
       }
@@ -27,7 +27,7 @@
     [
       {
         "EntityType": "minecraft:phantom",
-        "Weight": 20,
+        "Weight": 1,
         "MinCount": 2,
         "MaxCount": 4
       }
@@ -35,7 +35,7 @@
     [
       {
         "EntityType": "minecraft:phantom",
-        "Weight": 20,
+        "Weight": 1,
         "MinCount": 2,
         "MaxCount": 5
       }

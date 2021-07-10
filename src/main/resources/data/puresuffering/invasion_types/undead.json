@@ -1,141 +1,141 @@
 {
-	"MobSpawnList": [
-		[
-			{
-				"EntityType": "minecraft:zombie",
-				"Weight": 20,
-				"MinCount": 1,
-				"MaxCount": 4
-			},
-			{
-				"EntityType": "minecraft:husk",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:skeleton",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:stray",
-				"Weight": 8,
-				"MinCount": 1,
-				"MaxCount": 2
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:zombie",
-				"Weight": 20,
-				"MinCount": 2,
-				"MaxCount": 4
-			},
-			{
-				"EntityType": "minecraft:husk",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:skeleton",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 4
-			},
-			{
-				"EntityType": "minecraft:stray",
-				"Weight": 8,
-				"MinCount": 1,
-				"MaxCount": 2
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:zombie",
-				"Weight": 20,
-				"MinCount": 2,
-				"MaxCount": 6
-			},
-			{
-				"EntityType": "minecraft:husk",
-				"Weight": 10,
-				"MinCount": 2,
-				"MaxCount": 4
-			},
-			{
-				"EntityType": "minecraft:skeleton",
-				"Weight": 15,
-				"MinCount": 2,
-				"MaxCount": 5
-			},
-			{
-				"EntityType": "minecraft:stray",
-				"Weight": 8,
-				"MinCount": 1,
-				"MaxCount": 3
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:zombie",
-				"Weight": 20,
-				"MinCount": 3,
-				"MaxCount": 8
-			},
-			{
-				"EntityType": "minecraft:husk",
-				"Weight": 10,
-				"MinCount": 2,
-				"MaxCount": 5
-			},
-			{
-				"EntityType": "minecraft:skeleton",
-				"Weight": 15,
-				"MinCount": 2,
-				"MaxCount": 6
-			},
-			{
-				"EntityType": "minecraft:stray",
-				"Weight": 8,
-				"MinCount": 2,
-				"MaxCount": 4
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:zombie",
-				"Weight": 20,
-				"MinCount": 4,
-				"MaxCount": 10
-			},
-			{
-				"EntityType": "minecraft:husk",
-				"Weight": 10,
-				"MinCount": 3,
-				"MaxCount": 7
-			},
-			{
-				"EntityType": "minecraft:skeleton",
-				"Weight": 15,
-				"MinCount": 3,
-				"MaxCount": 8
-			},
-			{
-				"EntityType": "minecraft:stray",
-				"Weight": 8,
-				"MinCount": 2,
-				"MaxCount": 6
-			}
-		]
-	],
-	"SkyRenderer": [],
-	"IsDayInvasion": false,
-	"ForceNoSleep": false,
-	"IsRepeatable": true,
-	"OnlyDuringNight": false,
-	"TickDelay": 6,
-	"Rarity": 0
+  "MobSpawnList": [
+    [
+      {
+        "EntityType": "minecraft:zombie",
+        "Weight": 20,
+        "MinCount": 1,
+        "MaxCount": 4
+      },
+      {
+        "EntityType": "minecraft:husk",
+        "Weight": 7,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:skeleton",
+        "Weight": 15,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:stray",
+        "Weight": 5,
+        "MinCount": 1,
+        "MaxCount": 1
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:zombie",
+        "Weight": 20,
+        "MinCount": 2,
+        "MaxCount": 5
+      },
+      {
+        "EntityType": "minecraft:husk",
+        "Weight": 8,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:skeleton",
+        "Weight": 15,
+        "MinCount": 1,
+        "MaxCount": 4
+      },
+      {
+        "EntityType": "minecraft:stray",
+        "Weight": 6,
+        "MinCount": 1,
+        "MaxCount": 2
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:zombie",
+        "Weight": 20,
+        "MinCount": 2,
+        "MaxCount": 6
+      },
+      {
+        "EntityType": "minecraft:husk",
+        "Weight": 9,
+        "MinCount": 2,
+        "MaxCount": 4
+      },
+      {
+        "EntityType": "minecraft:skeleton",
+        "Weight": 15,
+        "MinCount": 2,
+        "MaxCount": 5
+      },
+      {
+        "EntityType": "minecraft:stray",
+        "Weight": 7,
+        "MinCount": 1,
+        "MaxCount": 3
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:zombie",
+        "Weight": 20,
+        "MinCount": 3,
+        "MaxCount": 8
+      },
+      {
+        "EntityType": "minecraft:husk",
+        "Weight": 9,
+        "MinCount": 2,
+        "MaxCount": 5
+      },
+      {
+        "EntityType": "minecraft:skeleton",
+        "Weight": 15,
+        "MinCount": 2,
+        "MaxCount": 6
+      },
+      {
+        "EntityType": "minecraft:stray",
+        "Weight": 7,
+        "MinCount": 2,
+        "MaxCount": 4
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:zombie",
+        "Weight": 20,
+        "MinCount": 4,
+        "MaxCount": 10
+      },
+      {
+        "EntityType": "minecraft:husk",
+        "Weight": 10,
+        "MinCount": 3,
+        "MaxCount": 7
+      },
+      {
+        "EntityType": "minecraft:skeleton",
+        "Weight": 15,
+        "MinCount": 3,
+        "MaxCount": 8
+      },
+      {
+        "EntityType": "minecraft:stray",
+        "Weight": 8,
+        "MinCount": 2,
+        "MaxCount": 6
+      }
+    ]
+  ],
+  "SkyRenderer": [],
+  "IsDayInvasion": false,
+  "ForceNoSleep": false,
+  "IsRepeatable": true,
+  "OnlyDuringNight": false,
+  "TickDelay": 6,
+  "Rarity": 1
 }

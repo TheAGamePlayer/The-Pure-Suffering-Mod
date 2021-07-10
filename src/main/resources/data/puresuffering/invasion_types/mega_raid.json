@@ -1,201 +1,189 @@
 {
-	"MobSpawnList": [
-		[
-			{
-				"EntityType": "minecraft:pillager",
-				"Weight": 20,
-				"MinCount": 1,
-				"MaxCount": 2
-			},
-			{
-				"EntityType": "minecraft:vindicator",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 1
-			},
-			{
-				"EntityType": "minecraft:evoker",
-				"Weight": 5,
-				"MinCount": 1,
-				"MaxCount": 1
-			},
-			{
-				"EntityType": "minecraft:vex",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 2
-			},
-			{
-				"EntityType": "minecraft:witch",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 1
-			},
-			{
-				"EntityType": "minecraft:ravager",
-				"Weight": 3,
-				"MinCount": 1,
-				"MaxCount": 1
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:pillager",
-				"Weight": 20,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:vindicator",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 1
-			},
-			{
-				"EntityType": "minecraft:evoker",
-				"Weight": 5,
-				"MinCount": 1,
-				"MaxCount": 1
-			},
-			{
-				"EntityType": "minecraft:vex",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:witch",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 2
-			},
-			{
-				"EntityType": "minecraft:ravager",
-				"Weight": 3,
-				"MinCount": 1,
-				"MaxCount": 1
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:pillager",
-				"Weight": 20,
-				"MinCount": 2,
-				"MaxCount": 4
-			},
-			{
-				"EntityType": "minecraft:vindicator",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 2
-			},
-			{
-				"EntityType": "minecraft:evoker",
-				"Weight": 5,
-				"MinCount": 1,
-				"MaxCount": 1
-			},
-			{
-				"EntityType": "minecraft:vex",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 5
-			},
-			{
-				"EntityType": "minecraft:witch",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:ravager",
-				"Weight": 3,
-				"MinCount": 1,
-				"MaxCount": 1
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:pillager",
-				"Weight": 20,
-				"MinCount": 3,
-				"MaxCount": 6
-			},
-			{
-				"EntityType": "minecraft:vindicator",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 3
-			},
-			{
-				"EntityType": "minecraft:evoker",
-				"Weight": 5,
-				"MinCount": 1,
-				"MaxCount": 2
-			},
-			{
-				"EntityType": "minecraft:vex",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 6
-			},
-			{
-				"EntityType": "minecraft:witch",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 4
-			},
-			{
-				"EntityType": "minecraft:ravager",
-				"Weight": 3,
-				"MinCount": 1,
-				"MaxCount": 2
-			}
-		],
-		[
-			{
-				"EntityType": "minecraft:pillager",
-				"Weight": 20,
-				"MinCount": 4,
-				"MaxCount": 8
-			},
-			{
-				"EntityType": "minecraft:vindicator",
-				"Weight": 10,
-				"MinCount": 2,
-				"MaxCount": 5
-			},
-			{
-				"EntityType": "minecraft:evoker",
-				"Weight": 5,
-				"MinCount": 1,
-				"MaxCount": 2
-			},
-			{
-				"EntityType": "minecraft:vex",
-				"Weight": 15,
-				"MinCount": 1,
-				"MaxCount": 8
-			},
-			{
-				"EntityType": "minecraft:witch",
-				"Weight": 10,
-				"MinCount": 1,
-				"MaxCount": 5
-			},
-			{
-				"EntityType": "minecraft:ravager",
-				"Weight": 3,
-				"MinCount": 1,
-				"MaxCount": 2
-			}
-		]
-	],
-	"SkyRenderer": [],
-	"IsDayInvasion": false,
-	"ForceNoSleep": false,
-	"IsRepeatable": true,
-	"OnlyDuringNight": false,
-	"TickDelay": 6,
-	"Rarity": 3
+  "MobSpawnList": [
+    [
+      {
+        "EntityType": "minecraft:pillager",
+        "Weight": 20,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:vindicator",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 1
+      },
+      {
+        "EntityType": "minecraft:evoker",
+        "Weight": 5,
+        "MinCount": 1,
+        "MaxCount": 1
+      },
+      {
+        "EntityType": "minecraft:witch",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 1
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:pillager",
+        "Weight": 20,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:vindicator",
+        "Weight": 11,
+        "MinCount": 1,
+        "MaxCount": 1
+      },
+      {
+        "EntityType": "minecraft:evoker",
+        "Weight": 5,
+        "MinCount": 1,
+        "MaxCount": 1
+      },
+      {
+        "EntityType": "minecraft:witch",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:ravager",
+        "Weight": 3,
+        "MinCount": 1,
+        "MaxCount": 1
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:pillager",
+        "Weight": 20,
+        "MinCount": 2,
+        "MaxCount": 4
+      },
+      {
+        "EntityType": "minecraft:vindicator",
+        "Weight": 12,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:evoker",
+        "Weight": 6,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:vex",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:witch",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:ravager",
+        "Weight": 3,
+        "MinCount": 1,
+        "MaxCount": 1
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:pillager",
+        "Weight": 20,
+        "MinCount": 3,
+        "MaxCount": 6
+      },
+      {
+        "EntityType": "minecraft:vindicator",
+        "Weight": 13,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:evoker",
+        "Weight": 6,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:vex",
+        "Weight": 12,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:witch",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 4
+      },
+      {
+        "EntityType": "minecraft:ravager",
+        "Weight": 4,
+        "MinCount": 1,
+        "MaxCount": 2
+      }
+    ],
+    [
+      {
+        "EntityType": "minecraft:pillager",
+        "Weight": 20,
+        "MinCount": 4,
+        "MaxCount": 8
+      },
+      {
+        "EntityType": "minecraft:vindicator",
+        "Weight": 15,
+        "MinCount": 2,
+        "MaxCount": 5
+      },
+      {
+        "EntityType": "minecraft:evoker",
+        "Weight": 7,
+        "MinCount": 1,
+        "MaxCount": 3
+      },
+      {
+        "EntityType": "minecraft:vex",
+        "Weight": 15,
+        "MinCount": 1,
+        "MaxCount": 5
+      },
+      {
+        "EntityType": "minecraft:witch",
+        "Weight": 10,
+        "MinCount": 1,
+        "MaxCount": 5
+      },
+      {
+        "EntityType": "minecraft:ravager",
+        "Weight": 5,
+        "MinCount": 1,
+        "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:illusioner",
+        "Weight": 1,
+        "MinCount": 1,
+        "MaxCount": 1
+      }
+    ]
+  ],
+  "SkyRenderer": [],
+  "IsDayInvasion": false,
+  "ForceNoSleep": false,
+  "IsRepeatable": true,
+  "OnlyDuringNight": false,
+  "TickDelay": 8,
+  "Rarity": 3
 }
