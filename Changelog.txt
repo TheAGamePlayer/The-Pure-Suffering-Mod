@@ -4,5 +4,6 @@ Version 0.1.2A:
 - Added text indicators to give info on invasions
 - Added query command
 - "[PureSuffering]" Now appears in front of command text
+
 Version 0.1.1A:
 - First Alpha Release
