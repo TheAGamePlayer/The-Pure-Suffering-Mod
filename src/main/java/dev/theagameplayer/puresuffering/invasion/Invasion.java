@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import dev.theagameplayer.puresuffering.PSConfig;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.util.InvasionList;
 import dev.theagameplayer.puresuffering.util.InvasionSpawnerEntity;
 import net.minecraft.entity.Entity;
@@ -62,7 +62,7 @@ public class Invasion {
 		INVASION_MOBS.removeIf(mobEntity -> {
 			return mobEntity == null || !mobEntity.isAlive();
 		});
-		if (INVASION_MOBS.size() <= PSConfig.COMMON.invasionMobCap.get()) {
+		if (INVASION_MOBS.size() <= PSConfigValues.common.invasionMobCap) {
 			if (this.spawnDelay < 0) {
 				this.delay(worldIn);
 			}
@@ -110,9 +110,9 @@ public class Invasion {
 							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
 								mobEntity.getPersistentData().putString("InvasionMob", this.invasionType.toString());
 								mobEntity.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
-								if (PSConfig.COMMON.autoAgro.get())
+								if (PSConfigValues.common.autoAgro && !PSConfigValues.common.autoAgroBlacklist.contains(mobEntity.getType().getRegistryName().toString()))
 									mobEntity.setTarget(worldIn.getNearestPlayer(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ(), Integer.MAX_VALUE, true));
-								if (PSConfig.COMMON.shouldMobsSpawnWithMaxRange.get())
+								if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
 									mobEntity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
 								INVASION_MOBS.add(mobEntity);
 							}

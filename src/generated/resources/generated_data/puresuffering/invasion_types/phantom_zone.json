@@ -28,7 +28,7 @@
       {
         "EntityType": "minecraft:phantom",
         "Weight": 1,
-        "MinCount": 2,
+        "MinCount": 1,
         "MaxCount": 4
       }
     ],

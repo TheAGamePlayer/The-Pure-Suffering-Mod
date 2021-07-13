@@ -3,7 +3,7 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 3,
+        "Weight": 8,
         "MinCount": 1,
         "MaxCount": 2
       }
@@ -11,7 +11,7 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 3,
+        "Weight": 8,
         "MinCount": 1,
         "MaxCount": 3
       },
@@ -25,7 +25,7 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 3,
+        "Weight": 8,
         "MinCount": 2,
         "MaxCount": 4
       },
@@ -39,7 +39,7 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 3,
+        "Weight": 8,
         "MinCount": 2,
         "MaxCount": 5
       },
@@ -53,7 +53,7 @@
     [
       {
         "EntityType": "minecraft:spider",
-        "Weight": 3,
+        "Weight": 8,
         "MinCount": 3,
         "MaxCount": 7
       },

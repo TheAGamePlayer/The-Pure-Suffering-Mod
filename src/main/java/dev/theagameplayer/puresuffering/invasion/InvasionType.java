@@ -16,6 +16,7 @@ import com.google.gson.JsonObject;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
@@ -214,14 +215,14 @@ public final class InvasionType {
 			JsonObject jsonObject = new JsonObject();
 			if (this.mobSpawnList != null) {
 				JsonArray jsonArray = new JsonArray();
-				for (List<Spawners> spawnerList : this.mobSpawnList.values()) {
+				for (List<Spawners> spawnInfoList : this.mobSpawnList.values()) {
 					JsonArray jsonArray1 = new JsonArray();
-					for (Spawners spawners : spawnerList) {
+					for (Spawners spawnInfo : spawnInfoList) {
 						JsonObject jsonObject1 = new JsonObject();
-						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
-						jsonObject1.addProperty("Weight", spawners.weight);
-						jsonObject1.addProperty("MinCount", spawners.minCount);
-						jsonObject1.addProperty("MaxCount", spawners.maxCount);
+						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITIES.getKey(spawnInfo.type).toString());
+						jsonObject1.addProperty("Weight", spawnInfo.weight);
+						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
+						jsonObject1.addProperty("MaxCount", spawnInfo.maxCount);
 						jsonArray1.add(jsonObject1);
 					}
 					jsonArray.add(jsonArray1);
@@ -266,14 +267,18 @@ public final class InvasionType {
 				if (jsonElement.isJsonArray()) {
 					JsonArray jsonArray = jsonElement.getAsJsonArray();
 					for (int list = 0; list < jsonArray.size(); list++) {
-						ArrayList<Spawners> spawnList = new ArrayList<>();
+						ArrayList<Spawners> spawnInfoList = new ArrayList<>();
 						JsonElement jsonElement1 = jsonArray.get(list);
 						if (jsonElement1.isJsonArray()) {
 							JsonArray jsonArray1 = jsonElement1.getAsJsonArray();
 							for (JsonElement jsonElement2 : jsonArray1) {
 								if (jsonElement2.isJsonObject()) {
 									JsonObject jsonObject = jsonElement2.getAsJsonObject();
-									spawnList.add(new Spawners(ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString())), jsonObject.get("Weight").getAsInt(), jsonObject.get("MinCount").getAsInt(), jsonObject.get("MaxCount").getAsInt()));
+									EntityType<?> type = ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString()));
+									int weight = jsonObject.get("Weight").getAsInt();
+									int minCount = jsonObject.get("MinCount").getAsInt();
+									int maxCount = jsonObject.get("MaxCount").getAsInt();
+									spawnInfoList.add(new Spawners(type, weight, minCount, maxCount));
 								} else {
 									errored = true;
 									break;
@@ -283,7 +288,7 @@ public final class InvasionType {
 							errored = true;
 							break;
 						}
-						mobSpawnList.put(list, spawnList);
+						mobSpawnList.put(list, spawnInfoList);
 					}
 				} else {
 					errored = true;

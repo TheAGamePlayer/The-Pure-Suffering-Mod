@@ -1,3 +1,8 @@
+Version 0.1.3A:
+- More Rebalancing
+- Config Changes
+- Vexes no longer auto agro by default
+
 Version 0.1.2A:
 - Rebalanced Invasions to be less toxic
 - Invasion mobs no longer break blocks with explosions

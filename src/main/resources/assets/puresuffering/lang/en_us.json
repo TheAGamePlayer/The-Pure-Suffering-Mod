@@ -35,6 +35,7 @@
 	"puresuffering.config.invasion_mob_cap": "Invasion Mob Cap",
 	"puresuffering.config.natural_spawn_chance": "Natural Spawn Chance",
 	"puresuffering.config.auto_agro": "Auto Agro",
+	"puresuffering.config.auto_agro_blacklist": "Auto Agro Blacklist",
 	"puresuffering.config.explosions_destroy_blocks": "Explosions Destroy Blocks",
 	"puresuffering.config.day_difficulty_increase_delay": "Day Difficulty Increase Delay",
 	"puresuffering.config.night_difficulty_increase_delay": "Night Difficulty Increase Delay",

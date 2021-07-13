@@ -3,6 +3,7 @@ package dev.theagameplayer.puresuffering;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import dev.theagameplayer.puresuffering.config.PSConfig;
 import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import net.minecraft.data.DataGenerator;

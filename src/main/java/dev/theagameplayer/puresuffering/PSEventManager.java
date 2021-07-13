@@ -10,6 +10,7 @@ import dev.theagameplayer.puresuffering.client.renderer.InvasionFogRenderer;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.command.PSCommands;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.invasion.InvasionTypeManager;
@@ -60,6 +61,7 @@ public final class PSEventManager {
 
 	public static void attachClientEventListeners(IEventBus modBusIn, IEventBus forgeBusIn) {
 		//Client
+		forgeBusIn.addListener(ClientEvents::loggedIn);
 		forgeBusIn.addListener(ClientEvents::loggedOut);
 		forgeBusIn.addListener(ClientEvents::fogDensity);
 		forgeBusIn.addListener(ClientEvents::fogColors);
@@ -81,8 +83,8 @@ public final class PSEventManager {
 		//World
 		forgeBusIn.addListener(WorldEvents::explosionDetonation);
 		//Server
-		forgeBusIn.addListener(ServerEvents::serverStarting);
 		forgeBusIn.addListener(ServerEvents::serverStarted);
+		forgeBusIn.addListener(ServerEvents::serverStarting);
 		forgeBusIn.addListener(ServerEvents::serverStopping);
 	} 
 	
@@ -90,10 +92,15 @@ public final class PSEventManager {
 		public static int dayInvasionsCount;
 		public static int nightInvasionsCount;
 		
+		public static void loggedIn(ClientPlayerNetworkEvent.LoggedInEvent eventIn) {
+			PSConfigValues.resync(PSConfigValues.client);
+		}
+		
 		public static void loggedOut(ClientPlayerNetworkEvent.LoggedOutEvent eventIn) {
 			ClientInvasionUtil.getDayRenderers().clear();
 			ClientInvasionUtil.getNightRenderers().clear();
 			ClientInvasionUtil.getLightRenderers().clear();
+			PSConfigValues.resync(PSConfigValues.client);
 		}
 		
 		public static void fogDensity(EntityViewRenderEvent.FogDensity eventIn) {
@@ -180,7 +187,7 @@ public final class PSEventManager {
 		public static void renderWorldLast(RenderWorldLastEvent eventIn) {
 			Minecraft mc = Minecraft.getInstance();
 			ClientWorld clientWorld = mc.level;
-			if (clientWorld != null && clientWorld.effects().skyType() == FogType.NORMAL && clientWorld.dimension() == World.OVERWORLD && PSConfig.CLIENT.useSkyBoxRenderer.get()) {
+			if (clientWorld != null && clientWorld.effects().skyType() == FogType.NORMAL && clientWorld.dimension() == World.OVERWORLD && PSConfigValues.client.useSkyBoxRenderer) {
 				ISkyRenderHandler skyRenderHandler = clientWorld.effects().getSkyRenderHandler();
 				if (!(skyRenderHandler instanceof InvasionSkyRenderHandler)) {
 					clientWorld.effects().setSkyRenderHandler(new InvasionSkyRenderHandler(skyRenderHandler));
@@ -210,15 +217,15 @@ public final class PSEventManager {
 				if (world == world.getServer().overworld()) {
 					if (ServerTimeUtil.isServerDay(world) && !checkedNight) { //Sets events for night time
 						days = world.getDayTime() / 24000L;
-						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfig.COMMON.nightDifficultyIncreaseDelay.get())) + 1, 0, PSConfig.COMMON.maxNightInvasions.get());
+						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.nightDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxNightInvasions);
 						LOGGER.info("Day: " + days + ", Possible Invasions: " + interval);
 						ServerInvasionUtil.getLightInvasions().clear();
 						InvasionSpawner.setNightTimeEvents(world, interval);
 						checkedDay = false;
 						checkedNight = true;
 						if (!InvasionSpawner.getDayInvasions().isEmpty()) {
-							int chance = world.random.nextInt(world.random.nextInt((int)(PSConfig.COMMON.dayDifficultyIncreaseDelay.get() * PSConfig.COMMON.dayChanceMultiplier.get()) + 1) + 1);
-							boolean cancelFlag = chance == 0 && InvasionSpawner.getDayInvasions().size() > 1 && PSConfig.COMMON.canDayInvasionsBeCanceled.get();
+							int chance = world.random.nextInt(world.random.nextInt((int)(PSConfigValues.common.dayDifficultyIncreaseDelay * PSConfigValues.common.dayChanceMultiplier) + 1) + 1);
+							boolean cancelFlag = chance == 0 && InvasionSpawner.getDayInvasions().size() > 1 && PSConfigValues.common.canDayInvasionsBeCanceled;
 							if (cancelFlag) {
 								InvasionSpawner.getDayInvasions().clear();
 							}
@@ -247,14 +254,14 @@ public final class PSEventManager {
 							}
 						}
 					} else if (ServerTimeUtil.isServerNight(world) && !checkedDay) { //Sets events for day time
-						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfig.COMMON.dayDifficultyIncreaseDelay.get())) + 1, 0, PSConfig.COMMON.maxDayInvasions.get());
+						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
 						ServerInvasionUtil.getLightInvasions().clear();
 						InvasionSpawner.setDayTimeEvents(world, interval);
 						checkedDay = true;
 						checkedNight = false;
 						if (!InvasionSpawner.getNightInvasions().isEmpty()) {
-							int chance = world.random.nextInt(world.random.nextInt((int)(PSConfig.COMMON.nightDifficultyIncreaseDelay.get() * PSConfig.COMMON.nightChanceMultiplier.get()) + 1) + 1);
-							boolean cancelFlag = chance == 0 && InvasionSpawner.getNightInvasions().size() > 1 && PSConfig.COMMON.canNightInvasionsBeCanceled.get();
+							int chance = world.random.nextInt(world.random.nextInt((int)(PSConfigValues.common.nightDifficultyIncreaseDelay * PSConfigValues.common.nightChanceMultiplier) + 1) + 1);
+							boolean cancelFlag = chance == 0 && InvasionSpawner.getNightInvasions().size() > 1 && PSConfigValues.common.canNightInvasionsBeCanceled;
 							if (cancelFlag) {
 								InvasionSpawner.getNightInvasions().clear();
 							}
@@ -296,7 +303,7 @@ public final class PSEventManager {
 			if (eventIn.getWorld() instanceof ServerWorld) {
 				if (eventIn.getSpawnReason().equals(SpawnReason.NATURAL)) {
 					ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
-					if (serverWorld.random.nextInt(100) < PSConfig.COMMON.naturalSpawnChance.get()) {
+					if (serverWorld.random.nextInt(10000) < PSConfigValues.common.naturalSpawnChance) {
 						eventIn.setResult(Result.DEFAULT);
 					} else if (ServerTimeUtil.isServerDay(serverWorld) && !InvasionSpawner.getDayInvasions().isEmpty()) {
 						eventIn.setResult(Result.DENY);
@@ -314,7 +321,7 @@ public final class PSEventManager {
 				if (persistentData.contains("InvasionMob")) {
 					if (Invasion.INVASION_MOBS.contains(mobEntity)) {
 						eventIn.setResult(Result.DEFAULT);
-					} else if (PSConfig.COMMON.shouldMobsDieAtEndOfInvasions.get()) {
+					} else if (PSConfigValues.common.shouldMobsDieAtEndOfInvasions) {
 						eventIn.setResult(Result.ALLOW);
 					}
 				}
@@ -355,7 +362,7 @@ public final class PSEventManager {
 	
 	public static final class WorldEvents {
 		public static void explosionDetonation(ExplosionEvent.Detonate eventIn) {
-			if (!PSConfig.COMMON.explosionsDestroyBlocks.get()) {
+			if (!PSConfigValues.common.explosionsDestroyBlocks) {
 				if (eventIn.getExplosion().getSourceMob().getPersistentData().contains("InvasionMob")) {
 					eventIn.getAffectedBlocks().clear();
 				}
@@ -364,11 +371,6 @@ public final class PSEventManager {
 	}
 	
 	public static final class ServerEvents {
-		public static void serverStarting(FMLServerStartingEvent eventIn) {
-			checkedDay = ServerTimeUtil.isServerNight(eventIn.getServer().overworld());
-			checkedNight = ServerTimeUtil.isServerDay(eventIn.getServer().overworld());
-		}
-		
 		public static void serverStarted(FMLServerStartedEvent eventIn) {
 			InvasionSpawner.getDayInvasions().clear();
 			InvasionSpawner.getNightInvasions().clear();
@@ -380,12 +382,20 @@ public final class PSEventManager {
 			}, "Invasion Ticker"));
 		}
 		
+		public static void serverStarting(FMLServerStartingEvent eventIn) {
+			PSConfigValues.resync(PSConfigValues.common);
+			checkedDay = ServerTimeUtil.isServerNight(eventIn.getServer().overworld());
+			checkedNight = ServerTimeUtil.isServerDay(eventIn.getServer().overworld());
+		}
+		
+		
 		public static void serverStopping(FMLServerStoppingEvent eventIn) {
 			InvasionSpawner.getDayInvasions().clear();
 			InvasionSpawner.getNightInvasions().clear();
 			InvasionSpawner.getQueuedDayInvasions().clear();
 			InvasionSpawner.getQueuedNightInvasions().clear();
 			ServerInvasionUtil.getLightInvasions().clear();
+			PSConfigValues.resync(PSConfigValues.common);
 		}
 	}
 }

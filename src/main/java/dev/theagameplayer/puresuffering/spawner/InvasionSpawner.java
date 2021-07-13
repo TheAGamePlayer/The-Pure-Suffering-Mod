@@ -7,8 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
-import dev.theagameplayer.puresuffering.PSConfig;
 import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.network.InvasionListType;
@@ -30,7 +30,7 @@ public final class InvasionSpawner {
 		NIGHT_INVASIONS.clear();
 		Invasion.INVASION_MOBS.clear();
 		Random random = worldIn.random;
-		int events = random.nextInt(PSConfig.COMMON.nightInvasionRarity.get()) == 0 ? random.nextInt(eventsIn + 1) : 0;
+		int events = random.nextInt(PSConfigValues.common.nightInvasionRarity) == 0 ? random.nextInt(eventsIn + 1) : 0;
 		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());
 		LOGGER.info("Setting Night Invasions: [");
 		for (int event = 0; event < events; event++) {
@@ -62,7 +62,7 @@ public final class InvasionSpawner {
 		DAY_INVASIONS.clear();
 		Invasion.INVASION_MOBS.clear();
 		Random random = worldIn.random;
-		int events = random.nextInt(PSConfig.COMMON.dayInvasionRarity.get()) == 0 ? random.nextInt(eventsIn + 1) : 0;
+		int events = random.nextInt(PSConfigValues.common.dayInvasionRarity) == 0 ? random.nextInt(eventsIn + 1) : 0;
 		isDayChangedToNight = false;
 		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getDayInvasionTypes());
 		ArrayList<InvasionType> invasionList1 = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());

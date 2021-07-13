@@ -3,7 +3,7 @@
     [
       {
         "EntityType": "minecraft:pillager",
-        "Weight": 20,
+        "Weight": 15,
         "MinCount": 1,
         "MaxCount": 2
       },
@@ -29,7 +29,7 @@
     [
       {
         "EntityType": "minecraft:pillager",
-        "Weight": 20,
+        "Weight": 15,
         "MinCount": 1,
         "MaxCount": 3
       },
@@ -61,7 +61,7 @@
     [
       {
         "EntityType": "minecraft:pillager",
-        "Weight": 20,
+        "Weight": 15,
         "MinCount": 2,
         "MaxCount": 4
       },
@@ -79,9 +79,9 @@
       },
       {
         "EntityType": "minecraft:vex",
-        "Weight": 10,
+        "Weight": 1,
         "MinCount": 1,
-        "MaxCount": 2
+        "MaxCount": 1
       },
       {
         "EntityType": "minecraft:witch",
@@ -99,7 +99,7 @@
     [
       {
         "EntityType": "minecraft:pillager",
-        "Weight": 20,
+        "Weight": 15,
         "MinCount": 3,
         "MaxCount": 6
       },
@@ -117,9 +117,9 @@
       },
       {
         "EntityType": "minecraft:vex",
-        "Weight": 12,
+        "Weight": 2,
         "MinCount": 1,
-        "MaxCount": 3
+        "MaxCount": 2
       },
       {
         "EntityType": "minecraft:witch",
@@ -132,12 +132,18 @@
         "Weight": 4,
         "MinCount": 1,
         "MaxCount": 2
+      },
+      {
+        "EntityType": "minecraft:illusioner",
+        "Weight": 1,
+        "MinCount": 1,
+        "MaxCount": 1
       }
     ],
     [
       {
         "EntityType": "minecraft:pillager",
-        "Weight": 20,
+        "Weight": 15,
         "MinCount": 4,
         "MaxCount": 8
       },
@@ -155,9 +161,9 @@
       },
       {
         "EntityType": "minecraft:vex",
-        "Weight": 15,
+        "Weight": 3,
         "MinCount": 1,
-        "MaxCount": 5
+        "MaxCount": 4
       },
       {
         "EntityType": "minecraft:witch",
@@ -173,9 +179,9 @@
       },
       {
         "EntityType": "minecraft:illusioner",
-        "Weight": 1,
+        "Weight": 2,
         "MinCount": 1,
-        "MaxCount": 1
+        "MaxCount": 2
       }
     ]
   ],
@@ -184,6 +190,6 @@
   "ForceNoSleep": false,
   "IsRepeatable": true,
   "OnlyDuringNight": false,
-  "TickDelay": 8,
+  "TickDelay": 9,
   "Rarity": 3
 }

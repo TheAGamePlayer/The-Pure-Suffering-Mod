@@ -5,11 +5,11 @@
         "EntityType": "minecraft:silverfish",
         "Weight": 10,
         "MinCount": 1,
-        "MaxCount": 4
+        "MaxCount": 3
       },
       {
         "EntityType": "minecraft:endermite",
-        "Weight": 5,
+        "Weight": 10,
         "MinCount": 1,
         "MaxCount": 1
       }
@@ -23,7 +23,7 @@
       },
       {
         "EntityType": "minecraft:endermite",
-        "Weight": 6,
+        "Weight": 9,
         "MinCount": 1,
         "MaxCount": 2
       }
@@ -33,13 +33,13 @@
         "EntityType": "minecraft:silverfish",
         "Weight": 15,
         "MinCount": 2,
-        "MaxCount": 6
+        "MaxCount": 5
       },
       {
         "EntityType": "minecraft:endermite",
-        "Weight": 6,
+        "Weight": 9,
         "MinCount": 2,
-        "MaxCount": 5
+        "MaxCount": 4
       }
     ],
     [
@@ -47,27 +47,27 @@
         "EntityType": "minecraft:silverfish",
         "Weight": 18,
         "MinCount": 3,
-        "MaxCount": 8
+        "MaxCount": 6
       },
       {
         "EntityType": "minecraft:endermite",
-        "Weight": 7,
+        "Weight": 8,
         "MinCount": 2,
-        "MaxCount": 6
+        "MaxCount": 5
       }
     ],
     [
       {
         "EntityType": "minecraft:silverfish",
         "Weight": 20,
-        "MinCount": 4,
-        "MaxCount": 10
+        "MinCount": 3,
+        "MaxCount": 8
       },
       {
         "EntityType": "minecraft:endermite",
         "Weight": 8,
-        "MinCount": 3,
-        "MaxCount": 8
+        "MinCount": 2,
+        "MaxCount": 6
       }
     ]
   ],
