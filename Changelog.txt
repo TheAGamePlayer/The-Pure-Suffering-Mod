@@ -1,3 +1,8 @@
+Version 0.1.4A:
+- Fixed Anti-Griefing during Invasions
+- Fixed compatibility with Mutant Beasts Mod
+- Fixed Query Command for non-op players
+
 Version 0.1.3A:
 - More Rebalancing
 - Config Changes

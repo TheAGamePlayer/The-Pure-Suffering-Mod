@@ -20,7 +20,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 public final class QueryInvasionsCommand {
 	public static ArgumentBuilder<CommandSource, ?> register() {
 		return Commands.literal("query").requires(player -> {
-			return player.hasPermission(2);
+			return player.hasPermission(0);
 		}).executes(ctx -> {
 			HashMap<InvasionType, InvasionText> map = new HashMap<>();
 			if (ServerTimeUtil.isServerDay(ctx.getSource().getServer().overworld()) && !InvasionSpawner.getDayInvasions().isEmpty()) {

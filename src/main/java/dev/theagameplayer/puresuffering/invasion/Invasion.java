@@ -7,6 +7,7 @@ import java.util.Optional;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.util.InvasionList;
 import dev.theagameplayer.puresuffering.util.InvasionSpawnerEntity;
+import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -109,6 +110,7 @@ public class Invasion {
 						if (this.nextSpawnData.getTag().size() == 1 && this.nextSpawnData.getTag().contains("id", 8)) {
 							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
 								mobEntity.getPersistentData().putString("InvasionMob", this.invasionType.toString());
+								mobEntity.getPersistentData().putBoolean("AntiGrief", ServerTimeUtil.isServerDay(worldIn));
 								mobEntity.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
 								if (PSConfigValues.common.autoAgro && !PSConfigValues.common.autoAgroBlacklist.contains(mobEntity.getType().getRegistryName().toString()))
 									mobEntity.setTarget(worldIn.getNearestPlayer(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ(), Integer.MAX_VALUE, true));

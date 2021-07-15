@@ -24,8 +24,10 @@ import dev.theagameplayer.puresuffering.util.text.InvasionText;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.client.world.DimensionRenderInfo.FogType;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity.SleepResult;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -43,10 +45,11 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
-import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
@@ -74,14 +77,16 @@ public final class PSEventManager {
 		forgeBusIn.addListener(BaseEvents::addReloadListeners);
 		forgeBusIn.addListener(BaseEvents::registerCommands);
 		forgeBusIn.addListener(BaseEvents::worldTick);
+		//Entity
+		forgeBusIn.addListener(EntityEvents::joinWorld);
+		forgeBusIn.addListener(EntityEvents::mobGriefing);
 		//Living
 		forgeBusIn.addListener(LivingEvents::checkSpawn);
+		forgeBusIn.addListener(LivingEvents::specialSpawn);
 		forgeBusIn.addListener(LivingEvents::allowDespawn);
 		//Player
 		forgeBusIn.addListener(PlayerEvents::playerLoggedIn);
 		forgeBusIn.addListener(PlayerEvents::playerSleepInBed);
-		//World
-		forgeBusIn.addListener(WorldEvents::explosionDetonation);
 		//Server
 		forgeBusIn.addListener(ServerEvents::serverStarted);
 		forgeBusIn.addListener(ServerEvents::serverStarting);
@@ -298,6 +303,29 @@ public final class PSEventManager {
 		}
 	}
 	
+	public static final class EntityEvents {
+		public static void joinWorld(EntityJoinWorldEvent eventIn) {
+			if (eventIn.getWorld() instanceof ServerWorld && eventIn.getEntity() instanceof TameableEntity) {
+				TameableEntity tameableEntity = (TameableEntity)eventIn.getEntity();
+				if (tameableEntity.getOwner() != null && tameableEntity.getOwner().getClassification(false) == EntityClassification.MONSTER) {
+					ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
+					CompoundNBT persistentData = eventIn.getEntity().getPersistentData();
+					if (!InvasionSpawner.getNightInvasions().isEmpty() && ServerTimeUtil.isServerNight(serverWorld)) {
+						persistentData.putBoolean("AntiGrief", false);
+					} else if (!InvasionSpawner.getDayInvasions().isEmpty() && ServerTimeUtil.isServerDay(serverWorld)) {
+						persistentData.putBoolean("AntiGrief", true);
+					}
+				}
+			}
+		}
+		
+		public static void mobGriefing(EntityMobGriefingEvent eventIn) {
+			if (!PSConfigValues.common.explosionsDestroyBlocks && eventIn.getEntity().getPersistentData().contains("AntiGrief")) {
+				eventIn.setResult(Result.DENY);
+			}
+		}
+	}
+	
 	public static final class LivingEvents {
 		public static void checkSpawn(LivingSpawnEvent.CheckSpawn eventIn) {
 			if (eventIn.getWorld() instanceof ServerWorld) {
@@ -309,6 +337,20 @@ public final class PSEventManager {
 						eventIn.setResult(Result.DENY);
 					} else if (ServerTimeUtil.isServerNight(serverWorld) && !InvasionSpawner.getNightInvasions().isEmpty()) {
 						eventIn.setResult(Result.DENY);
+					}
+				}
+			}
+		}
+		
+		public static void specialSpawn(LivingSpawnEvent.SpecialSpawn eventIn) {
+			if (eventIn.getWorld() instanceof ServerWorld && eventIn.getEntityLiving().getClassification(false) == EntityClassification.MONSTER) {
+				if (eventIn.getSpawnReason() == SpawnReason.NATURAL) {
+					ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
+					CompoundNBT persistentData = eventIn.getEntityLiving().getPersistentData();
+					if (!InvasionSpawner.getNightInvasions().isEmpty() && ServerTimeUtil.isServerNight(serverWorld)) {
+						persistentData.putBoolean("AntiGrief", false);
+					} else if (!InvasionSpawner.getDayInvasions().isEmpty() && ServerTimeUtil.isServerDay(serverWorld)) {
+						persistentData.putBoolean("AntiGrief", true);
 					}
 				}
 			}
@@ -355,16 +397,6 @@ public final class PSEventManager {
 						eventIn.setResult(SleepResult.NOT_POSSIBLE_NOW);
 						return;
 					}
-				}
-			}
-		}
-	}
-	
-	public static final class WorldEvents {
-		public static void explosionDetonation(ExplosionEvent.Detonate eventIn) {
-			if (!PSConfigValues.common.explosionsDestroyBlocks) {
-				if (eventIn.getExplosion().getSourceMob().getPersistentData().contains("InvasionMob")) {
-					eventIn.getAffectedBlocks().clear();
 				}
 			}
 		}
