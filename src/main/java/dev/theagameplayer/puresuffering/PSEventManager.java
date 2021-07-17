@@ -305,16 +305,10 @@ public final class PSEventManager {
 	
 	public static final class EntityEvents {
 		public static void joinWorld(EntityJoinWorldEvent eventIn) {
-			if (eventIn.getWorld() instanceof ServerWorld && eventIn.getEntity() instanceof TameableEntity) {
+			if (eventIn.getEntity() instanceof TameableEntity) {
 				TameableEntity tameableEntity = (TameableEntity)eventIn.getEntity();
-				if (tameableEntity.getOwner() != null && tameableEntity.getOwner().getClassification(false) == EntityClassification.MONSTER) {
-					ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
-					CompoundNBT persistentData = eventIn.getEntity().getPersistentData();
-					if (!InvasionSpawner.getNightInvasions().isEmpty() && ServerTimeUtil.isServerNight(serverWorld)) {
-						persistentData.putBoolean("AntiGrief", false);
-					} else if (!InvasionSpawner.getDayInvasions().isEmpty() && ServerTimeUtil.isServerDay(serverWorld)) {
-						persistentData.putBoolean("AntiGrief", true);
-					}
+				if (tameableEntity.getOwner() != null && tameableEntity.getOwner().getPersistentData().contains("AntiGrief")) {
+					eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", tameableEntity.getOwner().getPersistentData().getBoolean("AntiGrief"));
 				}
 			}
 		}
