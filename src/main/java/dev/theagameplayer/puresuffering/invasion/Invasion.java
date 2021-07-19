@@ -33,37 +33,38 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class Invasion {
 	public static final ArrayList<MobEntity> INVASION_MOBS = new ArrayList<>();
+	public static final ArrayList<MobEntity> QUEUED_MOBS = new ArrayList<>();
 	private final InvasionType invasionType;
 	private final int severity;
 	private final boolean shouldTick;
 	private final ArrayList<InvasionSpawnerEntity> spawnPotentials = new ArrayList<>();
 	private InvasionSpawnerEntity nextSpawnData = new InvasionSpawnerEntity();
 	private int spawnDelay;
-	
+
 	public Invasion(final InvasionType invasionTypeIn, final int severityIn) {
 		this.invasionType = invasionTypeIn;
 		this.severity = severityIn;
 		this.shouldTick = invasionTypeIn.getTickDelay() > -1 && invasionTypeIn.getMobSpawnList() != null;
 	}
-	
+
 	public InvasionType getType() {
 		return this.invasionType;
 	}
-	
+
 	public int getSeverity() {
 		return this.severity;
 	}
-	
+
 	public void tick(final ServerWorld worldIn, final InvasionList invasionListIn) {
-		if (this.shouldTick)
-			this.tickEntitySpawn(worldIn);
-	}
-	
-	private final void tickEntitySpawn(ServerWorld worldIn) {
 		INVASION_MOBS.removeIf(mobEntity -> {
 			return mobEntity == null || !mobEntity.isAlive();
 		});
-		if (INVASION_MOBS.size() <= PSConfigValues.common.invasionMobCap) {
+		if (this.shouldTick)
+			this.tickEntitySpawn(worldIn);
+	}
+
+	public void tickEntitySpawn(ServerWorld worldIn) {
+		if (INVASION_MOBS.size() < PSConfigValues.common.invasionMobCap) {
 			if (this.spawnDelay < 0) {
 				this.delay(worldIn);
 			}
@@ -109,24 +110,13 @@ public class Invasion {
 						MobEntity mobEntity = (MobEntity)entity;
 						if (this.nextSpawnData.getTag().size() == 1 && this.nextSpawnData.getTag().contains("id", 8)) {
 							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
-								mobEntity.getPersistentData().putString("InvasionMob", this.invasionType.toString());
-								mobEntity.getPersistentData().putBoolean("AntiGrief", ServerTimeUtil.isServerDay(worldIn));
-								mobEntity.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
-								if (PSConfigValues.common.autoAgro && !PSConfigValues.common.autoAgroBlacklist.contains(mobEntity.getType().getRegistryName().toString()))
-									mobEntity.setTarget(worldIn.getNearestPlayer(mobEntity.getX(), mobEntity.getY(), mobEntity.getZ(), Integer.MAX_VALUE, true));
-								if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
-									mobEntity.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
-								INVASION_MOBS.add(mobEntity);
+								QUEUED_MOBS.add(mobEntity);
 							}
 						}
 					}
 					if (!worldIn.tryAddFreshEntityWithPassengers(entity)) {
 						this.delay(worldIn);
 						return;
-					}
-					worldIn.levelEvent(Constants.WorldEvents.MOB_SPAWNER_PARTICLES, pos, 0);
-					if (entity instanceof MobEntity) {
-						((MobEntity)entity).spawnAnim();
 					}
 					flag1 = true;
 				}
@@ -135,6 +125,20 @@ public class Invasion {
 				this.delay(worldIn);
 			}
 		}
+	}
+
+	public void spawnInvasionMob(ServerWorld worldIn, MobEntity mobEntityIn) {
+		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.toString());
+		mobEntityIn.getPersistentData().putBoolean("AntiGrief", ServerTimeUtil.isServerDay(worldIn));
+		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
+		if (PSConfigValues.common.autoAgro && !PSConfigValues.common.autoAgroBlacklist.contains(mobEntityIn.getType().getRegistryName().toString()))
+			mobEntityIn.setTarget(worldIn.getNearestPlayer(mobEntityIn.getX(), mobEntityIn.getY(), mobEntityIn.getZ(), Integer.MAX_VALUE, true));
+		if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
+			mobEntityIn.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
+		INVASION_MOBS.add(mobEntityIn);
+		QUEUED_MOBS.remove(mobEntityIn);
+		worldIn.levelEvent(Constants.WorldEvents.MOB_SPAWNER_PARTICLES, mobEntityIn.blockPosition(), 0);
+		mobEntityIn.spawnAnim();
 	}
 
 	private final void delay(ServerWorld worldIn) {

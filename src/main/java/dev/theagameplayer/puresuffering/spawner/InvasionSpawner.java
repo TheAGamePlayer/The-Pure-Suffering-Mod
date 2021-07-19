@@ -29,6 +29,7 @@ public final class InvasionSpawner {
 	public static void setNightTimeEvents(ServerWorld worldIn, int eventsIn) {
 		NIGHT_INVASIONS.clear();
 		Invasion.INVASION_MOBS.clear();
+		Invasion.QUEUED_MOBS.clear();
 		Random random = worldIn.random;
 		int events = random.nextInt(PSConfigValues.common.nightInvasionRarity) == 0 ? random.nextInt(eventsIn + 1) : 0;
 		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());
@@ -61,6 +62,7 @@ public final class InvasionSpawner {
 	public static void setDayTimeEvents(ServerWorld worldIn, int eventsIn) {
 		DAY_INVASIONS.clear();
 		Invasion.INVASION_MOBS.clear();
+		Invasion.QUEUED_MOBS.clear();
 		Random random = worldIn.random;
 		int events = random.nextInt(PSConfigValues.common.dayInvasionRarity) == 0 ? random.nextInt(eventsIn + 1) : 0;
 		isDayChangedToNight = false;
@@ -109,12 +111,16 @@ public final class InvasionSpawner {
 	
 	public static void invasionTick(MinecraftServer serverIn) {
 		ServerWorld world = serverIn.overworld();
+		Invasion invasion = null;
 		if (!world.players().isEmpty() && !NIGHT_INVASIONS.isEmpty() && ServerTimeUtil.isServerNight(serverIn.overworld())) {
-			Invasion invasion = NIGHT_INVASIONS.get(serverIn.overworld().getRandom().nextInt(NIGHT_INVASIONS.size()));
+			invasion = NIGHT_INVASIONS.get(serverIn.overworld().getRandom().nextInt(NIGHT_INVASIONS.size()));
 			invasion.tick(world, NIGHT_INVASIONS);
 		} else if (!world.players().isEmpty() && !DAY_INVASIONS.isEmpty() && ServerTimeUtil.isServerDay(serverIn.overworld())) {
-			Invasion invasion = DAY_INVASIONS.get(serverIn.overworld().getRandom().nextInt(DAY_INVASIONS.size()));
+			invasion = DAY_INVASIONS.get(serverIn.overworld().getRandom().nextInt(DAY_INVASIONS.size()));
 			invasion.tick(world, DAY_INVASIONS);
+		}
+		if (invasion != null && !Invasion.QUEUED_MOBS.isEmpty()) {
+			invasion.spawnInvasionMob(world, Invasion.QUEUED_MOBS.get(0));
 		}
 	}
 	

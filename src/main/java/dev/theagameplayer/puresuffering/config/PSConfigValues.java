@@ -44,7 +44,7 @@ public abstract class PSConfigValues {
 		public final int naturalSpawnChance;
 		
 		private CommonValues() {
-			this.invasionMobCap = PSConfig.CommonConfig.COMMON.invasionMobCap.get();
+			this.invasionMobCap = PSConfig.CommonConfig.COMMON.invasionMobCap.get() + 1;
 			this.dayDifficultyIncreaseDelay = PSConfig.CommonConfig.COMMON.dayDifficultyIncreaseDelay.get();
 			this.nightDifficultyIncreaseDelay = PSConfig.CommonConfig.COMMON.nightDifficultyIncreaseDelay.get();
 			this.maxDayInvasions = PSConfig.CommonConfig.COMMON.maxDayInvasions.get();
