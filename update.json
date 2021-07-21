@@ -3,9 +3,5 @@
 	"promos": {
 		"1.16.5-latest": "1.1.0B",
 		"1.16.5-recommended": "1.1.0B",
-	},
-	"1.16.5": {
-		"1.1.0B": "new xp system",
-		"1.0.0B": "rebalance"
 	}
 }
