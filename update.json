@@ -5,7 +5,7 @@
 		"1.16.5-recommended": "1.1.0-beta",
 	},
 	"1.16.5": {
-		"1.1.0-beta": "new xp system"
+		"1.1.0-beta": "new xp system",
 		"1.0.0-beta": "rebalance"
 	}
 }
