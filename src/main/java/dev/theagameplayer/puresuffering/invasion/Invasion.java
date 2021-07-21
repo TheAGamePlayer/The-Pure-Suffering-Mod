@@ -128,7 +128,7 @@ public class Invasion {
 	}
 
 	public void spawnInvasionMob(ServerWorld worldIn, MobEntity mobEntityIn) {
-		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.toString());
+		mobEntityIn.getPersistentData().putBoolean("InvasionMob", ServerTimeUtil.isServerDay(worldIn));
 		mobEntityIn.getPersistentData().putBoolean("AntiGrief", ServerTimeUtil.isServerDay(worldIn));
 		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
 		if (PSConfigValues.common.autoAgro && !PSConfigValues.common.autoAgroBlacklist.contains(mobEntityIn.getType().getRegistryName().toString()))

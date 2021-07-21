@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -41,7 +42,8 @@ public final class PSConfig {
 		public final ForgeConfigSpec.DoubleValue nightChanceMultiplier;
 		
 		public final ForgeConfigSpec.BooleanValue autoAgro;
-		public final ForgeConfigSpec.ConfigValue<List<String>> autoAgroBlacklist;
+		public final ConfigValue<List<? extends String>> autoAgroBlacklist;
+		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
 		public final ForgeConfigSpec.BooleanValue explosionsDestroyBlocks;
 		public final ForgeConfigSpec.BooleanValue shouldMobsDieAtEndOfInvasions;
 		public final ForgeConfigSpec.BooleanValue shouldMobsSpawnWithMaxRange;
@@ -121,7 +123,15 @@ public final class PSConfig {
 					.translation(CONFIG + "auto_agro_blacklist")
 					.worldRestart()
 					.comment("List of Mobs that won't auto agro the player. (If setting is turned on)")
-					.define("autoAgroBlacklist", ImmutableList.of("minecraft:vex"));
+					.defineList("autoAgroBlacklist", ImmutableList.of("minecraft:vex"), string -> {
+						return string != "";
+					});
+			
+			useXPMultiplier = COMMON_BUILDER
+					.translation(CONFIG + "enforce_xp_multiplier")
+					.worldRestart()
+					.comment("This determines whether invasion mobs should have an xp boost per kill.")
+					.define("enforceXPMultiplier", true);
 			
 			explosionsDestroyBlocks = COMMON_BUILDER
 					.translation(CONFIG + "explosions_destroy_blocks")

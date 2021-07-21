@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.ImmutableList;
+
 import dev.theagameplayer.puresuffering.client.renderer.InvasionFogRenderer;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
@@ -47,6 +48,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -81,6 +83,7 @@ public final class PSEventManager {
 		forgeBusIn.addListener(EntityEvents::joinWorld);
 		forgeBusIn.addListener(EntityEvents::mobGriefing);
 		//Living
+		forgeBusIn.addListener(LivingEvents::experienceDrop);
 		forgeBusIn.addListener(LivingEvents::checkSpawn);
 		forgeBusIn.addListener(LivingEvents::specialSpawn);
 		forgeBusIn.addListener(LivingEvents::allowDespawn);
@@ -226,6 +229,7 @@ public final class PSEventManager {
 						LOGGER.info("Day: " + days + ", Possible Invasions: " + interval);
 						ServerInvasionUtil.getLightInvasions().clear();
 						InvasionSpawner.setNightTimeEvents(world, interval);
+						LivingEvents.dayXPMultiplier = 0.0D;
 						checkedDay = false;
 						checkedNight = true;
 						if (!InvasionSpawner.getDayInvasions().isEmpty()) {
@@ -262,6 +266,7 @@ public final class PSEventManager {
 						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
 						ServerInvasionUtil.getLightInvasions().clear();
 						InvasionSpawner.setDayTimeEvents(world, interval);
+						LivingEvents.nightXPMultiplier = 0.0D;
 						checkedDay = true;
 						checkedNight = false;
 						if (!InvasionSpawner.getNightInvasions().isEmpty()) {
@@ -321,6 +326,26 @@ public final class PSEventManager {
 	}
 	
 	public static final class LivingEvents {
+		public static double dayXPMultiplier = 0.0D;
+		public static double nightXPMultiplier = 0.0D;
+		
+		public static void experienceDrop(LivingExperienceDropEvent eventIn) {
+			CompoundNBT persistentData = eventIn.getEntityLiving().getPersistentData();
+			if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
+				if (persistentData.getBoolean("InvasionMob")) {
+					dayXPMultiplier++;
+					double log = Math.log1p(dayXPMultiplier) / Math.E;
+					eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
+					//LOGGER.info("Day XP: " + log);
+				} else {
+					nightXPMultiplier++;
+					double log = Math.log1p(nightXPMultiplier) / Math.E;
+					eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
+					//LOGGER.info("Night XP: " + log);
+				}
+			}
+		}
+		
 		public static void checkSpawn(LivingSpawnEvent.CheckSpawn eventIn) {
 			if (eventIn.getWorld() instanceof ServerWorld) {
 				if (eventIn.getSpawnReason().equals(SpawnReason.NATURAL)) {

@@ -37,7 +37,8 @@ public abstract class PSConfigValues {
 		public final double nightChanceMultiplier;
 		
 		public final boolean autoAgro;
-		public final List<String> autoAgroBlacklist;
+		public final List<? extends String> autoAgroBlacklist;
+		public final boolean useXPMultiplier;
 		public final boolean explosionsDestroyBlocks;
 		public final boolean shouldMobsDieAtEndOfInvasions;
 		public final boolean shouldMobsSpawnWithMaxRange;
@@ -59,6 +60,7 @@ public abstract class PSConfigValues {
 			
 			this.autoAgro = PSConfig.CommonConfig.COMMON.autoAgro.get();
 			this.autoAgroBlacklist = PSConfig.CommonConfig.COMMON.autoAgroBlacklist.get();
+			this.useXPMultiplier = PSConfig.CommonConfig.COMMON.useXPMultiplier.get();
 			this.explosionsDestroyBlocks = PSConfig.CommonConfig.COMMON.explosionsDestroyBlocks.get();
 			this.shouldMobsDieAtEndOfInvasions = PSConfig.CommonConfig.COMMON.shouldMobsDieAtEndOfInvasions.get();
 			this.shouldMobsSpawnWithMaxRange = PSConfig.CommonConfig.COMMON.shouldMobsSpawnWithMaxRange.get();
