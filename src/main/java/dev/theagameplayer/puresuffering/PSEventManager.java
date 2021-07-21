@@ -319,7 +319,7 @@ public final class PSEventManager {
 		}
 		
 		public static void mobGriefing(EntityMobGriefingEvent eventIn) {
-			if (!PSConfigValues.common.explosionsDestroyBlocks && eventIn.getEntity().getPersistentData().contains("AntiGrief")) {
+			if (!PSConfigValues.common.explosionsDestroyBlocks && eventIn.getEntity() != null && eventIn.getEntity().getPersistentData().contains("AntiGrief")) {
 				eventIn.setResult(Result.DENY);
 			}
 		}

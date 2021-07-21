@@ -1,3 +1,6 @@
+Version 1.1.1B:
+- Fixed exploding ghast balls caused by despawned ghasts crashing the world
+
 Version 1.1.0B:
 - Added new Invasion XP System
 - Fix Auto Agro Blacklist
