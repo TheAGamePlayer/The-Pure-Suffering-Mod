@@ -1,3 +1,8 @@
+Version 1.1.2B:
+- Fixed Invasions returning as null
+- Added config option to make the delay between Invasions consistent "consistentInvasions"
+- Updated Forge to 36.2.0
+
 Version 1.1.1B:
 - Fixed exploding ghast balls caused by despawned ghasts crashing the world
 

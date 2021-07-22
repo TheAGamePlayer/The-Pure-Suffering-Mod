@@ -31,6 +31,7 @@ public abstract class PSConfigValues {
 		
 		public final int dayInvasionRarity;
 		public final int nightInvasionRarity;
+		public final boolean consistentInvasions;
 		public final boolean canDayInvasionsBeCanceled;
 		public final boolean canNightInvasionsBeCanceled;
 		public final double dayChanceMultiplier;
@@ -53,6 +54,7 @@ public abstract class PSConfigValues {
 			
 			this.dayInvasionRarity = PSConfig.CommonConfig.COMMON.dayInvasionRarity.get();
 			this.nightInvasionRarity = PSConfig.CommonConfig.COMMON.nightInvasionRarity.get();
+			this.consistentInvasions = PSConfig.CommonConfig.COMMON.consistentInvasions.get();
 			this.canDayInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canDayInvasionsBeCanceled.get();
 			this.canNightInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canNightInvasionsBeCanceled.get();
 			this.dayChanceMultiplier = PSConfig.CommonConfig.COMMON.dayChanceMultiplier.get();

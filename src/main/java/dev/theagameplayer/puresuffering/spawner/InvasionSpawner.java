@@ -1,10 +1,13 @@
 package dev.theagameplayer.puresuffering.spawner;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.google.common.collect.ImmutableList;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
@@ -26,12 +29,12 @@ public final class InvasionSpawner {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static boolean isDayChangedToNight = false;
 	
-	public static void setNightTimeEvents(ServerWorld worldIn, int eventsIn) {
+	public static void setNightTimeEvents(ServerWorld worldIn, int eventsIn, long daysIn) {
 		NIGHT_INVASIONS.clear();
 		Invasion.INVASION_MOBS.clear();
 		Invasion.QUEUED_MOBS.clear();
 		Random random = worldIn.random;
-		int events = random.nextInt(PSConfigValues.common.nightInvasionRarity) == 0 ? random.nextInt(eventsIn + 1) : 0;
+		int events = calculateEvents(random, false, eventsIn, daysIn);
 		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());
 		LOGGER.info("Setting Night Invasions: [");
 		for (int event = 0; event < events; event++) {
@@ -41,8 +44,6 @@ public final class InvasionSpawner {
 				Invasion invasion = new Invasion(invasionType, severity);
 				NIGHT_INVASIONS.add(invasion);
 				LOGGER.info("Invasion " + (event + 1) + ": " + invasionType + " - " + severity);
-			} else {
-				LOGGER.info("Invasion " + (event + 1) + ": NULL");
 			}
 		}
 		if (!QUEUED_NIGHT_INVASIONS.isEmpty()) {
@@ -59,26 +60,26 @@ public final class InvasionSpawner {
 		LOGGER.info("]");
 	}
 	
-	public static void setDayTimeEvents(ServerWorld worldIn, int eventsIn) {
+	public static void setDayTimeEvents(ServerWorld worldIn, int eventsIn, long daysIn) {
 		DAY_INVASIONS.clear();
 		Invasion.INVASION_MOBS.clear();
 		Invasion.QUEUED_MOBS.clear();
 		Random random = worldIn.random;
-		int events = random.nextInt(PSConfigValues.common.dayInvasionRarity) == 0 ? random.nextInt(eventsIn + 1) : 0;
+		int events = calculateEvents(random, true, eventsIn, daysIn);
 		isDayChangedToNight = false;
 		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getDayInvasionTypes());
 		ArrayList<InvasionType> invasionList1 = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());
 		LOGGER.info("Setting Day Invasions: [");
+		int acceptedEvents = 0;
 		for (int event = 0; event < events; event++) {
 			InvasionType invasionType = getInvasionType(isDayChangedToNight ? invasionList1 : invasionList, random, event, true);
 			if (invasionType != null) {
 				int severity = random.nextInt(random.nextInt(MathHelper.clamp(events, 1, invasionType.getMaxSeverity())) + 1) + 1;
 				Invasion invasion = new Invasion(invasionType, severity);
 				DAY_INVASIONS.add(invasion);
-				LOGGER.info("Invasion " + (event + 1) + ": " + invasionType + " - " + severity);
+				acceptedEvents++;
+				LOGGER.info("Invasion " + (acceptedEvents + 1) + ": " + invasionType + " - " + severity);
 				isDayChangedToNight |= invasionType.setsEventsToNight();
-			} else {
-				LOGGER.info("Invasion " + (event + 1) + ": NULL");
 			}
 		};
 		if (!QUEUED_DAY_INVASIONS.isEmpty()) {
@@ -95,10 +96,19 @@ public final class InvasionSpawner {
 		LOGGER.info("]");
 	}
 	
+	private static int calculateEvents(Random randomIn, boolean isDayIn, int eventsIn, long daysIn) {
+		if (PSConfigValues.common.consistentInvasions) {
+			return (daysIn % (isDayIn ? PSConfigValues.common.dayInvasionRarity : PSConfigValues.common.nightInvasionRarity)) == 0 ? randomIn.nextInt(eventsIn) + 1 : 0;
+		} else {
+			return randomIn.nextInt(isDayIn ? PSConfigValues.common.dayInvasionRarity : PSConfigValues.common.nightInvasionRarity) == 0 ? randomIn.nextInt(eventsIn) + 1 : 0;
+		}
+	}
+	
 	private static InvasionType getInvasionType(ArrayList<InvasionType> invasionListIn, Random randomIn, int eventIn, boolean isDayIn) {
-		InvasionType invasionType = invasionListIn.get(randomIn.nextInt(invasionListIn.size()));
-		int chance = isDayIn ? randomIn.nextInt(invasionListIn.size()) : 0;
-		if (chance == 0 && !(eventIn == 0 && !invasionType.getSkyRenderer().isEmpty())) {
+		List<InvasionType> invasionList = eventIn == 0 ? ImmutableList.copyOf(invasionListIn.stream().filter(it -> it.getSkyRenderer().isEmpty()).iterator()) : invasionListIn;
+		InvasionType invasionType = invasionList.size() > 0 ? invasionList.get(randomIn.nextInt(invasionList.size())) : null;
+		int chance = isDayIn && !PSConfigValues.common.consistentInvasions ? randomIn.nextInt(invasionListIn.size()) : 0;
+		if (chance == 0 && invasionType != null) {
 			if (randomIn.nextInt(invasionType.getRarity() + 1) != 0 || (invasionType.isOnlyDuringNight() && isDayIn))
 				return getInvasionType(invasionListIn, randomIn, eventIn, isDayIn);
 			if (!invasionType.isRepeatable() && invasionListIn.contains(invasionType))

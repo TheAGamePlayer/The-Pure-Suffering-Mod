@@ -36,6 +36,7 @@ public final class PSConfig {
 		
 		public final ForgeConfigSpec.IntValue dayInvasionRarity;
 		public final ForgeConfigSpec.IntValue nightInvasionRarity;
+		public final ForgeConfigSpec.BooleanValue consistentInvasions;
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
 		public final ForgeConfigSpec.DoubleValue dayChanceMultiplier;
@@ -91,6 +92,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("How often should Night Invasions occur.")
 					.defineInRange("nightInvasionRarity", 3, 1, 100);
+			consistentInvasions = COMMON_BUILDER
+					.translation(CONFIG + "consistent_invasions")
+					.worldRestart()
+					.comment("Should the rarity of Invasions act as a set delay between Invasions instead.")
+					.define("consistentInvasions", false);
 			canDayInvasionsBeCanceled = COMMON_BUILDER
 					.translation(CONFIG + "can_day_invasions_be_canceled")
 					.worldRestart()
@@ -128,10 +134,10 @@ public final class PSConfig {
 					});
 			
 			useXPMultiplier = COMMON_BUILDER
-					.translation(CONFIG + "enforce_xp_multiplier")
+					.translation(CONFIG + "use_xp_multiplier")
 					.worldRestart()
 					.comment("This determines whether invasion mobs should have an xp boost per kill.")
-					.define("enforceXPMultiplier", true);
+					.define("useXPMultiplier", true);
 			
 			explosionsDestroyBlocks = COMMON_BUILDER
 					.translation(CONFIG + "explosions_destroy_blocks")

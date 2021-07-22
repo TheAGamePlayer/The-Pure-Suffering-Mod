@@ -15,6 +15,7 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.invasion.InvasionTypeManager;
+import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import dev.theagameplayer.puresuffering.spawner.InvasionSpawner;
 import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
 import dev.theagameplayer.puresuffering.util.ClientTimeUtil;
@@ -222,13 +223,13 @@ public final class PSEventManager {
 		public static void worldTick(TickEvent.WorldTickEvent eventIn) {
 			if (eventIn.side.isServer() && eventIn.phase == TickEvent.Phase.END) {
 				ServerWorld world = (ServerWorld)eventIn.world;
-				if (world == world.getServer().overworld()) {
+				if (world == world.getServer().overworld() && PSGameRulesRegistry.getEnableInvasions(world)) {
 					if (ServerTimeUtil.isServerDay(world) && !checkedNight) { //Sets events for night time
 						days = world.getDayTime() / 24000L;
 						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.nightDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxNightInvasions);
 						LOGGER.info("Day: " + days + ", Possible Invasions: " + interval);
 						ServerInvasionUtil.getLightInvasions().clear();
-						InvasionSpawner.setNightTimeEvents(world, interval);
+						InvasionSpawner.setNightTimeEvents(world, interval, days);
 						LivingEvents.dayXPMultiplier = 0.0D;
 						checkedDay = false;
 						checkedNight = true;
@@ -265,7 +266,7 @@ public final class PSEventManager {
 					} else if (ServerTimeUtil.isServerNight(world) && !checkedDay) { //Sets events for day time
 						int interval = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
 						ServerInvasionUtil.getLightInvasions().clear();
-						InvasionSpawner.setDayTimeEvents(world, interval);
+						InvasionSpawner.setDayTimeEvents(world, interval, days);
 						LivingEvents.nightXPMultiplier = 0.0D;
 						checkedDay = true;
 						checkedNight = false;

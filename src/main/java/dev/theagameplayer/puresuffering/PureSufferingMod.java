@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import dev.theagameplayer.puresuffering.config.PSConfig;
 import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
+import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -49,6 +50,7 @@ public final class PureSufferingMod {
 	
 	private void commonSetup(final FMLCommonSetupEvent eventIn) {
 		PSPacketHandler.registerPackets();
+		PSGameRulesRegistry.registerGameRules();
 		LOGGER.info("Finished common setup.");
 	}
 	
