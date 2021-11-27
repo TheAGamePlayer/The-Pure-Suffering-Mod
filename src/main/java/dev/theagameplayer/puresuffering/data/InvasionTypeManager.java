@@ -1,8 +1,10 @@
-package dev.theagameplayer.puresuffering.invasion;
+package dev.theagameplayer.puresuffering.data;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -16,6 +18,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
+import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
@@ -26,8 +30,6 @@ public final class InvasionTypeManager extends JsonReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).create();
 	private HashMap<ResourceLocation, InvasionType> allInvasionTypeMap = new HashMap<>();
-	private HashMap<ResourceLocation, InvasionType> dayInvasionTypeMap = new HashMap<>();
-	private HashMap<ResourceLocation, InvasionType> nightInvasionTypeMap = new HashMap<>();
 
 	public InvasionTypeManager() {
 		super(GSON, "invasion_types");
@@ -36,22 +38,19 @@ public final class InvasionTypeManager extends JsonReloadListener {
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
 		this.allInvasionTypeMap.clear();
-		this.dayInvasionTypeMap.clear();
-		this.nightInvasionTypeMap.clear();
 		objectIn.forEach((conditions, invasionType) -> {
 			try {
 				JsonObject jsonObject = JSONUtils.convertToJsonObject(invasionType, "invasion_type");
 				InvasionType invasionType1 = InvasionType.Builder.fromJson(jsonObject).build(conditions);
 				if (invasionType1 == null) {
-					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met", conditions);
+					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met.", conditions);
+					return;
+				}
+				if (PSConfigValues.common.invasionBlacklist.contains(conditions.toString())) {
+					LOGGER.debug("Skipping loading invasion type {} as it is blacklisted.", conditions);
 					return;
 				}
 				this.allInvasionTypeMap.put(conditions, invasionType1);
-				if (invasionType1.isDayInvasion()) {
-					this.dayInvasionTypeMap.put(conditions, invasionType1);
-				} else {
-					this.nightInvasionTypeMap.put(conditions, invasionType1);
-				}
 			} catch (IllegalArgumentException | JsonParseException jsonParseExceptionIn) {
 				LOGGER.error("Parsing error loading custom invasion types {}: {}", conditions, jsonParseExceptionIn.getMessage());	
 			}
@@ -68,11 +67,12 @@ public final class InvasionTypeManager extends JsonReloadListener {
 		return this.allInvasionTypeMap.values();
 	}
 	
-	public Collection<InvasionType> getDayInvasionTypes() {
-		return this.dayInvasionTypeMap.values();
-	}
-	
-	public Collection<InvasionType> getNightInvasionTypes() {
-		return this.nightInvasionTypeMap.values();
+	public ArrayList<InvasionType> getInvasionTypesOf(Predicate<InvasionType> predIn) {
+		ArrayList<InvasionType> invasionList = new ArrayList<>();
+		for (InvasionType invasionType : this.allInvasionTypeMap.values()) {
+			if (predIn.test(invasionType))
+				invasionList.add(invasionType);
+		}
+		return invasionList;
 	}
 }

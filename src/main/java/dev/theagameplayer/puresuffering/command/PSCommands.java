@@ -9,8 +9,7 @@ public final class PSCommands {
 	public static void build(CommandDispatcher<CommandSource> dispatcherIn) {
 		dispatcherIn.register(LiteralArgumentBuilder.<CommandSource>literal("puresuffering")
 				.then(ClearInvasionsCommand.register())
-				.then(RemoveInvasionCommand.register())
-				.then(AddInvasionCommand.register())
+				.then(AddInvasionsCommand.register())
 				.then(QueryInvasionsCommand.register()));
 	}
 }

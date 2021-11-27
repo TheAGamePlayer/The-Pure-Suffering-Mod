@@ -1,10 +1,11 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod",
 	"promos": {
-		"1.16.5-latest": "1.1.2B",
-		"1.16.5-recommended": "1.1.2B"
+		"1.16.5-latest": "1.2.0B",
+		"1.16.5-recommended": "1.2.0B"
 	},
 	"1.16.5": {
+		"1.2.0B": "So Much stuff changed that you might as well just look on my GitHub.",
 		"1.1.2B": "- Fixed Invasions returning as null\n- Added config option to make the delay between Invasions consistent "consistentInvasions"\n- Updated Forge to 36.2.0",
 		"1.1.1B": "- Fixed exploding ghast balls caused by despawned ghasts crashing the world",
 		"1.1.0B": "- Added new Invasion XP System\n- Fix Auto Agro"

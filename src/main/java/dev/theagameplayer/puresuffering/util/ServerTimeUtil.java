@@ -16,7 +16,7 @@ public final class ServerTimeUtil {
 		prevDayCheck = result;
 		return result;
 	}
-
+	
 	public static boolean isServerNight(ServerWorld worldIn) {
 		boolean result = !worldIn.dimensionType().hasFixedTime() && !isServerDay(worldIn);
 		if (prevNightCheck != result)

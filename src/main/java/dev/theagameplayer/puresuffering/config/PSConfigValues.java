@@ -23,22 +23,27 @@ public abstract class PSConfigValues {
 	}
 	
 	public static final class CommonValues extends PSConfigValues {
-		public final int invasionMobCap;
+		public final int primaryInvasionMobCap;
+		public final int secondaryInvasionMobCap;
 		public final int dayDifficultyIncreaseDelay;
 		public final int nightDifficultyIncreaseDelay;
 		public final int maxDayInvasions;
 		public final int maxNightInvasions;
+		public final boolean consistentInvasions;
+		public final boolean tieredInvasions;
+		public final List<? extends String> invasionBlacklist;
+		public final List<? extends String> primaryWhitelist;
 		
 		public final int dayInvasionRarity;
 		public final int nightInvasionRarity;
-		public final boolean consistentInvasions;
 		public final boolean canDayInvasionsBeCanceled;
 		public final boolean canNightInvasionsBeCanceled;
-		public final double dayChanceMultiplier;
-		public final double nightChanceMultiplier;
+		public final double dayCancelChanceMultiplier;
+		public final double nightCancelChanceMultiplier;
 		
-		public final boolean autoAgro;
-		public final List<? extends String> autoAgroBlacklist;
+		public final boolean hyperAggression;
+		public final List<? extends String> hyperAggressionBlacklist;
+		public final boolean weakenedVexes;
 		public final boolean useXPMultiplier;
 		public final boolean explosionsDestroyBlocks;
 		public final boolean shouldMobsDieAtEndOfInvasions;
@@ -46,22 +51,27 @@ public abstract class PSConfigValues {
 		public final int naturalSpawnChance;
 		
 		private CommonValues() {
-			this.invasionMobCap = PSConfig.CommonConfig.COMMON.invasionMobCap.get() + 1;
+			this.primaryInvasionMobCap = PSConfig.CommonConfig.COMMON.primaryInvasionMobCap.get();
+			this.secondaryInvasionMobCap = PSConfig.CommonConfig.COMMON.secondaryInvasionMobCap.get();
 			this.dayDifficultyIncreaseDelay = PSConfig.CommonConfig.COMMON.dayDifficultyIncreaseDelay.get();
 			this.nightDifficultyIncreaseDelay = PSConfig.CommonConfig.COMMON.nightDifficultyIncreaseDelay.get();
 			this.maxDayInvasions = PSConfig.CommonConfig.COMMON.maxDayInvasions.get();
 			this.maxNightInvasions = PSConfig.CommonConfig.COMMON.maxNightInvasions.get();
+			this.consistentInvasions = PSConfig.CommonConfig.COMMON.consistentInvasions.get();
+			this.tieredInvasions = PSConfig.CommonConfig.COMMON.tieredInvasions.get();
+			this.invasionBlacklist = PSConfig.CommonConfig.COMMON.invasionBlacklist.get();
+			this.primaryWhitelist = PSConfig.CommonConfig.COMMON.primaryWhitelist.get();
 			
 			this.dayInvasionRarity = PSConfig.CommonConfig.COMMON.dayInvasionRarity.get();
 			this.nightInvasionRarity = PSConfig.CommonConfig.COMMON.nightInvasionRarity.get();
-			this.consistentInvasions = PSConfig.CommonConfig.COMMON.consistentInvasions.get();
 			this.canDayInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canDayInvasionsBeCanceled.get();
 			this.canNightInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canNightInvasionsBeCanceled.get();
-			this.dayChanceMultiplier = PSConfig.CommonConfig.COMMON.dayChanceMultiplier.get();
-			this.nightChanceMultiplier = PSConfig.CommonConfig.COMMON.nightChanceMultiplier.get();
+			this.dayCancelChanceMultiplier = PSConfig.CommonConfig.COMMON.dayCancelChanceMultiplier.get();
+			this.nightCancelChanceMultiplier = PSConfig.CommonConfig.COMMON.nightCancelChanceMultiplier.get();
 			
-			this.autoAgro = PSConfig.CommonConfig.COMMON.autoAgro.get();
-			this.autoAgroBlacklist = PSConfig.CommonConfig.COMMON.autoAgroBlacklist.get();
+			this.hyperAggression = PSConfig.CommonConfig.COMMON.hyperAggression.get();
+			this.hyperAggressionBlacklist = PSConfig.CommonConfig.COMMON.hyperAggressionBlacklist.get();
+			this.weakenedVexes = PSConfig.CommonConfig.COMMON.weakenedVexes.get();
 			this.useXPMultiplier = PSConfig.CommonConfig.COMMON.useXPMultiplier.get();
 			this.explosionsDestroyBlocks = PSConfig.CommonConfig.COMMON.explosionsDestroyBlocks.get();
 			this.shouldMobsDieAtEndOfInvasions = PSConfig.CommonConfig.COMMON.shouldMobsDieAtEndOfInvasions.get();
@@ -72,9 +82,11 @@ public abstract class PSConfigValues {
 	
 	public static final class ClientValues extends PSConfigValues {
 		public final boolean useSkyBoxRenderer;
+		public final boolean canInvasionsChangeBrightness;
 		
 		private ClientValues() {
 			this.useSkyBoxRenderer = PSConfig.ClientConfig.CLIENT.useSkyBoxRenderer.get();
+			this.canInvasionsChangeBrightness = PSConfig.ClientConfig.CLIENT.canInvasionsChangeBrightness.get();
 		}
 	}
 }

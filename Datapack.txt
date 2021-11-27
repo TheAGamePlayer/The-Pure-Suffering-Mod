@@ -1,0 +1,224 @@
+Pure Suffering Data Pack Guide
+------------------------------
+
+Step1: Create your datapack.
+- Here's a tutorial https://minecraft.fandom.com/wiki/Tutorials/Creating_a_data_pack
+
+Step2: In your data namespace folder, create a folder called "invasion_types"
+- Minecraft's namespace folder is named "minecraft"
+- Pure Suffering's namespace folder is named "puresuffering"
+
+Step3: Create a json file for your invasion (all lower case, replace spaces with underscores)
+- Ex "phantom_zone, example_name, pain_and_suffering" 
+
+Step4: Setup your invasion json file.
+- The Invasion Values and what they do are listed below.
+
+--------------------------------------------------------
+
+All Invasion Values:
+Rarity: (Integer 0+)
+- How rare your invasion is, higher numbers are more rare.
+Tier: (Integer 0+)
+- The Tier of your invasion, increased numbers occurring after so many difficulty bumps.
+InvasionTime: (String)
+- When your invasion occurs.
+- "DAY" The invasion occurs only in the day.
+- "NIGHT" The invasions occurs only at night.
+- "BOTH" The invasions occurs in the day and at night.
+InvasionPriority: (String)
+- The priority of the invasion when the event occurs.
+- "SECONDARY_ONLY" The invasion can only serve as a support to another invasion.
+- "PRIMARY_ONLY" The invasion can only serve as the main invasion.
+- "BOTH" By default, the invasion can serve as either the main invasion or a support invasion.
+SpawningSystem: (String)
+- The spawning method used by this invasion.
+- "DEFAULT" The invasion uses the mob list provided to choose mobs to spawn.
+- "BIOME_BOOSTED" The invasions uses the biome's spawn list to choose mobs to spawn.
+TimeModifier: (String)
+- How your invasion changes the what day/night invasions can be chosen.
+- This is preferably only changed as a primary invasion, but is possible to experiment.
+- "NONE" This invasion does not change anything.
+- "DAY_TO_NIGHT" This invasion is a day time invasion that makes night invasions occur with it.
+- "NIGHT_TO_DAY" This invasion is a night time invasion that makes day invasions occur with it.
+TimeChangeability: (String)
+- How this invasion is affected by a previous invasion's time modifier.
+- Typically used when this invasion is chosen as a secondary invasion.
+- "DEFAULT" The invasion is affected normally.
+- "ONLY_NIGHT" The invasion cannot be chosen when a day invasion makes night invasions occur.
+- "ONLY_DAY" The invasion cannot be chosen when a night invasion makes day invasions occur.
+SeverityInfo: (List of info for each severity of this invasion, every entry is 1 more severity) {
+    SkyRenderer: (Skybox attributes changed by this invasion) {
+        FogRenderer: (Fog attributes changed by this invasion) {
+            RedOffset: (Float)
+            - Red color value offset to the default fog color.
+            GreenOffset: (Float)
+            - Green color value offset to the default fog color.
+            BlueOffset: (Float)
+            - Blue color value offset to the default fog color.
+        }
+        SunTexture: (ResourceLocation-String)
+        - The texture used for the sun if the invasion occurs in the day.
+        MoonTexture: (ResourceLocation-String)
+        - The texture used for the moon if the invasion occurs at night.
+        WeatherVisibility: (Float 0.0 - 1.0)
+        - How visible the sun/moon is in rain/thunder.
+        - Higher values are more visible.
+        Brightness: (Float 0.0 - 1.0)
+        - How bright the world is when your invasion occurs.
+        - 1.0 for default daytime, 0.2 for default nighttime.
+        - lower numbers for lower brightness.
+        RedOffset: (Float)
+        - Red color value offset to the default sky color.
+        GreenOffset: (Float)
+        - Green color value offset to the default sky color.
+        BlueOffset: (Float)
+        - Blue color value offset to the default sky color.
+    }
+    MobSpawnList: (List of mobs spawned by the invasion) {
+        EntityType: (ResourceLocation-String)
+        - ID of the mob for this spawn entry
+        Weight: (Integer)
+        - How common the mob is spawned.
+        - Bigger number is spawned more.
+        MinCount: (Integer)
+        - Least amount of mobs that can spawn in a group.
+        MaxCount: (Integer)
+        - Most amount of mobs that can spawn in a group.
+    }
+    MobCapPercentage: (Float 0.0 - 1.0)
+    - What percent of these mobs can spawn of the mob cap limit.
+    - Such as 100 times 0.8 is 80% of the total mobs possible.
+    - Can go higher, but is unrecommended due to performance limitations.
+    ForceNoSleep: (Boolean)
+    - Should this invasion force players to not be able to sleep as it occurs?
+    LightLevel: (Integer 0 - 15)
+    - The server-side light level of the world when the invasion occurs.
+    - The values are inverted so 15 will result in a light level of 0.
+    TickDelay: (Integer 0+)
+    - The delay in ticks for when a mob should spawn.
+    - Negative tick delay will prevent the invasion from ticking.
+}
+
+-----------------------------------------------------------------
+
+Additional Tools to help...
+
+Pure Suffering Mutant Beasts Datapack: https://github.com/TheAGamePlayer/PSMB-Datapack
+
+Example Pure Suffering Invasion Jsons: https://github.com/TheAGamePlayer/The-Pure-Suffering-Mod/tree/main/src/main/resources/data/puresuffering/invasion_types
+
+Another Example invasion json:
+{
+   "Rarity": 3,
+   "Tier": 0,
+   "InvasionTime": "DAY",
+   "InvasionPriority": "BOTH",
+   "SpawningSystem": "DEFAULT",
+   "TimeModifier": "NONE",
+   "TimeChangeability": "DEFAULT",
+   "SeverityInfo": [
+      {
+         "SkyRenderer": {
+            "FogRenderer": {
+               "RedOffset": 0.25,
+               "GreenOffset": 0.25,
+               "BlueOffset": 0.05
+            },
+            "SunTexture": "examplepack:textures/environment/example_sun.png",
+            "MoonTexture": "examplepack:textures/environment/example_moon.png",
+            "WeatherVisibility": 0.2,
+            "Brightness": 0.5,
+            "RedOffset": -0.5,
+            "GreenOffset": -0.5,
+            "BlueOffset": -0.5
+         },
+         "MobSpawnList":[
+            {
+               "EntityType": "minecraft:bee",
+               "Weight": 10,
+               "MinCount": 1,
+               "MaxCount": 3
+            },
+            {
+               "EntityType": "minecraft:llama",
+               "Weight": 5,
+               "MinCount": 1,
+               "MaxCount": 2
+            }
+         ],
+         "MobCapPercentage": 0.6,
+         "ForceNoSleep": true,
+         "LightLevel": 5,
+         "TickDelay": 12
+      },
+      {
+         "SkyRenderer": {
+            "FogRenderer": {
+               "RedOffset": 0.25,
+               "GreenOffset": 0.25,
+               "BlueOffset": 0.05
+            },
+            "SunTexture": "examplepack:textures/environment/example_sun.png",
+            "MoonTexture": "examplepack:textures/environment/example_moon.png",
+            "WeatherVisibility": 0.2,
+            "Brightness": 0.6,
+            "RedOffset": -0.5,
+            "GreenOffset": -0.5,
+            "BlueOffset": -0.5
+         },
+         "MobSpawnList":[
+            {
+               "EntityType": "minecraft:bee",
+               "Weight": 10,
+               "MinCount": 1,
+               "MaxCount": 4
+            },
+            {
+               "EntityType": "minecraft:llama",
+               "Weight": 5,
+               "MinCount": 1,
+               "MaxCount": 3
+            }
+         ],
+         "MobCapPercentage": 0.8,
+         "ForceNoSleep": true,
+         "LightLevel": 5,
+         "TickDelay": 9
+      },
+      {
+         "SkyRenderer": {
+            "FogRenderer": {
+               "RedOffset": 0.25,
+               "GreenOffset": 0.25,
+               "BlueOffset": 0.05
+            },
+            "SunTexture": "examplepack:textures/environment/example_sun.png",
+            "MoonTexture": "examplepack:textures/environment/example_moon.png",
+            "WeatherVisibility": 0.2,
+            "Brightness": 0.7,
+            "RedOffset": -0.5,
+            "GreenOffset": -0.5,
+            "BlueOffset": -0.5
+         },
+         "MobSpawnList": [
+            {
+               "EntityType": "minecraft:bee",
+               "Weight": 10,
+               "MinCount": 2,
+               "MaxCount": 5
+            },
+            {
+               "EntityType": "minecraft:llama",
+               "Weight": 5,
+               "MinCount": 1,
+               "MaxCount": 4
+            }
+         ],
+         "MobCapPercentage": 1.0,
+         "ForceNoSleep": true,
+         "LightLevel": 5,
+         "TickDelay": 6
+      }
+   ]
+}

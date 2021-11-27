@@ -1,35 +1,43 @@
 package dev.theagameplayer.puresuffering.util;
 
 import java.util.ArrayList;
-
+import dev.theagameplayer.puresuffering.client.ClientTransitionHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
 
 public final class ClientInvasionUtil {
-	private static final ArrayList<InvasionSkyRenderer> NIGHT_RENDERERS = new ArrayList<>();
-	private static final ArrayList<InvasionSkyRenderer> DAY_RENDERERS = new ArrayList<>();
-	private static final ArrayList<InvasionSkyRenderer> LIGHT_RENDERERS = new ArrayList<>();
-
-	public static float handleBrightness(float brightnessIn, World worldIn) {
-		if (worldIn.dimension() == World.OVERWORLD && !LIGHT_RENDERERS.isEmpty()) {
+	private static final InvasionRendererMap DAY_RENDERERS = new InvasionRendererMap();
+	private static final InvasionRendererMap NIGHT_RENDERERS = new InvasionRendererMap();
+	
+	public static float handleBrightness(float brightnessIn, ClientWorld worldIn) {
+		if (worldIn.dimension() == World.OVERWORLD) {
 			float brightness = 0.0F;
-			for (InvasionSkyRenderer renderer : LIGHT_RENDERERS) {
-				brightness += renderer.getBrightness() / LIGHT_RENDERERS.size();
+			if (ClientTimeUtil.isClientDay() && !ClientInvasionUtil.getDayRenderers().isEmpty()) {
+				ArrayList<InvasionSkyRenderer> rendererList = ClientInvasionUtil.getDayRenderers().getRenderersOf(renderer -> {
+					return renderer.isBrightnessChanged();
+				});
+				for (InvasionSkyRenderer renderer : rendererList) {
+					brightness += renderer.getBrightness() / rendererList.size();
+				}
+			} else if (ClientTimeUtil.isClientNight() && !ClientInvasionUtil.getNightRenderers().isEmpty()) {
+				ArrayList<InvasionSkyRenderer> rendererList = ClientInvasionUtil.getNightRenderers().getRenderersOf(renderer -> {
+					return renderer.isBrightnessChanged();
+				});
+				for (InvasionSkyRenderer renderer : rendererList) {
+					brightness += renderer.getBrightness() / rendererList.size();
+				}
 			}
-			return brightness;
+			return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, worldIn.getDayTime() % 12000L);
 		}
 		return brightnessIn;
 	}
 	
-	public static ArrayList<InvasionSkyRenderer> getNightRenderers() {
-		return NIGHT_RENDERERS;
-	}
-	
-	public static ArrayList<InvasionSkyRenderer> getDayRenderers() {
+	public static InvasionRendererMap getDayRenderers() {
 		return DAY_RENDERERS;
 	}
 	
-	public static ArrayList<InvasionSkyRenderer> getLightRenderers() {
-		return LIGHT_RENDERERS;
+	public static InvasionRendererMap getNightRenderers() {
+		return NIGHT_RENDERERS;
 	}
 }

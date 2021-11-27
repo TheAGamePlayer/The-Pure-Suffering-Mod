@@ -1,75 +1,100 @@
 {
-  "MobSpawnList": [
-    [
-      {
-        "EntityType": "minecraft:spider",
-        "Weight": 8,
-        "MinCount": 1,
-        "MaxCount": 2
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:spider",
-        "Weight": 8,
-        "MinCount": 1,
-        "MaxCount": 3
-      },
-      {
-        "EntityType": "minecraft:cave_spider",
-        "Weight": 1,
-        "MinCount": 1,
-        "MaxCount": 1
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:spider",
-        "Weight": 8,
-        "MinCount": 2,
-        "MaxCount": 4
-      },
-      {
-        "EntityType": "minecraft:cave_spider",
-        "Weight": 1,
-        "MinCount": 1,
-        "MaxCount": 2
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:spider",
-        "Weight": 8,
-        "MinCount": 2,
-        "MaxCount": 5
-      },
-      {
-        "EntityType": "minecraft:cave_spider",
-        "Weight": 2,
-        "MinCount": 1,
-        "MaxCount": 3
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:spider",
-        "Weight": 8,
-        "MinCount": 3,
-        "MaxCount": 7
-      },
-      {
-        "EntityType": "minecraft:cave_spider",
-        "Weight": 2,
-        "MinCount": 2,
-        "MaxCount": 4
-      }
-    ]
-  ],
-  "SkyRenderer": [],
-  "IsDayInvasion": false,
-  "ForceNoSleep": false,
-  "IsRepeatable": true,
-  "OnlyDuringNight": false,
-  "TickDelay": 6,
-  "Rarity": 0
+  "Rarity": 0,
+  "Tier": 0,
+  "InvasionTime": "NIGHT",
+  "InvasionPriority": "BOTH",
+  "SpawningSystem": "DEFAULT",
+  "TimeModifier": "NONE",
+  "TimeChangeability": "DEFAULT",
+  "SeverityInfo": [
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:spider",
+          "Weight": 6,
+          "MinCount": 1,
+          "MaxCount": 2
+        }
+      ],
+      "MobCapPercentage": 0.6,
+      "ForceNoSleep": false,
+      "TickDelay": 30
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:spider",
+          "Weight": 6,
+          "MinCount": 1,
+          "MaxCount": 3
+        },
+        {
+          "EntityType": "minecraft:cave_spider",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 1
+        }
+      ],
+      "MobCapPercentage": 0.7,
+      "ForceNoSleep": false,
+      "TickDelay": 24
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:spider",
+          "Weight": 6,
+          "MinCount": 2,
+          "MaxCount": 4
+        },
+        {
+          "EntityType": "minecraft:cave_spider",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 2
+        }
+      ],
+      "MobCapPercentage": 0.8,
+      "ForceNoSleep": false,
+      "TickDelay": 18
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:spider",
+          "Weight": 6,
+          "MinCount": 2,
+          "MaxCount": 5
+        },
+        {
+          "EntityType": "minecraft:cave_spider",
+          "Weight": 2,
+          "MinCount": 1,
+          "MaxCount": 3
+        }
+      ],
+      "MobCapPercentage": 0.9,
+      "ForceNoSleep": false,
+      "TickDelay": 12
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:spider",
+          "Weight": 6,
+          "MinCount": 3,
+          "MaxCount": 7
+        },
+        {
+          "EntityType": "minecraft:cave_spider",
+          "Weight": 2,
+          "MinCount": 2,
+          "MaxCount": 4
+        }
+      ],
+      "MobCapPercentage": 1.0,
+      "ForceNoSleep": false,
+      "TickDelay": 6
+    }
+  ]
 }

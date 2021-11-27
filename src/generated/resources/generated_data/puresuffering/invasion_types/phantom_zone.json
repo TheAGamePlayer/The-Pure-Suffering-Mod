@@ -1,51 +1,76 @@
 {
-  "MobSpawnList": [
-    [
-      {
-        "EntityType": "minecraft:phantom",
-        "Weight": 1,
-        "MinCount": 1,
-        "MaxCount": 1
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:phantom",
-        "Weight": 1,
-        "MinCount": 1,
-        "MaxCount": 2
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:phantom",
-        "Weight": 1,
-        "MinCount": 1,
-        "MaxCount": 3
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:phantom",
-        "Weight": 1,
-        "MinCount": 1,
-        "MaxCount": 4
-      }
-    ],
-    [
-      {
-        "EntityType": "minecraft:phantom",
-        "Weight": 1,
-        "MinCount": 2,
-        "MaxCount": 5
-      }
-    ]
-  ],
-  "SkyRenderer": [],
-  "IsDayInvasion": false,
-  "ForceNoSleep": false,
-  "IsRepeatable": true,
-  "OnlyDuringNight": false,
-  "TickDelay": 30,
-  "Rarity": 5
+  "Rarity": 5,
+  "Tier": 2,
+  "InvasionTime": "NIGHT",
+  "InvasionPriority": "BOTH",
+  "SpawningSystem": "DEFAULT",
+  "TimeModifier": "NONE",
+  "TimeChangeability": "DEFAULT",
+  "SeverityInfo": [
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:phantom",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 1
+        }
+      ],
+      "MobCapPercentage": 0.1,
+      "ForceNoSleep": false,
+      "TickDelay": 90
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:phantom",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 2
+        }
+      ],
+      "MobCapPercentage": 0.2,
+      "ForceNoSleep": false,
+      "TickDelay": 75
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:phantom",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 3
+        }
+      ],
+      "MobCapPercentage": 0.3,
+      "ForceNoSleep": false,
+      "TickDelay": 60
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:phantom",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 4
+        }
+      ],
+      "MobCapPercentage": 0.4,
+      "ForceNoSleep": false,
+      "TickDelay": 45
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:phantom",
+          "Weight": 1,
+          "MinCount": 2,
+          "MaxCount": 5
+        }
+      ],
+      "MobCapPercentage": 0.5,
+      "ForceNoSleep": false,
+      "TickDelay": 30
+    }
+  ]
 }

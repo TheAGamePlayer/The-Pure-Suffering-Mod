@@ -27,23 +27,28 @@ public final class PSConfig {
 	public static final class CommonConfig {
 		public static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
 		public static final CommonConfig COMMON = new CommonConfig();
-		
-		public final ForgeConfigSpec.IntValue invasionMobCap;
+		//Invasion
+		public final ForgeConfigSpec.IntValue primaryInvasionMobCap;
+		public final ForgeConfigSpec.IntValue secondaryInvasionMobCap;
 		public final ForgeConfigSpec.IntValue dayDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue nightDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue maxDayInvasions;
 		public final ForgeConfigSpec.IntValue maxNightInvasions;
-		
+		public final ForgeConfigSpec.BooleanValue consistentInvasions;
+		public final ForgeConfigSpec.BooleanValue tieredInvasions;
+		public final ConfigValue<List<? extends String>> invasionBlacklist;
+		public final ConfigValue<List<? extends String>> primaryWhitelist;
+		//Balancing
 		public final ForgeConfigSpec.IntValue dayInvasionRarity;
 		public final ForgeConfigSpec.IntValue nightInvasionRarity;
-		public final ForgeConfigSpec.BooleanValue consistentInvasions;
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
-		public final ForgeConfigSpec.DoubleValue dayChanceMultiplier;
-		public final ForgeConfigSpec.DoubleValue nightChanceMultiplier;
-		
-		public final ForgeConfigSpec.BooleanValue autoAgro;
-		public final ConfigValue<List<? extends String>> autoAgroBlacklist;
+		public final ForgeConfigSpec.DoubleValue dayCancelChanceMultiplier;
+		public final ForgeConfigSpec.DoubleValue nightCancelChanceMultiplier;
+		//Modifications
+		public final ForgeConfigSpec.BooleanValue hyperAggression;
+		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
+		public final ForgeConfigSpec.BooleanValue weakenedVexes;
 		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
 		public final ForgeConfigSpec.BooleanValue explosionsDestroyBlocks;
 		public final ForgeConfigSpec.BooleanValue shouldMobsDieAtEndOfInvasions;
@@ -54,31 +59,60 @@ public final class PSConfig {
 		private CommonConfig() {
 			COMMON_BUILDER.push("Gameplay");
 			COMMON_BUILDER.push("InvasionDifficulty");
-			invasionMobCap = COMMON_BUILDER
-					.translation(CONFIG + "invasion_mob_cap")
+			primaryInvasionMobCap = COMMON_BUILDER
+					.translation(CONFIG + "primary_invasion_mob_cap")
 					.worldRestart()
-					.comment("The Max amount of mobs that can spawn from Invasions at once.", "NOTE: Reduce for increased performance!")
-					.defineInRange("invasionMobCap", 150, 0, Integer.MAX_VALUE);
+					.comment("The Max amount of mobs that can spawn from Primary Invasions at once.", "NOTE: Reduce for increased performance!")
+					.defineInRange("primaryInvasionMobCap", 100, 0, Integer.MAX_VALUE);
+			secondaryInvasionMobCap = COMMON_BUILDER
+					.translation(CONFIG + "secondary_invasion_mob_cap")
+					.worldRestart()
+					.comment("The Max amount of mobs that can spawn from Primary Invasions at once.", "NOTE: Reduce for increased performance!")
+					.defineInRange("secondaryInvasionMobCap", 25, 0, Integer.MAX_VALUE);
 			dayDifficultyIncreaseDelay = COMMON_BUILDER
 					.translation(CONFIG + "day_difficulty_increase_delay")
 					.worldRestart()
-					.comment("How many days should pass when the Day Invasion Difficulty increases.")
-					.defineInRange("dayDifficultyIncreaseDelay", 125, 0, Integer.MAX_VALUE);
+					.comment("How many days should pass when the Day Invasion Difficulty increases?")
+					.defineInRange("dayDifficultyIncreaseDelay", 60, 0, Integer.MAX_VALUE);
 			nightDifficultyIncreaseDelay = COMMON_BUILDER
 					.translation(CONFIG + "night_difficulty_increase_delay")
 					.worldRestart()
-					.comment("How many days should pass when the Night Invasion Difficulty increases.")
-					.defineInRange("nightDifficultyIncreaseDelay", 100, 0, Integer.MAX_VALUE);
+					.comment("How many days should pass when the Night Invasion Difficulty increases?")
+					.defineInRange("nightDifficultyIncreaseDelay", 40, 0, Integer.MAX_VALUE);
 			maxDayInvasions = COMMON_BUILDER
 					.translation(CONFIG + "max_day_invasions")
 					.worldRestart()
 					.comment("Max Day Invasions that can occur.")
-					.defineInRange("maxDayInvasions", 75, 0, Integer.MAX_VALUE);
+					.defineInRange("maxDayInvasions", 3, 0, Integer.MAX_VALUE);
 			maxNightInvasions = COMMON_BUILDER
 					.translation(CONFIG + "max_night_invasions")
 					.worldRestart()
 					.comment("Max Night Invasions that can occur.")
-					.defineInRange("maxNightInvasions", 100, 0, Integer.MAX_VALUE);
+					.defineInRange("maxNightInvasions", 3, 0, Integer.MAX_VALUE);
+			consistentInvasions = COMMON_BUILDER
+					.translation(CONFIG + "consistent_invasions")
+					.worldRestart()
+					.comment("Should the rarity of Invasions act as a set delay between Invasions instead?")
+					.define("consistentInvasions", false);
+			tieredInvasions = COMMON_BUILDER
+					.translation(CONFIG + "tiered_invasions")
+					.worldRestart()
+					.comment("Should invasions follow the tier system?")
+					.define("tieredInvasions", true);
+			invasionBlacklist = COMMON_BUILDER
+					.translation(CONFIG + "invasion_blacklist")
+					.worldRestart()
+					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (must be surrounded by quotation marks)")
+					.defineList("invasionBlacklist", ImmutableList.of(), string -> {
+						return string != "";
+					});
+			primaryWhitelist = COMMON_BUILDER
+					.translation(CONFIG + "primary_whitelist")
+					.worldRestart()
+					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (must be surrounded by quotation marks)")
+					.defineList("primaryWhitelist", ImmutableList.of(), string -> {
+						return string != "";
+					});
 			COMMON_BUILDER.pop();
 			
 			COMMON_BUILDER.push("Balancing");
@@ -92,67 +126,65 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("How often should Night Invasions occur.")
 					.defineInRange("nightInvasionRarity", 3, 1, 100);
-			consistentInvasions = COMMON_BUILDER
-					.translation(CONFIG + "consistent_invasions")
-					.worldRestart()
-					.comment("Should the rarity of Invasions act as a set delay between Invasions instead.")
-					.define("consistentInvasions", false);
 			canDayInvasionsBeCanceled = COMMON_BUILDER
 					.translation(CONFIG + "can_day_invasions_be_canceled")
 					.worldRestart()
-					.comment("Can Day Invasions have a random chance to be canceled.")
+					.comment("Can Day Invasions have a random chance to be canceled?")
 					.define("canDayInvasionsBeCanceled", true);
 			canNightInvasionsBeCanceled = COMMON_BUILDER
 					.translation(CONFIG + "can_night_invasions_be_canceled")
 					.worldRestart()
-					.comment("Can Night Invasions have a random chance to be canceled.")
+					.comment("Can Night Invasions have a random chance to be canceled?")
 					.define("canNightInvasionsBeCanceled", true);
-			dayChanceMultiplier = COMMON_BUILDER
-					.translation(CONFIG + "day_chance_multiplier")
+			dayCancelChanceMultiplier = COMMON_BUILDER
+					.translation(CONFIG + "day_cancel_chance_multiplier")
 					.worldRestart()
 					.comment("Chance for Day Invasions to be canceled.", "NOTE: Multiplied by Day Difficulty Increase Delay.")
-					.defineInRange("dayChanceMultiplier", 1.0D, 0.0D, 10.0D);
-			nightChanceMultiplier = COMMON_BUILDER
-					.translation(CONFIG + "night_chance_multiplier")
+					.defineInRange("dayCancelChanceMultiplier", 1.0D, 0.0D, 10.0D);
+			nightCancelChanceMultiplier = COMMON_BUILDER
+					.translation(CONFIG + "night_cancel_chance_multiplier")
 					.worldRestart()
 					.comment("Chance for Night Invasions to be canceled.", "NOTE: Multiplied by Night Difficulty Increase Delay.")
-					.defineInRange("nightChanceMultiplier", 1.0D, 0.0D, 10.0D);
+					.defineInRange("nightCancelChanceMultiplier", 1.0D, 0.0D, 10.0D);
 			COMMON_BUILDER.pop();
 			
 			COMMON_BUILDER.push("Modifications");
-			autoAgro = COMMON_BUILDER
-					.translation(CONFIG + "auto_agro")
+			hyperAggression = COMMON_BUILDER
+					.translation(CONFIG + "hyper_aggression")
 					.worldRestart()
-					.comment("Should neutral invasion mobs agro the player when spawned.")
-					.define("autoAgro", true);
-			autoAgroBlacklist = COMMON_BUILDER
-					.translation(CONFIG + "auto_agro_blacklist")
+					.comment("Should neutral invasion mobs agro the player when spawned?")
+					.define("hyperAggression", true);
+			hyperAggressionBlacklist = COMMON_BUILDER
+					.translation(CONFIG + "hyper_aggression_blacklist")
 					.worldRestart()
-					.comment("List of Mobs that won't auto agro the player. (If setting is turned on)")
-					.defineList("autoAgroBlacklist", ImmutableList.of("minecraft:vex"), string -> {
+					.comment("List of Mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
+					.defineList("hyperAggressionBlacklist", ImmutableList.of("minecraft:vex"), string -> {
 						return string != "";
 					});
-			
+			weakenedVexes = COMMON_BUILDER
+					.translation(CONFIG + "weakened_vexes")
+					.worldRestart()
+					.comment("Should vexes in Invasions be weakened?")
+					.define("weakenedVexes", true);
 			useXPMultiplier = COMMON_BUILDER
 					.translation(CONFIG + "use_xp_multiplier")
 					.worldRestart()
 					.comment("This determines whether invasion mobs should have an xp boost per kill.")
 					.define("useXPMultiplier", true);
-			
 			explosionsDestroyBlocks = COMMON_BUILDER
 					.translation(CONFIG + "explosions_destroy_blocks")
 					.worldRestart()
-					.comment("Should explosions caused by invasion mobs break blocks.")
+					.comment("Should explosions caused by invasion mobs break blocks?")
 					.define("explosionsDestroy", false);
 			shouldMobsDieAtEndOfInvasions = COMMON_BUILDER
 					.translation(CONFIG + "should_mobs_die_at_end_of_invasions")
 					.worldRestart()
-					.comment("Should Invasion Mobs die when the Invasions are over.", "NOTE: Can be used to reduce server lag.")
+					.comment("Should Invasion Mobs die when the Invasions are over?", "NOTE: Can be used to reduce server lag.")
 					.define("shouldMobsDieAtEndOfInvasions", false);
 			shouldMobsSpawnWithMaxRange = COMMON_BUILDER
 					.translation(CONFIG + "should_mobs_spawn_with_max_range")
 					.worldRestart()
-					.comment("Should Invasion Mobs spawn with max follow range.", "NOTE: Very Taxing on server performance!")
+					.comment("Should Invasion Mobs spawn with max follow range?", "NOTE: Very Taxing on server performance!")
 					.define("shouldMobsSpawnWithMaxRange", false);
 			naturalSpawnChance = COMMON_BUILDER
 					.translation(CONFIG + "natural_spawn_chance")
@@ -173,13 +205,18 @@ public final class PSConfig {
 		public static final ClientConfig CLIENT = new ClientConfig();
 		
 		public final ForgeConfigSpec.BooleanValue useSkyBoxRenderer;
+		public final ForgeConfigSpec.BooleanValue canInvasionsChangeBrightness;
 		
 		private ClientConfig() {
 			CLIENT_BUILDER.push("Rendering");
 			useSkyBoxRenderer = CLIENT_BUILDER
 					.translation(CONFIG + "use_sky_box_renderer")
-					.comment("Can render Invasions with a custom sky box renderer.", "NOTE: Set false with incompatible shaders!")
+					.comment("Can render Invasions with a custom sky box renderer?", "NOTE: Set false with incompatible shaders!")
 					.define("useSkyBoxRenderer", true);
+			canInvasionsChangeBrightness = CLIENT_BUILDER
+					.translation(CONFIG + "can_invasions_change_brightness")
+					.comment("Can Invasions change the brightness Values?", "NOTE: Set false with incompatible shaders!")
+					.define("canInvasionsChangeBrightness", true);
 			CLIENT_BUILDER.pop();
 		}
 		

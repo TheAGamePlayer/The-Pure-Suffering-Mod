@@ -1,21 +1,25 @@
 {
-  "MobSpawnList": [],
-  "SkyRenderer": [
+  "Rarity": 7,
+  "Tier": 1,
+  "InvasionTime": "NIGHT",
+  "InvasionPriority": "PRIMARY_ONLY",
+  "SpawningSystem": "BIOME_BOOSTED",
+  "TimeModifier": "NONE",
+  "TimeChangeability": "ONLY_NIGHT",
+  "SeverityInfo": [
     {
-      "FogRenderer": {
-        "DensityOffset": 0.085,
-        "RedOffset": 0.05,
-        "GreenOffset": 0.0,
-        "BlueOffset": 0.0
+      "SkyRenderer": {
+        "FogRenderer": {
+          "RedOffset": 0.05,
+          "GreenOffset": 0.0,
+          "BlueOffset": 0.0
+        },
+        "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
+        "WeatherVisibility": 0.1
       },
-      "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
-      "WeatherVisibility": 0.1
+      "MobCapPercentage": 1.0,
+      "ForceNoSleep": false,
+      "TickDelay": 15
     }
-  ],
-  "IsDayInvasion": false,
-  "ForceNoSleep": false,
-  "IsRepeatable": false,
-  "OnlyDuringNight": true,
-  "TickDelay": 15,
-  "Rarity": 7
+  ]
 }

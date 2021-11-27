@@ -8,37 +8,37 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
-public final class UpdateCountPacket {
-	private final int count;
+public final class UpdateXPMultPacket {
+	private final double xpMult;
 	private final boolean isDay;
 	
-	public UpdateCountPacket(int countIn, boolean isDayIn) {
-		this.count = countIn;
+	public UpdateXPMultPacket(double xpMultIn, boolean isDayIn) {
+		this.xpMult = xpMultIn;
 		this.isDay = isDayIn;
 	}
 	
-	public static void encode(UpdateCountPacket msgIn, PacketBuffer bufIn) {
-		bufIn.writeInt(msgIn.count);
+	public static void encode(UpdateXPMultPacket msgIn, PacketBuffer bufIn) {
+		bufIn.writeDouble(msgIn.xpMult);
 		bufIn.writeBoolean(msgIn.isDay);
 	}
 	
-	public static UpdateCountPacket decode(PacketBuffer bufIn) {
-		return new UpdateCountPacket(bufIn.readInt(), bufIn.readBoolean());
+	public static UpdateXPMultPacket decode(PacketBuffer bufIn) {
+		return new UpdateXPMultPacket(bufIn.readDouble(), bufIn.readBoolean());
 	}
 
 	public static class Handler {
-		public static boolean handle(UpdateCountPacket msgIn, Supplier<Context> ctxIn) {
+		public static boolean handle(UpdateXPMultPacket msgIn, Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(UpdateCountPacket msgIn, Supplier<Context> ctxIn) {
+		private static void handlePacket(UpdateXPMultPacket msgIn, Supplier<Context> ctxIn) {
 			if (msgIn.isDay) {
-				ClientEvents.dayInvasionsCount = msgIn.count;
+				ClientEvents.dayXPMult = msgIn.xpMult;
 			} else {
-				ClientEvents.nightInvasionsCount = msgIn.count;
+				ClientEvents.nightXPMult = msgIn.xpMult;
 			}
 		}
 	}

@@ -1,3 +1,38 @@
+Version 1.2.0B:
+- Fixed some Client-Side performance issues.
+- Fixed performance bugs when choosing the next invasions.
+- Fixed random performance drop during eclipse invasions.
+- Fixed Fog and Sky Color not updating properly.
+- Fixed Fog and Sky Color being weird with other mods.
+- Fixed a bug with natural spawning allowing them to spawn slightly more often.
+- Fixed Invasions being canceled when set by a command.
+- Smoothened client side Transitions between Invasions.
+- Created new Invasion System involving Primary & Secondary Invasions.
+- Primary and Secondary Invasions now have separate mob caps (100 & 25 by default).
+- Primary Invasions can only change the sun and moon now.
+- Changed commands to work better with the new InvasionSystem.
+- Added Invasion Tier system so players don't get harder invasions as early.
+- Added Spawning Systems to make eclipse spawning accessible to datapacks.
+- Added Time Modifiers so that Invasions can set the subsequent invasions to be from day to night or night to day.
+- Added Time Adaptability to Invasions to determine how Time Modifiers affect it.
+- Added Day & Night XP Multipliers to the F3 Menu.
+- Removed the Remove Invasion command as it could cause invasions to break (Plan to return in future update).
+- Removed the ability for the same Invasion Types to naturally repeat.
+- Removed Fog Density attribute as it breaks fog mechanics for lava/water/blindness/etc...
+- Severity now determines the mob cap for invasions.
+- Phantom Invasions now have a 50% reduced spawn cap.
+- Mega Raid has been changed again, but will tweak based on feedback.
+- Slightly tweaked Vexes to hopefully be less cancerous for Invasions.
+- Revamped the light level system to be less memory demanding.
+- Revamped the Json layout for invasions (Now easier for datapack creators).
+- Invasions will generate a name based on it's id if none is supplied (For Datapack creators).
+- Modified config to be more in line with the new Invasion System (Delete old config file).
+- New Invasion Blacklist config option for disabling Invasions based on their id.
+- New Primary Whitelist config option for allowing specified invasions to be the only primary invasions able to be chosen.
+- New Tiered Invasions config option to enable/disable the new tier system added.
+- Renamed Auto Agro config option to Hyper Aggression.
+- According to feedback, invasions difficulty delay was far too sluggish for single player and server worlds. Therefore dayDifficultyIncreaseDelay was changed to 60 from 125 and nightDifficultyIncreaseDelay was changed to 40 from 100 to be more pressuring.
+
 Version 1.1.2B:
 - Fixed Invasions returning as null
 - Added config option to make the delay between Invasions consistent "consistentInvasions"

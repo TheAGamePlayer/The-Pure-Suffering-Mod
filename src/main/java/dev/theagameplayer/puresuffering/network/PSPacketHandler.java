@@ -3,9 +3,9 @@ package dev.theagameplayer.puresuffering.network;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.network.packet.AddInvasionPacket;
 import dev.theagameplayer.puresuffering.network.packet.ClearInvasionsPacket;
-import dev.theagameplayer.puresuffering.network.packet.RemoveInvasionPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateCountPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateTimePacket;
+import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
@@ -25,9 +25,9 @@ public final class PSPacketHandler {
 		//PLAY DEDICATED SERVER -> CLIENT
 		CHANNEL.messageBuilder(UpdateTimePacket.class, id++).encoder(UpdateTimePacket::encode).decoder(UpdateTimePacket::decode).consumer(UpdateTimePacket.Handler::handle).add();
 		CHANNEL.messageBuilder(AddInvasionPacket.class, id++).encoder(AddInvasionPacket::encode).decoder(AddInvasionPacket::decode).consumer(AddInvasionPacket.Handler::handle).add();
-		CHANNEL.messageBuilder(RemoveInvasionPacket.class, id++).encoder(RemoveInvasionPacket::encode).decoder(RemoveInvasionPacket::decode).consumer(RemoveInvasionPacket.Handler::handle).add();
 		CHANNEL.messageBuilder(ClearInvasionsPacket.class, id++).encoder(ClearInvasionsPacket::encode).decoder(ClearInvasionsPacket::decode).consumer(ClearInvasionsPacket.Handler::handle).add();
 		CHANNEL.messageBuilder(UpdateCountPacket.class, id++).encoder(UpdateCountPacket::encode).decoder(UpdateCountPacket::decode).consumer(UpdateCountPacket.Handler::handle).add();
+		CHANNEL.messageBuilder(UpdateXPMultPacket.class, id++).encoder(UpdateXPMultPacket::encode).decoder(UpdateXPMultPacket::decode).consumer(UpdateXPMultPacket.Handler::handle).add();
 	}
 	
 	public static void sendToClient(Object msgIn, ServerPlayerEntity playerIn) {

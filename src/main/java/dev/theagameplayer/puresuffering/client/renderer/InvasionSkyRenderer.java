@@ -14,17 +14,21 @@ public final class InvasionSkyRenderer {
 	private final ResourceLocation moon;
 	private final ResourceLocation daySky;
 	private final ResourceLocation nightSky;
+	private final boolean weatherVisibilityChanged, brightnessChanged, skyColorChanged;
 	private final float weatherVisibility;
 	private final float brightness;
 	private final float red, green, blue;
 	
-	public InvasionSkyRenderer(ResourceLocation idIn, InvasionFogRenderer fogRendererIn, ResourceLocation sunIn, ResourceLocation moonIn, ResourceLocation daySkyIn, ResourceLocation nightSkyIn, float weatherVisibilityIn, float brightnessIn, float redIn, float greenIn, float blueIn) {
+	public InvasionSkyRenderer(ResourceLocation idIn, InvasionFogRenderer fogRendererIn, ResourceLocation sunIn, ResourceLocation moonIn, ResourceLocation daySkyIn, ResourceLocation nightSkyIn, boolean weatherVisibilityChangedIn, boolean brightnessChangedIn, boolean skyColorChangedIn, float weatherVisibilityIn, float brightnessIn, float redIn, float greenIn, float blueIn) {
 		this.fogRenderer = fogRendererIn;
 		this.id = idIn;
 		this.sun = sunIn;
 		this.moon = moonIn;
 		this.daySky = daySkyIn;
 		this.nightSky = nightSkyIn;
+		this.weatherVisibilityChanged = weatherVisibilityChangedIn;
+		this.brightnessChanged = brightnessChangedIn;
+		this.skyColorChanged = skyColorChangedIn;
 		this.weatherVisibility = weatherVisibilityIn;
 		this.brightness = brightnessIn;
 		this.red = redIn;
@@ -33,7 +37,7 @@ public final class InvasionSkyRenderer {
 	}
 	
 	public InvasionSkyRenderer.Builder deconstruct() {
-		return new InvasionSkyRenderer.Builder(this.fogRenderer.deconstruct(), this.sun, this.moon, this.daySky, this.nightSky, this.weatherVisibility, this.brightness, this.red, this.green, this.blue);
+		return new InvasionSkyRenderer.Builder(this.fogRenderer.deconstruct(), this.sun, this.moon, this.daySky, this.nightSky, this.weatherVisibilityChanged, this.brightnessChanged, this.skyColorChanged, this.weatherVisibility, this.brightness, this.red, this.green, this.blue);
 	}
 	
 	public ResourceLocation getId() {
@@ -58,6 +62,18 @@ public final class InvasionSkyRenderer {
 	
 	public ResourceLocation getNightSkyTexture() {
 		return this.nightSky;
+	}
+	
+	public boolean isWeatherVisibilityChanged() {
+		return this.weatherVisibilityChanged;
+	}
+	
+	public boolean isBrightnessChanged() {
+		return this.brightnessChanged;
+	}
+	
+	public boolean isSkyColorChanged() {
+		return this.skyColorChanged;
 	}
 	
 	public float getWeatherVisibility() {
@@ -91,16 +107,20 @@ public final class InvasionSkyRenderer {
 		private ResourceLocation moon;
 		private ResourceLocation daySky;
 		private ResourceLocation nightSky;
+		private boolean weatherVisibilityChanged, brightnessChanged, skyColorChanged;
 		private float weatherVisibility;
 		private float brightness;
 		private float red, green, blue;
 		
-		private Builder(InvasionFogRenderer.Builder fogRendererIn, @Nullable ResourceLocation sunIn, @Nullable ResourceLocation moonIn, @Nullable ResourceLocation daySkyIn, @Nullable ResourceLocation nightSkyIn, float weatherVisibilityIn, float brightnessIn, float redIn, float greenIn, float blueIn) {
+		private Builder(InvasionFogRenderer.Builder fogRendererIn, @Nullable ResourceLocation sunIn, @Nullable ResourceLocation moonIn, @Nullable ResourceLocation daySkyIn, @Nullable ResourceLocation nightSkyIn, boolean weatherVisibilityChangedIn, boolean brightnessChangedIn, boolean skyColorChangedIn, float weatherVisibilityIn, float brightnessIn, float redIn, float greenIn, float blueIn) {
 			this.fogRenderer = fogRendererIn;
 			this.sun = sunIn;
 			this.moon = moonIn;
 			this.daySky = daySkyIn;
 			this.nightSky = nightSkyIn;
+			this.weatherVisibilityChanged = weatherVisibilityChangedIn;
+			this.brightnessChanged = brightnessChangedIn;
+			this.skyColorChanged = skyColorChangedIn;
 			this.weatherVisibility = weatherVisibilityIn;
 			this.brightness = brightnessIn;
 			this.red = redIn;
@@ -141,11 +161,13 @@ public final class InvasionSkyRenderer {
 		
 		public InvasionSkyRenderer.Builder weatherVisibility(float weatherVisibilityIn) {
 			this.weatherVisibility = weatherVisibilityIn;
+			this.weatherVisibilityChanged = true;
 			return this;
 		}
 		
 		public InvasionSkyRenderer.Builder withSkyBrightness(float brightnessIn) {
 			this.brightness = brightnessIn;
+			this.brightnessChanged = true;
 			return this;
 		}
 		
@@ -153,6 +175,7 @@ public final class InvasionSkyRenderer {
 			this.red = redIn;
 			this.green = greenIn;
 			this.blue = blueIn;
+			this.skyColorChanged = true;
 			return this;
 		}
 		
@@ -161,7 +184,7 @@ public final class InvasionSkyRenderer {
 			ResourceLocation moon = this.moon;
 			ResourceLocation daySky = this.daySky;
 			ResourceLocation nightSky = this.nightSky;
-			return new InvasionSkyRenderer(idIn, this.fogRenderer.build(idIn), sun, moon, daySky, nightSky, this.weatherVisibility, this.brightness, this.red, this.green, this.blue);
+			return new InvasionSkyRenderer(idIn, this.fogRenderer.build(idIn), sun, moon, daySky, nightSky, this.weatherVisibilityChanged, this.brightnessChanged, this.skyColorChanged, this.weatherVisibility, this.brightness, this.red, this.green, this.blue);
 		}
 		
 		public JsonObject serializeToJson() {
@@ -174,14 +197,14 @@ public final class InvasionSkyRenderer {
 			if (this.moon != null)
 				jsonObject.addProperty("MoonTexture", this.moon.toString());
 			if (this.daySky != null)
-				jsonObject.addProperty("DayTexture", this.daySky.toString());
+				jsonObject.addProperty("DaySkyTexture", this.daySky.toString());
 			if (this.nightSky != null)
-				jsonObject.addProperty("NightTexture", this.nightSky.toString());
-			if ((this.sun != null || this.moon != null || this.daySky != null || this.nightSky != null) && this.weatherVisibility != 0.0F)
+				jsonObject.addProperty("NightSkyTexture", this.nightSky.toString());
+			if ((this.sun != null || this.moon != null || this.daySky != null || this.nightSky != null) && this.weatherVisibilityChanged)
 				jsonObject.addProperty("WeatherVisibility", this.weatherVisibility);
-			if (this.brightness != 0.0F)
+			if (this.brightnessChanged)
 				jsonObject.addProperty("Brightness", this.brightness);
-			if (this.red != 0.0F || this.green != 0.0F || this.blue != 0.0F) {
+			if (this.skyColorChanged) {
 				jsonObject.addProperty("RedOffset", this.red);
 				jsonObject.addProperty("GreenOffset", this.green);
 				jsonObject.addProperty("BlueOffset", this.blue);
@@ -193,14 +216,17 @@ public final class InvasionSkyRenderer {
 			InvasionFogRenderer.Builder fogRenderer = jsonObjectIn.has("FogRenderer") ? InvasionFogRenderer.Builder.fromJson(jsonObjectIn.get("FogRenderer").getAsJsonObject()) : InvasionFogRenderer.Builder.fogRenderer();
 			ResourceLocation sun = jsonObjectIn.has("SunTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("SunTexture").getAsString()) : null;
 			ResourceLocation moon = jsonObjectIn.has("MoonTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("MoonTexture").getAsString()) : null;
-			ResourceLocation daySky = jsonObjectIn.has("DayTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("DayTexture").getAsString()) : null;
-			ResourceLocation nightSky = jsonObjectIn.has("NightTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("NightTexture").getAsString()) : null;
-			float weatherVisibility = jsonObjectIn.has("WeatherVisibility") ? jsonObjectIn.get("WeatherVisibility").getAsFloat() : 0.0F;
-			float brightness = jsonObjectIn.has("Brightness") ? jsonObjectIn.get("Brightness").getAsFloat() : 0.0F;
-			float red = jsonObjectIn.has("RedOffset") ? jsonObjectIn.get("RedOffset").getAsFloat() : 0.0F;
-			float green = jsonObjectIn.has("GreenOffset") ? jsonObjectIn.get("GreenOffset").getAsFloat() : 0.0F;
-			float blue = jsonObjectIn.has("BlueOffset") ? jsonObjectIn.get("BlueOffset").getAsFloat() : 0.0F;
-			return new InvasionSkyRenderer.Builder(fogRenderer, sun, moon, daySky, nightSky, weatherVisibility, brightness, red, green, blue);
+			ResourceLocation daySky = jsonObjectIn.has("DaySkyTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("DaySkyTexture").getAsString()) : null;
+			ResourceLocation nightSky = jsonObjectIn.has("NightSkyTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("NightSkyTexture").getAsString()) : null;
+			boolean weatherVisibilityChanged = jsonObjectIn.has("WeatherVisibility");
+			boolean brightnessChanged = jsonObjectIn.has("Brightness");
+			boolean skyColorChanged = jsonObjectIn.has("RedOffset") && jsonObjectIn.has("GreenOffset") && jsonObjectIn.has("BlueOffset");
+			float weatherVisibility = weatherVisibilityChanged ? jsonObjectIn.get("WeatherVisibility").getAsFloat() : 0.0F;
+			float brightness = brightnessChanged ? 1.0F - jsonObjectIn.get("Brightness").getAsFloat() : 1.0F;
+			float red = skyColorChanged ? jsonObjectIn.get("RedOffset").getAsFloat() : 0.0F;
+			float green = skyColorChanged ? jsonObjectIn.get("GreenOffset").getAsFloat() : 0.0F;
+			float blue = skyColorChanged ? jsonObjectIn.get("BlueOffset").getAsFloat() : 0.0F;
+			return new InvasionSkyRenderer.Builder(fogRenderer, sun, moon, daySky, nightSky, weatherVisibilityChanged, brightnessChanged, skyColorChanged, weatherVisibility, brightness, red, green, blue);
 		}
 		
 		public void serializeToNetwork(PacketBuffer bufIn) {
@@ -217,6 +243,9 @@ public final class InvasionSkyRenderer {
 			bufIn.writeBoolean(this.nightSky != null);
 			if (this.nightSky != null)
 				bufIn.writeResourceLocation(this.nightSky);
+			bufIn.writeBoolean(this.weatherVisibilityChanged);
+			bufIn.writeBoolean(this.brightnessChanged);
+			bufIn.writeBoolean(this.skyColorChanged);
 			bufIn.writeFloat(this.weatherVisibility);
 			bufIn.writeFloat(this.brightness);
 			bufIn.writeFloat(this.red);
@@ -238,12 +267,15 @@ public final class InvasionSkyRenderer {
 				daySky = bufIn.readResourceLocation();
 			if (bufIn.readBoolean())
 				nightSky = bufIn.readResourceLocation();
+			boolean weatherVisibilityChanged = bufIn.readBoolean();
+			boolean brightnessChanged = bufIn.readBoolean();
+			boolean skyColorChanged = bufIn.readBoolean();
 			float weatherVisibility = bufIn.readFloat();
 			float brightness = bufIn.readFloat();
 			float red = bufIn.readFloat();
 			float green = bufIn.readFloat();
 			float blue = bufIn.readFloat();
-			return new InvasionSkyRenderer.Builder(fogRenderer, sun, moon, daySky, nightSky, weatherVisibility, brightness, red, green, blue);
+			return new InvasionSkyRenderer.Builder(fogRenderer, sun, moon, daySky, nightSky, weatherVisibilityChanged, brightnessChanged, skyColorChanged, weatherVisibility, brightness, red, green, blue);
 		}
 	}
 }

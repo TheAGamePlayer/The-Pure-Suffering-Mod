@@ -17,6 +17,7 @@ import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
+//TheAGamePlayer was here :>
 @Mod(value = PureSufferingMod.MODID)
 public final class PureSufferingMod {
 	public static final String MODID = "puresuffering";
@@ -66,4 +67,7 @@ public final class PureSufferingMod {
 		}
 		LOGGER.info("Generated new data.");
 	}
+	
+	/* TODO: 1.3.0
+	 */
 }

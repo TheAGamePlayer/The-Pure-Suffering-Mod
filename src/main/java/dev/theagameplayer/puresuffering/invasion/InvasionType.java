@@ -1,10 +1,7 @@
 package dev.theagameplayer.puresuffering.invasion;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
@@ -18,291 +15,467 @@ import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class InvasionType {
 	private final ResourceLocation id;
-	private final Map<Integer, InvasionSkyRenderer> skyRenderer;
-	private final Map<Integer, List<Spawners>> mobSpawnList;
-	private final boolean isDayInvasion;
-	private final boolean forceNoSleep;
-	private final boolean setsToNight;
-	private final boolean isRepeating;
-	private final boolean onlyDuringNight;
-	private final int lightLevel;
-	private final int tickDelay;
 	private final int rarity;
-	private final TranslationTextComponent component;
-
-	public InvasionType(ResourceLocation idIn, Map<Integer, InvasionSkyRenderer> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean isRepeatingIn, boolean onlyDuringNightIn, int lightLevelIn, int tickDelayIn, int rarityIn) {
+	private final int tier;
+	private final InvasionTime invasionTime;
+	private final InvasionPriority invasionPriority;
+	private final SpawningSystem spawningSystem;
+	private final TimeModifier timeModifier;
+	private final TimeChangeability timeChangeability;
+	private final List<SeverityInfo> severityInfo;
+	private final ITextComponent component;
+	
+	public InvasionType(ResourceLocation idIn, int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, List<SeverityInfo> severityInfoIn) {
 		this.id = idIn;
-		this.skyRenderer = skyRendererIn;
-		this.mobSpawnList = mobSpawnListIn;
-		this.isDayInvasion = isDayInvasionIn;
-		this.forceNoSleep = forceNoSleepIn;
-		this.setsToNight = setsToNightIn;
-		this.isRepeating = isRepeatingIn;
-		this.onlyDuringNight = onlyDuringNightIn;
-		this.lightLevel = lightLevelIn;
-		this.tickDelay = tickDelayIn;
 		this.rarity = rarityIn;
-		this.component = new TranslationTextComponent("invasion." + idIn.getNamespace() + "." + idIn.getPath());
+		this.tier = tierIn;
+		this.invasionTime = invasionTimeIn;
+		this.invasionPriority = invasionPriorityIn;
+		this.spawningSystem = spawningSystemIn;
+		this.timeModifier = timeModifierIn;
+		this.timeChangeability = timeChangeabilityIn;
+		this.severityInfo = severityInfoIn;
+		String text = "invasion." + idIn.getNamespace() + "." + idIn.getPath();
+		TranslationTextComponent component = new TranslationTextComponent(text);
+		this.component = component.getString().equals(text) ? new StringTextComponent(this.formatDefaultText(idIn)) : component;
 	}
 	
+	private String formatDefaultText(ResourceLocation idIn) {
+		String str = idIn.getPath().replace('_', ' ');
+        if (str == null || str.length() == 0)
+            return str;
+        final char[] buffer = str.toCharArray();
+        boolean capitalizeNext = true;
+        for (int i = 0; i < buffer.length; i++) {
+            final char ch = buffer[i];
+            if (Character.isWhitespace(ch)) {
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                buffer[i] = Character.toTitleCase(ch);
+                capitalizeNext = false;
+            }
+        }
+		return new String(buffer);
+	}
+
 	public InvasionType.Builder deconstruct() {
-		Map<Integer, InvasionSkyRenderer.Builder> skyRenderer = new HashMap<>();
-		for (Entry<Integer, InvasionSkyRenderer> entry : this.skyRenderer.entrySet())
-			skyRenderer.put(entry.getKey(), entry.getValue().deconstruct());
-		return new InvasionType.Builder(skyRenderer, this.mobSpawnList, this.isDayInvasion, this.forceNoSleep, this.setsToNight, this.isRepeating, this.onlyDuringNight, this.lightLevel, this.tickDelay, this.rarity);
+		ArrayList<SeverityInfo.Builder> severityInfo = new ArrayList<>();
+		for (SeverityInfo info : this.severityInfo)
+			severityInfo.add(info.deconstruct());
+		return new InvasionType.Builder(this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, severityInfo);
 	}
-	
+
 	public ResourceLocation getId() {
 		return this.id;
 	}
-	
-	public Map<Integer, InvasionSkyRenderer> getSkyRenderer() {
-		return this.skyRenderer;
-	}
-	
-	public Map<Integer, List<Spawners>> getMobSpawnList() {
-		return this.mobSpawnList;
-	}
-	
-	public boolean isDayInvasion() {
-		return this.isDayInvasion;
-	}
-	
-	public boolean forcesNoSleep() {
-		return this.forceNoSleep;
-	}
-	
-	public boolean setsEventsToNight() {
-		return this.setsToNight;
-	}
-	
-	public boolean isRepeatable() {
-		return this.isRepeating;
-	}
-	
-	public boolean isOnlyDuringNight() {
-		return this.onlyDuringNight;
-	}
-	
-	public int getLightLevel() {
-		return this.lightLevel;
-	}
-	
-	public int getTickDelay() {
-		return this.tickDelay;
-	}
-	
+
 	public int getRarity() {
 		return this.rarity;
 	}
 	
-	public TranslationTextComponent getComponent() {
+	public int getTier() {
+		return this.tier;
+	}
+
+	public InvasionTime getInvasionTime() {
+		return this.invasionTime;
+	}
+	
+	public InvasionPriority getInvasionPriority() {
+		return this.invasionPriority;
+	}
+	
+	public SpawningSystem getSpawningSystem() {
+		return this.spawningSystem;
+	}
+
+	public TimeModifier getTimeModifier() {
+		return this.timeModifier;
+	}
+
+	public TimeChangeability getTimeChangeability() {
+		return this.timeChangeability;
+	}
+
+	public List<SeverityInfo> getSeverityInfo() {
+		return this.severityInfo;
+	}
+
+	public ITextComponent getComponent() {
 		return this.component;
 	}
-	
+
 	public int getMaxSeverity() {
-		return this.mobSpawnList.isEmpty() ? 1 : this.mobSpawnList.size();
+		return this.severityInfo.isEmpty() ? 1 : this.severityInfo.size();
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.getId().toString();
 	}
 	
-	public static class Builder {
-		private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
-		private Map<Integer, InvasionSkyRenderer.Builder> skyRenderer;
-		private Map<Integer, List<Spawners>> mobSpawnList;
-		private boolean isDayInvasion = false;
-		private boolean forceNoSleep = false;
-		private boolean setsToNight = false;
-		private boolean isRepeating = true;
-		private boolean onlyDuringNight = false;
-		private int lightLevel; 
-		private int tickDelay = 6;
-		private int rarity = 0;
-		
-		private Builder(Map<Integer, InvasionSkyRenderer.Builder> skyRendererIn, Map<Integer, List<Spawners>> mobSpawnListIn, boolean isDayInvasionIn, boolean forceNoSleepIn, boolean setsToNightIn, boolean isRepeatingIn, boolean onlyDuringNightIn, int lightLevelIn, int tickDelayIn, int rarityIn) {
+	public static enum InvasionTime {
+		BOTH,
+		NIGHT,
+		DAY
+	}
+	
+	public static enum InvasionPriority {
+		BOTH,
+		PRIMARY_ONLY,
+		SECONDARY_ONLY
+	}
+	
+	public static enum SpawningSystem {
+		DEFAULT,
+		BIOME_BOOSTED
+	}
+	
+	public static enum TimeModifier {
+		NONE,
+		DAY_TO_NIGHT,
+		NIGHT_TO_DAY
+	}
+	
+	public static enum TimeChangeability {
+		DEFAULT,
+		ONLY_NIGHT,
+		ONLY_DAY
+	}
+
+	public static class SeverityInfo {
+		private final InvasionSkyRenderer skyRenderer;
+		private final List<Spawners> mobSpawnList;
+		private final float mobCapPercentage;
+		private final boolean forceNoSleep;
+		private final int lightLevel;
+		private final int tickDelay;
+
+		private SeverityInfo(InvasionSkyRenderer skyRendererIn, List<Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn) {
 			this.skyRenderer = skyRendererIn;
 			this.mobSpawnList = mobSpawnListIn;
-			this.isDayInvasion = isDayInvasionIn;
+			this.mobCapPercentage = mobCapPercentageIn;
 			this.forceNoSleep = forceNoSleepIn;
-			this.setsToNight = setsToNightIn;
-			this.isRepeating = isRepeatingIn;
-			this.onlyDuringNight = onlyDuringNightIn;
 			this.lightLevel = lightLevelIn;
 			this.tickDelay = tickDelayIn;
-			this.rarity = rarityIn;
 		}
 		
-		private Builder() {};
-		
-		public static InvasionType.Builder invasionType() {
-			return new InvasionType.Builder();
+		public SeverityInfo.Builder deconstruct() {
+			return new SeverityInfo.Builder(this.skyRenderer == null ? null : this.skyRenderer.deconstruct(), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay);
+		}
+
+		public InvasionSkyRenderer getSkyRenderer() {
+			return this.skyRenderer;
+		}
+
+		public List<Spawners> getMobSpawnList() {
+			return this.mobSpawnList;
 		}
 		
-		public InvasionType.Builder skyRenderer(Map<Integer, InvasionSkyRenderer.Builder> skyRendererIn) {
-			this.skyRenderer = skyRendererIn;
-			return this;
+		public float getMobCapPercentage() {
+			return this.mobCapPercentage;
 		}
-		
-		public InvasionType.Builder mobSpawnList(Map<Integer, List<Spawners>> mobSpawnListIn) {
-			this.mobSpawnList = mobSpawnListIn;
-			return this;
+
+		public boolean forcesNoSleep() {
+			return this.forceNoSleep;
 		}
-		
-		public InvasionType.Builder setDayTimeEvent() {
-			this.isDayInvasion = true;
-			return this;
+
+		public int getLightLevel() {
+			return this.lightLevel;
 		}
-		
-		public InvasionType.Builder setForcesNoSleep() {
-			this.forceNoSleep = true;
-			return this;
+
+		public int getTickDelay() {
+			return this.tickDelay;
 		}
-		
-		public InvasionType.Builder setToNightEvents() {
-			this.setsToNight = true;
-			return this;
-		}
-		
-		public InvasionType.Builder withLight(int lightLevelIn) {
-			this.lightLevel = lightLevelIn;
-			return this;
-		}
-		
-		public InvasionType.Builder setNonRepeatable() {
-			this.isRepeating = false;
-			return this;
-		}
-		
-		public InvasionType.Builder setOnlyDuringNight() {
-			this.onlyDuringNight = true;
-			return this;
-		}
-		
-		public InvasionType.Builder tickDelay(int tickDelayIn) {
-			this.tickDelay = tickDelayIn;
-			return this;
-		}
-		
-		public InvasionType.Builder withRarity(int rarityIn) {
-			this.rarity = rarityIn;
-			return this;
-		}
-		
-		public InvasionType save(Consumer<InvasionType> consumerIn, String pathIn) {
-			InvasionType invasionType = this.build(new ResourceLocation(PureSufferingMod.MODID, pathIn));
-			consumerIn.accept(invasionType);
-			return invasionType;
-		}
-		
-		public InvasionType build(ResourceLocation idIn) {
-			Map<Integer, InvasionSkyRenderer> skyRenderer = new HashMap<>();
-			if (this.skyRenderer != null)
-				for (Entry<Integer, InvasionSkyRenderer.Builder> entry : this.skyRenderer.entrySet())
-					skyRenderer.put(entry.getKey(), entry.getValue().build(idIn));
-			return new InvasionType(idIn, skyRenderer, this.mobSpawnList, this.isDayInvasion, this.forceNoSleep, this.setsToNight, this.isRepeating, this.onlyDuringNight, this.lightLevel, this.tickDelay, this.rarity);
-		}
-		
-		public JsonObject serializeToJson() {
-			JsonObject jsonObject = new JsonObject();
-			if (this.mobSpawnList != null) {
-				JsonArray jsonArray = new JsonArray();
-				for (List<Spawners> spawnInfoList : this.mobSpawnList.values()) {
-					JsonArray jsonArray1 = new JsonArray();
-					for (Spawners spawnInfo : spawnInfoList) {
+
+		public static class Builder {
+			private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+			private InvasionSkyRenderer.Builder skyRenderer = null;
+			private List<Spawners> mobSpawnList;
+			private float mobCapPercentage = 1.0F;
+			private boolean forceNoSleep = false;
+			private int lightLevel = -1;
+			private int tickDelay = 6;
+
+			private Builder(InvasionSkyRenderer.Builder skyRendererIn, List<Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn) {
+				this.skyRenderer = skyRendererIn;
+				this.mobSpawnList = mobSpawnListIn;
+				this.mobCapPercentage = mobCapPercentageIn;
+				this.forceNoSleep = forceNoSleepIn;
+				this.lightLevel = lightLevelIn;
+				this.tickDelay = tickDelayIn;
+			}
+
+			private Builder() {};
+			
+			public static SeverityInfo.Builder severityInfo() {
+				return new SeverityInfo.Builder();
+			}
+
+			public SeverityInfo.Builder skyRenderer(InvasionSkyRenderer.Builder skyRendererIn) {
+				this.skyRenderer = skyRendererIn;
+				return this;
+			}
+
+			public SeverityInfo.Builder mobSpawnList(List<Spawners> mobSpawnListIn) {
+				this.mobSpawnList = mobSpawnListIn;
+				return this;
+			}
+			
+			public SeverityInfo.Builder setMobCapMultiplier(float mobCapPercentageIn) {
+				this.mobCapPercentage = mobCapPercentageIn;
+				return this;
+			}
+
+			public SeverityInfo.Builder setForcesNoSleep() {
+				this.forceNoSleep = true;
+				return this;
+			}
+
+			public SeverityInfo.Builder withLightLevel(int lightLevelIn) {
+				this.lightLevel = lightLevelIn;
+				return this;
+			}
+
+			public SeverityInfo.Builder withTickDelay(int tickDelayIn) {
+				this.tickDelay = tickDelayIn;
+				return this;
+			}
+
+			public SeverityInfo build(ResourceLocation idIn) {
+				return new SeverityInfo(this.skyRenderer == null ? null : this.skyRenderer.build(idIn), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay);
+			}
+
+			public JsonObject serializeToJson() {
+				JsonObject jsonObject = new JsonObject();
+				if (this.skyRenderer != null) {
+					jsonObject.add("SkyRenderer", this.skyRenderer.serializeToJson());
+				}
+				if (this.mobSpawnList != null) {
+					JsonArray jsonArray = new JsonArray();
+					for (Spawners spawnInfo : this.mobSpawnList) {
 						JsonObject jsonObject1 = new JsonObject();
 						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITIES.getKey(spawnInfo.type).toString());
 						jsonObject1.addProperty("Weight", spawnInfo.weight);
 						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
 						jsonObject1.addProperty("MaxCount", spawnInfo.maxCount);
-						jsonArray1.add(jsonObject1);
+						jsonArray.add(jsonObject1);
 					}
-					jsonArray.add(jsonArray1);
+					jsonObject.add("MobSpawnList", jsonArray);
 				}
-				jsonObject.add("MobSpawnList", jsonArray);
+				jsonObject.addProperty("MobCapPercentage", this.mobCapPercentage);
+				jsonObject.addProperty("ForceNoSleep", this.forceNoSleep);
+				if (this.lightLevel > -1)
+					jsonObject.addProperty("LightLevel", this.lightLevel);
+				jsonObject.addProperty("TickDelay", this.tickDelay);
+				return jsonObject;
 			}
-			if (this.skyRenderer != null) {
-				JsonArray jsonArray = new JsonArray();
-				for (InvasionSkyRenderer.Builder builder : this.skyRenderer.values()) {
-					jsonArray.add(builder.serializeToJson());
+
+			public static InvasionType.SeverityInfo.Builder fromJson(JsonObject jsonObjectIn) {
+				InvasionSkyRenderer.Builder skyRenderer = null;
+				List<Spawners> mobSpawnList = new ArrayList<>();
+				float mobCapPercentage = MathHelper.clamp(jsonObjectIn.get("MobCapPercentage").getAsFloat(), 0.0F, 1.0F);
+				boolean forceNoSleep = jsonObjectIn.get("ForceNoSleep").getAsBoolean();
+				int lightLevel = jsonObjectIn.has("LightLevel") ? MathHelper.clamp(jsonObjectIn.get("LightLevel").getAsInt(), 0, 15) : -1;
+				int tickDelay = jsonObjectIn.get("TickDelay").getAsInt();
+				boolean errored = false;
+				JsonElement jsonElement = jsonObjectIn.getAsJsonObject("SkyRenderer");
+				if (jsonElement != null) {
+					if (jsonElement.isJsonObject()) {
+						skyRenderer = InvasionSkyRenderer.Builder.fromJson(jsonElement.getAsJsonObject());
+					} else {
+						errored = true;
+					}
 				}
-				jsonObject.add("SkyRenderer", jsonArray);
+				JsonElement jsonElement1 = jsonObjectIn.getAsJsonArray("MobSpawnList");
+				if (jsonElement1 != null) {
+					if (jsonElement1.isJsonArray()) {
+						JsonArray jsonArray = jsonElement1.getAsJsonArray();
+						for (JsonElement jsonElement2 : jsonArray) {
+							if (jsonElement2.isJsonObject()) {
+								JsonObject jsonObject = jsonElement2.getAsJsonObject();
+								EntityType<?> type = ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString()));
+								int weight = jsonObject.get("Weight").getAsInt();
+								int minCount = jsonObject.get("MinCount").getAsInt();
+								int maxCount = jsonObject.get("MaxCount").getAsInt();
+								mobSpawnList.add(new Spawners(type, weight, minCount, maxCount));
+							} else {
+								errored = true;
+								break;
+							}
+						}
+					} else {
+						errored = true;
+					}
+				}
+				if (errored) {
+					LOGGER.error("JsonElement is incorrectly setup: " + jsonObjectIn.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
+				}
+				return new SeverityInfo.Builder(skyRenderer, mobSpawnList, mobCapPercentage, forceNoSleep, lightLevel, tickDelay);
 			}
-			jsonObject.addProperty("IsDayInvasion", this.isDayInvasion);
-			jsonObject.addProperty("ForceNoSleep", this.forceNoSleep);
-			if (this.isDayInvasion)
-				jsonObject.addProperty("SetsEventsToNight", this.setsToNight);
-			if (this.lightLevel != 0.0F) {
-				jsonObject.addProperty("LightLevel", this.lightLevel);
-			}
-			jsonObject.addProperty("IsRepeatable", this.isRepeating);
-			if (!this.isDayInvasion)
-				jsonObject.addProperty("OnlyDuringNight", this.onlyDuringNight);
-			jsonObject.addProperty("TickDelay", this.tickDelay);
-			jsonObject.addProperty("Rarity", this.rarity);
-			return jsonObject;
+		}
+	}
+
+	public static class Builder {
+		private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+		private int rarity = 0;
+		private int tier = 0;
+		private InvasionTime invasionTime;
+		private InvasionPriority invasionPriority;
+		private SpawningSystem spawningSystem;
+		private TimeModifier timeModifier;
+		private TimeChangeability timeChangeability;
+		private List<SeverityInfo.Builder> severityInfo;
+
+		private Builder(int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, List<SeverityInfo.Builder> severityInfoIn) {
+			this.rarity = rarityIn;
+			this.tier = tierIn;
+			this.invasionTime = invasionTimeIn;
+			this.invasionPriority = invasionPriorityIn;
+			this.spawningSystem = spawningSystemIn;
+			this.timeModifier = timeModifierIn;
+			this.timeChangeability = timeChangeabilityIn;
+			this.severityInfo = severityInfoIn;
+		}
+
+		private Builder() {};
+
+		public static InvasionType.Builder invasionType() {
+			return new InvasionType.Builder();
+		}
+
+		public InvasionType.Builder withRarity(int rarityIn) {
+			this.rarity = rarityIn;
+			return this;
 		}
 		
+		public InvasionType.Builder withTier(int tierIn) {
+			this.tier = tierIn;
+			return this;
+		}
+
+		public InvasionType.Builder withInvasionTime(InvasionTime invasionTimeIn) {
+			this.invasionTime = invasionTimeIn;
+			return this;
+		}
+		
+		public InvasionType.Builder withInvasionPriority(InvasionPriority invasionPriorityIn) {
+			this.invasionPriority = invasionPriorityIn;
+			return this;
+		}
+		
+		public InvasionType.Builder withSpawningSystem(SpawningSystem spawningSystemIn) {
+			this.spawningSystem = spawningSystemIn;
+			return this;
+		}
+
+		public InvasionType.Builder withTimeModifier(TimeModifier timeModifierIn) {
+			this.timeModifier = timeModifierIn;
+			return this;
+		}
+
+		public InvasionType.Builder withTimeChangeability(TimeChangeability timeChangeabilityIn) {
+			this.timeChangeability = timeChangeabilityIn;
+			return this;
+		}
+
+		public InvasionType.Builder severityInfo(List<SeverityInfo.Builder> severityInfoIn) {
+			this.severityInfo = severityInfoIn;
+			return this;
+		}
+
+		public InvasionType save(Consumer<InvasionType> consumerIn, String pathIn) {
+			InvasionType invasionType = this.build(new ResourceLocation(PureSufferingMod.MODID, pathIn));
+			consumerIn.accept(invasionType);
+			return invasionType;
+		}
+
+		public InvasionType build(ResourceLocation idIn) {
+			ArrayList<SeverityInfo> severityInfo = new ArrayList<>();
+			if (this.severityInfo != null)
+				for (SeverityInfo.Builder builder : this.severityInfo)
+					severityInfo.add(builder.build(idIn));
+			return new InvasionType(idIn, this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, severityInfo);
+		}
+
+		public JsonObject serializeToJson() {
+			JsonObject jsonObject = new JsonObject();
+			jsonObject.addProperty("Rarity", this.rarity);
+			jsonObject.addProperty("Tier", this.tier);
+			jsonObject.addProperty("InvasionTime", this.invasionTime.toString());
+			jsonObject.addProperty("InvasionPriority", this.invasionPriority.toString());
+			jsonObject.addProperty("SpawningSystem", this.spawningSystem.toString());
+			if ((this.invasionTime != InvasionTime.DAY && this.timeModifier != TimeModifier.DAY_TO_NIGHT) || (this.invasionTime != InvasionTime.NIGHT && this.timeModifier != TimeModifier.NIGHT_TO_DAY) || this.timeModifier == TimeModifier.NONE)
+				jsonObject.addProperty("TimeModifier", this.timeModifier.toString());
+			if ((this.invasionTime != InvasionTime.DAY && this.timeChangeability != TimeChangeability.ONLY_DAY) || (this.invasionTime != InvasionTime.NIGHT && this.timeChangeability != TimeChangeability.ONLY_NIGHT) || this.timeChangeability == TimeChangeability.DEFAULT)
+				jsonObject.addProperty("TimeChangeability", this.timeChangeability.toString());
+			if (this.severityInfo != null) {
+				JsonArray jsonArray = new JsonArray();
+				for (SeverityInfo.Builder builder : this.severityInfo) {
+					jsonArray.add(builder.serializeToJson());
+				}
+				jsonObject.add("SeverityInfo", jsonArray);
+			}
+			return jsonObject;
+		}
+
 		public static InvasionType.Builder fromJson(JsonObject jsonObjectIn) {
-			boolean isDayInvasion = jsonObjectIn.get("IsDayInvasion").getAsBoolean();
-			boolean forceNoSleep = jsonObjectIn.has("ForceNoSleep") ? jsonObjectIn.get("ForceNoSleep").getAsBoolean() : false;
-			boolean setsToNight = jsonObjectIn.has("SetsEventsToNight") ? jsonObjectIn.get("SetsEventsToNight").getAsBoolean() : false;
-			boolean isRepeating = jsonObjectIn.get("IsRepeatable").getAsBoolean();
-			boolean onlyDuringNight = jsonObjectIn.has("OnlyDuringNight") ? jsonObjectIn.get("OnlyDuringNight").getAsBoolean() : false;
-			int lightLevel = jsonObjectIn.has("LightLevel") ? jsonObjectIn.get("LightLevel").getAsInt() : 0;
-			int tickDelay = jsonObjectIn.get("TickDelay").getAsInt();
 			int rarity = jsonObjectIn.get("Rarity").getAsInt();
+			int tier = jsonObjectIn.get("Tier").getAsInt();
+			InvasionTime invasionTime = null;
+			for (InvasionTime time : InvasionTime.values()) {
+				if (time.toString().equals(jsonObjectIn.get("InvasionTime").getAsString())) {
+					invasionTime = time;
+					break;
+				}
+			}
+			InvasionPriority invasionPriority = null;
+			for (InvasionPriority order : InvasionPriority.values()) {
+				if (order.toString().equals(jsonObjectIn.get("InvasionPriority").getAsString())) {
+					invasionPriority = order;
+					break;
+				}
+			}
+			SpawningSystem spawningSystem = null;
+			for (SpawningSystem system : SpawningSystem.values()) {
+				if (system.toString().equals(jsonObjectIn.get("SpawningSystem").getAsString())) {
+					spawningSystem = system;
+					break;
+				}
+			}
+			TimeModifier timeModifier = null;
+			for (TimeModifier modifier : TimeModifier.values()) {
+				if (modifier.toString().equals(jsonObjectIn.get("TimeModifier").getAsString()) && ((invasionTime != InvasionTime.DAY && modifier != TimeModifier.DAY_TO_NIGHT) || (invasionTime != InvasionTime.NIGHT && modifier != TimeModifier.NIGHT_TO_DAY) || modifier == TimeModifier.NONE)) {
+					timeModifier = modifier;
+					break;
+				}
+			}
+			TimeChangeability timeChangeability = null;
+			for (TimeChangeability changeability : TimeChangeability.values()) {
+				if (changeability.toString().equals(jsonObjectIn.get("TimeChangeability").getAsString()) && ((invasionTime != InvasionTime.DAY && changeability != TimeChangeability.ONLY_DAY) || (invasionTime != InvasionTime.NIGHT && changeability != TimeChangeability.ONLY_NIGHT) || changeability == TimeChangeability.DEFAULT)) {
+					timeChangeability = changeability;
+					break;
+				}
+			}
+			List<SeverityInfo.Builder> severityInfo = new ArrayList<>();
 			boolean errored = false;
-			Map<Integer, List<Spawners>> mobSpawnList = new HashMap<>();
-			JsonElement jsonElement = jsonObjectIn.getAsJsonArray("MobSpawnList");
+			JsonElement jsonElement = jsonObjectIn.getAsJsonArray("SeverityInfo");
 			if (jsonElement != null) {
 				if (jsonElement.isJsonArray()) {
 					JsonArray jsonArray = jsonElement.getAsJsonArray();
-					for (int list = 0; list < jsonArray.size(); list++) {
-						ArrayList<Spawners> spawnInfoList = new ArrayList<>();
-						JsonElement jsonElement1 = jsonArray.get(list);
-						if (jsonElement1.isJsonArray()) {
-							JsonArray jsonArray1 = jsonElement1.getAsJsonArray();
-							for (JsonElement jsonElement2 : jsonArray1) {
-								if (jsonElement2.isJsonObject()) {
-									JsonObject jsonObject = jsonElement2.getAsJsonObject();
-									EntityType<?> type = ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString()));
-									int weight = jsonObject.get("Weight").getAsInt();
-									int minCount = jsonObject.get("MinCount").getAsInt();
-									int maxCount = jsonObject.get("MaxCount").getAsInt();
-									spawnInfoList.add(new Spawners(type, weight, minCount, maxCount));
-								} else {
-									errored = true;
-									break;
-								}
-							}
-						} else {
-							errored = true;
-							break;
-						}
-						mobSpawnList.put(list, spawnInfoList);
-					}
-				} else {
-					errored = true;
-				}
-			}
-			Map<Integer, InvasionSkyRenderer.Builder> skyRenderer = new HashMap<>();
-			JsonElement jsonElement1 = jsonObjectIn.getAsJsonArray("SkyRenderer");
-			if (jsonElement1 != null) {
-				if (jsonElement1.isJsonArray()) {
-					JsonArray jsonArray = jsonElement1.getAsJsonArray();
-					for (int sky = 0; sky < jsonArray.size(); sky++) {
-						JsonElement jsonElement2 = jsonArray.get(sky);
-						if (jsonElement2.isJsonObject()) {
-							skyRenderer.put(sky, InvasionSkyRenderer.Builder.fromJson(jsonElement2.getAsJsonObject()));
+					for (int info = 0; info < jsonArray.size(); info++) {
+						JsonElement jsonElement1 = jsonArray.get(info);
+						if (jsonElement1.isJsonObject()) {
+							severityInfo.add(SeverityInfo.Builder.fromJson(jsonElement1.getAsJsonObject()));
 						} else {
 							errored = true;
 							break;
@@ -312,10 +485,9 @@ public final class InvasionType {
 					errored = true;
 				}
 			}
-			if (errored) {
-				LOGGER.error("JsonElement is incorrectly setup: " + jsonElement.toString() + ". Therefore InvasionType wasn't registered!");
-			}
-			return new InvasionType.Builder(skyRenderer, mobSpawnList, isDayInvasion, forceNoSleep, setsToNight, isRepeating, onlyDuringNight, lightLevel, tickDelay, rarity);
+			if (invasionTime == null || invasionPriority == null || spawningSystem == null || timeModifier == null || timeChangeability == null || errored)
+				LOGGER.error("JsonElement is incorrectly setup: " + jsonObjectIn.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
+			return new InvasionType.Builder(rarity, tier, invasionTime, invasionPriority, spawningSystem, timeModifier, timeChangeability, severityInfo);
 		}
 	}
 }

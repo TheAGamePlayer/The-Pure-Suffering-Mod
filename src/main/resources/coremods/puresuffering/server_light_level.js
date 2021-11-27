@@ -9,20 +9,20 @@ function initializeCoreMod() {
 			},
 			'transformer': function(method) {
 				var ASMAPI = Java.type('net.minecraftforge.coremod.api.ASMAPI');
-				ASMAPI.log('INFO', 'Adding \'server_light_level\' ASM patch...');
+				ASMAPI.log('INFO', 'Adding PS \'server_light_level\' ASM patch...');
 				var Opcodes = Java.type('org.objectweb.asm.Opcodes');
 				var VarInsnNode = Java.type('org.objectweb.asm.tree.VarInsnNode');
 				var putField = ASMAPI.findFirstInstructionAfter(method, Opcodes.PUTFIELD, 0);
 				while (putField !== null) {
 					method.instructions.insertBefore(putField, new VarInsnNode(Opcodes.ALOAD, 0));
 					method.instructions.insertBefore(putField, ASMAPI.buildMethodCall(
-						'dev/theagameplayer/puresuffering/coremod/PSCoreModHandler',
-						'handleLightLevel',
+						'dev/theagameplayer/puresuffering/coremod/PSASMHooks',
+						'lightLevelHook',
 						"(ILnet/minecraft/world/World;)I",
 						ASMAPI.MethodType.STATIC));
 					putField = ASMAPI.findFirstInstructionAfter(method, Opcodes.PUTFIELD, method.instructions.indexOf(putField) + 2);
 				}
-				ASMAPI.log('INFO', 'Added \'server_light_level\' ASM patch!');
+				ASMAPI.log('INFO', 'Added PS \'server_light_level\' ASM patch!');
 				return method;
 			}
 		}

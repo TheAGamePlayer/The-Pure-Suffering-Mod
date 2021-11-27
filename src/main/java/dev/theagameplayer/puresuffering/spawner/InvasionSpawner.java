@@ -1,20 +1,20 @@
 package dev.theagameplayer.puresuffering.spawner;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import com.google.common.collect.ImmutableList;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
-import dev.theagameplayer.puresuffering.network.InvasionListType;
+import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionPriority;
+import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionTime;
+import dev.theagameplayer.puresuffering.invasion.InvasionType.TimeChangeability;
+import dev.theagameplayer.puresuffering.invasion.InvasionType.TimeModifier;
+import dev.theagameplayer.puresuffering.util.InvasionChart;
 import dev.theagameplayer.puresuffering.util.InvasionList;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
 import net.minecraft.server.MinecraftServer;
@@ -22,131 +22,113 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.server.ServerWorld;
 
 public final class InvasionSpawner {
-	private static final InvasionList NIGHT_INVASIONS = new InvasionList(InvasionListType.NIGHT);
-	private static final InvasionList DAY_INVASIONS = new InvasionList(InvasionListType.DAY);
+	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final InvasionList NIGHT_INVASIONS = new InvasionList(false);
+	private static final InvasionList DAY_INVASIONS = new InvasionList(true);
 	private static final ArrayList<Invasion> QUEUED_NIGHT_INVASIONS = new ArrayList<>();
 	private static final ArrayList<Invasion> QUEUED_DAY_INVASIONS = new ArrayList<>();
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static int nightInterval = 0, dayInterval = 0;
+	private static boolean isNightChangedToDay = false;
 	private static boolean isDayChangedToNight = false;
-	
-	public static void setNightTimeEvents(ServerWorld worldIn, int eventsIn, long daysIn) {
+
+	public static void setNightTimeEvents(ServerWorld worldIn, int amountIn, long daysIn) {
 		NIGHT_INVASIONS.clear();
-		Invasion.INVASION_MOBS.clear();
-		Invasion.QUEUED_MOBS.clear();
 		Random random = worldIn.random;
-		int events = calculateEvents(random, false, eventsIn, daysIn);
-		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());
+		isNightChangedToDay = false;
+		int totalInvasions = !QUEUED_NIGHT_INVASIONS.isEmpty() ? QUEUED_NIGHT_INVASIONS.size() : calculateInvasions(random, amountIn, nightInterval, daysIn == 0);
+		nightInterval = nightInterval > 0 ? nightInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.nightInvasionRarity : random.nextInt(PSConfigValues.common.nightInvasionRarity) + PSConfigValues.common.nightInvasionRarity - (int)(daysIn % PSConfigValues.common.nightInvasionRarity));
+		InvasionChart.refresh();
+		InvasionChart potentialPrimaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
+		InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
+		InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY));
 		LOGGER.info("Setting Night Invasions: [");
-		for (int event = 0; event < events; event++) {
-			InvasionType invasionType = getInvasionType(invasionList, random, event, false);
-			if (invasionType != null) {
-				int severity = random.nextInt(random.nextInt(MathHelper.clamp(events, 1, invasionType.getMaxSeverity())) + 1) + 1;
-				Invasion invasion = new Invasion(invasionType, severity);
-				NIGHT_INVASIONS.add(invasion);
-				LOGGER.info("Invasion " + (event + 1) + ": " + invasionType + " - " + severity);
-			}
-		}
 		if (!QUEUED_NIGHT_INVASIONS.isEmpty()) {
 			for (int q = 0; q < QUEUED_NIGHT_INVASIONS.size(); q++) {
 				Invasion invasion = QUEUED_NIGHT_INVASIONS.get(q);
-				if (!invasion.getType().isRepeatable() && NIGHT_INVASIONS.contains(invasion))
-					continue;
 				NIGHT_INVASIONS.add(invasion);
-				LOGGER.info("Queued Invasion " + (events + 1) + ": " + invasion.getType() + " - " + invasion.getSeverity());
-				events++;
+				LOGGER.info("Queued Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}
 			QUEUED_NIGHT_INVASIONS.clear();
-		}
+		} else {
+			for (int inv = 0; inv < totalInvasions; inv++) {
+				InvasionType invasionType = getInvasionType(inv == 0 ? potentialPrimaryNightInvasions : (isNightChangedToDay ? potentialSecondaryDayInvasions : potentialSecondaryNightInvasions), random);
+				if (invasionType != null) {
+					int severity = random.nextInt(random.nextInt(MathHelper.clamp((int)daysIn/PSConfigValues.common.nightDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					Invasion invasion = new Invasion(invasionType, severity, inv == 0);
+					NIGHT_INVASIONS.add(invasion);
+					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
+					isNightChangedToDay |= invasionType.getTimeModifier() == TimeModifier.NIGHT_TO_DAY;
+				}
+			}
+		}	
 		LOGGER.info("]");
 	}
-	
-	public static void setDayTimeEvents(ServerWorld worldIn, int eventsIn, long daysIn) {
+
+	public static void setDayTimeEvents(ServerWorld worldIn, int amountIn, long daysIn) {
 		DAY_INVASIONS.clear();
-		Invasion.INVASION_MOBS.clear();
-		Invasion.QUEUED_MOBS.clear();
 		Random random = worldIn.random;
-		int events = calculateEvents(random, true, eventsIn, daysIn);
 		isDayChangedToNight = false;
-		ArrayList<InvasionType> invasionList = new ArrayList<>(BaseEvents.getInvasionTypeManager().getDayInvasionTypes());
-		ArrayList<InvasionType> invasionList1 = new ArrayList<>(BaseEvents.getInvasionTypeManager().getNightInvasionTypes());
+		int totalInvasions = !QUEUED_DAY_INVASIONS.isEmpty() ? QUEUED_DAY_INVASIONS.size() : calculateInvasions(random, amountIn, dayInterval, daysIn == 0);
+		dayInterval = dayInterval > 0 ? dayInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.dayInvasionRarity : random.nextInt(PSConfigValues.common.dayInvasionRarity) + PSConfigValues.common.dayInvasionRarity - (int)(daysIn % PSConfigValues.common.dayInvasionRarity));
+		InvasionChart.refresh();
+		InvasionChart potentialPrimaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
+		InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
+		InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT));
 		LOGGER.info("Setting Day Invasions: [");
-		int acceptedEvents = 0;
-		for (int event = 0; event < events; event++) {
-			InvasionType invasionType = getInvasionType(isDayChangedToNight ? invasionList1 : invasionList, random, event, true);
-			if (invasionType != null) {
-				int severity = random.nextInt(random.nextInt(MathHelper.clamp(events, 1, invasionType.getMaxSeverity())) + 1) + 1;
-				Invasion invasion = new Invasion(invasionType, severity);
-				DAY_INVASIONS.add(invasion);
-				acceptedEvents++;
-				LOGGER.info("Invasion " + (acceptedEvents + 1) + ": " + invasionType + " - " + severity);
-				isDayChangedToNight |= invasionType.setsEventsToNight();
-			}
-		};
 		if (!QUEUED_DAY_INVASIONS.isEmpty()) {
 			for (int q = 0; q < QUEUED_DAY_INVASIONS.size(); q++) {
 				Invasion invasion = QUEUED_DAY_INVASIONS.get(q);
-				if (!invasion.getType().isRepeatable() && DAY_INVASIONS.contains(invasion))
-					continue;
 				DAY_INVASIONS.add(invasion);
-				LOGGER.info("Queued Invasion " + (events + 1) + ": " + invasion.getType() + " - " + invasion.getSeverity());
-				events++;
+				LOGGER.info("Queued Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}
 			QUEUED_DAY_INVASIONS.clear();
+		} else {
+			for (int inv = 0; inv < totalInvasions; inv++) {
+				InvasionType invasionType = getInvasionType(inv == 0 ? potentialPrimaryDayInvasions : (isDayChangedToNight ? potentialSecondaryNightInvasions : potentialSecondaryDayInvasions), random);
+				if (invasionType != null) {
+					int severity = random.nextInt(random.nextInt(MathHelper.clamp((int)daysIn/PSConfigValues.common.dayDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					Invasion invasion = new Invasion(invasionType, severity, inv == 0);
+					DAY_INVASIONS.add(invasion);
+					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
+					isDayChangedToNight |= invasionType.getTimeModifier() == TimeModifier.DAY_TO_NIGHT;
+				}
+			}
 		}
 		LOGGER.info("]");
 	}
-	
-	private static int calculateEvents(Random randomIn, boolean isDayIn, int eventsIn, long daysIn) {
-		if (PSConfigValues.common.consistentInvasions) {
-			return (daysIn % (isDayIn ? PSConfigValues.common.dayInvasionRarity : PSConfigValues.common.nightInvasionRarity)) == 0 ? randomIn.nextInt(eventsIn) + 1 : 0;
-		} else {
-			return randomIn.nextInt(isDayIn ? PSConfigValues.common.dayInvasionRarity : PSConfigValues.common.nightInvasionRarity) == 0 ? randomIn.nextInt(eventsIn) + 1 : 0;
-		}
+
+	private static int calculateInvasions(Random randomIn, int amountIn, int intervalIn, boolean isFirstDayIn) {
+		return !isFirstDayIn && intervalIn == 0 ? randomIn.nextInt(amountIn) + 1 : 0;
 	}
-	
-	private static InvasionType getInvasionType(ArrayList<InvasionType> invasionListIn, Random randomIn, int eventIn, boolean isDayIn) {
-		List<InvasionType> invasionList = eventIn == 0 ? ImmutableList.copyOf(invasionListIn.stream().filter(it -> it.getSkyRenderer().isEmpty()).iterator()) : invasionListIn;
-		InvasionType invasionType = invasionList.size() > 0 ? invasionList.get(randomIn.nextInt(invasionList.size())) : null;
-		int chance = isDayIn && !PSConfigValues.common.consistentInvasions ? randomIn.nextInt(invasionListIn.size()) : 0;
-		if (chance == 0 && invasionType != null) {
-			if (randomIn.nextInt(invasionType.getRarity() + 1) != 0 || (invasionType.isOnlyDuringNight() && isDayIn))
-				return getInvasionType(invasionListIn, randomIn, eventIn, isDayIn);
-			if (!invasionType.isRepeatable() && invasionListIn.contains(invasionType))
-				invasionListIn.remove(invasionType);
-			return invasionType;
-		} else {
-			return null;
-		}
+
+	private static InvasionType getInvasionType(InvasionChart invasionChartIn, Random randomIn) {
+		return invasionChartIn.getInvasionInRange(randomIn.nextFloat());
 	}
-	
+
 	public static void invasionTick(MinecraftServer serverIn) {
 		ServerWorld world = serverIn.overworld();
-		Invasion invasion = null;
 		if (!world.players().isEmpty() && !NIGHT_INVASIONS.isEmpty() && ServerTimeUtil.isServerNight(serverIn.overworld())) {
-			invasion = NIGHT_INVASIONS.get(serverIn.overworld().getRandom().nextInt(NIGHT_INVASIONS.size()));
-			invasion.tick(world, NIGHT_INVASIONS);
+			Invasion invasion = NIGHT_INVASIONS.get(serverIn.overworld().getRandom().nextInt(NIGHT_INVASIONS.size()));
+			invasion.tick(world);
 		} else if (!world.players().isEmpty() && !DAY_INVASIONS.isEmpty() && ServerTimeUtil.isServerDay(serverIn.overworld())) {
-			invasion = DAY_INVASIONS.get(serverIn.overworld().getRandom().nextInt(DAY_INVASIONS.size()));
-			invasion.tick(world, DAY_INVASIONS);
-		}
-		if (invasion != null && !Invasion.QUEUED_MOBS.isEmpty()) {
-			invasion.spawnInvasionMob(world, Invasion.QUEUED_MOBS.get(0));
+			Invasion invasion = DAY_INVASIONS.get(serverIn.overworld().getRandom().nextInt(DAY_INVASIONS.size()));
+			invasion.tick(world);
 		}
 	}
-	
+
 	public static InvasionList getNightInvasions() {
 		return NIGHT_INVASIONS;
 	}
-	
+
 	public static InvasionList getDayInvasions() {
 		return DAY_INVASIONS;
 	}
 	
-	public static ArrayList<Invasion> getQueuedDayInvasions() {
-		return QUEUED_DAY_INVASIONS;
-	}
-	
 	public static ArrayList<Invasion> getQueuedNightInvasions() {
 		return QUEUED_NIGHT_INVASIONS;
+	}
+
+	public static ArrayList<Invasion> getQueuedDayInvasions() {
+		return QUEUED_DAY_INVASIONS;
 	}
 }
