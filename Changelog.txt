@@ -30,6 +30,7 @@ Version 1.2.0B:
 - New Invasion Blacklist config option for disabling Invasions based on their id.
 - New Primary Whitelist config option for allowing specified invasions to be the only primary invasions able to be chosen.
 - New Tiered Invasions config option to enable/disable the new tier system added.
+- New "canInvasionsChangeBrightness" config option for better shader compatibility.
 - Renamed Auto Agro config option to Hyper Aggression.
 - According to feedback, invasions difficulty delay was far too sluggish for single player and server worlds. Therefore dayDifficultyIncreaseDelay was changed to 60 from 125 and nightDifficultyIncreaseDelay was changed to 40 from 100 to be more pressuring.
 
