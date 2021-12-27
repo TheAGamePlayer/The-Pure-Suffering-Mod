@@ -43,6 +43,8 @@ public abstract class PSConfigValues {
 		
 		public final boolean hyperAggression;
 		public final List<? extends String> hyperAggressionBlacklist;
+		public final List<? extends String> modBiomeBoostedBlacklist;
+		public final List<? extends String> mobBiomeBoostedBlacklist;
 		public final boolean weakenedVexes;
 		public final boolean useXPMultiplier;
 		public final boolean explosionsDestroyBlocks;
@@ -71,6 +73,8 @@ public abstract class PSConfigValues {
 			
 			this.hyperAggression = PSConfig.CommonConfig.COMMON.hyperAggression.get();
 			this.hyperAggressionBlacklist = PSConfig.CommonConfig.COMMON.hyperAggressionBlacklist.get();
+			this.modBiomeBoostedBlacklist = PSConfig.CommonConfig.COMMON.modBiomeBoostedBlacklist.get();
+			this.mobBiomeBoostedBlacklist = PSConfig.CommonConfig.COMMON.mobBiomeBoostedBlacklist.get();
 			this.weakenedVexes = PSConfig.CommonConfig.COMMON.weakenedVexes.get();
 			this.useXPMultiplier = PSConfig.CommonConfig.COMMON.useXPMultiplier.get();
 			this.explosionsDestroyBlocks = PSConfig.CommonConfig.COMMON.explosionsDestroyBlocks.get();

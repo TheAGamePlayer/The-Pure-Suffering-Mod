@@ -1,3 +1,11 @@
+Version 1.2.1B:
+- Fixed Invasions being canceled way too commonly.
+- Fixed Invasions being canceled crashing servers.
+- Fixed client side bugs caused by Invasions being canceled when set by a command.
+- Added "modBiomeBoostedBlacklist" config option to disable spawning mobs from certain mods in biome boosted invasions such as eclipses.
+- Added "mobBiomeBoostedBlacklist" for disabling specific mobs from spawning in biome boosted invasions (eclipses).
+(Config file may be changed when updating!)
+
 Version 1.2.0B:
 - Fixed some Client-Side performance issues.
 - Fixed performance bugs when choosing the next invasions.

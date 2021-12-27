@@ -48,6 +48,8 @@ public final class PSConfig {
 		//Modifications
 		public final ForgeConfigSpec.BooleanValue hyperAggression;
 		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
+		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
+		public final ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
 		public final ForgeConfigSpec.BooleanValue weakenedVexes;
 		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
 		public final ForgeConfigSpec.BooleanValue explosionsDestroyBlocks;
@@ -140,12 +142,12 @@ public final class PSConfig {
 					.translation(CONFIG + "day_cancel_chance_multiplier")
 					.worldRestart()
 					.comment("Chance for Day Invasions to be canceled.", "NOTE: Multiplied by Day Difficulty Increase Delay.")
-					.defineInRange("dayCancelChanceMultiplier", 1.0D, 0.0D, 10.0D);
+					.defineInRange("dayCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
 			nightCancelChanceMultiplier = COMMON_BUILDER
 					.translation(CONFIG + "night_cancel_chance_multiplier")
 					.worldRestart()
 					.comment("Chance for Night Invasions to be canceled.", "NOTE: Multiplied by Night Difficulty Increase Delay.")
-					.defineInRange("nightCancelChanceMultiplier", 1.0D, 0.0D, 10.0D);
+					.defineInRange("nightCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
 			COMMON_BUILDER.pop();
 			
 			COMMON_BUILDER.push("Modifications");
@@ -159,6 +161,20 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("List of Mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
 					.defineList("hyperAggressionBlacklist", ImmutableList.of("minecraft:vex"), string -> {
+						return string != "";
+					});
+			modBiomeBoostedBlacklist = COMMON_BUILDER
+					.translation(CONFIG + "mod_biome_boosted_blacklist")
+					.worldRestart()
+					.comment("List of Mods that won't be allowed to have their mobs spawn in Biome Boosted Invasions.", "Ex: 'johncraft', 'mutantbeasts'")
+					.defineList("modBiomeBoostedBlacklist", ImmutableList.of(), string -> {
+						return string != "";
+					});
+			mobBiomeBoostedBlacklist = COMMON_BUILDER
+					.translation(CONFIG + "mob_biome_boosted_blacklist")
+					.worldRestart()
+					.comment("List of Mobs that won't be allowed to spawn in Biome Boosted Invasions.", "Ex: 'minecraft:enderman', 'mutantbeasts:mutant_creeper'")
+					.defineList("mobBiomeBoostedBlacklist", ImmutableList.of(), string -> {
 						return string != "";
 					});
 			weakenedVexes = COMMON_BUILDER

@@ -31,17 +31,18 @@ public final class InvasionSpawner {
 	private static boolean isNightChangedToDay = false;
 	private static boolean isDayChangedToNight = false;
 
-	public static void setNightTimeEvents(ServerWorld worldIn, int amountIn, long daysIn) {
+	public static void setNightTimeEvents(ServerWorld worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		NIGHT_INVASIONS.clear();
 		Random random = worldIn.random;
 		isNightChangedToDay = false;
-		int totalInvasions = !QUEUED_NIGHT_INVASIONS.isEmpty() ? QUEUED_NIGHT_INVASIONS.size() : calculateInvasions(random, amountIn, nightInterval, daysIn == 0);
+		int totalInvasions = !QUEUED_NIGHT_INVASIONS.isEmpty() ? QUEUED_NIGHT_INVASIONS.size() : calculateInvasions(random, amountIn, nightInterval, isCanceledIn, daysIn == 0);
 		nightInterval = nightInterval > 0 ? nightInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.nightInvasionRarity : random.nextInt(PSConfigValues.common.nightInvasionRarity) + PSConfigValues.common.nightInvasionRarity - (int)(daysIn % PSConfigValues.common.nightInvasionRarity));
 		InvasionChart.refresh();
 		InvasionChart potentialPrimaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
 		InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
 		InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY));
 		LOGGER.info("Setting Night Invasions: [");
+		NIGHT_INVASIONS.setCanceled(QUEUED_NIGHT_INVASIONS.isEmpty() && isCanceledIn);
 		if (!QUEUED_NIGHT_INVASIONS.isEmpty()) {
 			for (int q = 0; q < QUEUED_NIGHT_INVASIONS.size(); q++) {
 				Invasion invasion = QUEUED_NIGHT_INVASIONS.get(q);
@@ -60,21 +61,22 @@ public final class InvasionSpawner {
 					isNightChangedToDay |= invasionType.getTimeModifier() == TimeModifier.NIGHT_TO_DAY;
 				}
 			}
-		}	
+		}
 		LOGGER.info("]");
 	}
 
-	public static void setDayTimeEvents(ServerWorld worldIn, int amountIn, long daysIn) {
+	public static void setDayTimeEvents(ServerWorld worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		DAY_INVASIONS.clear();
 		Random random = worldIn.random;
 		isDayChangedToNight = false;
-		int totalInvasions = !QUEUED_DAY_INVASIONS.isEmpty() ? QUEUED_DAY_INVASIONS.size() : calculateInvasions(random, amountIn, dayInterval, daysIn == 0);
+		int totalInvasions = !QUEUED_DAY_INVASIONS.isEmpty() ? QUEUED_DAY_INVASIONS.size() : calculateInvasions(random, amountIn, dayInterval, isCanceledIn, daysIn == 0);
 		dayInterval = dayInterval > 0 ? dayInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.dayInvasionRarity : random.nextInt(PSConfigValues.common.dayInvasionRarity) + PSConfigValues.common.dayInvasionRarity - (int)(daysIn % PSConfigValues.common.dayInvasionRarity));
 		InvasionChart.refresh();
 		InvasionChart potentialPrimaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
 		InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
 		InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT));
 		LOGGER.info("Setting Day Invasions: [");
+		DAY_INVASIONS.setCanceled(QUEUED_DAY_INVASIONS.isEmpty() && isCanceledIn);
 		if (!QUEUED_DAY_INVASIONS.isEmpty()) {
 			for (int q = 0; q < QUEUED_DAY_INVASIONS.size(); q++) {
 				Invasion invasion = QUEUED_DAY_INVASIONS.get(q);
@@ -97,8 +99,8 @@ public final class InvasionSpawner {
 		LOGGER.info("]");
 	}
 
-	private static int calculateInvasions(Random randomIn, int amountIn, int intervalIn, boolean isFirstDayIn) {
-		return !isFirstDayIn && intervalIn == 0 ? randomIn.nextInt(amountIn) + 1 : 0;
+	private static int calculateInvasions(Random randomIn, int amountIn, int intervalIn, boolean isCanceledIn, boolean isFirstDayIn) {
+		return !isFirstDayIn && intervalIn == 0 && amountIn > 0 && !isCanceledIn ? randomIn.nextInt(amountIn) + 1 : 0;
 	}
 
 	private static InvasionType getInvasionType(InvasionChart invasionChartIn, Random randomIn) {

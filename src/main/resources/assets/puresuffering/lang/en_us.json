@@ -53,6 +53,8 @@
 	
 	"puresuffering.config.hyper_aggression": "Hyper Aggression",
 	"puresuffering.config.hyper_aggression_blacklist": "Hyper Aggression Blacklist",
+	"puresuffering.config.mod_biome_boosted_blacklist": "Mod Biome Boosted Blacklist",
+	"puresuffering.config.mob_biome_boosted_blacklist": "Mob Biome Boosted Blacklist",
 	"puresuffering.config.use_xp_multiplier": "Use XP Multiplier",
 	"puresuffering.config.explosions_destroy_blocks": "Explosions Destroy Blocks",
 	"puresuffering.config.should_mobs_die_at_end_of_invasions": "Should Mobs Die at End of Invasions",

@@ -21,11 +21,12 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeMagnifier;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap;
@@ -44,7 +45,7 @@ public class Invasion {
 	private final ArrayList<InvasionSpawnerEntity> spawnPotentials = new ArrayList<>();
 	private InvasionSpawnerEntity nextSpawnData = new InvasionSpawnerEntity();
 	private int spawnDelay;
-	
+
 	public Invasion(final InvasionType invasionTypeIn, final int severityIn, final boolean isPrimaryIn) {
 		SeverityInfo info = invasionTypeIn.getSeverityInfo().get(severityIn);
 		int mobCap = isPrimaryIn ? PSConfigValues.common.primaryInvasionMobCap : PSConfigValues.common.secondaryInvasionMobCap;
@@ -62,15 +63,15 @@ public class Invasion {
 	public int getSeverity() {
 		return this.severity;
 	}
-	
+
 	public boolean isPrimary() {
 		return this.isPrimary;
 	}
-	
+
 	public int getMobCap() {
 		return this.mobCap;
 	}
-	
+
 	public SeverityInfo getSeverityInfo() {
 		return this.invasionType.getSeverityInfo().get(this.severity);
 	}
@@ -104,7 +105,7 @@ public class Invasion {
 				break;
 			case BIOME_BOOSTED:
 				BlockPos pos = this.getSpawnPos(worldIn, chunkPos);
-				mobs = this.getRoughBiome(pos, worldIn.getChunk(pos)).getMobSettings().getMobs(EntityClassification.MONSTER);
+				mobs = this.getBiomeSpawnList(pos, worldIn.getChunk(pos));
 				break;
 			}
 			if (mobs.size() < 1) return;
@@ -173,8 +174,13 @@ public class Invasion {
 		}
 	}
 
-	protected final Biome getRoughBiome(BlockPos posIn, IChunk chunkIn) {
-		return DefaultBiomeMagnifier.INSTANCE.getBiome(0L, posIn.getX(), posIn.getY(), posIn.getZ(), chunkIn.getBiomes());
+	protected final ArrayList<MobSpawnInfo.Spawners> getBiomeSpawnList(BlockPos posIn, IChunk chunkIn) {
+		ArrayList<MobSpawnInfo.Spawners> spawners = new ArrayList<>(DefaultBiomeMagnifier.INSTANCE.getBiome(0L, posIn.getX(), posIn.getY(), posIn.getZ(), chunkIn.getBiomes()).getMobSettings().getMobs(EntityClassification.MONSTER));
+		spawners.removeIf(spawner -> {
+			ResourceLocation name = spawner.type.getRegistryName();
+			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
+		});
+		return spawners;
 	}
 
 	protected final ChunkPos getSpawnChunk(ServerWorld worldIn) {

@@ -13,9 +13,18 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 public final class InvasionList implements Iterable<Invasion> {
 	private final ArrayList<Invasion> invasionList = new ArrayList<>();
 	private final boolean isDay;
+	private boolean isCanceled;
 	
 	public InvasionList(boolean isDayIn) {
 		this.isDay = isDayIn;
+	}
+	
+	public void setCanceled(boolean isCanceledIn) {
+		this.isCanceled = isCanceledIn;
+	}
+	
+	public boolean isCanceled() {
+		return this.isCanceled;
 	}
 	
 	public boolean add(Invasion invasionIn) {

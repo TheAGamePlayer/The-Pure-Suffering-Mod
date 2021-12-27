@@ -192,19 +192,18 @@ public final class PSEventManager {
 				if (world == world.getServer().overworld() && PSGameRulesRegistry.getEnableInvasions(world)) {
 					if (ServerTimeUtil.isServerDay(world) && !checkedNight) { //Sets events for night time
 						days = world.getDayTime() / 24000L;
-						int possibleAmount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.nightDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxNightInvasions);
-						int chance = world.random.nextInt(world.random.nextInt((int)(PSConfigValues.common.nightDifficultyIncreaseDelay * PSConfigValues.common.nightCancelChanceMultiplier) + 1) + 1);
-						boolean cancelFlag = chance == 0 && possibleAmount > 1 && InvasionSpawner.getQueuedNightInvasions().isEmpty() && PSConfigValues.common.canNightInvasionsBeCanceled;
-						int amount = cancelFlag ? 0 : possibleAmount;
+						int amount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.nightDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxNightInvasions);
+						int chance = world.random.nextInt((int)(PSConfigValues.common.nightDifficultyIncreaseDelay * PSConfigValues.common.nightCancelChanceMultiplier) + 1);
+						boolean cancelFlag = chance == 0 && amount > 1 && InvasionSpawner.getQueuedNightInvasions().isEmpty() && PSConfigValues.common.canNightInvasionsBeCanceled;
 						LOGGER.info("Day: " + days + ", Possible Invasions: " + amount);
-						InvasionSpawner.setNightTimeEvents(world, amount, days);
+						InvasionSpawner.setNightTimeEvents(world, cancelFlag, amount, days);
 						PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(0.0D, true));
 						LivingEvents.dayXPMultiplier = 0.0D;
 						checkedDay = false;
 						checkedNight = true;
-						if (!InvasionSpawner.getDayInvasions().isEmpty()) {
+						if (!InvasionSpawner.getDayInvasions().isEmpty() || InvasionSpawner.getDayInvasions().isCanceled()) {
 							for (ServerPlayerEntity player : world.players()) {
-								if (cancelFlag) {
+								if (InvasionSpawner.getDayInvasions().isCanceled()) {
 									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
 									continue;
 								}
@@ -214,19 +213,18 @@ public final class PSEventManager {
 						}
 					} else if (ServerTimeUtil.isServerNight(world) && !checkedDay) { //Sets events for day time
 						days = world.getDayTime() / 24000L;
-						int possibleAmount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
-						int chance = world.random.nextInt(world.random.nextInt((int)(PSConfigValues.common.dayDifficultyIncreaseDelay * PSConfigValues.common.dayCancelChanceMultiplier) + 1) + 1);
-						boolean cancelFlag = chance == 0 && possibleAmount > 1 && InvasionSpawner.getQueuedDayInvasions().isEmpty() && PSConfigValues.common.canDayInvasionsBeCanceled;
-						int amount = cancelFlag ? 0 : possibleAmount;
+						int amount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
+						int chance = world.random.nextInt((int)(PSConfigValues.common.dayDifficultyIncreaseDelay * PSConfigValues.common.dayCancelChanceMultiplier) + 1);
+						boolean cancelFlag = chance == 0 && amount > 1 && InvasionSpawner.getQueuedDayInvasions().isEmpty() && PSConfigValues.common.canDayInvasionsBeCanceled;
 						LOGGER.info("Night: " + days + ", Possible Invasions: " + amount);
-						InvasionSpawner.setDayTimeEvents(world, amount, days);
+						InvasionSpawner.setDayTimeEvents(world, cancelFlag, amount, days);
 						PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(0.0D, false));
 						LivingEvents.nightXPMultiplier = 0.0D;
 						checkedDay = true;
 						checkedNight = false;
-						if (!InvasionSpawner.getNightInvasions().isEmpty()) {
+						if (!InvasionSpawner.getNightInvasions().isEmpty() || InvasionSpawner.getNightInvasions().isCanceled()) {
 							for (ServerPlayerEntity player : world.players()) {
-								if (cancelFlag) {
+								if (InvasionSpawner.getNightInvasions().isCanceled()) {
 									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
 									continue;
 								}
