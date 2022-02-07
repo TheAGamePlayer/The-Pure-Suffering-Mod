@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public final class PSConfig {
@@ -32,8 +31,11 @@ public final class PSConfig {
 		public final ForgeConfigSpec.IntValue secondaryInvasionMobCap;
 		public final ForgeConfigSpec.IntValue dayDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue nightDifficultyIncreaseDelay;
+		public final ForgeConfigSpec.IntValue fixedDifficultyIncreaseDelay;
 		public final ForgeConfigSpec.IntValue maxDayInvasions;
 		public final ForgeConfigSpec.IntValue maxNightInvasions;
+		public final ForgeConfigSpec.IntValue maxFixedInvasions;
+		public final ForgeConfigSpec.BooleanValue multiThreadedInvasions;
 		public final ForgeConfigSpec.BooleanValue consistentInvasions;
 		public final ForgeConfigSpec.BooleanValue tieredInvasions;
 		public final ConfigValue<List<? extends String>> invasionBlacklist;
@@ -41,22 +43,27 @@ public final class PSConfig {
 		//Balancing
 		public final ForgeConfigSpec.IntValue dayInvasionRarity;
 		public final ForgeConfigSpec.IntValue nightInvasionRarity;
+		public final ForgeConfigSpec.IntValue fixedInvasionRarity;
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
+		public final ForgeConfigSpec.BooleanValue canFixedInvasionsBeCanceled;
 		public final ForgeConfigSpec.DoubleValue dayCancelChanceMultiplier;
 		public final ForgeConfigSpec.DoubleValue nightCancelChanceMultiplier;
+		public final ForgeConfigSpec.DoubleValue fixedCancelChanceMultiplier;
 		//Modifications
 		public final ForgeConfigSpec.BooleanValue hyperAggression;
 		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
 		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
 		public final ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
+		public final ForgeConfigSpec.BooleanValue forceInvasionSleeplessness;
 		public final ForgeConfigSpec.BooleanValue weakenedVexes;
 		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
 		public final ForgeConfigSpec.BooleanValue explosionsDestroyBlocks;
 		public final ForgeConfigSpec.BooleanValue shouldMobsDieAtEndOfInvasions;
 		public final ForgeConfigSpec.BooleanValue shouldMobsSpawnWithMaxRange;
 		public final ForgeConfigSpec.IntValue naturalSpawnChance;
-		
+		public final ForgeConfigSpec.IntValue blessingEffectRespawnDuration;
+		public final ForgeConfigSpec.IntValue blessingEffectDimensionChangeDuration;
 		
 		private CommonConfig() {
 			COMMON_BUILDER.push("Gameplay");
@@ -81,6 +88,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("How many days should pass when the Night Invasion Difficulty increases?")
 					.defineInRange("nightDifficultyIncreaseDelay", 40, 0, Integer.MAX_VALUE);
+			fixedDifficultyIncreaseDelay = COMMON_BUILDER
+					.translation(CONFIG + "fixed_difficulty_increase_delay")
+					.worldRestart()
+					.comment("How many days should pass when the Fixed Invasion Difficulty increases?")
+					.defineInRange("fixedDifficultyIncreaseDelay", 50, 0, Integer.MAX_VALUE);
 			maxDayInvasions = COMMON_BUILDER
 					.translation(CONFIG + "max_day_invasions")
 					.worldRestart()
@@ -91,6 +103,16 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Max Night Invasions that can occur.")
 					.defineInRange("maxNightInvasions", 3, 0, Integer.MAX_VALUE);
+			maxFixedInvasions = COMMON_BUILDER
+					.translation(CONFIG + "max_fixed_invasions")
+					.worldRestart()
+					.comment("Max Fixed Invasions that can occur.")
+					.defineInRange("maxFixedInvasions", 3, 0, Integer.MAX_VALUE);
+			multiThreadedInvasions = COMMON_BUILDER
+					.translation(CONFIG + "multi_threaded_invasions")
+					.worldRestart()
+					.comment("Should a thread be added for every dimension's Invasion Spawner instead of just 1 for all?", "NOTE: This can boost performance on multi-threaded CPUs!")
+					.define("multiThreadedInvasions", false);
 			consistentInvasions = COMMON_BUILDER
 					.translation(CONFIG + "consistent_invasions")
 					.worldRestart()
@@ -128,6 +150,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("How often should Night Invasions occur.")
 					.defineInRange("nightInvasionRarity", 3, 1, 100);
+			fixedInvasionRarity = COMMON_BUILDER
+					.translation(CONFIG + "fixed_invasion_rarity")
+					.worldRestart()
+					.comment("How often should Fixed Invasions occur.")
+					.defineInRange("fixedInvasionRarity", 12, 1, 100);
 			canDayInvasionsBeCanceled = COMMON_BUILDER
 					.translation(CONFIG + "can_day_invasions_be_canceled")
 					.worldRestart()
@@ -138,6 +165,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Can Night Invasions have a random chance to be canceled?")
 					.define("canNightInvasionsBeCanceled", true);
+			canFixedInvasionsBeCanceled = COMMON_BUILDER
+					.translation(CONFIG + "can_fixed_invasions_be_canceled")
+					.worldRestart()
+					.comment("Can Fixed Invasions have a random chance to be canceled?")
+					.define("canFixedInvasionsBeCanceled", true);
 			dayCancelChanceMultiplier = COMMON_BUILDER
 					.translation(CONFIG + "day_cancel_chance_multiplier")
 					.worldRestart()
@@ -148,6 +180,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Chance for Night Invasions to be canceled.", "NOTE: Multiplied by Night Difficulty Increase Delay.")
 					.defineInRange("nightCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
+			fixedCancelChanceMultiplier = COMMON_BUILDER
+					.translation(CONFIG + "fixed_cancel_chance_multiplier")
+					.worldRestart()
+					.comment("Chance for Fixed Invasions to be canceled.", "NOTE: Multiplied by Fixed Difficulty Increase Delay.")
+					.defineInRange("fixedCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
 			COMMON_BUILDER.pop();
 			
 			COMMON_BUILDER.push("Modifications");
@@ -177,6 +214,11 @@ public final class PSConfig {
 					.defineList("mobBiomeBoostedBlacklist", ImmutableList.of(), string -> {
 						return string != "";
 					});
+			forceInvasionSleeplessness = COMMON_BUILDER
+					.translation(CONFIG + "force_invasion_sleeplessness")
+					.worldRestart()
+					.comment("Should players be unable to sleep during all invasions?")
+					.define("forceInvasionSleeplessness", false);
 			weakenedVexes = COMMON_BUILDER
 					.translation(CONFIG + "weakened_vexes")
 					.worldRestart()
@@ -207,6 +249,16 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("The Chance of a naturally spawning mob has of spawning during an Invasion.", "NOTE: May affect performance at higher numbers!")
 					.defineInRange("naturalSpawnChance", 3, 0, 10000);
+			blessingEffectRespawnDuration = COMMON_BUILDER
+					.translation(CONFIG + "blessing_effect_respawn_duration")
+					.worldRestart()
+					.comment("How many ticks the Blessing Effect lasts when respawning.")
+					.defineInRange("blessingEffectRespawnDuration", 600, 0, Integer.MAX_VALUE);
+			blessingEffectDimensionChangeDuration = COMMON_BUILDER
+					.translation(CONFIG + "blessing_effect_dimension_change_duration")
+					.worldRestart()
+					.comment("How many ticks the Blessing Effect lasts when changing dimensions.")
+					.defineInRange("blessingEffectDimensionChangeDuration", 300, 0, Integer.MAX_VALUE);
 			COMMON_BUILDER.pop();
 			COMMON_BUILDER.pop();
 		}
@@ -265,12 +317,4 @@ public final class PSConfig {
         configData.load();
         specIn.setConfig(configData);
     }
-	
-	public static void configReloading(ModConfig.Reloading eventIn) {
-		/*ModConfig config = eventIn.getConfig();
-		if (config.getModId().equals(PureSufferingMod.MODID)) {
-			//ForgeConfigSpec spec = config.getSpec();
-			//TODO: Server Config Sync goes here.
-		}*/
-	}
 }

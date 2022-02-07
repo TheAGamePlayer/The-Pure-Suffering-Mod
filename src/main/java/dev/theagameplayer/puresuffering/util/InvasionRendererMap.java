@@ -14,6 +14,10 @@ public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRend
 	public void add(InvasionSkyRenderer rendererIn, boolean isPrimaryIn) {
 		this.rendererMap.put(rendererIn, isPrimaryIn);
 	}
+	
+	public void remove(InvasionSkyRenderer rendererIn) {
+		this.rendererMap.remove(rendererIn);
+	}
 
 	public void clear() {
 		this.rendererMap.clear();

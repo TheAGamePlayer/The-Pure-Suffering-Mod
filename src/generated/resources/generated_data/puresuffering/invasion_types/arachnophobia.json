@@ -6,25 +6,27 @@
   "SpawningSystem": "DEFAULT",
   "TimeModifier": "NONE",
   "TimeChangeability": "DEFAULT",
+  "WeatherType": "DEFAULT",
   "SeverityInfo": [
     {
       "MobSpawnList": [
         {
           "EntityType": "minecraft:spider",
-          "Weight": 6,
+          "Weight": 3,
           "MinCount": 1,
           "MaxCount": 2
         }
       ],
       "MobCapPercentage": 0.6,
       "ForceNoSleep": false,
-      "TickDelay": 30
+      "TickDelay": 30,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
         {
           "EntityType": "minecraft:spider",
-          "Weight": 6,
+          "Weight": 3,
           "MinCount": 1,
           "MaxCount": 3
         },
@@ -37,13 +39,14 @@
       ],
       "MobCapPercentage": 0.7,
       "ForceNoSleep": false,
-      "TickDelay": 24
+      "TickDelay": 24,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
         {
           "EntityType": "minecraft:spider",
-          "Weight": 6,
+          "Weight": 3,
           "MinCount": 2,
           "MaxCount": 4
         },
@@ -56,45 +59,51 @@
       ],
       "MobCapPercentage": 0.8,
       "ForceNoSleep": false,
-      "TickDelay": 18
+      "TickDelay": 18,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
         {
           "EntityType": "minecraft:spider",
-          "Weight": 6,
+          "Weight": 3,
           "MinCount": 2,
           "MaxCount": 5
         },
         {
           "EntityType": "minecraft:cave_spider",
-          "Weight": 2,
+          "Weight": 1,
           "MinCount": 1,
           "MaxCount": 3
         }
       ],
       "MobCapPercentage": 0.9,
       "ForceNoSleep": false,
-      "TickDelay": 12
+      "TickDelay": 12,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
         {
           "EntityType": "minecraft:spider",
-          "Weight": 6,
+          "Weight": 3,
           "MinCount": 3,
           "MaxCount": 7
         },
         {
           "EntityType": "minecraft:cave_spider",
-          "Weight": 2,
+          "Weight": 1,
           "MinCount": 2,
           "MaxCount": 4
         }
       ],
       "MobCapPercentage": 1.0,
       "ForceNoSleep": false,
-      "TickDelay": 6
+      "TickDelay": 6,
+      "ClusterSize": 1
     }
+  ],
+  "Dimensions": [
+    "minecraft:overworld"
   ]
 }

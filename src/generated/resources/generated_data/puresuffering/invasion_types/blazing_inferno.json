@@ -1,0 +1,175 @@
+{
+  "Rarity": 10,
+  "Tier": 1,
+  "InvasionTime": "BOTH",
+  "InvasionPriority": "BOTH",
+  "SpawningSystem": "DEFAULT",
+  "TimeModifier": "NONE",
+  "TimeChangeability": "DEFAULT",
+  "WeatherType": "DEFAULT",
+  "SeverityInfo": [
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:blaze",
+          "Weight": 5,
+          "MinCount": 1,
+          "MaxCount": 2
+        },
+        {
+          "EntityType": "minecraft:skeleton",
+          "Weight": 6,
+          "MinCount": 1,
+          "MaxCount": 3
+        }
+      ],
+      "MobCapPercentage": 0.2,
+      "ForceNoSleep": false,
+      "TickDelay": 30,
+      "ClusterSize": 1
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:blaze",
+          "Weight": 5,
+          "MinCount": 1,
+          "MaxCount": 2
+        },
+        {
+          "EntityType": "minecraft:skeleton",
+          "Weight": 6,
+          "MinCount": 1,
+          "MaxCount": 3
+        },
+        {
+          "EntityType": "minecraft:magma_cube",
+          "Weight": 4,
+          "MinCount": 1,
+          "MaxCount": 1
+        }
+      ],
+      "MobCapPercentage": 0.4,
+      "ForceNoSleep": false,
+      "TickDelay": 25,
+      "ClusterSize": 1
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:blaze",
+          "Weight": 5,
+          "MinCount": 1,
+          "MaxCount": 3
+        },
+        {
+          "EntityType": "minecraft:skeleton",
+          "Weight": 6,
+          "MinCount": 1,
+          "MaxCount": 4
+        },
+        {
+          "EntityType": "minecraft:magma_cube",
+          "Weight": 4,
+          "MinCount": 1,
+          "MaxCount": 2
+        },
+        {
+          "EntityType": "minecraft:wither_skeleton",
+          "Weight": 2,
+          "MinCount": 1,
+          "MaxCount": 1
+        },
+        {
+          "EntityType": "minecraft:ghast",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 1
+        }
+      ],
+      "MobCapPercentage": 0.6,
+      "ForceNoSleep": false,
+      "TickDelay": 20,
+      "ClusterSize": 1
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:blaze",
+          "Weight": 5,
+          "MinCount": 2,
+          "MaxCount": 3
+        },
+        {
+          "EntityType": "minecraft:skeleton",
+          "Weight": 6,
+          "MinCount": 2,
+          "MaxCount": 4
+        },
+        {
+          "EntityType": "minecraft:magma_cube",
+          "Weight": 4,
+          "MinCount": 1,
+          "MaxCount": 2
+        },
+        {
+          "EntityType": "minecraft:wither_skeleton",
+          "Weight": 2,
+          "MinCount": 1,
+          "MaxCount": 2
+        },
+        {
+          "EntityType": "minecraft:ghast",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 2
+        }
+      ],
+      "MobCapPercentage": 0.8,
+      "ForceNoSleep": false,
+      "TickDelay": 15,
+      "ClusterSize": 1
+    },
+    {
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:blaze",
+          "Weight": 5,
+          "MinCount": 2,
+          "MaxCount": 4
+        },
+        {
+          "EntityType": "minecraft:skeleton",
+          "Weight": 6,
+          "MinCount": 2,
+          "MaxCount": 5
+        },
+        {
+          "EntityType": "minecraft:magma_cube",
+          "Weight": 4,
+          "MinCount": 1,
+          "MaxCount": 3
+        },
+        {
+          "EntityType": "minecraft:wither_skeleton",
+          "Weight": 2,
+          "MinCount": 1,
+          "MaxCount": 2
+        },
+        {
+          "EntityType": "minecraft:ghast",
+          "Weight": 1,
+          "MinCount": 1,
+          "MaxCount": 3
+        }
+      ],
+      "MobCapPercentage": 1.0,
+      "ForceNoSleep": false,
+      "TickDelay": 10,
+      "ClusterSize": 1
+    }
+  ],
+  "Dimensions": [
+    "minecraft:the_nether"
+  ]
+}

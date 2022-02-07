@@ -2,7 +2,9 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.PSEventManager.ClientEvents;
+import dev.theagameplayer.puresuffering.util.InvasionListType;
+import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -10,20 +12,20 @@ import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public final class UpdateXPMultPacket {
 	private final double xpMult;
-	private final boolean isDay;
+	private final InvasionListType listType;
 	
-	public UpdateXPMultPacket(double xpMultIn, boolean isDayIn) {
+	public UpdateXPMultPacket(double xpMultIn, InvasionListType listTypeIn) {
 		this.xpMult = xpMultIn;
-		this.isDay = isDayIn;
+		this.listType = listTypeIn;
 	}
 	
 	public static void encode(UpdateXPMultPacket msgIn, PacketBuffer bufIn) {
 		bufIn.writeDouble(msgIn.xpMult);
-		bufIn.writeBoolean(msgIn.isDay);
+		bufIn.writeEnum(msgIn.listType);
 	}
 	
 	public static UpdateXPMultPacket decode(PacketBuffer bufIn) {
-		return new UpdateXPMultPacket(bufIn.readDouble(), bufIn.readBoolean());
+		return new UpdateXPMultPacket(bufIn.readDouble(), bufIn.readEnum(InvasionListType.class));
 	}
 
 	public static class Handler {
@@ -35,10 +37,17 @@ public final class UpdateXPMultPacket {
 		}
 		
 		private static void handlePacket(UpdateXPMultPacket msgIn, Supplier<Context> ctxIn) {
-			if (msgIn.isDay) {
-				ClientEvents.dayXPMult = msgIn.xpMult;
-			} else {
-				ClientEvents.nightXPMult = msgIn.xpMult;
+			Minecraft mc = Minecraft.getInstance();
+			switch (msgIn.listType) {
+			case DAY:
+				ClientInvasionWorldInfo.getDayClientInfo(mc.level).setXPMultiplier(msgIn.xpMult);
+				break;
+			case NIGHT:
+				ClientInvasionWorldInfo.getNightClientInfo(mc.level).setXPMultiplier(msgIn.xpMult);
+				break;
+			case FIXED:
+				ClientInvasionWorldInfo.getFixedClientInfo(mc.level).setXPMultiplier(msgIn.xpMult);
+				break;
 			}
 		}
 	}

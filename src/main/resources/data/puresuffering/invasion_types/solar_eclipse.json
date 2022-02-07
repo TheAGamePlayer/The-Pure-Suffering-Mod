@@ -6,7 +6,27 @@
   "SpawningSystem": "BIOME_BOOSTED",
   "TimeModifier": "DAY_TO_NIGHT",
   "TimeChangeability": "ONLY_DAY",
+  "WeatherType": "DEFAULT",
   "SeverityInfo": [
+    {
+      "SkyRenderer": {
+        "FogRenderer": {
+          "RedOffset": 0.15,
+          "GreenOffset": 0.15,
+          "BlueOffset": 0.15
+        },
+        "SunTexture": "puresuffering:textures/environment/solar_eclipse_sun.png",
+        "Brightness": 0.15,
+        "RedOffset": -0.85,
+        "GreenOffset": -0.85,
+        "BlueOffset": -0.85
+      },
+      "MobCapPercentage": 0.6,
+      "ForceNoSleep": true,
+      "LightLevel": 15,
+      "TickDelay": 30,
+      "ClusterSize": 1
+    },
     {
       "SkyRenderer": {
         "FogRenderer": {
@@ -20,10 +40,33 @@
         "GreenOffset": -0.9,
         "BlueOffset": -0.9
       },
+      "MobCapPercentage": 0.8,
+      "ForceNoSleep": true,
+      "LightLevel": 15,
+      "TickDelay": 24,
+      "ClusterSize": 1
+    },
+    {
+      "SkyRenderer": {
+        "FogRenderer": {
+          "RedOffset": 0.05,
+          "GreenOffset": 0.05,
+          "BlueOffset": 0.05
+        },
+        "SunTexture": "puresuffering:textures/environment/solar_eclipse_sun.png",
+        "Brightness": 0.05,
+        "RedOffset": -0.95,
+        "GreenOffset": -0.95,
+        "BlueOffset": -0.95
+      },
       "MobCapPercentage": 1.0,
       "ForceNoSleep": true,
       "LightLevel": 15,
-      "TickDelay": 18
+      "TickDelay": 18,
+      "ClusterSize": 1
     }
+  ],
+  "Dimensions": [
+    "minecraft:overworld"
   ]
 }

@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import dev.theagameplayer.puresuffering.config.PSConfig;
 import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
+import dev.theagameplayer.puresuffering.registries.PSPotions;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,6 +43,7 @@ public final class PureSufferingMod {
 	}
 	
 	private void registerAll(IEventBus busIn) {
+		PSPotions.POTIONS.register(busIn);
 		LOGGER.info("Registered all event buses.");
 	}
 	
@@ -67,7 +69,4 @@ public final class PureSufferingMod {
 		}
 		LOGGER.info("Generated new data.");
 	}
-	
-	/* TODO: 1.3.0
-	 */
 }

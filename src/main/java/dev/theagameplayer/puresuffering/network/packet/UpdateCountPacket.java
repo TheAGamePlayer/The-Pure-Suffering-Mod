@@ -2,7 +2,9 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.PSEventManager.ClientEvents;
+import dev.theagameplayer.puresuffering.util.InvasionListType;
+import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -10,20 +12,20 @@ import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public final class UpdateCountPacket {
 	private final int count;
-	private final boolean isDay;
+	private final InvasionListType listType;
 	
-	public UpdateCountPacket(int countIn, boolean isDayIn) {
+	public UpdateCountPacket(int countIn, InvasionListType listTypeIn) {
 		this.count = countIn;
-		this.isDay = isDayIn;
+		this.listType = listTypeIn;
 	}
 	
 	public static void encode(UpdateCountPacket msgIn, PacketBuffer bufIn) {
 		bufIn.writeInt(msgIn.count);
-		bufIn.writeBoolean(msgIn.isDay);
+		bufIn.writeEnum(msgIn.listType);
 	}
 	
 	public static UpdateCountPacket decode(PacketBuffer bufIn) {
-		return new UpdateCountPacket(bufIn.readInt(), bufIn.readBoolean());
+		return new UpdateCountPacket(bufIn.readInt(), bufIn.readEnum(InvasionListType.class));
 	}
 
 	public static class Handler {
@@ -35,10 +37,17 @@ public final class UpdateCountPacket {
 		}
 		
 		private static void handlePacket(UpdateCountPacket msgIn, Supplier<Context> ctxIn) {
-			if (msgIn.isDay) {
-				ClientEvents.dayInvasionsCount = msgIn.count;
-			} else {
-				ClientEvents.nightInvasionsCount = msgIn.count;
+			Minecraft mc = Minecraft.getInstance();
+			switch (msgIn.listType) {
+			case DAY:
+				ClientInvasionWorldInfo.getDayClientInfo(mc.level).setInvasionsCount(msgIn.count);
+				break;
+			case NIGHT:
+				ClientInvasionWorldInfo.getNightClientInfo(mc.level).setInvasionsCount(msgIn.count);
+				break;
+			case FIXED:
+				ClientInvasionWorldInfo.getFixedClientInfo(mc.level).setInvasionsCount(msgIn.count);
+				break;
 			}
 		}
 	}

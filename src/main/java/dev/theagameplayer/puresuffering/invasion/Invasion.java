@@ -3,14 +3,21 @@ package dev.theagameplayer.puresuffering.invasion;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import com.google.common.collect.ImmutableList;
+import javax.annotation.Nullable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import dev.theagameplayer.puresuffering.PureSufferingMod;
+import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SeverityInfo;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SpawningSystem;
 import dev.theagameplayer.puresuffering.util.InvasionSpawnerEntity;
-import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -19,12 +26,14 @@ import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeMagnifier;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.MobSpawnInfo.Spawners;
@@ -36,7 +45,9 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class Invasion {
-	private final ArrayList<MobEntity> invasionMobs = new ArrayList<>();
+	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final ArrayList<Biome> MIXED_BIOMES = new ArrayList<>(ForgeRegistries.BIOMES.getValues());
+	private final ArrayList<UUID> invasionMobs = new ArrayList<>();
 	private final InvasionType invasionType;
 	private final int severity;
 	private final boolean isPrimary;
@@ -53,7 +64,7 @@ public class Invasion {
 		this.severity = severityIn;
 		this.isPrimary  = isPrimaryIn;
 		this.mobCap = (int)(mobCap * info.getMobCapPercentage()) + 1;
-		this.shouldTick = info.getTickDelay() > -1 && (invasionTypeIn.getSpawningSystem() == SpawningSystem.BIOME_BOOSTED || (info.getMobSpawnList() != null && invasionTypeIn.getSpawningSystem() != SpawningSystem.BIOME_BOOSTED));
+		this.shouldTick = info.getTickDelay() > -1 && (invasionTypeIn.getSpawningSystem() != SpawningSystem.DEFAULT || (info.getMobSpawnList() != null && invasionTypeIn.getSpawningSystem() == SpawningSystem.DEFAULT));
 	}
 
 	public InvasionType getType() {
@@ -77,16 +88,30 @@ public class Invasion {
 	}
 
 	public void tick(final ServerWorld worldIn) {
-		this.invasionMobs.removeIf(mobEntity -> {
-			return mobEntity == null || !mobEntity.isAlive();
+		this.invasionMobs.removeIf(uuid -> {
+			return worldIn.getEntity(uuid) == null || !worldIn.getEntity(uuid).isAlive();
 		});
+		switch (this.invasionType.getWeatherType()) {
+		case DEFAULT: break;
+		case CLEAR:
+			if (worldIn.isRaining() || worldIn.isThundering())
+				worldIn.setWeatherParameters(600, 0, false, false);
+			break;
+		case RAIN:
+			if (!worldIn.isRaining())
+				worldIn.setWeatherParameters(0, 600, true, false);
+			break;
+		case THUNDER:
+			if (!worldIn.isThundering())
+				worldIn.setWeatherParameters(0, 600, true, true);
+			break;
+		}
 		if (this.shouldTick)
 			this.tickEntitySpawn(worldIn);
 	}
 
 	protected void tickEntitySpawn(ServerWorld worldIn) {
-		boolean flag = this.invasionMobs.size() < this.mobCap;
-		if (flag) {
+		if (this.invasionMobs.size() < this.mobCap) {
 			//Delay check
 			if (this.spawnDelay < 0) {
 				this.delay(worldIn);
@@ -98,54 +123,50 @@ public class Invasion {
 			//Get Mobs
 			boolean flag1 = false;
 			ChunkPos chunkPos = this.getSpawnChunk(worldIn);
-			List<Spawners> mobs = ImmutableList.of();
-			switch (this.invasionType.getSpawningSystem()) {
-			case DEFAULT:
-				mobs = this.getSeverityInfo().getMobSpawnList();
-				break;
-			case BIOME_BOOSTED:
-				BlockPos pos = this.getSpawnPos(worldIn, chunkPos);
-				mobs = this.getBiomeSpawnList(pos, worldIn.getChunk(pos));
-				break;
-			}
+			List<Spawners> mobs = this.getMobSpawnList(worldIn, chunkPos);
 			if (mobs.size() < 1) return;
-			int index = worldIn.random.nextInt(mobs.size());
-			Spawners spawners = mobs.get(index);
-			int groupSize = worldIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-			this.nextSpawnData.getTag().putString("id", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
-			//Spawn Mob Group
-			for(int count = 0; count < groupSize && flag; ++count) {
+			//Spawn Mob Cluster (Different Mobs)
+			int clusterSize = worldIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
+			for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
+				Spawners spawners = mobs.get(worldIn.random.nextInt(mobs.size()));
+				int groupSize = worldIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
+				this.nextSpawnData.getTag().putString("id", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
 				CompoundNBT compoundNBT = this.nextSpawnData.getTag();
 				Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
 				if (!optional.isPresent()) {
 					this.delay(worldIn);
 					return;
 				}
-				//Spawn Entity
-				BlockPos pos = this.getSpawnPos(worldIn, chunkPos);
-				if (pos != null && EntitySpawnPlacementRegistry.checkSpawnRules(optional.get(), worldIn, SpawnReason.EVENT, pos, worldIn.getRandom())) {
-					Entity entity = EntityType.loadEntityRecursive(compoundNBT, worldIn, (e) -> {
-						e.moveTo(pos.getX(), pos.getY(), pos.getZ(), e.yRot, e.xRot);
-						return e;
-					});
-					if (entity == null) {
-						this.delay(worldIn);
-						return;
-					}
-					entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), worldIn.random.nextFloat() * 360.0F, 0.0F);
-					if (entity instanceof MobEntity) {
-						MobEntity mobEntity = (MobEntity)entity;
-						if (this.nextSpawnData.getTag().size() == 1 && this.nextSpawnData.getTag().contains("id", 8)) {
-							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
-								this.spawnInvasionMob(worldIn, mobEntity);
+				//Spawn Mob Group (Same Mob)
+				for(int count = 0; count < groupSize && this.invasionMobs.size() < this.mobCap; ++count) {
+					//Spawn Entity
+					BlockPos spawnPos = this.getSpawnPos(worldIn, chunkPos, false);
+					if (spawnPos != null && EntitySpawnPlacementRegistry.checkSpawnRules(optional.get(), worldIn, SpawnReason.EVENT, spawnPos, worldIn.getRandom())) {
+						Entity entity = EntityType.loadEntityRecursive(compoundNBT, worldIn, (e) -> {
+							e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.yRot, e.xRot);
+							return e;
+						});
+						if (entity == null) {
+							this.delay(worldIn);
+							return;
+						}
+						entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), worldIn.random.nextFloat() * 360.0F, 0.0F);
+						if (entity instanceof MobEntity) {
+							MobEntity mobEntity = (MobEntity)entity;
+							if (this.nextSpawnData.getTag().size() == 1 && this.nextSpawnData.getTag().contains("id", 8)) {
+								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
+									this.spawnInvasionMob(worldIn, mobEntity);
+								}
 							}
 						}
+						if (entity instanceof LightningBoltEntity)
+							LOGGER.info("LIGHTNING!!!");
+						if (!worldIn.tryAddFreshEntityWithPassengers(entity)) {
+							this.delay(worldIn);
+							return;
+						}
+						flag1 = true;
 					}
-					if (!worldIn.tryAddFreshEntityWithPassengers(entity)) {
-						this.delay(worldIn);
-						return;
-					}
-					flag1 = true;
 				}
 			}
 			if (flag1) {
@@ -156,13 +177,11 @@ public class Invasion {
 
 	protected void spawnInvasionMob(ServerWorld worldIn, MobEntity mobEntityIn) {
 		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.getId().toString());
-		mobEntityIn.getPersistentData().putBoolean("AntiGrief", ServerTimeUtil.isServerDay(worldIn));
+		mobEntityIn.getPersistentData().putBoolean("AntiGrief", worldIn.dimensionType().hasFixedTime());
 		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
-		if (PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(mobEntityIn.getType().getRegistryName().toString()))
-			mobEntityIn.setTarget(worldIn.getNearestPlayer(mobEntityIn.getX(), mobEntityIn.getY(), mobEntityIn.getZ(), Integer.MAX_VALUE, true));
 		if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
 			mobEntityIn.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
-		this.invasionMobs.add(mobEntityIn);
+		this.invasionMobs.add(mobEntityIn.getUUID());
 		worldIn.levelEvent(Constants.WorldEvents.MOB_SPAWNER_PARTICLES, mobEntityIn.blockPosition(), 0);
 		mobEntityIn.spawnAnim();
 	}
@@ -174,8 +193,39 @@ public class Invasion {
 		}
 	}
 
-	protected final ArrayList<MobSpawnInfo.Spawners> getBiomeSpawnList(BlockPos posIn, IChunk chunkIn) {
+	protected final List<MobSpawnInfo.Spawners> getMobSpawnList(ServerWorld worldIn, ChunkPos chunkPosIn) {
+		BlockPos biomePos = this.getSpawnPos(worldIn, chunkPosIn, true);
+		ArrayList<MobSpawnInfo.Spawners> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
+		switch (this.invasionType.getSpawningSystem()) {
+		case DEFAULT: break;
+		case BIOME_BOOSTED:
+			originalList.addAll(this.getBiomeSpawnList(biomePos, worldIn.getChunk(biomePos)));
+			break;
+		case BIOME_MIXED:
+			originalList.addAll(this.getMixedSpawnList(worldIn));
+			break;
+		}
+		ArrayList<MobSpawnInfo.Spawners> newList = new ArrayList<>();
+		if (!originalList.isEmpty()) {
+			for (Spawners spawners : originalList) {
+				for (int w = 0; w < spawners.weight; w++)
+					newList.add(spawners);
+			}
+		}
+		return newList;
+	}
+
+	private final ArrayList<MobSpawnInfo.Spawners> getBiomeSpawnList(BlockPos posIn, IChunk chunkIn) {
 		ArrayList<MobSpawnInfo.Spawners> spawners = new ArrayList<>(DefaultBiomeMagnifier.INSTANCE.getBiome(0L, posIn.getX(), posIn.getY(), posIn.getZ(), chunkIn.getBiomes()).getMobSettings().getMobs(EntityClassification.MONSTER));
+		spawners.removeIf(spawner -> {
+			ResourceLocation name = spawner.type.getRegistryName();
+			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
+		});
+		return spawners;
+	}
+
+	private final ArrayList<MobSpawnInfo.Spawners> getMixedSpawnList(ServerWorld worldIn) {
+		ArrayList<MobSpawnInfo.Spawners> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(EntityClassification.MONSTER));
 		spawners.removeIf(spawner -> {
 			ResourceLocation name = spawner.type.getRegistryName();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
@@ -193,16 +243,51 @@ public class Invasion {
 		return chunkPos1;
 	}
 
-	protected final int getChunkOffset(ServerWorld worldIn) {
+	private final int getChunkOffset(ServerWorld worldIn) {
 		int offSet = worldIn.random.nextInt(8) + 1;
-		boolean flag = worldIn.random.nextBoolean();
-		return flag ? offSet : -offSet;
+		return worldIn.random.nextBoolean() ? offSet : -offSet;
 	}
 
-	protected final BlockPos getSpawnPos(ServerWorld worldIn, ChunkPos chunkPosIn) {
+	protected final BlockPos getSpawnPos(ServerWorld worldIn, ChunkPos chunkPosIn, boolean biomeCheckIn) {
 		int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
 		int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
-		return new BlockPos(x, worldIn.getHeight(Heightmap.Type.MOTION_BLOCKING, x, z), z);
+		int surface = worldIn.getHeight(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
+		if (biomeCheckIn || (!worldIn.dimensionType().hasCeiling() && worldIn.random.nextBoolean()))
+			return new BlockPos(x, surface, z);
+		BlockState air = Blocks.AIR.defaultBlockState();
+		BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
+		ArrayList<BlockPos> potentialPos = new ArrayList<>();
+		for (int y = 0; y < surface; y++) {
+			BlockPos pos = new BlockPos(x, y, z);
+			if (worldIn.getBlockState(pos) != air && worldIn.getBlockState(pos) != bedrock && worldIn.getBlockState(pos.above()) == air)
+				potentialPos.add(pos.above());
+		}
+		return potentialPos.size() > 0 ? potentialPos.get(worldIn.random.nextInt(potentialPos.size())) : new BlockPos(x, surface, z);
+	}
+
+	@Nullable
+	public static Invasion load(CompoundNBT nbtIn) {
+		if (ResourceLocation.isValidResourceLocation(nbtIn.getString("InvasionType"))) {
+			InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
+			Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"));
+			CompoundNBT invasionMobs = nbtIn.getCompound("InvasionMobs");
+			for (String name : invasionMobs.getAllKeys())
+				invasion.invasionMobs.add(invasionMobs.getUUID(name));
+			return invasion;
+		}
+		return null;
+	}
+
+	public CompoundNBT save() {
+		CompoundNBT nbt = new CompoundNBT();
+		CompoundNBT mobs = new CompoundNBT();
+		for (UUID id : this.invasionMobs)
+			mobs.putUUID(id.toString(), id);
+		nbt.put("InvasionMobs", mobs);
+		nbt.putString("InvasionType", this.invasionType.toString());
+		nbt.putInt("Severity", this.severity);
+		nbt.putBoolean("IsPrimary", this.isPrimary);
+		return nbt;
 	}
 
 	@Override

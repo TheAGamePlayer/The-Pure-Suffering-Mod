@@ -1,3 +1,45 @@
+Version 1.3.0R:
+- Reimplemented the Remove command without bugs.
+- Made Hyper Aggression far more chaotic :>
+- Invasions now include a dimension list that they can occur in.
+- Support for invasions occurring in any dimension.
+- Added Fixed Invasions for dimensions that have a fixed time such as the Nether or End.
+- Added "fixedDifficultyIncreaseDelay" Config Option to set how many days should go by when Fixed Invasion Difficulty Increases.
+- Added "maxFixedInvasions" Config Option to set the total Fixed Invasions that can happen at once.
+- Added "fixedInvasionRarity" Config Option to set how often Fixed Invasions can occur.
+- Added "canFixedInvasionsBeCanceled" Config Option to set if Fixed Invasions can be canceled.
+- Added "fixedCancelChanceMultiplier" Config Option to set the chance of Fixed Invasions being canceled if enabled.
+- Added "forceInvasionSleeplessness" Config Option to force players to be unable to sleep through invasions.
+- Added "multiThreadedInvasions" Config Option to boost performance for multi-threaded CPUs.
+- Added Blessing Effect to act as a timer after respawning or changing dimensions before enemies become hyper aggressive towards you if enabled.
+- Added "blessingEffectRespawnDuration" Config Option to set how many ticks the Blessing effect should last when respawning.
+- Added "blessingEffectDimensionChangeDuration" Config Option to set how many ticks the Blessing effect should last when changing dimensions/
+- Invasions now save data to the world data file so they will restart at launch.
+- Invasions all have new weights assigned to each of their mob spawns.
+- Invasion Severity Info now contains a "ClusterSize" variable to determine how many mobs should spawn together per chunk selection.
+- Phantom Zone is now a Secondary Invasion only since players tend to sleep through them anyways :P
+- Phantom Zone can also occur in The End ;)
+- Solar and Lunar Eclipses now have 3 severities instead of 1.
+- Solar Eclipses now have a square sun cause the Minecraft sun is not a circle...
+- New Spawning System Biome Mixed containing monster spawns of every biome.
+- Biome Boosted and Biome Mixed Invasions can now have additional mobs in the mob spawn list.
+- New WeatherType perameter for Invasions allowing weather to occur during an invasion.
+- Added Nether Again Invasion for The Nether, acts similar to an eclipse.
+- Added Blazing Inferno Invasion for The Nether.
+- Added Pigs Galore Invasion for The Nether.
+- Added End Game Invasion for The End.
+- Added Super Storm Invasion.
+- Fixed Bug causing Non-Invasion mobs to have outdated Anti-Grief tag during Invasions.
+- Fixed Invasion Enemies not attacking golems after being hit.
+- Fixed "weakenedVexes" config option missing in en_us.json.
+- Fixed a few performance problems hidden in my code...
+- Fixed a bug where beds wouldn't explode in modded dimensions when a solar eclipse happened in the overworld.
+- Fixed a bug where the sky box would refuse to update properly.
+- Fixed very old bug with mobs being unable to spawn in caves.
+- Fixed InvasionMob and AntiGrief tags not applying to converted mobs.
+- Fixed Spawner weights not being utilized by Invasions properly, breaking the spawning system.
+- Fixed a bug where mob spawn groups would go over the mob cap limit for the invasion.
+
 Version 1.2.1B:
 - Fixed Invasions being canceled way too commonly.
 - Fixed Invasions being canceled crashing servers.

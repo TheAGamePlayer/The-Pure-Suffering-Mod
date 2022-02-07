@@ -29,7 +29,7 @@ import net.minecraft.util.ResourceLocation;
 public final class InvasionTypeManager extends JsonReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).create();
-	private HashMap<ResourceLocation, InvasionType> allInvasionTypeMap = new HashMap<>();
+	private HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
 
 	public InvasionTypeManager() {
 		super(GSON, "invasion_types");
@@ -37,7 +37,7 @@ public final class InvasionTypeManager extends JsonReloadListener {
 
 	@Override
 	protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
-		this.allInvasionTypeMap.clear();
+		this.invasionTypeMap.clear();
 		objectIn.forEach((conditions, invasionType) -> {
 			try {
 				JsonObject jsonObject = JSONUtils.convertToJsonObject(invasionType, "invasion_type");
@@ -50,26 +50,26 @@ public final class InvasionTypeManager extends JsonReloadListener {
 					LOGGER.debug("Skipping loading invasion type {} as it is blacklisted.", conditions);
 					return;
 				}
-				this.allInvasionTypeMap.put(conditions, invasionType1);
+				this.invasionTypeMap.put(conditions, invasionType1);
 			} catch (IllegalArgumentException | JsonParseException jsonParseExceptionIn) {
 				LOGGER.error("Parsing error loading custom invasion types {}: {}", conditions, jsonParseExceptionIn.getMessage());	
 			}
 		});
-		LOGGER.info("Loaded {} invasion types", (int)this.allInvasionTypeMap.size());
+		LOGGER.info("Loaded {} invasion types", (int)this.invasionTypeMap.size());
 	}
 	
 	@Nullable
 	public InvasionType getInvasionType(ResourceLocation idIn) {
-		return this.allInvasionTypeMap.get(idIn);
+		return this.invasionTypeMap.get(idIn);
 	}
 
 	public Collection<InvasionType> getAllInvasionTypes() {
-		return this.allInvasionTypeMap.values();
+		return this.invasionTypeMap.values();
 	}
 	
 	public ArrayList<InvasionType> getInvasionTypesOf(Predicate<InvasionType> predIn) {
 		ArrayList<InvasionType> invasionList = new ArrayList<>();
-		for (InvasionType invasionType : this.allInvasionTypeMap.values()) {
+		for (InvasionType invasionType : this.invasionTypeMap.values()) {
 			if (predIn.test(invasionType))
 				invasionList.add(invasionType);
 		}

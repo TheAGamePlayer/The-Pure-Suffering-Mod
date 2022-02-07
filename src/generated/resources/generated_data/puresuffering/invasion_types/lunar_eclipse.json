@@ -6,6 +6,7 @@
   "SpawningSystem": "BIOME_BOOSTED",
   "TimeModifier": "NONE",
   "TimeChangeability": "ONLY_NIGHT",
+  "WeatherType": "DEFAULT",
   "SeverityInfo": [
     {
       "SkyRenderer": {
@@ -15,11 +16,54 @@
           "BlueOffset": 0.0
         },
         "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
-        "WeatherVisibility": 0.1
+        "WeatherVisibility": 0.1,
+        "RedOffset": 0.0,
+        "GreenOffset": -0.1,
+        "BlueOffset": -0.1
+      },
+      "MobCapPercentage": 0.6,
+      "ForceNoSleep": false,
+      "TickDelay": 25,
+      "ClusterSize": 1
+    },
+    {
+      "SkyRenderer": {
+        "FogRenderer": {
+          "RedOffset": 0.1,
+          "GreenOffset": 0.0,
+          "BlueOffset": 0.0
+        },
+        "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
+        "WeatherVisibility": 0.2,
+        "RedOffset": 0.0,
+        "GreenOffset": -0.2,
+        "BlueOffset": -0.2
+      },
+      "MobCapPercentage": 0.8,
+      "ForceNoSleep": false,
+      "TickDelay": 20,
+      "ClusterSize": 1
+    },
+    {
+      "SkyRenderer": {
+        "FogRenderer": {
+          "RedOffset": 0.15,
+          "GreenOffset": 0.0,
+          "BlueOffset": 0.0
+        },
+        "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
+        "WeatherVisibility": 0.3,
+        "RedOffset": 0.0,
+        "GreenOffset": -0.3,
+        "BlueOffset": -0.3
       },
       "MobCapPercentage": 1.0,
       "ForceNoSleep": false,
-      "TickDelay": 15
+      "TickDelay": 15,
+      "ClusterSize": 1
     }
+  ],
+  "Dimensions": [
+    "minecraft:overworld"
   ]
 }

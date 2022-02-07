@@ -2,10 +2,11 @@
   "Rarity": 5,
   "Tier": 2,
   "InvasionTime": "NIGHT",
-  "InvasionPriority": "BOTH",
+  "InvasionPriority": "SECONDARY_ONLY",
   "SpawningSystem": "DEFAULT",
   "TimeModifier": "NONE",
   "TimeChangeability": "DEFAULT",
+  "WeatherType": "DEFAULT",
   "SeverityInfo": [
     {
       "MobSpawnList": [
@@ -18,7 +19,8 @@
       ],
       "MobCapPercentage": 0.1,
       "ForceNoSleep": false,
-      "TickDelay": 90
+      "TickDelay": 90,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
@@ -31,7 +33,8 @@
       ],
       "MobCapPercentage": 0.2,
       "ForceNoSleep": false,
-      "TickDelay": 75
+      "TickDelay": 75,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
@@ -44,7 +47,8 @@
       ],
       "MobCapPercentage": 0.3,
       "ForceNoSleep": false,
-      "TickDelay": 60
+      "TickDelay": 60,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
@@ -57,7 +61,8 @@
       ],
       "MobCapPercentage": 0.4,
       "ForceNoSleep": false,
-      "TickDelay": 45
+      "TickDelay": 45,
+      "ClusterSize": 1
     },
     {
       "MobSpawnList": [
@@ -70,7 +75,12 @@
       ],
       "MobCapPercentage": 0.5,
       "ForceNoSleep": false,
-      "TickDelay": 30
+      "TickDelay": 30,
+      "ClusterSize": 1
     }
+  ],
+  "Dimensions": [
+    "minecraft:overworld",
+    "minecraft:the_end"
   ]
 }

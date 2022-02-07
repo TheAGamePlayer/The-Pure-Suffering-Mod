@@ -2,25 +2,27 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
+import dev.theagameplayer.puresuffering.util.InvasionListType;
+import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
 public final class ClearInvasionsPacket {
-	private final boolean isDay;
+	private final InvasionListType listType;
 	
-	public ClearInvasionsPacket(boolean isDayIn) {
-		this.isDay = isDayIn;
+	public ClearInvasionsPacket(InvasionListType listTypeIn) {
+		this.listType = listTypeIn;
 	}
 	
 	public static void encode(ClearInvasionsPacket msgIn, PacketBuffer bufIn) {
-		bufIn.writeBoolean(msgIn.isDay);
+		bufIn.writeEnum(msgIn.listType);
 	}
 	
 	public static ClearInvasionsPacket decode(PacketBuffer bufIn) {
-		return new ClearInvasionsPacket(bufIn.readBoolean());
+		return new ClearInvasionsPacket(bufIn.readEnum(InvasionListType.class));
 	}
 	
 	public static class Handler {
@@ -32,10 +34,17 @@ public final class ClearInvasionsPacket {
 		}
 		
 		private static void handlePacket(ClearInvasionsPacket msgIn, Supplier<Context> ctxIn) {
-			if (msgIn.isDay) {
-				ClientInvasionUtil.getDayRenderers().clear();
-			} else {
-				ClientInvasionUtil.getNightRenderers().clear();
+			Minecraft mc = Minecraft.getInstance();
+			switch (msgIn.listType) {
+			case DAY:
+				ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().clear();
+				break;
+			case NIGHT:
+				ClientInvasionWorldInfo.getNightClientInfo(mc.level).getRendererMap().clear();
+				break;
+			case FIXED:
+				ClientInvasionWorldInfo.getFixedClientInfo(mc.level).getRendererMap().clear();
+				break;
 			}
 		}
 	}

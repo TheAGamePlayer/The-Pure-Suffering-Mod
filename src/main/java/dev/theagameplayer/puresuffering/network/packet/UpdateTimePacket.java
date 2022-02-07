@@ -2,7 +2,8 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.util.ClientTimeUtil;
+import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -35,10 +36,11 @@ public final class UpdateTimePacket {
 		}
 		
 		private static void handlePacket(UpdateTimePacket msgIn, Supplier<Context> ctxIn) {
+			Minecraft mc = Minecraft.getInstance();
 			if (msgIn.isDay) {
-				ClientTimeUtil.updateClientDay(msgIn.isTime);
+				ClientInvasionWorldInfo.getDayClientInfo(mc.level).updateClientTime(msgIn.isTime);
 			} else {
-				ClientTimeUtil.updateClientNight(msgIn.isTime);
+				ClientInvasionWorldInfo.getNightClientInfo(mc.level).updateClientTime(msgIn.isTime);
 			}
 		}
 	}

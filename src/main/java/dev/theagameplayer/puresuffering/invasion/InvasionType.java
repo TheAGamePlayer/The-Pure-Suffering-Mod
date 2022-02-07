@@ -19,7 +19,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.biome.MobSpawnInfo.Spawners;
+import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class InvasionType {
@@ -31,10 +31,12 @@ public final class InvasionType {
 	private final SpawningSystem spawningSystem;
 	private final TimeModifier timeModifier;
 	private final TimeChangeability timeChangeability;
+	private final WeatherType weatherType;
 	private final List<SeverityInfo> severityInfo;
+	private final List<ResourceLocation> dimensions;
 	private final ITextComponent component;
 	
-	public InvasionType(ResourceLocation idIn, int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, List<SeverityInfo> severityInfoIn) {
+	public InvasionType(ResourceLocation idIn, int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, WeatherType weatherTypeIn, List<SeverityInfo> severityInfoIn, List<ResourceLocation> dimensionsIn) {
 		this.id = idIn;
 		this.rarity = rarityIn;
 		this.tier = tierIn;
@@ -43,7 +45,9 @@ public final class InvasionType {
 		this.spawningSystem = spawningSystemIn;
 		this.timeModifier = timeModifierIn;
 		this.timeChangeability = timeChangeabilityIn;
+		this.weatherType = weatherTypeIn;
 		this.severityInfo = severityInfoIn;
+		this.dimensions = dimensionsIn;
 		String text = "invasion." + idIn.getNamespace() + "." + idIn.getPath();
 		TranslationTextComponent component = new TranslationTextComponent(text);
 		this.component = component.getString().equals(text) ? new StringTextComponent(this.formatDefaultText(idIn)) : component;
@@ -71,7 +75,7 @@ public final class InvasionType {
 		ArrayList<SeverityInfo.Builder> severityInfo = new ArrayList<>();
 		for (SeverityInfo info : this.severityInfo)
 			severityInfo.add(info.deconstruct());
-		return new InvasionType.Builder(this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, severityInfo);
+		return new InvasionType.Builder(this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, this.weatherType, severityInfo, this.dimensions);
 	}
 
 	public ResourceLocation getId() {
@@ -105,9 +109,17 @@ public final class InvasionType {
 	public TimeChangeability getTimeChangeability() {
 		return this.timeChangeability;
 	}
+	
+	public WeatherType getWeatherType() {
+		return this.weatherType;
+	}
 
 	public List<SeverityInfo> getSeverityInfo() {
 		return this.severityInfo;
+	}
+	
+	public List<ResourceLocation> getDimensions() {
+		return this.dimensions;
 	}
 
 	public ITextComponent getComponent() {
@@ -137,7 +149,8 @@ public final class InvasionType {
 	
 	public static enum SpawningSystem {
 		DEFAULT,
-		BIOME_BOOSTED
+		BIOME_BOOSTED,
+		BIOME_MIXED
 	}
 	
 	public static enum TimeModifier {
@@ -151,33 +164,42 @@ public final class InvasionType {
 		ONLY_NIGHT,
 		ONLY_DAY
 	}
+	
+	public static enum WeatherType {
+		DEFAULT,
+		CLEAR,
+		RAIN,
+		THUNDER
+	}
 
 	public static class SeverityInfo {
 		private final InvasionSkyRenderer skyRenderer;
-		private final List<Spawners> mobSpawnList;
+		private final List<MobSpawnInfo.Spawners> mobSpawnList;
 		private final float mobCapPercentage;
 		private final boolean forceNoSleep;
 		private final int lightLevel;
 		private final int tickDelay;
+		private final int clusterSize;
 
-		private SeverityInfo(InvasionSkyRenderer skyRendererIn, List<Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn) {
+		private SeverityInfo(InvasionSkyRenderer skyRendererIn, List<MobSpawnInfo.Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn, int clusterSizeIn) {
 			this.skyRenderer = skyRendererIn;
 			this.mobSpawnList = mobSpawnListIn;
 			this.mobCapPercentage = mobCapPercentageIn;
 			this.forceNoSleep = forceNoSleepIn;
 			this.lightLevel = lightLevelIn;
 			this.tickDelay = tickDelayIn;
+			this.clusterSize = clusterSizeIn;
 		}
 		
 		public SeverityInfo.Builder deconstruct() {
-			return new SeverityInfo.Builder(this.skyRenderer == null ? null : this.skyRenderer.deconstruct(), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay);
+			return new SeverityInfo.Builder(this.skyRenderer == null ? null : this.skyRenderer.deconstruct(), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
 		}
 
 		public InvasionSkyRenderer getSkyRenderer() {
 			return this.skyRenderer;
 		}
 
-		public List<Spawners> getMobSpawnList() {
+		public List<MobSpawnInfo.Spawners> getMobSpawnList() {
 			return this.mobSpawnList;
 		}
 		
@@ -196,23 +218,29 @@ public final class InvasionType {
 		public int getTickDelay() {
 			return this.tickDelay;
 		}
+		
+		public int getClusterSize() {
+			return this.clusterSize;
+		}
 
 		public static class Builder {
 			private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 			private InvasionSkyRenderer.Builder skyRenderer = null;
-			private List<Spawners> mobSpawnList;
+			private List<MobSpawnInfo.Spawners> mobSpawnList;
 			private float mobCapPercentage = 1.0F;
 			private boolean forceNoSleep = false;
 			private int lightLevel = -1;
 			private int tickDelay = 6;
+			private int clusterSize = 1;
 
-			private Builder(InvasionSkyRenderer.Builder skyRendererIn, List<Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn) {
+			private Builder(InvasionSkyRenderer.Builder skyRendererIn, List<MobSpawnInfo.Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn, int clusterSizeIn) {
 				this.skyRenderer = skyRendererIn;
 				this.mobSpawnList = mobSpawnListIn;
 				this.mobCapPercentage = mobCapPercentageIn;
 				this.forceNoSleep = forceNoSleepIn;
 				this.lightLevel = lightLevelIn;
 				this.tickDelay = tickDelayIn;
+				this.clusterSize = clusterSizeIn;
 			}
 
 			private Builder() {};
@@ -226,7 +254,7 @@ public final class InvasionType {
 				return this;
 			}
 
-			public SeverityInfo.Builder mobSpawnList(List<Spawners> mobSpawnListIn) {
+			public SeverityInfo.Builder mobSpawnList(List<MobSpawnInfo.Spawners> mobSpawnListIn) {
 				this.mobSpawnList = mobSpawnListIn;
 				return this;
 			}
@@ -250,9 +278,14 @@ public final class InvasionType {
 				this.tickDelay = tickDelayIn;
 				return this;
 			}
+			
+			public SeverityInfo.Builder withClusterSize(int clusterSizeIn) {
+				this.clusterSize = clusterSizeIn;
+				return this;
+			}
 
 			public SeverityInfo build(ResourceLocation idIn) {
-				return new SeverityInfo(this.skyRenderer == null ? null : this.skyRenderer.build(idIn), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay);
+				return new SeverityInfo(this.skyRenderer == null ? null : this.skyRenderer.build(idIn), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
 			}
 
 			public JsonObject serializeToJson() {
@@ -262,7 +295,7 @@ public final class InvasionType {
 				}
 				if (this.mobSpawnList != null) {
 					JsonArray jsonArray = new JsonArray();
-					for (Spawners spawnInfo : this.mobSpawnList) {
+					for (MobSpawnInfo.Spawners spawnInfo : this.mobSpawnList) {
 						JsonObject jsonObject1 = new JsonObject();
 						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITIES.getKey(spawnInfo.type).toString());
 						jsonObject1.addProperty("Weight", spawnInfo.weight);
@@ -277,16 +310,18 @@ public final class InvasionType {
 				if (this.lightLevel > -1)
 					jsonObject.addProperty("LightLevel", this.lightLevel);
 				jsonObject.addProperty("TickDelay", this.tickDelay);
+				jsonObject.addProperty("ClusterSize", this.clusterSize);
 				return jsonObject;
 			}
 
 			public static InvasionType.SeverityInfo.Builder fromJson(JsonObject jsonObjectIn) {
 				InvasionSkyRenderer.Builder skyRenderer = null;
-				List<Spawners> mobSpawnList = new ArrayList<>();
+				List<MobSpawnInfo.Spawners> mobSpawnList = new ArrayList<>();
 				float mobCapPercentage = MathHelper.clamp(jsonObjectIn.get("MobCapPercentage").getAsFloat(), 0.0F, 1.0F);
 				boolean forceNoSleep = jsonObjectIn.get("ForceNoSleep").getAsBoolean();
 				int lightLevel = jsonObjectIn.has("LightLevel") ? MathHelper.clamp(jsonObjectIn.get("LightLevel").getAsInt(), 0, 15) : -1;
 				int tickDelay = jsonObjectIn.get("TickDelay").getAsInt();
+				int clusterSize = jsonObjectIn.get("ClusterSize").getAsInt();
 				boolean errored = false;
 				JsonElement jsonElement = jsonObjectIn.getAsJsonObject("SkyRenderer");
 				if (jsonElement != null) {
@@ -307,7 +342,7 @@ public final class InvasionType {
 								int weight = jsonObject.get("Weight").getAsInt();
 								int minCount = jsonObject.get("MinCount").getAsInt();
 								int maxCount = jsonObject.get("MaxCount").getAsInt();
-								mobSpawnList.add(new Spawners(type, weight, minCount, maxCount));
+								mobSpawnList.add(new MobSpawnInfo.Spawners(type, weight, minCount, maxCount));
 							} else {
 								errored = true;
 								break;
@@ -320,7 +355,7 @@ public final class InvasionType {
 				if (errored) {
 					LOGGER.error("JsonElement is incorrectly setup: " + jsonObjectIn.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
 				}
-				return new SeverityInfo.Builder(skyRenderer, mobSpawnList, mobCapPercentage, forceNoSleep, lightLevel, tickDelay);
+				return new SeverityInfo.Builder(skyRenderer, mobSpawnList, mobCapPercentage, forceNoSleep, lightLevel, tickDelay, clusterSize);
 			}
 		}
 	}
@@ -330,13 +365,15 @@ public final class InvasionType {
 		private int rarity = 0;
 		private int tier = 0;
 		private InvasionTime invasionTime;
-		private InvasionPriority invasionPriority;
-		private SpawningSystem spawningSystem;
-		private TimeModifier timeModifier;
-		private TimeChangeability timeChangeability;
+		private InvasionPriority invasionPriority = InvasionPriority.BOTH;
+		private SpawningSystem spawningSystem = SpawningSystem.DEFAULT;
+		private TimeModifier timeModifier = TimeModifier.NONE;
+		private TimeChangeability timeChangeability = TimeChangeability.DEFAULT;
+		private WeatherType weatherType = WeatherType.DEFAULT;
 		private List<SeverityInfo.Builder> severityInfo;
+		private List<ResourceLocation> dimensions;
 
-		private Builder(int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, List<SeverityInfo.Builder> severityInfoIn) {
+		private Builder(int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, WeatherType weatherTypeIn, List<SeverityInfo.Builder> severityInfoIn, List<ResourceLocation> dimensionsIn) {
 			this.rarity = rarityIn;
 			this.tier = tierIn;
 			this.invasionTime = invasionTimeIn;
@@ -344,7 +381,9 @@ public final class InvasionType {
 			this.spawningSystem = spawningSystemIn;
 			this.timeModifier = timeModifierIn;
 			this.timeChangeability = timeChangeabilityIn;
+			this.weatherType = weatherTypeIn;
 			this.severityInfo = severityInfoIn;
+			this.dimensions = dimensionsIn;
 		}
 
 		private Builder() {};
@@ -387,9 +426,19 @@ public final class InvasionType {
 			this.timeChangeability = timeChangeabilityIn;
 			return this;
 		}
+		
+		public InvasionType.Builder withWeatherType(WeatherType weatherTypeIn) {
+			this.weatherType = weatherTypeIn;
+			return this;
+		}
 
 		public InvasionType.Builder severityInfo(List<SeverityInfo.Builder> severityInfoIn) {
 			this.severityInfo = severityInfoIn;
+			return this;
+		}
+		
+		public InvasionType.Builder dimensions(List<ResourceLocation> dimensionsIn) {
+			this.dimensions = dimensionsIn;
 			return this;
 		}
 
@@ -404,7 +453,7 @@ public final class InvasionType {
 			if (this.severityInfo != null)
 				for (SeverityInfo.Builder builder : this.severityInfo)
 					severityInfo.add(builder.build(idIn));
-			return new InvasionType(idIn, this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, severityInfo);
+			return new InvasionType(idIn, this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, this.weatherType, severityInfo, this.dimensions);
 		}
 
 		public JsonObject serializeToJson() {
@@ -418,12 +467,20 @@ public final class InvasionType {
 				jsonObject.addProperty("TimeModifier", this.timeModifier.toString());
 			if ((this.invasionTime != InvasionTime.DAY && this.timeChangeability != TimeChangeability.ONLY_DAY) || (this.invasionTime != InvasionTime.NIGHT && this.timeChangeability != TimeChangeability.ONLY_NIGHT) || this.timeChangeability == TimeChangeability.DEFAULT)
 				jsonObject.addProperty("TimeChangeability", this.timeChangeability.toString());
+			jsonObject.addProperty("WeatherType", this.weatherType.toString());
 			if (this.severityInfo != null) {
 				JsonArray jsonArray = new JsonArray();
 				for (SeverityInfo.Builder builder : this.severityInfo) {
 					jsonArray.add(builder.serializeToJson());
 				}
 				jsonObject.add("SeverityInfo", jsonArray);
+			}
+			if (this.dimensions != null) {
+				JsonArray jsonArray = new JsonArray();
+				for (ResourceLocation id : this.dimensions) {
+					jsonArray.add(id.toString());
+				}
+				jsonObject.add("Dimensions", jsonArray);
 			}
 			return jsonObject;
 		}
@@ -466,6 +523,13 @@ public final class InvasionType {
 					break;
 				}
 			}
+			WeatherType weatherType = null;
+			for (WeatherType weather : WeatherType.values()) {
+				if (weather.toString().equals(jsonObjectIn.get("WeatherType").getAsString())) {
+					weatherType = weather;
+					break;
+				}
+			}
 			List<SeverityInfo.Builder> severityInfo = new ArrayList<>();
 			boolean errored = false;
 			JsonElement jsonElement = jsonObjectIn.getAsJsonArray("SeverityInfo");
@@ -485,9 +549,21 @@ public final class InvasionType {
 					errored = true;
 				}
 			}
-			if (invasionTime == null || invasionPriority == null || spawningSystem == null || timeModifier == null || timeChangeability == null || errored)
+			List<ResourceLocation> dimensions = new ArrayList<>();
+			JsonElement jsonElement2 = jsonObjectIn.getAsJsonArray("Dimensions");
+			if (jsonElement2 != null) {
+				if (jsonElement2.isJsonArray()) {
+					JsonArray jsonArray = jsonElement2.getAsJsonArray();
+					for (int dim = 0; dim < jsonArray.size(); dim++) {
+						dimensions.add(ResourceLocation.tryParse(jsonArray.get(dim).getAsString()));
+					}
+				} else {
+					errored = true;
+				}
+			}
+			if (invasionTime == null || invasionPriority == null || spawningSystem == null || timeModifier == null || timeChangeability == null || weatherType == null || errored)
 				LOGGER.error("JsonElement is incorrectly setup: " + jsonObjectIn.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
-			return new InvasionType.Builder(rarity, tier, invasionTime, invasionPriority, spawningSystem, timeModifier, timeChangeability, severityInfo);
+			return new InvasionType.Builder(rarity, tier, invasionTime, invasionPriority, spawningSystem, timeModifier, timeChangeability, weatherType, severityInfo, dimensions);
 		}
 	}
 }

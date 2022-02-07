@@ -10,6 +10,7 @@ public final class PSCommands {
 		dispatcherIn.register(LiteralArgumentBuilder.<CommandSource>literal("puresuffering")
 				.then(ClearInvasionsCommand.register())
 				.then(AddInvasionsCommand.register())
+				.then(RemoveInvasionsCommand.register())
 				.then(QueryInvasionsCommand.register()));
 	}
 }

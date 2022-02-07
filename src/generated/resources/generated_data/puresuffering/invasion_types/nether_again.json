@@ -1,0 +1,33 @@
+{
+  "Rarity": 14,
+  "Tier": 2,
+  "InvasionTime": "BOTH",
+  "InvasionPriority": "PRIMARY_ONLY",
+  "SpawningSystem": "BIOME_BOOSTED",
+  "TimeModifier": "NONE",
+  "TimeChangeability": "DEFAULT",
+  "WeatherType": "DEFAULT",
+  "SeverityInfo": [
+    {
+      "MobCapPercentage": 0.6,
+      "ForceNoSleep": false,
+      "TickDelay": 45,
+      "ClusterSize": 1
+    },
+    {
+      "MobCapPercentage": 0.8,
+      "ForceNoSleep": false,
+      "TickDelay": 30,
+      "ClusterSize": 1
+    },
+    {
+      "MobCapPercentage": 1.0,
+      "ForceNoSleep": false,
+      "TickDelay": 15,
+      "ClusterSize": 1
+    }
+  ],
+  "Dimensions": [
+    "minecraft:the_nether"
+  ]
+}

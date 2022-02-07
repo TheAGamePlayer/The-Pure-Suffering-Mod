@@ -2,8 +2,10 @@ package dev.theagameplayer.puresuffering.command;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 
-import dev.theagameplayer.puresuffering.spawner.InvasionSpawner;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
+import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
+import dev.theagameplayer.puresuffering.world.InvasionWorldData;
+import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.util.text.Style;
@@ -16,41 +18,109 @@ public final class ClearInvasionsCommand {
 				.requires(player -> {
 					return player.hasPermission(2);
 				}).then(Commands.literal("current").executes(ctx -> {
-					if (ServerTimeUtil.isServerDay(ctx.getSource().getServer().overworld())) {
-						InvasionSpawner.getDayInvasions().clear();
-						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
-					} else if (ServerTimeUtil.isServerNight(ctx.getSource().getServer().overworld())) {
-						InvasionSpawner.getNightInvasions().clear();
-						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						if (ServerTimeUtil.isServerDay(ctx.getSource().getLevel(), tiwData)) {
+							tiwData.getInvasionSpawner().getDayInvasions().clear();
+							ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+						} else if (ServerTimeUtil.isServerNight(ctx.getSource().getLevel(), tiwData)) {
+							tiwData.getInvasionSpawner().getNightInvasions().clear();
+							ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+						} else {
+							ctx.getSource().sendFailure(new TranslationTextComponent("commands.puresuffering.clear.failure").withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)));
+						}
 					} else {
-						ctx.getSource().sendFailure(new TranslationTextComponent("commands.puresuffering.clear.failure").withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)));
+						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
+						fiwData.getInvasionSpawner().getInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
 					}
 					return 0;
 				})).then(Commands.literal("day").executes(ctx -> {
-					InvasionSpawner.getDayInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						tiwData.getInvasionSpawner().getDayInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), true);
+					}
 					return 0;
 				})).then(Commands.literal("night").executes(ctx -> {
-					InvasionSpawner.getNightInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						tiwData.getInvasionSpawner().getNightInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), true);
+					}
+					return 0;
+				})).then(Commands.literal("fixed").executes(ctx -> {
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (iwData.hasFixedTime()) {
+						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
+						fiwData.getInvasionSpawner().getInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), true);
+					}
 					return 0;
 				})).then(Commands.literal("all").executes(ctx -> {
-					InvasionSpawner.getDayInvasions().clear();
-					InvasionSpawner.getNightInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						tiwData.getInvasionSpawner().getDayInvasions().clear();
+						tiwData.getInvasionSpawner().getNightInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
+						fiwData.getInvasionSpawner().getInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					}
 					return 0;
 				})).then(Commands.literal("queued").then(Commands.literal("day").executes(ctx -> {
-					InvasionSpawner.getQueuedDayInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						tiwData.getInvasionSpawner().getQueuedDayInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.day").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), true);
+					}
 					return 0;
 				})).then(Commands.literal("night").executes(ctx -> {
-					InvasionSpawner.getQueuedNightInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						tiwData.getInvasionSpawner().getQueuedNightInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.night").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), true);
+					}
+					return 0;
+				})).then(Commands.literal("fixed").executes(ctx -> {
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (iwData.hasFixedTime()) {
+						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
+						fiwData.getInvasionSpawner().getQueuedInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.fixed").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), true);
+					}
 					return 0;
 				})).then(Commands.literal("all").executes(ctx -> {
-					InvasionSpawner.getQueuedDayInvasions().clear();
-					InvasionSpawner.getQueuedNightInvasions().clear();
-					ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					if (!iwData.hasFixedTime()) {
+						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+						tiwData.getInvasionSpawner().getQueuedDayInvasions().clear();
+						tiwData.getInvasionSpawner().getQueuedNightInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					} else {
+						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
+						fiwData.getInvasionSpawner().getQueuedInvasions().clear();
+						ctx.getSource().sendSuccess(new TranslationTextComponent("commands.puresuffering.clear.success.queued.all").withStyle(Style.EMPTY.withColor(TextFormatting.YELLOW)), true);
+					}
 					return 0;
 				})));
 	}

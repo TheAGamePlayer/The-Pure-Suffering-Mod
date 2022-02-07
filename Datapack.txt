@@ -34,7 +34,8 @@ InvasionPriority: (String)
 SpawningSystem: (String)
 - The spawning method used by this invasion.
 - "DEFAULT" The invasion uses the mob list provided to choose mobs to spawn.
-- "BIOME_BOOSTED" The invasions uses the biome's spawn list to choose mobs to spawn.
+- "BIOME_BOOSTED" The invasion uses the biome's monster spawn list to choose mobs to spawn.
+- "BIOME_MIXED" The invasion uses every biome monster spawn list to choose mobs to spawn.
 TimeModifier: (String)
 - How your invasion changes the what day/night invasions can be chosen.
 - This is preferably only changed as a primary invasion, but is possible to experiment.
@@ -47,6 +48,11 @@ TimeChangeability: (String)
 - "DEFAULT" The invasion is affected normally.
 - "ONLY_NIGHT" The invasion cannot be chosen when a day invasion makes night invasions occur.
 - "ONLY_DAY" The invasion cannot be chosen when a night invasion makes day invasions occur.
+WeatherType: (String)
+- "DEFAULT" Weather is unchanged.
+- "CLEAR" Weather is forced to be clear during the invasion.
+- "RAIN" Weather is forced to be raining during the invasion.
+- "THUNDER" Weather is forced to be thundering during the invasion.
 SeverityInfo: (List of info for each severity of this invasion, every entry is 1 more severity) {
     SkyRenderer: (Skybox attributes changed by this invasion) {
         FogRenderer: (Fog attributes changed by this invasion) {
@@ -61,6 +67,8 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - The texture used for the sun if the invasion occurs in the day.
         MoonTexture: (ResourceLocation-String)
         - The texture used for the moon if the invasion occurs at night.
+        FixedSkyTexture: (ResourceLocation-String)
+        - The texture used for the end sky when the invasion occurs (May not work in other dimensions, but nothing I can do to fix it).
         WeatherVisibility: (Float 0.0 - 1.0)
         - How visible the sun/moon is in rain/thunder.
         - Higher values are more visible.
@@ -98,7 +106,11 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
     TickDelay: (Integer 0+)
     - The delay in ticks for when a mob should spawn.
     - Negative tick delay will prevent the invasion from ticking.
+    ClusterSize: (Integer 1+)
+    - The amount of mobs spawn in a cluster per chunk picked by the invasion.
 }
+Dimensions: (List of Strings)
+- The Ids of every dimension this invasion can occur in.
 
 -----------------------------------------------------------------
 
@@ -220,5 +232,8 @@ Another Example invasion json:
          "LightLevel": 5,
          "TickDelay": 6
       }
+   ],
+   "Dimensions": [
+      "minecraft:overworld"
    ]
 }
