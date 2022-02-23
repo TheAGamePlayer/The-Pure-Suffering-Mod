@@ -75,4 +75,12 @@ public final class InvasionTypeManager extends JsonReloadListener {
 		}
 		return invasionList;
 	}
+	
+	public boolean verifyInvasion(String idIn) {
+		for (ResourceLocation id : this.invasionTypeMap.keySet()) {
+			if (id.toString().matches(idIn))
+				return true;
+		}
+		return false;
+	}
 }

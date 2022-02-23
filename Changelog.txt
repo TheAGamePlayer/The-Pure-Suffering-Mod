@@ -1,3 +1,6 @@
+Version 1.3.1R:
+- Fixed a bug crashing when reloading a server that stopped while an invasion was active.
+
 Version 1.3.0R:
 - Reimplemented the Remove command without bugs.
 - Made Hyper Aggression far more chaotic :>

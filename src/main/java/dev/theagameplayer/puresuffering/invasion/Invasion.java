@@ -267,7 +267,7 @@ public class Invasion {
 
 	@Nullable
 	public static Invasion load(CompoundNBT nbtIn) {
-		if (ResourceLocation.isValidResourceLocation(nbtIn.getString("InvasionType"))) {
+		if (BaseEvents.getInvasionTypeManager().verifyInvasion(nbtIn.getString("InvasionType"))) {
 			InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
 			Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"));
 			CompoundNBT invasionMobs = nbtIn.getCompound("InvasionMobs");
