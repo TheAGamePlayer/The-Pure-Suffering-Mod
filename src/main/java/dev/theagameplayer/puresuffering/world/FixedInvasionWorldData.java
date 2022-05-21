@@ -1,28 +1,29 @@
 package dev.theagameplayer.puresuffering.world;
 
 import dev.theagameplayer.puresuffering.spawner.FixedInvasionSpawner;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 
 public final class FixedInvasionWorldData extends InvasionWorldData {
 	private final FixedInvasionSpawner spawner = new FixedInvasionSpawner();
 	private boolean isFirstCycle;
 	private double xpMultiplier;
 
-	public FixedInvasionWorldData(ServerWorld worldIn) {
+	public FixedInvasionWorldData(ServerLevel worldIn) {
 		super(worldIn);
 	}
 
-	@Override
-	public void load(CompoundNBT nbtIn) {
-		this.spawner.load(nbtIn.getCompound("Spawner"));
-		this.isFirstCycle = nbtIn.getBoolean("IsFirstCycle");
-		this.xpMultiplier = nbtIn.getDouble("XPMultiplier");
-		super.load(nbtIn);
+	public static FixedInvasionWorldData load(ServerLevel worldIn, CompoundTag nbtIn) {
+		FixedInvasionWorldData fiwData = new FixedInvasionWorldData(worldIn);
+		fiwData.spawner.load(nbtIn.getCompound("Spawner"));
+		fiwData.isFirstCycle = nbtIn.getBoolean("IsFirstCycle");
+		fiwData.xpMultiplier = nbtIn.getDouble("XPMultiplier");
+		fiwData.days = nbtIn.getLong("Days");
+		return fiwData;
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT nbtIn) {
+	public CompoundTag save(CompoundTag nbtIn) {
 		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putBoolean("IsFirstCycle", this.isFirstCycle);
 		nbtIn.putDouble("XPMultiplier", this.xpMultiplier);

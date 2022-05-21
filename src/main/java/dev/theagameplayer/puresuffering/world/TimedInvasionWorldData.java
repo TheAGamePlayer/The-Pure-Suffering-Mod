@@ -2,8 +2,8 @@ package dev.theagameplayer.puresuffering.world;
 
 import dev.theagameplayer.puresuffering.spawner.TimedInvasionSpawner;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 
 public final class TimedInvasionWorldData extends InvasionWorldData {
 	private final TimedInvasionSpawner spawner = new TimedInvasionSpawner();
@@ -11,26 +11,27 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 	private boolean checkedDay, checkedNight;
 	private boolean prevDayCheck, prevNightCheck;
 	
-	public TimedInvasionWorldData(ServerWorld worldIn) {
+	public TimedInvasionWorldData(ServerLevel worldIn) {
 		super(worldIn);
 		this.checkedDay = ServerTimeUtil.isServerNight(worldIn, this);
 		this.checkedNight = ServerTimeUtil.isServerDay(worldIn, this);
 	}
 	
-	@Override
-	public void load(CompoundNBT nbtIn) {
-		this.spawner.load(nbtIn.getCompound("Spawner"));
-		this.dayXPMultiplier = nbtIn.getDouble("DayXPMultiplier");
-		this.nightXPMultiplier = nbtIn.getDouble("NightXPMultiplier");
-		this.checkedDay = nbtIn.getBoolean("CheckedDay");
-		this.checkedNight = nbtIn.getBoolean("CheckedNight");
-		this.prevDayCheck = nbtIn.getBoolean("PrevDayCheck");
-		this.prevNightCheck = nbtIn.getBoolean("PrevNightCheck");
-		super.load(nbtIn);
+	public static TimedInvasionWorldData load(ServerLevel worldIn, CompoundTag nbtIn) {
+		TimedInvasionWorldData tiwData = new TimedInvasionWorldData(worldIn);
+		tiwData.spawner.load(nbtIn.getCompound("Spawner"));
+		tiwData.dayXPMultiplier = nbtIn.getDouble("DayXPMultiplier");
+		tiwData.nightXPMultiplier = nbtIn.getDouble("NightXPMultiplier");
+		tiwData.checkedDay = nbtIn.getBoolean("CheckedDay");
+		tiwData.checkedNight = nbtIn.getBoolean("CheckedNight");
+		tiwData.prevDayCheck = nbtIn.getBoolean("PrevDayCheck");
+		tiwData.prevNightCheck = nbtIn.getBoolean("PrevNightCheck");
+		tiwData.days = nbtIn.getLong("Days");
+		return tiwData;
 	}
 
 	@Override
-	public CompoundNBT save(CompoundNBT nbtIn) {
+	public CompoundTag save(CompoundTag nbtIn) {
 		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putDouble("DayXPMultiplier", this.dayXPMultiplier);
 		nbtIn.putDouble("NightXPMultiplier", this.nightXPMultiplier);

@@ -4,10 +4,10 @@ import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
 import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 
 public final class ServerInvasionUtil {
-	public static int handleLightLevel(int lightLevelIn, ServerWorld worldIn) {
+	public static int handleLightLevel(int lightLevelIn, ServerLevel worldIn) {
 		InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(worldIn);
 		if (iwData != null) {
 			if (!iwData.hasFixedTime()) {

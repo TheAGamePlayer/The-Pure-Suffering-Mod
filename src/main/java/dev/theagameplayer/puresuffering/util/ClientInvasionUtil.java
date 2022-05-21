@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import dev.theagameplayer.puresuffering.client.ClientTransitionHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 
 public final class ClientInvasionUtil {
-	public static float handleBrightness(float brightnessIn, ClientWorld worldIn) {
+	public static float handleBrightness(float brightnessIn, ClientLevel worldIn) {
 		if (!worldIn.dimensionType().hasFixedTime()) {
 			float brightness = 0.0F;
 			ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(worldIn);
@@ -45,7 +45,7 @@ public final class ClientInvasionUtil {
 		return brightnessIn;
 	}
 	
-	public static boolean handleLightMap(boolean resultIn, ClientWorld worldIn) {
+	public static boolean handleLightMap(boolean resultIn, ClientLevel worldIn) {
 		if (!worldIn.dimensionType().hasFixedTime()) {
 			ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(worldIn);
 			ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(worldIn);

@@ -2,12 +2,12 @@ package dev.theagameplayer.puresuffering.registries.other;
 
 import java.util.function.Predicate;
 
-import dev.theagameplayer.puresuffering.registries.PSPotions;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import dev.theagameplayer.puresuffering.registries.PSMobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 public final class PSEntityPredicates {
 	public static final Predicate<Entity> HYPER_AGGRESSION = entity -> {
-		return !(entity instanceof PlayerEntity) || !entity.isSpectator() && !((PlayerEntity)entity).isCreative() && !((PlayerEntity)entity).hasEffect(PSPotions.BLESSING.get());
+		return !(entity instanceof Player) || !entity.isSpectator() && !((Player)entity).isCreative() && !((Player)entity).hasEffect(PSMobEffects.BLESSING.get());
 	};
 }

@@ -6,10 +6,10 @@ import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class RemoveInvasionPacket {
 	private final InvasionSkyRenderer renderer;
@@ -20,13 +20,13 @@ public final class RemoveInvasionPacket {
 		this.listType = listTypeIn;
 	}
 
-	public static void encode(RemoveInvasionPacket msgIn, PacketBuffer bufIn) {
+	public static void encode(RemoveInvasionPacket msgIn, FriendlyByteBuf bufIn) {
 		msgIn.renderer.deconstruct().serializeToNetwork(bufIn);
 		bufIn.writeResourceLocation(msgIn.renderer.getId());
 		bufIn.writeEnum(msgIn.listType);
 	}
 
-	public static RemoveInvasionPacket decode(PacketBuffer bufIn) {
+	public static RemoveInvasionPacket decode(FriendlyByteBuf bufIn) {
 		InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
 		return new RemoveInvasionPacket(renderer, bufIn.readEnum(InvasionListType.class));
 	}

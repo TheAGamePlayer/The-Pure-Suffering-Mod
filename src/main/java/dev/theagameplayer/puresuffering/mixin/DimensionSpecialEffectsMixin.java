@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.DimensionRenderInfo;
+import net.minecraft.client.renderer.DimensionSpecialEffects;
 
-@Mixin(DimensionRenderInfo.class)
-public class DimensionRenderInfoMixin {
+@Mixin(DimensionSpecialEffects.class)
+public class DimensionSpecialEffectsMixin {
 	@Inject(at = @At("RETURN"), method = "forceBrightLightmap()Z", cancellable = true)
 	private void forceBrightLightmap(CallbackInfoReturnable<Boolean> callbackIn) {
 		if (PSConfigValues.client.canInvasionsChangeBrightness) {

@@ -2,8 +2,8 @@ package dev.theagameplayer.puresuffering.client.renderer;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionFogRenderer {
 	private final ResourceLocation id;
@@ -89,14 +89,14 @@ public final class InvasionFogRenderer {
 			return new InvasionFogRenderer.Builder(fogColorChanged, red, green, blue);
 		}
 		
-		public void serializeToNetwork(PacketBuffer bufIn) {
+		public void serializeToNetwork(FriendlyByteBuf bufIn) {
 			bufIn.writeBoolean(this.fogColorChanged);
 			bufIn.writeFloat(this.red);
 			bufIn.writeFloat(this.green);
 			bufIn.writeFloat(this.blue);
 		}
 		
-		public static InvasionFogRenderer.Builder fromNetwork(PacketBuffer bufIn) {
+		public static InvasionFogRenderer.Builder fromNetwork(FriendlyByteBuf bufIn) {
 			boolean fogColorChanged = bufIn.readBoolean();
 			float red = bufIn.readFloat();
 			float green = bufIn.readFloat();

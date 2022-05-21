@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 import com.google.gson.JsonObject;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionSkyRenderer {
 	private final ResourceLocation id;
@@ -207,7 +207,7 @@ public final class InvasionSkyRenderer {
 			return new InvasionSkyRenderer.Builder(fogRenderer, sun, moon, fixedSky, weatherVisibilityChanged, brightnessChanged, skyColorChanged, weatherVisibility, brightness, red, green, blue);
 		}
 		
-		public void serializeToNetwork(PacketBuffer bufIn) {
+		public void serializeToNetwork(FriendlyByteBuf bufIn) {
 			this.fogRenderer.serializeToNetwork(bufIn);
 			bufIn.writeBoolean(this.sun != null);
 			if (this.sun != null)
@@ -228,7 +228,7 @@ public final class InvasionSkyRenderer {
 			bufIn.writeFloat(this.blue);
 		}
 		
-		public static InvasionSkyRenderer.Builder fromNetwork(PacketBuffer bufIn) {
+		public static InvasionSkyRenderer.Builder fromNetwork(FriendlyByteBuf bufIn) {
 			InvasionFogRenderer.Builder fogRenderer = InvasionFogRenderer.Builder.fromNetwork(bufIn);
 			ResourceLocation sun = null;
 			ResourceLocation moon = null;

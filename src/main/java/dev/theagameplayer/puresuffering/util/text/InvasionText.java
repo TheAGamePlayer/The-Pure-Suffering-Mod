@@ -1,8 +1,8 @@
 package dev.theagameplayer.puresuffering.util.text;
 
 import dev.theagameplayer.puresuffering.invasion.Invasion;
-import net.minecraft.util.text.IFormattableTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class InvasionText {
 	private final boolean isPrimary;
@@ -19,13 +19,13 @@ public class InvasionText {
 		this.mobCap = invasionIn.getMobCap() - 1;
 	}
 	
-	public IFormattableTextComponent getHoverText() {
-		IFormattableTextComponent primaryComponent = new TranslationTextComponent("invasion.puresuffering.info1").append(this.isPrimary + ", ");
-		IFormattableTextComponent severityComponent = new TranslationTextComponent("invasion.puresuffering.info2").append(this.severity + "\n");
-		IFormattableTextComponent infoComponent = new TranslationTextComponent("invasion.puresuffering.info3").append("\n");
-		IFormattableTextComponent rarityComponent = new TranslationTextComponent("invasion.puresuffering.info4").append(this.rarity + ", ");
-		IFormattableTextComponent tierComponent = new TranslationTextComponent("invasion.puresuffering.info5").append(this.tier + ", ");
-		IFormattableTextComponent mobCapComponent = new TranslationTextComponent("invasion.puresuffering.info6").append(this.mobCap + "");
+	public MutableComponent getHoverText() {
+		MutableComponent primaryComponent = new TranslatableComponent("invasion.puresuffering.info1").append(this.isPrimary + ", ");
+		MutableComponent severityComponent = new TranslatableComponent("invasion.puresuffering.info2").append(this.severity + "\n");
+		MutableComponent infoComponent = new TranslatableComponent("invasion.puresuffering.info3").append("\n");
+		MutableComponent rarityComponent = new TranslatableComponent("invasion.puresuffering.info4").append(this.rarity + ", ");
+		MutableComponent tierComponent = new TranslatableComponent("invasion.puresuffering.info5").append(this.tier + ", ");
+		MutableComponent mobCapComponent = new TranslatableComponent("invasion.puresuffering.info6").append(this.mobCap + "");
 		return primaryComponent.append(severityComponent).append(infoComponent).append(rarityComponent).append(tierComponent).append(mobCapComponent);
 	}
 }

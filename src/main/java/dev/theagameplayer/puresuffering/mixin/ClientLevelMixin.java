@@ -7,13 +7,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 
-@Mixin(ClientWorld.class)
-public class ClientWorldMixin {
+@Mixin(ClientLevel.class)
+public class ClientLevelMixin {
 	@Inject(at = @At("RETURN"), method = "getSkyDarken(F)F", cancellable = true)
 	private void getSkyDarken(float brightnessIn, CallbackInfoReturnable<Float> callbackIn) {
-		ClientWorld world = (ClientWorld)(Object)this;
+		ClientLevel world = (ClientLevel)(Object)this;
 		if (PSConfigValues.client.canInvasionsChangeBrightness)
 			callbackIn.setReturnValue(ClientInvasionUtil.handleBrightness(callbackIn.getReturnValueF(), world));
 	}

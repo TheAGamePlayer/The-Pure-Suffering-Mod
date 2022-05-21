@@ -7,45 +7,37 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SeverityInfo;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SpawningSystem;
-import dev.theagameplayer.puresuffering.util.InvasionSpawnerEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ILivingEntityData;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.effect.LightningBoltEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.WeightedRandom;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.DefaultBiomeMagnifier;
-import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.biome.MobSpawnInfo.Spawners;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.SpawnData;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class Invasion {
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final ArrayList<Biome> MIXED_BIOMES = new ArrayList<>(ForgeRegistries.BIOMES.getValues());
 	private final ArrayList<UUID> invasionMobs = new ArrayList<>();
 	private final InvasionType invasionType;
@@ -53,8 +45,8 @@ public class Invasion {
 	private final boolean isPrimary;
 	private final int mobCap;
 	private final boolean shouldTick;
-	private final ArrayList<InvasionSpawnerEntity> spawnPotentials = new ArrayList<>();
-	private InvasionSpawnerEntity nextSpawnData = new InvasionSpawnerEntity();
+	private final SimpleWeightedRandomList<SpawnData> spawnPotentials = SimpleWeightedRandomList.empty();
+	private SpawnData nextSpawnData = new SpawnData();
 	private int spawnDelay;
 
 	public Invasion(final InvasionType invasionTypeIn, final int severityIn, final boolean isPrimaryIn) {
@@ -87,7 +79,7 @@ public class Invasion {
 		return this.invasionType.getSeverityInfo().get(this.severity);
 	}
 
-	public void tick(final ServerWorld worldIn) {
+	public void tick(final ServerLevel worldIn) {
 		this.invasionMobs.removeIf(uuid -> {
 			return worldIn.getEntity(uuid) == null || !worldIn.getEntity(uuid).isAlive();
 		});
@@ -110,7 +102,7 @@ public class Invasion {
 			this.tickEntitySpawn(worldIn);
 	}
 
-	protected void tickEntitySpawn(ServerWorld worldIn) {
+	protected void tickEntitySpawn(ServerLevel worldIn) {
 		if (this.invasionMobs.size() < this.mobCap) {
 			//Delay check
 			if (this.spawnDelay < 0) {
@@ -123,15 +115,15 @@ public class Invasion {
 			//Get Mobs
 			boolean flag1 = false;
 			ChunkPos chunkPos = this.getSpawnChunk(worldIn);
-			List<Spawners> mobs = this.getMobSpawnList(worldIn, chunkPos);
-			if (mobs.size() < 1) return;
+			List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(worldIn, chunkPos);
+			if (mobs.isEmpty()) return;
 			//Spawn Mob Cluster (Different Mobs)
 			int clusterSize = worldIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
 			for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
-				Spawners spawners = mobs.get(worldIn.random.nextInt(mobs.size()));
+				MobSpawnSettings.SpawnerData spawners = mobs.get(worldIn.random.nextInt(mobs.size()));
 				int groupSize = worldIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-				this.nextSpawnData.getTag().putString("id", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
-				CompoundNBT compoundNBT = this.nextSpawnData.getTag();
+				this.nextSpawnData.getEntityToSpawn().putString("id", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
+				CompoundTag compoundNBT = this.nextSpawnData.getEntityToSpawn();
 				Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
 				if (!optional.isPresent()) {
 					this.delay(worldIn);
@@ -141,9 +133,9 @@ public class Invasion {
 				for(int count = 0; count < groupSize && this.invasionMobs.size() < this.mobCap; ++count) {
 					//Spawn Entity
 					BlockPos spawnPos = this.getSpawnPos(worldIn, chunkPos, false);
-					if (spawnPos != null && EntitySpawnPlacementRegistry.checkSpawnRules(optional.get(), worldIn, SpawnReason.EVENT, spawnPos, worldIn.getRandom())) {
+					if (spawnPos != null && SpawnPlacements.checkSpawnRules(optional.get(), worldIn, MobSpawnType.EVENT, spawnPos, worldIn.getRandom())) {
 						Entity entity = EntityType.loadEntityRecursive(compoundNBT, worldIn, (e) -> {
-							e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.yRot, e.xRot);
+							e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.getYRot(), e.getXRot());
 							return e;
 						});
 						if (entity == null) {
@@ -151,16 +143,14 @@ public class Invasion {
 							return;
 						}
 						entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), worldIn.random.nextFloat() * 360.0F, 0.0F);
-						if (entity instanceof MobEntity) {
-							MobEntity mobEntity = (MobEntity)entity;
-							if (this.nextSpawnData.getTag().size() == 1 && this.nextSpawnData.getTag().contains("id", 8)) {
-								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, SpawnReason.EVENT)) {
+						if (entity instanceof Mob) {
+							Mob mobEntity = (Mob)entity;
+							if (this.nextSpawnData.getEntityToSpawn().size() == 1 && this.nextSpawnData.getEntityToSpawn().contains("id", 8)) {
+								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, (LevelAccessor)worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, MobSpawnType.EVENT)) {
 									this.spawnInvasionMob(worldIn, mobEntity);
 								}
 							}
 						}
-						if (entity instanceof LightningBoltEntity)
-							LOGGER.info("LIGHTNING!!!");
 						if (!worldIn.tryAddFreshEntityWithPassengers(entity)) {
 							this.delay(worldIn);
 							return;
@@ -175,27 +165,27 @@ public class Invasion {
 		}
 	}
 
-	protected void spawnInvasionMob(ServerWorld worldIn, MobEntity mobEntityIn) {
+	protected void spawnInvasionMob(ServerLevel worldIn, Mob mobEntityIn) {
 		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.getId().toString());
 		mobEntityIn.getPersistentData().putBoolean("AntiGrief", worldIn.dimensionType().hasFixedTime());
-		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), SpawnReason.EVENT, (ILivingEntityData)null, (CompoundNBT)null);
+		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, (SpawnGroupData)null, (CompoundTag)null);
 		if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
 			mobEntityIn.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
 		this.invasionMobs.add(mobEntityIn.getUUID());
-		worldIn.levelEvent(Constants.WorldEvents.MOB_SPAWNER_PARTICLES, mobEntityIn.blockPosition(), 0);
+		worldIn.levelEvent(2004, mobEntityIn.blockPosition(), 0); //Mob Spawn Particles
 		mobEntityIn.spawnAnim();
 	}
 
-	protected final void delay(ServerWorld worldIn) {
+	protected final void delay(ServerLevel worldIn) {
 		this.spawnDelay = this.getSeverityInfo().getTickDelay();
-		if (!this.spawnPotentials.isEmpty()) {
-			this.nextSpawnData = WeightedRandom.getRandomItem(worldIn.random, this.spawnPotentials);;
-		}
+		this.spawnPotentials.getRandom(worldIn.random).ifPresent(entry -> {
+			this.nextSpawnData = entry.getData();
+		});
 	}
 
-	protected final List<MobSpawnInfo.Spawners> getMobSpawnList(ServerWorld worldIn, ChunkPos chunkPosIn) {
+	protected final List<MobSpawnSettings.SpawnerData> getMobSpawnList(ServerLevel worldIn, ChunkPos chunkPosIn) {
 		BlockPos biomePos = this.getSpawnPos(worldIn, chunkPosIn, true);
-		ArrayList<MobSpawnInfo.Spawners> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
+		ArrayList<MobSpawnSettings.SpawnerData> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
 		switch (this.invasionType.getSpawningSystem()) {
 		case DEFAULT: break;
 		case BIOME_BOOSTED:
@@ -205,18 +195,18 @@ public class Invasion {
 			originalList.addAll(this.getMixedSpawnList(worldIn));
 			break;
 		}
-		ArrayList<MobSpawnInfo.Spawners> newList = new ArrayList<>();
+		ArrayList<MobSpawnSettings.SpawnerData> newList = new ArrayList<>();
 		if (!originalList.isEmpty()) {
-			for (Spawners spawners : originalList) {
-				for (int w = 0; w < spawners.weight; w++)
+			for (MobSpawnSettings.SpawnerData spawners : originalList) {
+				for (int w = 0; w < spawners.getWeight().asInt(); w++)
 					newList.add(spawners);
 			}
 		}
 		return newList;
 	}
 
-	private final ArrayList<MobSpawnInfo.Spawners> getBiomeSpawnList(BlockPos posIn, IChunk chunkIn) {
-		ArrayList<MobSpawnInfo.Spawners> spawners = new ArrayList<>(DefaultBiomeMagnifier.INSTANCE.getBiome(0L, posIn.getX(), posIn.getY(), posIn.getZ(), chunkIn.getBiomes()).getMobSettings().getMobs(EntityClassification.MONSTER));
+	private final ArrayList<MobSpawnSettings.SpawnerData> getBiomeSpawnList(BlockPos posIn, ChunkAccess chunkIn) {
+		ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(chunkIn.getNoiseBiome(posIn.getX(), posIn.getY(), posIn.getZ()).value().getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
 			ResourceLocation name = spawner.type.getRegistryName();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
@@ -224,8 +214,8 @@ public class Invasion {
 		return spawners;
 	}
 
-	private final ArrayList<MobSpawnInfo.Spawners> getMixedSpawnList(ServerWorld worldIn) {
-		ArrayList<MobSpawnInfo.Spawners> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(EntityClassification.MONSTER));
+	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(ServerLevel worldIn) {
+		ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
 			ResourceLocation name = spawner.type.getRegistryName();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
@@ -233,8 +223,8 @@ public class Invasion {
 		return spawners;
 	}
 
-	protected final ChunkPos getSpawnChunk(ServerWorld worldIn) {
-		ServerPlayerEntity player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
+	protected final ChunkPos getSpawnChunk(ServerLevel worldIn) {
+		ServerPlayer player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
 		ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
 		int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
 		int chunkZ = chunkPos.z - 8 + worldIn.random.nextInt(17);
@@ -243,15 +233,15 @@ public class Invasion {
 		return chunkPos1;
 	}
 
-	private final int getChunkOffset(ServerWorld worldIn) {
+	private final int getChunkOffset(ServerLevel worldIn) {
 		int offSet = worldIn.random.nextInt(8) + 1;
 		return worldIn.random.nextBoolean() ? offSet : -offSet;
 	}
 
-	protected final BlockPos getSpawnPos(ServerWorld worldIn, ChunkPos chunkPosIn, boolean biomeCheckIn) {
+	protected final BlockPos getSpawnPos(ServerLevel worldIn, ChunkPos chunkPosIn, boolean biomeCheckIn) {
 		int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
 		int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
-		int surface = worldIn.getHeight(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
+		int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) + 1;
 		if (biomeCheckIn || (!worldIn.dimensionType().hasCeiling() && worldIn.random.nextBoolean()))
 			return new BlockPos(x, surface, z);
 		BlockState air = Blocks.AIR.defaultBlockState();
@@ -266,11 +256,11 @@ public class Invasion {
 	}
 
 	@Nullable
-	public static Invasion load(CompoundNBT nbtIn) {
+	public static Invasion load(CompoundTag nbtIn) {
 		if (BaseEvents.getInvasionTypeManager().verifyInvasion(nbtIn.getString("InvasionType"))) {
 			InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
 			Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"));
-			CompoundNBT invasionMobs = nbtIn.getCompound("InvasionMobs");
+			CompoundTag invasionMobs = nbtIn.getCompound("InvasionMobs");
 			for (String name : invasionMobs.getAllKeys())
 				invasion.invasionMobs.add(invasionMobs.getUUID(name));
 			return invasion;
@@ -278,9 +268,9 @@ public class Invasion {
 		return null;
 	}
 
-	public CompoundNBT save() {
-		CompoundNBT nbt = new CompoundNBT();
-		CompoundNBT mobs = new CompoundNBT();
+	public CompoundTag save() {
+		CompoundTag nbt = new CompoundTag();
+		CompoundTag mobs = new CompoundTag();
 		for (UUID id : this.invasionMobs)
 			mobs.putUUID(id.toString(), id);
 		nbt.put("InvasionMobs", mobs);

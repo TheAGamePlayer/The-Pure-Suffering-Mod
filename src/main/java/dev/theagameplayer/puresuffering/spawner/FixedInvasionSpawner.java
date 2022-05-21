@@ -15,13 +15,12 @@ import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionPriority;
 import dev.theagameplayer.puresuffering.util.InvasionChart;
 import dev.theagameplayer.puresuffering.util.InvasionList;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.util.Mth;
+import net.minecraft.server.level.ServerLevel;
 
 public final class FixedInvasionSpawner {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
@@ -29,7 +28,7 @@ public final class FixedInvasionSpawner {
 	private final ArrayList<Invasion> queuedInvasions = new ArrayList<>();
 	private int interval;
 
-	public void setInvasions(ServerWorld worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
+	public void setInvasions(ServerLevel worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		this.invasions.clear();
 		Random random = worldIn.random;
 		int totalInvasions = !this.queuedInvasions.isEmpty() ? this.queuedInvasions.size() : this.calculateInvasions(random, amountIn, this.interval, isCanceledIn, daysIn == 0);
@@ -50,7 +49,7 @@ public final class FixedInvasionSpawner {
 			for (int inv = 0; inv < totalInvasions; inv++) {
 				InvasionType invasionType = this.getInvasionType(inv == 0 ? potentialPrimaryInvasions : potentialSecondaryInvasions, random);
 				if (invasionType != null) {
-					int severity = random.nextInt(random.nextInt(MathHelper.clamp((int)daysIn/PSConfigValues.common.fixedDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					int severity = random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.fixedDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
 					Invasion invasion = new Invasion(invasionType, severity, inv == 0);
 					this.invasions.add(invasion);
 					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
@@ -68,27 +67,27 @@ public final class FixedInvasionSpawner {
 		return invasionChartIn.getInvasionInRange(randomIn.nextFloat());
 	}
 
-	public void invasionTick(MinecraftServer serverIn, ServerWorld worldIn) {
+	public void invasionTick(MinecraftServer serverIn, ServerLevel worldIn) {
 		if (!this.invasions.isEmpty()) {
 			Invasion invasion = this.invasions.get(worldIn.getRandom().nextInt(this.invasions.size()));
 			invasion.tick(worldIn);
 		}
 	}
 
-	public void load(CompoundNBT nbtIn) {
-		ListNBT invasionsNBT = nbtIn.getList("Invasions", Constants.NBT.TAG_COMPOUND);
-		ListNBT queuedInvasionsNBT = nbtIn.getList("QueuedInvasions", Constants.NBT.TAG_COMPOUND);
-		for (INBT inbt : invasionsNBT)
-			this.invasions.add(Invasion.load((CompoundNBT)inbt));
-		for (INBT inbt : queuedInvasionsNBT)
-			this.queuedInvasions.add(Invasion.load((CompoundNBT)inbt));
+	public void load(CompoundTag nbtIn) {
+		ListTag invasionsNBT = nbtIn.getList("Invasions", Tag.TAG_COMPOUND);
+		ListTag queuedInvasionsNBT = nbtIn.getList("QueuedInvasions", Tag.TAG_COMPOUND);
+		for (Tag inbt : invasionsNBT)
+			this.invasions.add(Invasion.load((CompoundTag)inbt));
+		for (Tag inbt : queuedInvasionsNBT)
+			this.queuedInvasions.add(Invasion.load((CompoundTag)inbt));
 		this.interval = nbtIn.getInt("Interval");
 	}
 
-	public CompoundNBT save() {
-		CompoundNBT nbt = new CompoundNBT();
-		ListNBT invasionsNBT = new ListNBT();
-		ListNBT queuedInvasionsNBT = new ListNBT();
+	public CompoundTag save() {
+		CompoundTag nbt = new CompoundTag();
+		ListTag invasionsNBT = new ListTag();
+		ListTag queuedInvasionsNBT = new ListTag();
 		for (Invasion invasion : this.invasions)
 			invasionsNBT.add(invasion.save());
 		for (Invasion invasion : this.queuedInvasions)

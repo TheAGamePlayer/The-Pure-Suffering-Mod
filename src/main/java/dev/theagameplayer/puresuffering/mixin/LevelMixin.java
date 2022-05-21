@@ -6,15 +6,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import dev.theagameplayer.puresuffering.util.ServerInvasionUtil;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 
-@Mixin(World.class)
-public class WorldMixin {
+@Mixin(Level.class)
+public class LevelMixin {
 	@Inject(at = @At("RETURN"), method = "updateSkyBrightness()V")
 	private void updateSkyBrightness(CallbackInfo callbackIn) {
-		World world = (World)(Object)this;
-		if (!world.isClientSide)
-			world.skyDarken = ServerInvasionUtil.handleLightLevel(world.skyDarken, (ServerWorld)world);
+		Level level = (Level)(Object)this;
+		if (!level.isClientSide)
+			level.skyDarken = ServerInvasionUtil.handleLightLevel(level.skyDarken, (ServerLevel)level);
 	}
 }

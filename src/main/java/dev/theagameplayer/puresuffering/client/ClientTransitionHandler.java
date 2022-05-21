@@ -1,6 +1,6 @@
 package dev.theagameplayer.puresuffering.client;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 
 public final class ClientTransitionHandler {
@@ -59,7 +59,7 @@ public final class ClientTransitionHandler {
 		} else {
 			brightness = brightnessIncIn;
 		}
-		return MathHelper.clamp(brightnessIn - brightness, 0.0F, 1.0F);
+		return Mth.clamp(brightnessIn - brightness, 0.0F, 1.0F);
 	}
 
 	//FOG COLOR

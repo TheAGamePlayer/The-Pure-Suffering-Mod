@@ -6,10 +6,10 @@ import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class AddInvasionPacket {
 	private final InvasionSkyRenderer renderer;
@@ -22,14 +22,14 @@ public final class AddInvasionPacket {
 		this.isPrimary = isPrimaryIn;
 	}
 
-	public static void encode(AddInvasionPacket msgIn, PacketBuffer bufIn) {
+	public static void encode(AddInvasionPacket msgIn, FriendlyByteBuf bufIn) {
 		msgIn.renderer.deconstruct().serializeToNetwork(bufIn);
 		bufIn.writeResourceLocation(msgIn.renderer.getId());
 		bufIn.writeEnum(msgIn.listType);
 		bufIn.writeBoolean(msgIn.isPrimary);
 	}
 
-	public static AddInvasionPacket decode(PacketBuffer bufIn) {
+	public static AddInvasionPacket decode(FriendlyByteBuf bufIn) {
 		InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
 		return new AddInvasionPacket(renderer, bufIn.readEnum(InvasionListType.class), bufIn.readBoolean());
 	}

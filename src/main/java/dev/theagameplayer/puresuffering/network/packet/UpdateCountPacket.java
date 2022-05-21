@@ -5,10 +5,10 @@ import java.util.function.Supplier;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class UpdateCountPacket {
 	private final int count;
@@ -19,12 +19,12 @@ public final class UpdateCountPacket {
 		this.listType = listTypeIn;
 	}
 	
-	public static void encode(UpdateCountPacket msgIn, PacketBuffer bufIn) {
+	public static void encode(UpdateCountPacket msgIn, FriendlyByteBuf bufIn) {
 		bufIn.writeInt(msgIn.count);
 		bufIn.writeEnum(msgIn.listType);
 	}
 	
-	public static UpdateCountPacket decode(PacketBuffer bufIn) {
+	public static UpdateCountPacket decode(FriendlyByteBuf bufIn) {
 		return new UpdateCountPacket(bufIn.readInt(), bufIn.readEnum(InvasionListType.class));
 	}
 

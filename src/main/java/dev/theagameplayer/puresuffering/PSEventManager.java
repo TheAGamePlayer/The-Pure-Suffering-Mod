@@ -14,7 +14,7 @@ import dev.theagameplayer.puresuffering.data.InvasionTypeManager;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
-import dev.theagameplayer.puresuffering.registries.PSPotions;
+import dev.theagameplayer.puresuffering.registries.PSMobEffects;
 import dev.theagameplayer.puresuffering.registries.other.PSEntityPredicates;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
@@ -26,31 +26,31 @@ import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
 import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.brain.memory.MemoryModuleType;
-import net.minecraft.entity.monster.HoglinEntity;
-import net.minecraft.entity.monster.VexEntity;
-import net.minecraft.entity.monster.ZoglinEntity;
-import net.minecraft.entity.monster.piglin.AbstractPiglinEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerEntity.SleepResult;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.monster.hoglin.Hoglin;
+import net.minecraft.world.entity.monster.Vex;
+import net.minecraft.world.entity.monster.Zoglin;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Player.BedSleepingProblem;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Style;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.client.ISkyRenderHandler;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -62,11 +62,11 @@ import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 public final class PSEventManager {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
@@ -173,27 +173,27 @@ public final class PSEventManager {
 					ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(mc.level);
 					ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(mc.level);
 					if (dayInfo.isClientTime()) {
-						eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Current Day Invasions: " + dayInfo.getInvasionsCount());
-						eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Day Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? dayInfo.getXPMultiplier() + "x" : "Disabled"));
-						eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Night Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? nightInfo.getXPMultiplier() + "x" : "Disabled"));
+						eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Day Invasions: " + dayInfo.getInvasionsCount());
+						eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Day Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? dayInfo.getXPMultiplier() + "x" : "Disabled"));
+						eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Night Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? nightInfo.getXPMultiplier() + "x" : "Disabled"));
 						return;
 					} else if (nightInfo.isClientTime()) {
-						eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Current Night Invasions: " + nightInfo.getInvasionsCount());
-						eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Night Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? nightInfo.getXPMultiplier() + "x" : "Disabled"));
-						eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Day Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? dayInfo.getXPMultiplier() + "x" : "Disabled"));
+						eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Night Invasions: " + nightInfo.getInvasionsCount());
+						eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Night Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? nightInfo.getXPMultiplier() + "x" : "Disabled"));
+						eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Day Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? dayInfo.getXPMultiplier() + "x" : "Disabled"));
 						return;
 					}
 				} else {
 					ClientInvasionWorldInfo fixedInfo = ClientInvasionWorldInfo.getFixedClientInfo(mc.level);
-					eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Current Invasions: " + fixedInfo.getInvasionsCount());
-					eventIn.getLeft().add(TextFormatting.RED + "[PureSuffering]" + TextFormatting.RESET + " Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? fixedInfo.getXPMultiplier() + "x" : "Disabled"));
+					eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Invasions: " + fixedInfo.getInvasionsCount());
+					eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? fixedInfo.getXPMultiplier() + "x" : "Disabled"));
 				}
 			}
 		}
 
-		public static void renderWorldLast(RenderWorldLastEvent eventIn) {
+		public static void renderWorldLast(RenderLevelLastEvent eventIn) {
 			Minecraft mc = Minecraft.getInstance();
-			ClientWorld clientWorld = mc.level;
+			ClientLevel clientWorld = mc.level;
 			if (clientWorld != null && PSConfigValues.client.useSkyBoxRenderer) {
 				ISkyRenderHandler skyRenderHandler = clientWorld.effects().getSkyRenderHandler();
 				if (!(skyRenderHandler instanceof InvasionSkyRenderHandler)) {
@@ -220,14 +220,14 @@ public final class PSEventManager {
 
 		public static void worldTick(TickEvent.WorldTickEvent eventIn) {
 			if (eventIn.side.isServer() && eventIn.phase == TickEvent.Phase.END) {
-				ServerWorld world = (ServerWorld)eventIn.world;
+				ServerLevel world = (ServerLevel)eventIn.world;
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(world);
 				if (iwData != null && PSGameRulesRegistry.getEnableInvasions(world)) {
 					if (!iwData.hasFixedTime()) {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						if (ServerTimeUtil.isServerDay(world, tiwData) && !tiwData.hasCheckedNight()) { //Sets events for night time
 							tiwData.setDays(world.getDayTime() / 24000L);
-							int amount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.nightDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxNightInvasions);
+							int amount = Mth.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.nightDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxNightInvasions);
 							int chance = world.random.nextInt((int)(PSConfigValues.common.nightDifficultyIncreaseDelay * PSConfigValues.common.nightCancelChanceMultiplier) + 1);
 							boolean cancelFlag = chance == 0 && amount > 1 && tiwData.getInvasionSpawner().getQueuedNightInvasions().isEmpty() && PSConfigValues.common.canNightInvasionsBeCanceled;
 							LOGGER.info("Day: " + iwData.getDays() + ", Possible Invasions: " + amount);
@@ -237,18 +237,18 @@ public final class PSEventManager {
 							tiwData.setCheckedDay(false);
 							tiwData.setCheckedNight(true);
 							if (!tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || tiwData.getInvasionSpawner().getDayInvasions().isCanceled()) {
-								for (ServerPlayerEntity player : world.players()) {
+								for (ServerPlayer player : world.players()) {
 									if (tiwData.getInvasionSpawner().getDayInvasions().isCanceled()) {
-										player.sendMessage(new TranslationTextComponent("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
+										player.sendMessage(new TranslatableComponent("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), player.getUUID());
 										continue;
 									}
-									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), player.getUUID());
-									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withColor(TextFormatting.DARK_RED)), player.getUUID());
+									player.sendMessage(new TranslatableComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), player.getUUID());
+									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED)), player.getUUID());
 								}
 							}
 						} else if (ServerTimeUtil.isServerNight(world, tiwData) && !tiwData.hasCheckedDay()) { //Sets events for day time
 							tiwData.setDays(world.getDayTime() / 24000L);
-							int amount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
+							int amount = Mth.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.dayDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxDayInvasions);
 							int chance = world.random.nextInt((int)(PSConfigValues.common.dayDifficultyIncreaseDelay * PSConfigValues.common.dayCancelChanceMultiplier) + 1);
 							boolean cancelFlag = chance == 0 && amount > 1 && tiwData.getInvasionSpawner().getQueuedDayInvasions().isEmpty() && PSConfigValues.common.canDayInvasionsBeCanceled;
 							LOGGER.info("Night: " + iwData.getDays() + ", Possible Invasions: " + amount);
@@ -258,13 +258,13 @@ public final class PSEventManager {
 							tiwData.setCheckedDay(true);
 							tiwData.setCheckedNight(false);
 							if (!tiwData.getInvasionSpawner().getNightInvasions().isEmpty() || tiwData.getInvasionSpawner().getNightInvasions().isCanceled()) {
-								for (ServerPlayerEntity player : world.players()) {
+								for (ServerPlayer player : world.players()) {
 									if (tiwData.getInvasionSpawner().getNightInvasions().isCanceled()) {
-										player.sendMessage(new TranslationTextComponent("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
+										player.sendMessage(new TranslatableComponent("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), player.getUUID());
 										continue;
 									}
-									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), player.getUUID());
-									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getNightInvasions()).withStyle(TextFormatting.DARK_RED), player.getUUID());
+									player.sendMessage(new TranslatableComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), player.getUUID());
+									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getNightInvasions()).withStyle(ChatFormatting.DARK_RED), player.getUUID());
 								}
 							}
 						} else {
@@ -276,7 +276,7 @@ public final class PSEventManager {
 						boolean flag = world.getDayTime() % 24000L < 12000L;
 						if (fiwData.isFirstCycle() ? flag : !flag) {
 							fiwData.setDays(world.getDayTime() / 24000L);
-							int amount = MathHelper.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.fixedDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxFixedInvasions);
+							int amount = Mth.clamp((int)(world.getDayTime() / (24000L * PSConfigValues.common.fixedDifficultyIncreaseDelay)) + 1, 0, PSConfigValues.common.maxFixedInvasions);
 							int chance = world.random.nextInt((int)(PSConfigValues.common.fixedDifficultyIncreaseDelay * PSConfigValues.common.fixedCancelChanceMultiplier) + 1);
 							boolean cancelFlag = chance == 0 && amount > 1 && fiwData.getInvasionSpawner().getQueuedInvasions().isEmpty() && PSConfigValues.common.canFixedInvasionsBeCanceled;
 							LOGGER.info("Cycle: " + iwData.getDays() + ", Possible Invasions: " + amount);
@@ -285,13 +285,13 @@ public final class PSEventManager {
 							PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(0.0D, InvasionListType.FIXED));
 							fiwData.setXPMultiplier(0.0D);
 							if (!fiwData.getInvasionSpawner().getInvasions().isEmpty() || fiwData.getInvasionSpawner().getInvasions().isCanceled()) {
-								for (ServerPlayerEntity player : world.players()) {
+								for (ServerPlayer player : world.players()) {
 									if (fiwData.getInvasionSpawner().getInvasions().isCanceled()) {
-										player.sendMessage(new TranslationTextComponent("invasion.puresuffering.fixed.cancel").withStyle(Style.EMPTY.withColor(TextFormatting.GREEN)), player.getUUID());
+										player.sendMessage(new TranslatableComponent("invasion.puresuffering.fixed.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), player.getUUID());
 										continue;
 									}
-									player.sendMessage(new TranslationTextComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(TextFormatting.RED)), player.getUUID());
-									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", fiwData.getInvasionSpawner().getInvasions()).withStyle(TextFormatting.DARK_RED), player.getUUID());
+									player.sendMessage(new TranslatableComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), player.getUUID());
+									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", fiwData.getInvasionSpawner().getInvasions()).withStyle(ChatFormatting.DARK_RED), player.getUUID());
 								}
 							}
 						}
@@ -303,13 +303,13 @@ public final class PSEventManager {
 
 	public static final class EntityEvents {
 		public static void joinWorld(EntityJoinWorldEvent eventIn) {
-			if (eventIn.getEntity() instanceof TameableEntity) {
-				TameableEntity tameableEntity = (TameableEntity)eventIn.getEntity();
+			if (eventIn.getEntity() instanceof TamableAnimal) {
+				TamableAnimal tameableEntity = (TamableAnimal)eventIn.getEntity();
 				if (tameableEntity.getOwner() != null && tameableEntity.getOwner().getPersistentData().contains("AntiGrief")) {
 					tameableEntity.getPersistentData().putBoolean("AntiGrief", tameableEntity.getOwner().getPersistentData().getBoolean("AntiGrief"));
 				}
-			} else if (PSConfigValues.common.weakenedVexes && eventIn.getEntity() instanceof VexEntity) {
-				VexEntity vexEntity = (VexEntity)eventIn.getEntity();
+			} else if (PSConfigValues.common.weakenedVexes && eventIn.getEntity() instanceof Vex) {
+				Vex vexEntity = (Vex)eventIn.getEntity();
 				if (vexEntity.getOwner() != null && vexEntity.getOwner().getPersistentData().contains("InvasionMob")) {
 					vexEntity.setLimitedLife(25 + eventIn.getWorld().getRandom().nextInt(65)); //Attempt to fix lag & spawn camping with vexes
 				}
@@ -325,9 +325,9 @@ public final class PSEventManager {
 
 	public static final class LivingEvents {
 		public static void livingConversion(LivingConversionEvent.Post eventIn) { //Needed for occasional bugginess
-			if (eventIn.getOutcome().getClassification(false) == EntityClassification.MONSTER) {
-				CompoundNBT persistentData = eventIn.getEntityLiving().getPersistentData();
-				CompoundNBT outcomeData = eventIn.getOutcome().getPersistentData();
+			if (eventIn.getOutcome().getClassification(false) == MobCategory.MONSTER) {
+				CompoundTag persistentData = eventIn.getEntityLiving().getPersistentData();
+				CompoundTag outcomeData = eventIn.getOutcome().getPersistentData();
 				if (persistentData.contains("InvasionMob"))
 					outcomeData.putString("InvasionMob", persistentData.getString("InvasionMob"));
 				if (persistentData.contains("AntiGrief"))
@@ -336,18 +336,18 @@ public final class PSEventManager {
 		}
 
 		public static void livingUpdate(LivingEvent.LivingUpdateEvent eventIn) {
-			if (eventIn.getEntityLiving() instanceof MobEntity && eventIn.getEntityLiving().getPersistentData().contains("InvasionMob") && (eventIn.getEntityLiving().getLastHurtByMob() == null || !eventIn.getEntityLiving().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntityLiving().getType().getRegistryName().toString())) {
-				MobEntity mob = (MobEntity)eventIn.getEntityLiving();
-				if (mob.getTarget() instanceof PlayerEntity) return;
-				PlayerEntity player = mob.level.getNearestPlayer(mob.getX(), mob.getY(), mob.getZ(), 144.0D, PSEntityPredicates.HYPER_AGGRESSION);
+			if (eventIn.getEntityLiving() instanceof Mob && eventIn.getEntityLiving().getPersistentData().contains("InvasionMob") && (eventIn.getEntityLiving().getLastHurtByMob() == null || !eventIn.getEntityLiving().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntityLiving().getType().getRegistryName().toString())) {
+				Mob mob = (Mob)eventIn.getEntityLiving();
+				if (mob.getTarget() instanceof Player) return;
+				Player player = mob.level.getNearestPlayer(mob.getX(), mob.getY(), mob.getZ(), 144.0D, PSEntityPredicates.HYPER_AGGRESSION);
 				if (player != null && player.isAlive()) {
-					if (mob instanceof AbstractPiglinEntity) { //If your wondering why a mob doesn't get aggressive, its because it didn't use the default targeting...
+					if (mob instanceof AbstractPiglin) { //If your wondering why a mob doesn't get aggressive, its because it didn't use the default targeting...
 						mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ANGRY_AT, player.getUUID(), 12000L);
-					} else if (mob instanceof HoglinEntity) {
+					} else if (mob instanceof Hoglin) {
 						mob.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
 						mob.getBrain().eraseMemory(MemoryModuleType.BREED_TARGET);
 						mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, 12000L);
-					} else if (mob instanceof ZoglinEntity) {
+					} else if (mob instanceof Zoglin) {
 						mob.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
 						mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, 12000L);
 					} else {
@@ -358,9 +358,9 @@ public final class PSEventManager {
 		}
 
 		public static void experienceDrop(LivingExperienceDropEvent eventIn) {
-			CompoundNBT persistentData = eventIn.getEntityLiving().getPersistentData();
+			CompoundTag persistentData = eventIn.getEntityLiving().getPersistentData();
 			if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
-				ServerWorld serverWorld = (ServerWorld)eventIn.getEntityLiving().level;
+				ServerLevel serverWorld = (ServerLevel)eventIn.getEntityLiving().level;
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
 				if (iwData != null) {
 					if (!iwData.hasFixedTime()) {
@@ -389,8 +389,8 @@ public final class PSEventManager {
 
 		public static void checkSpawn(LivingSpawnEvent.CheckSpawn eventIn) {
 			if (!eventIn.getWorld().isClientSide()) {
-				if (eventIn.getSpawnReason().equals(SpawnReason.NATURAL)) {
-					ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
+				if (eventIn.getSpawnReason().equals(MobSpawnType.NATURAL)) {
+					ServerLevel serverWorld = (ServerLevel)eventIn.getWorld();
 					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
 					if (iwData != null) {
 						if (serverWorld.random.nextInt(10000) < PSConfigValues.common.naturalSpawnChance) {
@@ -412,14 +412,14 @@ public final class PSEventManager {
 		}
 
 		public static void specialSpawn(LivingSpawnEvent.SpecialSpawn eventIn) {
-			if (!eventIn.getWorld().isClientSide() && eventIn.getEntityLiving().getClassification(false) == EntityClassification.MONSTER) {
-				if (eventIn.getSpawnReason() == SpawnReason.NATURAL) {
-					ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
+			if (!eventIn.getWorld().isClientSide() && eventIn.getEntityLiving().getClassification(false) == MobCategory.MONSTER) {
+				if (eventIn.getSpawnReason() == MobSpawnType.NATURAL) {
+					ServerLevel serverWorld = (ServerLevel)eventIn.getWorld();
 					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
 					if (iwData != null) {
 						if (!iwData.hasFixedTime()) {
 							TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-							CompoundNBT persistentData = eventIn.getEntityLiving().getPersistentData();
+							CompoundTag persistentData = eventIn.getEntityLiving().getPersistentData();
 							if (!tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
 								persistentData.putBoolean("AntiGrief", false);
 							}
@@ -435,11 +435,11 @@ public final class PSEventManager {
 		}
 
 		public static void allowDespawn(LivingSpawnEvent.AllowDespawn eventIn) {
-			if (!eventIn.getWorld().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntityLiving() instanceof MobEntity) {
-				ServerWorld serverWorld = (ServerWorld)eventIn.getWorld();
+			if (!eventIn.getWorld().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntityLiving() instanceof Mob) {
+				ServerLevel serverWorld = (ServerLevel)eventIn.getWorld();
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
-				MobEntity mobEntity = (MobEntity)eventIn.getEntityLiving();
-				CompoundNBT persistentData = mobEntity.getPersistentData();
+				Mob mobEntity = (Mob)eventIn.getEntityLiving();
+				CompoundTag persistentData = mobEntity.getPersistentData();
 				if (iwData != null && persistentData.contains("InvasionMob")) {
 					if (!iwData.hasFixedTime()) {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -479,20 +479,20 @@ public final class PSEventManager {
 
 		public static void playerRespawn(PlayerEvent.PlayerRespawnEvent eventIn) {
 			if (PSConfigValues.common.hyperAggression)
-				eventIn.getEntityLiving().addEffect(new EffectInstance(PSPotions.BLESSING.get(), PSConfigValues.common.blessingEffectRespawnDuration, 0));
+				eventIn.getEntityLiving().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectRespawnDuration, 0));
 			updatePlayer(eventIn);
 		}
 
 		public static void playerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent eventIn) {
 			if (PSConfigValues.common.hyperAggression)
-				eventIn.getEntityLiving().addEffect(new EffectInstance(PSPotions.BLESSING.get(), PSConfigValues.common.blessingEffectDimensionChangeDuration, 0));
+				eventIn.getEntityLiving().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectDimensionChangeDuration, 0));
 			updatePlayer(eventIn);
 		}
 
 		private static void updatePlayer(PlayerEvent eventIn) {
-			if (eventIn.getPlayer() instanceof ServerPlayerEntity) {
-				ServerPlayerEntity player = (ServerPlayerEntity)eventIn.getPlayer();
-				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get((ServerWorld)player.level);
+			if (eventIn.getPlayer() instanceof ServerPlayer) {
+				ServerPlayer player = (ServerPlayer)eventIn.getPlayer();
+				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get((ServerLevel)player.level);
 				if (iwData != null) {
 					if (!iwData.hasFixedTime()) {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -508,21 +508,21 @@ public final class PSEventManager {
 		}
 
 		public static void playerSleepInBed(PlayerSleepInBedEvent eventIn) {
-			ServerWorld world = (ServerWorld)eventIn.getPlayer().level;
+			ServerLevel world = (ServerLevel)eventIn.getPlayer().level;
 			InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(world);
 			if (iwData != null && !iwData.hasFixedTime()) {
 				TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 				if (ServerTimeUtil.isServerDay(world, tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) { //Added day check for Mods that allow sleeping during the day
 					for (Invasion invasion : tiwData.getInvasionSpawner().getDayInvasions()) {
 						if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
-							eventIn.setResult(SleepResult.NOT_POSSIBLE_NOW);
+							eventIn.setResult(BedSleepingProblem.NOT_POSSIBLE_NOW);
 							return;
 						}
 					}
 				} else if (ServerTimeUtil.isServerNight(world, tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
 					for (Invasion invasion : tiwData.getInvasionSpawner().getNightInvasions()) {
 						if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
-							eventIn.setResult(SleepResult.NOT_POSSIBLE_NOW);
+							eventIn.setResult(BedSleepingProblem.NOT_POSSIBLE_NOW);
 							return;
 						}
 					}
@@ -532,7 +532,7 @@ public final class PSEventManager {
 	}
 
 	public static final class ServerEvents {
-		public static void serverStarted(FMLServerStartedEvent eventIn) {
+		public static void serverStarted(ServerStartedEvent eventIn) {
 			if (PSConfigValues.common.multiThreadedInvasions) {
 				for (InvasionWorldData iwData : InvasionWorldData.getInvasionData().values()) {
 					eventIn.getServer().addTickable(new Thread(() -> {
@@ -541,7 +541,7 @@ public final class PSEventManager {
 						} else {
 							((FixedInvasionWorldData)iwData).getInvasionSpawner().invasionTick(eventIn.getServer(), iwData.getWorld());
 						}
-					}, "Invasion Ticker: " + iwData.getId()));
+					}, "Invasion Ticker: " + iwData.getWorld().dimension().location()));
 				}
 			} else {
 				eventIn.getServer().addTickable(new Thread(() -> {
@@ -558,17 +558,20 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void serverStarting(FMLServerStartingEvent eventIn) {
+		public static void serverStarting(ServerStartingEvent eventIn) {
 			PSConfigValues.resync(PSConfigValues.common);
 			eventIn.getServer().getAllLevels().forEach(level -> {
-				InvasionWorldData.getInvasionData().put(level, level.getDataStorage().computeIfAbsent(() -> { 
-					return level.dimensionType().hasFixedTime() ? new FixedInvasionWorldData(level) : new TimedInvasionWorldData(level);
-				}, InvasionWorldData.getFileId(level.dimensionType())));
+				boolean hasFixedTime = level.dimensionType().hasFixedTime();
+				InvasionWorldData.getInvasionData().put(level, level.getDataStorage().computeIfAbsent(data -> { 
+					return hasFixedTime ? FixedInvasionWorldData.load(level, data) : TimedInvasionWorldData.load(level, data);
+				}, () -> {
+					return hasFixedTime ? new FixedInvasionWorldData(level) : new TimedInvasionWorldData(level);
+				}, InvasionWorldData.getFileId(level.dimensionTypeRegistration())));
 			});
 		}
 
 
-		public static void serverStopping(FMLServerStoppingEvent eventIn) {
+		public static void serverStopping(ServerStoppingEvent eventIn) {
 			PSConfigValues.resync(PSConfigValues.common);
 		}
 	}

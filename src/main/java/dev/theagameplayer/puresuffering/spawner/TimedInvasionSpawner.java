@@ -20,13 +20,12 @@ import dev.theagameplayer.puresuffering.util.InvasionListType;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
 import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.util.Mth;
+import net.minecraft.server.level.ServerLevel;
 
 public final class TimedInvasionSpawner {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
@@ -37,7 +36,7 @@ public final class TimedInvasionSpawner {
 	private boolean isNightChangedToDay, isDayChangedToNight;
 	private int nightInterval, dayInterval;
 
-	public void setNightInvasions(ServerWorld worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
+	public void setNightInvasions(ServerLevel worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		this.nightInvasions.clear();
 		Random random = worldIn.random;
 		this.isNightChangedToDay = false;
@@ -60,7 +59,7 @@ public final class TimedInvasionSpawner {
 			for (int inv = 0; inv < totalInvasions; inv++) {
 				InvasionType invasionType = this.getInvasionType(inv == 0 ? potentialPrimaryNightInvasions : (this.isNightChangedToDay ? potentialSecondaryDayInvasions : potentialSecondaryNightInvasions), random);
 				if (invasionType != null) {
-					int severity = random.nextInt(random.nextInt(MathHelper.clamp((int)daysIn/PSConfigValues.common.nightDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					int severity = random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.nightDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
 					Invasion invasion = new Invasion(invasionType, severity, inv == 0);
 					this.nightInvasions.add(invasion);
 					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
@@ -71,7 +70,7 @@ public final class TimedInvasionSpawner {
 		LOGGER.info("]");
 	}
 
-	public void setDayInvasions(ServerWorld worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
+	public void setDayInvasions(ServerLevel worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		this.dayInvasions.clear();
 		Random random = worldIn.random;
 		this.isDayChangedToNight = false;
@@ -94,7 +93,7 @@ public final class TimedInvasionSpawner {
 			for (int inv = 0; inv < totalInvasions; inv++) {
 				InvasionType invasionType = this.getInvasionType(inv == 0 ? potentialPrimaryDayInvasions : (this.isDayChangedToNight ? potentialSecondaryNightInvasions : potentialSecondaryDayInvasions), random);
 				if (invasionType != null) {
-					int severity = random.nextInt(random.nextInt(MathHelper.clamp((int)daysIn/PSConfigValues.common.dayDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					int severity = random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.dayDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
 					Invasion invasion = new Invasion(invasionType, severity, inv == 0);
 					this.dayInvasions.add(invasion);
 					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
@@ -113,7 +112,7 @@ public final class TimedInvasionSpawner {
 		return invasionChartIn.getInvasionInRange(randomIn.nextFloat());
 	}
 
-	public void invasionTick(MinecraftServer serverIn, ServerWorld worldIn) {
+	public void invasionTick(MinecraftServer serverIn, ServerLevel worldIn) {
 		TimedInvasionWorldData tiwData = (TimedInvasionWorldData)InvasionWorldData.getInvasionData().get(worldIn);
 		if (!this.nightInvasions.isEmpty() && ServerTimeUtil.isServerNight(worldIn, tiwData)) {
 			Invasion invasion = this.nightInvasions.get(worldIn.getRandom().nextInt(this.nightInvasions.size()));
@@ -124,31 +123,31 @@ public final class TimedInvasionSpawner {
 		}
 	}
 
-	public void load(CompoundNBT nbtIn) {
-		ListNBT nightInvasionsNBT = nbtIn.getList("NightInvasions", Constants.NBT.TAG_COMPOUND);
-		ListNBT dayInvasionsNBT = nbtIn.getList("DayInvasions", Constants.NBT.TAG_COMPOUND);
-		ListNBT queuedNightInvasionsNBT = nbtIn.getList("QueuedNightInvasions", Constants.NBT.TAG_COMPOUND);
-		ListNBT queuedDayInvasionsNBT = nbtIn.getList("QueuedDayInvasions", Constants.NBT.TAG_COMPOUND);
-		for (INBT inbt : nightInvasionsNBT)
-			this.nightInvasions.add(Invasion.load((CompoundNBT)inbt));
-		for (INBT inbt : dayInvasionsNBT)
-			this.dayInvasions.add(Invasion.load((CompoundNBT)inbt));
-		for (INBT inbt : queuedNightInvasionsNBT)
-			this.queuedNightInvasions.add(Invasion.load((CompoundNBT)inbt));
-		for (INBT inbt : queuedDayInvasionsNBT)
-			this.queuedDayInvasions.add(Invasion.load((CompoundNBT)inbt));
+	public void load(CompoundTag nbtIn) {
+		ListTag nightInvasionsNBT = nbtIn.getList("NightInvasions", Tag.TAG_COMPOUND);
+		ListTag dayInvasionsNBT = nbtIn.getList("DayInvasions", Tag.TAG_COMPOUND);
+		ListTag queuedNightInvasionsNBT = nbtIn.getList("QueuedNightInvasions", Tag.TAG_COMPOUND);
+		ListTag queuedDayInvasionsNBT = nbtIn.getList("QueuedDayInvasions", Tag.TAG_COMPOUND);
+		for (Tag inbt : nightInvasionsNBT)
+			this.nightInvasions.add(Invasion.load((CompoundTag)inbt));
+		for (Tag inbt : dayInvasionsNBT)
+			this.dayInvasions.add(Invasion.load((CompoundTag)inbt));
+		for (Tag inbt : queuedNightInvasionsNBT)
+			this.queuedNightInvasions.add(Invasion.load((CompoundTag)inbt));
+		for (Tag inbt : queuedDayInvasionsNBT)
+			this.queuedDayInvasions.add(Invasion.load((CompoundTag)inbt));
 		this.isNightChangedToDay = nbtIn.getBoolean("IsNightChangedToDay");
 		this.isDayChangedToNight = nbtIn.getBoolean("IsDayChangedToNight");
 		this.nightInterval = nbtIn.getInt("NightInterval");
 		this.dayInterval = nbtIn.getInt("DayInterval");
 	}
 
-	public CompoundNBT save() {
-		CompoundNBT nbt = new CompoundNBT();
-		ListNBT nightInvasionsNBT = new ListNBT();
-		ListNBT dayInvasionsNBT = new ListNBT();
-		ListNBT queuedNightInvasionsNBT = new ListNBT();
-		ListNBT queuedDayInvasionsNBT = new ListNBT();
+	public CompoundTag save() {
+		CompoundTag nbt = new CompoundTag();
+		ListTag nightInvasionsNBT = new ListTag();
+		ListTag dayInvasionsNBT = new ListTag();
+		ListTag queuedNightInvasionsNBT = new ListTag();
+		ListTag queuedDayInvasionsNBT = new ListTag();
 		for (Invasion invasion : this.nightInvasions)
 			nightInvasionsNBT.add(invasion.save());
 		for (Invasion invasion : this.dayInvasions)

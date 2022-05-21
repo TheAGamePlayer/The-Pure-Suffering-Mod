@@ -6,11 +6,11 @@ import dev.theagameplayer.puresuffering.network.packet.ClearInvasionsPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateCountPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateTimePacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
 
 public final class PSPacketHandler {
 	private static final String PROTOCAL_VERSION = "1";
@@ -30,7 +30,7 @@ public final class PSPacketHandler {
 		CHANNEL.messageBuilder(UpdateXPMultPacket.class, id++).encoder(UpdateXPMultPacket::encode).decoder(UpdateXPMultPacket::decode).consumer(UpdateXPMultPacket.Handler::handle).add();
 	}
 	
-	public static void sendToClient(Object msgIn, ServerPlayerEntity playerIn) {
+	public static void sendToClient(Object msgIn, ServerPlayer playerIn) {
 		CHANNEL.send(PacketDistributor.PLAYER.with(() -> playerIn), msgIn);
 	}
 	

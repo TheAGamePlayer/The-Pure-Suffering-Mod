@@ -9,7 +9,7 @@ import dev.theagameplayer.puresuffering.network.packet.AddInvasionPacket;
 import dev.theagameplayer.puresuffering.network.packet.ClearInvasionsPacket;
 import dev.theagameplayer.puresuffering.network.packet.RemoveInvasionPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateCountPacket;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public final class InvasionList implements Iterable<Invasion> {
 	private final ArrayList<Invasion> invasionList = new ArrayList<>();
@@ -55,7 +55,7 @@ public final class InvasionList implements Iterable<Invasion> {
 		PSPacketHandler.sendToAllClients(new UpdateCountPacket(this.size(), this.listType));
 	}
 	
-	public void update(ServerPlayerEntity playerIn) {
+	public void update(ServerPlayer playerIn) {
 		PSPacketHandler.sendToClient(new ClearInvasionsPacket(this.listType), playerIn);
 		for (int index = 0; index < this.size(); index++) {
 			Invasion invasion = this.get(index);

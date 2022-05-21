@@ -4,10 +4,10 @@ import java.util.function.Supplier;
 
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class UpdateTimePacket {
 	private final boolean isDay;
@@ -18,12 +18,12 @@ public final class UpdateTimePacket {
 		this.isTime = isTimeIn;
 	}
 	
-	public static void encode(UpdateTimePacket msgIn, PacketBuffer bufIn) {
+	public static void encode(UpdateTimePacket msgIn, FriendlyByteBuf bufIn) {
 		bufIn.writeBoolean(msgIn.isDay);
 		bufIn.writeBoolean(msgIn.isTime);
 	}
 
-	public static UpdateTimePacket decode(PacketBuffer bufIn) {
+	public static UpdateTimePacket decode(FriendlyByteBuf bufIn) {
 		return new UpdateTimePacket(bufIn.readBoolean(), bufIn.readBoolean());
 	}
 

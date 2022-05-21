@@ -20,13 +20,13 @@ import com.google.gson.JsonParseException;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
-import net.minecraft.client.resources.JsonReloadListener;
-import net.minecraft.profiler.IProfiler;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 
-public final class InvasionTypeManager extends JsonReloadListener {
+public final class InvasionTypeManager extends SimpleJsonResourceReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).create();
 	private HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
@@ -36,11 +36,11 @@ public final class InvasionTypeManager extends JsonReloadListener {
 	}
 
 	@Override
-	protected void apply(Map<ResourceLocation, JsonElement> objectIn, IResourceManager resourceManagerIn, IProfiler profilerIn) {
+	protected void apply(Map<ResourceLocation, JsonElement> objectIn, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
 		this.invasionTypeMap.clear();
 		objectIn.forEach((conditions, invasionType) -> {
 			try {
-				JsonObject jsonObject = JSONUtils.convertToJsonObject(invasionType, "invasion_type");
+				JsonObject jsonObject = GsonHelper.convertToJsonObject(invasionType, "invasion_type");
 				InvasionType invasionType1 = InvasionType.Builder.fromJson(jsonObject).build(conditions);
 				if (invasionType1 == null) {
 					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met.", conditions);

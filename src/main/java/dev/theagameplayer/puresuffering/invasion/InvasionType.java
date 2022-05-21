@@ -13,13 +13,13 @@ import com.google.gson.JsonObject;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.biome.MobSpawnInfo;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class InvasionType {
@@ -34,7 +34,7 @@ public final class InvasionType {
 	private final WeatherType weatherType;
 	private final List<SeverityInfo> severityInfo;
 	private final List<ResourceLocation> dimensions;
-	private final ITextComponent component;
+	private final Component component;
 	
 	public InvasionType(ResourceLocation idIn, int rarityIn, int tierIn, InvasionTime invasionTimeIn, InvasionPriority invasionPriorityIn, SpawningSystem spawningSystemIn, TimeModifier timeModifierIn, TimeChangeability timeChangeabilityIn, WeatherType weatherTypeIn, List<SeverityInfo> severityInfoIn, List<ResourceLocation> dimensionsIn) {
 		this.id = idIn;
@@ -49,8 +49,8 @@ public final class InvasionType {
 		this.severityInfo = severityInfoIn;
 		this.dimensions = dimensionsIn;
 		String text = "invasion." + idIn.getNamespace() + "." + idIn.getPath();
-		TranslationTextComponent component = new TranslationTextComponent(text);
-		this.component = component.getString().equals(text) ? new StringTextComponent(this.formatDefaultText(idIn)) : component;
+		TranslatableComponent component = new TranslatableComponent(text);
+		this.component = component.getString().equals(text) ? new TextComponent(this.formatDefaultText(idIn)) : component;
 	}
 	
 	private String formatDefaultText(ResourceLocation idIn) {
@@ -122,7 +122,7 @@ public final class InvasionType {
 		return this.dimensions;
 	}
 
-	public ITextComponent getComponent() {
+	public Component getComponent() {
 		return this.component;
 	}
 
@@ -174,14 +174,14 @@ public final class InvasionType {
 
 	public static class SeverityInfo {
 		private final InvasionSkyRenderer skyRenderer;
-		private final List<MobSpawnInfo.Spawners> mobSpawnList;
+		private final List<MobSpawnSettings.SpawnerData> mobSpawnList;
 		private final float mobCapPercentage;
 		private final boolean forceNoSleep;
 		private final int lightLevel;
 		private final int tickDelay;
 		private final int clusterSize;
 
-		private SeverityInfo(InvasionSkyRenderer skyRendererIn, List<MobSpawnInfo.Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn, int clusterSizeIn) {
+		private SeverityInfo(InvasionSkyRenderer skyRendererIn, List<MobSpawnSettings.SpawnerData> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn, int clusterSizeIn) {
 			this.skyRenderer = skyRendererIn;
 			this.mobSpawnList = mobSpawnListIn;
 			this.mobCapPercentage = mobCapPercentageIn;
@@ -199,7 +199,7 @@ public final class InvasionType {
 			return this.skyRenderer;
 		}
 
-		public List<MobSpawnInfo.Spawners> getMobSpawnList() {
+		public List<MobSpawnSettings.SpawnerData> getMobSpawnList() {
 			return this.mobSpawnList;
 		}
 		
@@ -226,14 +226,14 @@ public final class InvasionType {
 		public static class Builder {
 			private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 			private InvasionSkyRenderer.Builder skyRenderer = null;
-			private List<MobSpawnInfo.Spawners> mobSpawnList;
+			private List<MobSpawnSettings.SpawnerData> mobSpawnList;
 			private float mobCapPercentage = 1.0F;
 			private boolean forceNoSleep = false;
 			private int lightLevel = -1;
 			private int tickDelay = 6;
 			private int clusterSize = 1;
 
-			private Builder(InvasionSkyRenderer.Builder skyRendererIn, List<MobSpawnInfo.Spawners> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn, int clusterSizeIn) {
+			private Builder(InvasionSkyRenderer.Builder skyRendererIn, List<MobSpawnSettings.SpawnerData> mobSpawnListIn, float mobCapPercentageIn, boolean forceNoSleepIn, int lightLevelIn, int tickDelayIn, int clusterSizeIn) {
 				this.skyRenderer = skyRendererIn;
 				this.mobSpawnList = mobSpawnListIn;
 				this.mobCapPercentage = mobCapPercentageIn;
@@ -254,7 +254,7 @@ public final class InvasionType {
 				return this;
 			}
 
-			public SeverityInfo.Builder mobSpawnList(List<MobSpawnInfo.Spawners> mobSpawnListIn) {
+			public SeverityInfo.Builder mobSpawnList(List<MobSpawnSettings.SpawnerData> mobSpawnListIn) {
 				this.mobSpawnList = mobSpawnListIn;
 				return this;
 			}
@@ -295,10 +295,10 @@ public final class InvasionType {
 				}
 				if (this.mobSpawnList != null) {
 					JsonArray jsonArray = new JsonArray();
-					for (MobSpawnInfo.Spawners spawnInfo : this.mobSpawnList) {
+					for (MobSpawnSettings.SpawnerData spawnInfo : this.mobSpawnList) {
 						JsonObject jsonObject1 = new JsonObject();
 						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITIES.getKey(spawnInfo.type).toString());
-						jsonObject1.addProperty("Weight", spawnInfo.weight);
+						jsonObject1.addProperty("Weight", spawnInfo.getWeight().asInt());
 						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
 						jsonObject1.addProperty("MaxCount", spawnInfo.maxCount);
 						jsonArray.add(jsonObject1);
@@ -316,10 +316,10 @@ public final class InvasionType {
 
 			public static InvasionType.SeverityInfo.Builder fromJson(JsonObject jsonObjectIn) {
 				InvasionSkyRenderer.Builder skyRenderer = null;
-				List<MobSpawnInfo.Spawners> mobSpawnList = new ArrayList<>();
-				float mobCapPercentage = MathHelper.clamp(jsonObjectIn.get("MobCapPercentage").getAsFloat(), 0.0F, 1.0F);
+				List<MobSpawnSettings.SpawnerData> mobSpawnList = new ArrayList<>();
+				float mobCapPercentage = Mth.clamp(jsonObjectIn.get("MobCapPercentage").getAsFloat(), 0.0F, 1.0F);
 				boolean forceNoSleep = jsonObjectIn.get("ForceNoSleep").getAsBoolean();
-				int lightLevel = jsonObjectIn.has("LightLevel") ? MathHelper.clamp(jsonObjectIn.get("LightLevel").getAsInt(), 0, 15) : -1;
+				int lightLevel = jsonObjectIn.has("LightLevel") ? Mth.clamp(jsonObjectIn.get("LightLevel").getAsInt(), 0, 15) : -1;
 				int tickDelay = jsonObjectIn.get("TickDelay").getAsInt();
 				int clusterSize = jsonObjectIn.get("ClusterSize").getAsInt();
 				boolean errored = false;
@@ -342,7 +342,7 @@ public final class InvasionType {
 								int weight = jsonObject.get("Weight").getAsInt();
 								int minCount = jsonObject.get("MinCount").getAsInt();
 								int maxCount = jsonObject.get("MaxCount").getAsInt();
-								mobSpawnList.add(new MobSpawnInfo.Spawners(type, weight, minCount, maxCount));
+								mobSpawnList.add(new MobSpawnSettings.SpawnerData(type, weight, minCount, maxCount));
 							} else {
 								errored = true;
 								break;

@@ -5,10 +5,10 @@ import java.util.function.Supplier;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class ClearInvasionsPacket {
 	private final InvasionListType listType;
@@ -17,11 +17,11 @@ public final class ClearInvasionsPacket {
 		this.listType = listTypeIn;
 	}
 	
-	public static void encode(ClearInvasionsPacket msgIn, PacketBuffer bufIn) {
+	public static void encode(ClearInvasionsPacket msgIn, FriendlyByteBuf bufIn) {
 		bufIn.writeEnum(msgIn.listType);
 	}
 	
-	public static ClearInvasionsPacket decode(PacketBuffer bufIn) {
+	public static ClearInvasionsPacket decode(FriendlyByteBuf bufIn) {
 		return new ClearInvasionsPacket(bufIn.readEnum(InvasionListType.class));
 	}
 	

@@ -17,11 +17,11 @@ import com.google.gson.GsonBuilder;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.HashCache;
+import net.minecraft.data.DataProvider;
+import net.minecraft.resources.ResourceLocation;
 
-public final class InvasionTypesProvider implements IDataProvider {
+public final class InvasionTypesProvider implements DataProvider {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
 	private final DataGenerator generator;
@@ -32,7 +32,7 @@ public final class InvasionTypesProvider implements IDataProvider {
 	}
 	
 	@Override
-	public void run(DirectoryCache cacheIn) throws IOException {
+	public void run(HashCache cacheIn) throws IOException {
 		Path path = this.generator.getOutputFolder();
 		Set<ResourceLocation> set = Sets.newHashSet();
 		Consumer<InvasionType> consumer = (invasionType) -> {
@@ -41,7 +41,7 @@ public final class InvasionTypesProvider implements IDataProvider {
 			} else {
 				Path path1 = createPath(path, invasionType);
 				try {
-					IDataProvider.save(GSON, cacheIn, invasionType.deconstruct().serializeToJson(), path1);
+					DataProvider.save(GSON, cacheIn, invasionType.deconstruct().serializeToJson(), path1);
 				} catch (IOException ioexception) {
 					LOGGER.error("Couldn't save invasion type {}", path1, ioexception);
 				}
