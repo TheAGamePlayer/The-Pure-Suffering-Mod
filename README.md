@@ -6,9 +6,6 @@ Version 1.3.2A is now available!
 
 Curseforge: https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod
 
-Discord: https://discord.gg/JcQD8ZCa6q
-
-
 Pure Suffering Mutant Beasts Datapack Github: https://github.com/TheAGamePlayer/PSMB-Datapack
 
 Mutant Beasts Github: https://github.com/Chumbanotz/MutantBeasts
