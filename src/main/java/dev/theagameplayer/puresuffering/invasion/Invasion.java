@@ -114,6 +114,7 @@ public class Invasion {
 			}
 			//Get Mobs
 			boolean flag1 = false;
+			if (worldIn.players().size() < 1) return;
 			ChunkPos chunkPos = this.getSpawnChunk(worldIn);
 			List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(worldIn, chunkPos);
 			if (mobs.isEmpty()) return;
