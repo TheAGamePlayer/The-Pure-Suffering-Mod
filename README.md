@@ -2,10 +2,10 @@
 
 A Minecraft Invasion Mod that started off as a fun side-project. Invasions will spawn every few days or so, increasing in severity and tiers as time goes on within your Minecraft World.
 
-Version 1.3.3B is now available!
+Version 1.3.4B is now available!
 
 Curseforge: https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod
 
-Pure Suffering Mutant Beasts Datapack Github: https://github.com/TheAGamePlayer/PSMB-Datapack
+1.16.5 Pure Suffering Mutant Beasts Datapack Github: https://github.com/TheAGamePlayer/PSMB-Datapack
 
 Mutant Beasts Github: https://github.com/Chumbanotz/MutantBeasts
