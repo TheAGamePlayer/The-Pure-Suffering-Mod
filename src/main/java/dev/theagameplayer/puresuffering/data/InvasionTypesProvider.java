@@ -11,19 +11,15 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionTypesProvider implements DataProvider {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
-	private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
 	private final DataGenerator generator;
 	private final List<Consumer<Consumer<InvasionType>>> tabs = ImmutableList.of(new PSInvasionTypes());
 
@@ -32,7 +28,7 @@ public final class InvasionTypesProvider implements DataProvider {
 	}
 	
 	@Override
-	public void run(HashCache cacheIn) throws IOException {
+	public void run(CachedOutput cacheIn) throws IOException {
 		Path path = this.generator.getOutputFolder();
 		Set<ResourceLocation> set = Sets.newHashSet();
 		Consumer<InvasionType> consumer = (invasionType) -> {
@@ -41,7 +37,7 @@ public final class InvasionTypesProvider implements DataProvider {
 			} else {
 				Path path1 = createPath(path, invasionType);
 				try {
-					DataProvider.save(GSON, cacheIn, invasionType.deconstruct().serializeToJson(), path1);
+					DataProvider.saveStable(cacheIn, invasionType.deconstruct().serializeToJson(), path1);
 				} catch (IOException ioexception) {
 					LOGGER.error("Couldn't save invasion type {}", path1, ioexception);
 				}

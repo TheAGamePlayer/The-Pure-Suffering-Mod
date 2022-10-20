@@ -17,8 +17,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -49,8 +47,8 @@ public final class InvasionType {
 		this.severityInfo = severityInfoIn;
 		this.dimensions = dimensionsIn;
 		String text = "invasion." + idIn.getNamespace() + "." + idIn.getPath();
-		TranslatableComponent component = new TranslatableComponent(text);
-		this.component = component.getString().equals(text) ? new TextComponent(this.formatDefaultText(idIn)) : component;
+		Component component = Component.translatable(text);
+		this.component = component.getString().equals(text) ? Component.translatable(this.formatDefaultText(idIn)) : component;
 	}
 	
 	private String formatDefaultText(ResourceLocation idIn) {
@@ -297,7 +295,7 @@ public final class InvasionType {
 					JsonArray jsonArray = new JsonArray();
 					for (MobSpawnSettings.SpawnerData spawnInfo : this.mobSpawnList) {
 						JsonObject jsonObject1 = new JsonObject();
-						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITIES.getKey(spawnInfo.type).toString());
+						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITY_TYPES.getKey(spawnInfo.type).toString());
 						jsonObject1.addProperty("Weight", spawnInfo.getWeight().asInt());
 						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
 						jsonObject1.addProperty("MaxCount", spawnInfo.maxCount);
@@ -338,7 +336,7 @@ public final class InvasionType {
 						for (JsonElement jsonElement2 : jsonArray) {
 							if (jsonElement2.isJsonObject()) {
 								JsonObject jsonObject = jsonElement2.getAsJsonObject();
-								EntityType<?> type = ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString()));
+								EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString()));
 								int weight = jsonObject.get("Weight").getAsInt();
 								int minCount = jsonObject.get("MinCount").getAsInt();
 								int maxCount = jsonObject.get("MaxCount").getAsInt();

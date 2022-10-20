@@ -78,7 +78,7 @@ public class Invasion {
 	public SeverityInfo getSeverityInfo() {
 		return this.invasionType.getSeverityInfo().get(this.severity);
 	}
-
+	
 	public void tick(final ServerLevel worldIn) {
 		this.invasionMobs.removeIf(uuid -> {
 			return worldIn.getEntity(uuid) == null || !worldIn.getEntity(uuid).isAlive();
@@ -102,11 +102,11 @@ public class Invasion {
 			this.tickEntitySpawn(worldIn);
 	}
 
-	protected void tickEntitySpawn(ServerLevel worldIn) {
+	protected void tickEntitySpawn(ServerLevel levelIn) {
 		if (this.invasionMobs.size() < this.mobCap) {
 			//Delay check
 			if (this.spawnDelay < 0) {
-				this.delay(worldIn);
+				this.delay(levelIn);
 			}
 			if (this.spawnDelay > 0) {
 				--this.spawnDelay;
@@ -114,46 +114,46 @@ public class Invasion {
 			}
 			//Get Mobs
 			boolean flag1 = false;
-			if (worldIn.players().size() < 1) return;
-			ChunkPos chunkPos = this.getSpawnChunk(worldIn);
-			List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(worldIn, chunkPos);
+			if (levelIn.players().size() < 1) return;
+			ChunkPos chunkPos = this.getSpawnChunk(levelIn);
+			List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(levelIn, chunkPos);
 			if (mobs.isEmpty()) return;
 			//Spawn Mob Cluster (Different Mobs)
-			int clusterSize = worldIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
+			int clusterSize = levelIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
 			for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
-				MobSpawnSettings.SpawnerData spawners = mobs.get(worldIn.random.nextInt(mobs.size()));
-				int groupSize = worldIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-				this.nextSpawnData.getEntityToSpawn().putString("id", ForgeRegistries.ENTITIES.getKey(spawners.type).toString());
+				MobSpawnSettings.SpawnerData spawners = mobs.get(levelIn.random.nextInt(mobs.size()));
+				int groupSize = levelIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
+				this.nextSpawnData.getEntityToSpawn().putString("id", ForgeRegistries.ENTITY_TYPES.getKey(spawners.type).toString());
 				CompoundTag compoundNBT = this.nextSpawnData.getEntityToSpawn();
 				Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
 				if (!optional.isPresent()) {
-					this.delay(worldIn);
+					this.delay(levelIn);
 					return;
 				}
 				//Spawn Mob Group (Same Mob)
 				for(int count = 0; count < groupSize && this.invasionMobs.size() < this.mobCap; ++count) {
 					//Spawn Entity
-					BlockPos spawnPos = this.getSpawnPos(worldIn, chunkPos, false);
-					if (spawnPos != null && SpawnPlacements.checkSpawnRules(optional.get(), worldIn, MobSpawnType.EVENT, spawnPos, worldIn.getRandom())) {
-						Entity entity = EntityType.loadEntityRecursive(compoundNBT, worldIn, (e) -> {
+					BlockPos spawnPos = this.getSpawnPos(levelIn, chunkPos, false);
+					if (spawnPos != null && SpawnPlacements.checkSpawnRules(optional.get(), levelIn, MobSpawnType.EVENT, spawnPos, levelIn.getRandom())) {
+						Entity entity = EntityType.loadEntityRecursive(compoundNBT, levelIn, (e) -> {
 							e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.getYRot(), e.getXRot());
 							return e;
 						});
 						if (entity == null) {
-							this.delay(worldIn);
+							this.delay(levelIn);
 							return;
 						}
-						entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), worldIn.random.nextFloat() * 360.0F, 0.0F);
+						entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), levelIn.random.nextFloat() * 360.0F, 0.0F);
 						if (entity instanceof Mob) {
 							Mob mobEntity = (Mob)entity;
 							if (this.nextSpawnData.getEntityToSpawn().size() == 1 && this.nextSpawnData.getEntityToSpawn().contains("id", 8)) {
-								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, (LevelAccessor)worldIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, MobSpawnType.EVENT)) {
-									this.spawnInvasionMob(worldIn, mobEntity);
+								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, (LevelAccessor)levelIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, MobSpawnType.EVENT)) {
+									this.spawnInvasionMob(levelIn, mobEntity);
 								}
 							}
 						}
-						if (!worldIn.tryAddFreshEntityWithPassengers(entity)) {
-							this.delay(worldIn);
+						if (!levelIn.tryAddFreshEntityWithPassengers(entity)) {
+							this.delay(levelIn);
 							return;
 						}
 						flag1 = true;
@@ -161,7 +161,7 @@ public class Invasion {
 				}
 			}
 			if (flag1) {
-				this.delay(worldIn);
+				this.delay(levelIn);
 			}
 		}
 	}
@@ -209,7 +209,7 @@ public class Invasion {
 	private final ArrayList<MobSpawnSettings.SpawnerData> getBiomeSpawnList(BlockPos posIn, ChunkAccess chunkIn) {
 		ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(chunkIn.getNoiseBiome(posIn.getX(), posIn.getY(), posIn.getZ()).value().getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
-			ResourceLocation name = spawner.type.getRegistryName();
+			ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
 		});
 		return spawners;
@@ -218,7 +218,7 @@ public class Invasion {
 	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(ServerLevel worldIn) {
 		ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
-			ResourceLocation name = spawner.type.getRegistryName();
+			ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
 		});
 		return spawners;
@@ -242,7 +242,7 @@ public class Invasion {
 	protected final BlockPos getSpawnPos(ServerLevel worldIn, ChunkPos chunkPosIn, boolean biomeCheckIn) {
 		int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
 		int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
-		int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z) + 1;
+		int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
 		if (biomeCheckIn || (!worldIn.dimensionType().hasCeiling() && worldIn.random.nextBoolean()))
 			return new BlockPos(x, surface, z);
 		BlockState air = Blocks.AIR.defaultBlockState();

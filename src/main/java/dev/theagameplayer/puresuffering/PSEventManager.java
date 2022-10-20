@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.client.ClientTransitionHandler;
-import dev.theagameplayer.puresuffering.client.InvasionSkyRenderHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionFogRenderer;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.command.PSCommands;
@@ -20,13 +19,12 @@ import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import dev.theagameplayer.puresuffering.util.InvasionListType;
 import dev.theagameplayer.puresuffering.util.InvasionRendererMap;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
-import dev.theagameplayer.puresuffering.util.text.InvasionListTextComponent;
+import dev.theagameplayer.puresuffering.util.text.InvasionText;
 import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
 import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
@@ -42,19 +40,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.util.Mth;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.client.ISkyRenderHandler;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -76,21 +72,20 @@ public final class PSEventManager {
 		forgeBusIn.addListener(ClientEvents::loggedIn);
 		forgeBusIn.addListener(ClientEvents::loggedOut);
 		forgeBusIn.addListener(ClientEvents::fogColors);
-		forgeBusIn.addListener(ClientEvents::renderGameOverlayText);
-		forgeBusIn.addListener(ClientEvents::renderWorldLast);
+		forgeBusIn.addListener(ClientEvents::customizeGuiOverlayDebugText);
 	}
 
 	public static void attachCommonEventListeners(IEventBus modBusIn, IEventBus forgeBusIn) {
 		//Base
 		forgeBusIn.addListener(BaseEvents::addReloadListeners);
 		forgeBusIn.addListener(BaseEvents::registerCommands);
-		forgeBusIn.addListener(BaseEvents::worldTick);
+		forgeBusIn.addListener(BaseEvents::levelTick);
 		//Entity
-		forgeBusIn.addListener(EntityEvents::joinWorld);
+		forgeBusIn.addListener(EntityEvents::joinLevel);
 		forgeBusIn.addListener(EntityEvents::mobGriefing);
 		//Living
 		forgeBusIn.addListener(LivingEvents::livingConversion);
-		forgeBusIn.addListener(LivingEvents::livingUpdate);
+		forgeBusIn.addListener(LivingEvents::livingTick);
 		forgeBusIn.addListener(LivingEvents::experienceDrop);
 		forgeBusIn.addListener(LivingEvents::checkSpawn);
 		forgeBusIn.addListener(LivingEvents::specialSpawn);
@@ -107,11 +102,11 @@ public final class PSEventManager {
 	} 
 
 	public static final class ClientEvents {
-		public static void loggedIn(ClientPlayerNetworkEvent.LoggedInEvent eventIn) {
+		public static void loggedIn(ClientPlayerNetworkEvent.LoggingIn eventIn) {
 			PSConfigValues.resync(PSConfigValues.client);
 		}
 
-		public static void loggedOut(ClientPlayerNetworkEvent.LoggedOutEvent eventIn) {
+		public static void loggedOut(ClientPlayerNetworkEvent.LoggingOut eventIn) {
 			Minecraft mc = Minecraft.getInstance();
 			ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().clear();
 			ClientInvasionWorldInfo.getNightClientInfo(mc.level).getRendererMap().clear();
@@ -119,7 +114,7 @@ public final class PSEventManager {
 			PSConfigValues.resync(PSConfigValues.client);
 		}
 
-		public static void fogColors(EntityViewRenderEvent.FogColors eventIn) {
+		public static void fogColors(ViewportEvent.ComputeFogColor eventIn) {
 			Minecraft mc = Minecraft.getInstance();
 			if (!mc.level.dimensionType().hasFixedTime()) {
 				float red = 0.0F, green = 0.0F, blue = 0.0F;
@@ -165,7 +160,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void renderGameOverlayText(RenderGameOverlayEvent.Text eventIn) {
+		public static void customizeGuiOverlayDebugText(CustomizeGuiOverlayEvent.DebugText eventIn) {
 			Minecraft mc = Minecraft.getInstance();
 			if (mc.options.renderDebug) {
 				eventIn.getLeft().add("");
@@ -190,17 +185,6 @@ public final class PSEventManager {
 				}
 			}
 		}
-
-		public static void renderWorldLast(RenderLevelLastEvent eventIn) {
-			Minecraft mc = Minecraft.getInstance();
-			ClientLevel clientWorld = mc.level;
-			if (clientWorld != null && PSConfigValues.client.useSkyBoxRenderer) {
-				ISkyRenderHandler skyRenderHandler = clientWorld.effects().getSkyRenderHandler();
-				if (!(skyRenderHandler instanceof InvasionSkyRenderHandler)) {
-					clientWorld.effects().setSkyRenderHandler(new InvasionSkyRenderHandler(skyRenderHandler));
-				}
-			}
-		}
 	}
 
 	public static final class BaseEvents {
@@ -218,9 +202,9 @@ public final class PSEventManager {
 			PSCommands.build(eventIn.getDispatcher());
 		}
 
-		public static void worldTick(TickEvent.WorldTickEvent eventIn) {
+		public static void levelTick(TickEvent.LevelTickEvent eventIn) {
 			if (eventIn.side.isServer() && eventIn.phase == TickEvent.Phase.END) {
-				ServerLevel world = (ServerLevel)eventIn.world;
+				ServerLevel world = (ServerLevel)eventIn.level;
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(world);
 				if (iwData != null && PSGameRulesRegistry.getEnableInvasions(world)) {
 					if (!iwData.hasFixedTime()) {
@@ -239,11 +223,11 @@ public final class PSEventManager {
 							if (!tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || tiwData.getInvasionSpawner().getDayInvasions().isCanceled()) {
 								for (ServerPlayer player : world.players()) {
 									if (tiwData.getInvasionSpawner().getDayInvasions().isCanceled()) {
-										player.sendMessage(new TranslatableComponent("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), player.getUUID());
+										player.sendSystemMessage(Component.translatable("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 										continue;
 									}
-									player.sendMessage(new TranslatableComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), player.getUUID());
-									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED)), player.getUUID());
+									player.sendSystemMessage(Component.translatable("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED)));
 								}
 							}
 						} else if (ServerTimeUtil.isServerNight(world, tiwData) && !tiwData.hasCheckedDay()) { //Sets events for day time
@@ -260,11 +244,11 @@ public final class PSEventManager {
 							if (!tiwData.getInvasionSpawner().getNightInvasions().isEmpty() || tiwData.getInvasionSpawner().getNightInvasions().isCanceled()) {
 								for (ServerPlayer player : world.players()) {
 									if (tiwData.getInvasionSpawner().getNightInvasions().isCanceled()) {
-										player.sendMessage(new TranslatableComponent("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), player.getUUID());
+										player.sendSystemMessage(Component.translatable("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 										continue;
 									}
-									player.sendMessage(new TranslatableComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), player.getUUID());
-									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getNightInvasions()).withStyle(ChatFormatting.DARK_RED), player.getUUID());
+									player.sendSystemMessage(Component.translatable("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getNightInvasions()).withStyle(ChatFormatting.DARK_RED));
 								}
 							}
 						} else {
@@ -287,11 +271,11 @@ public final class PSEventManager {
 							if (!fiwData.getInvasionSpawner().getInvasions().isEmpty() || fiwData.getInvasionSpawner().getInvasions().isCanceled()) {
 								for (ServerPlayer player : world.players()) {
 									if (fiwData.getInvasionSpawner().getInvasions().isCanceled()) {
-										player.sendMessage(new TranslatableComponent("invasion.puresuffering.fixed.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), player.getUUID());
+										player.sendSystemMessage(Component.translatable("invasion.puresuffering.fixed.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 										continue;
 									}
-									player.sendMessage(new TranslatableComponent("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), player.getUUID());
-									player.sendMessage(new InvasionListTextComponent("invasion.puresuffering.message2", fiwData.getInvasionSpawner().getInvasions()).withStyle(ChatFormatting.DARK_RED), player.getUUID());
+									player.sendSystemMessage(Component.translatable("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message2", fiwData.getInvasionSpawner().getInvasions()).withStyle(ChatFormatting.DARK_RED));
 								}
 							}
 						}
@@ -302,7 +286,7 @@ public final class PSEventManager {
 	}
 
 	public static final class EntityEvents {
-		public static void joinWorld(EntityJoinWorldEvent eventIn) {
+		public static void joinLevel(EntityJoinLevelEvent eventIn) {
 			if (eventIn.getEntity() instanceof TamableAnimal) {
 				TamableAnimal tameableEntity = (TamableAnimal)eventIn.getEntity();
 				if (tameableEntity.getOwner() != null && tameableEntity.getOwner().getPersistentData().contains("AntiGrief")) {
@@ -311,7 +295,7 @@ public final class PSEventManager {
 			} else if (PSConfigValues.common.weakenedVexes && eventIn.getEntity() instanceof Vex) {
 				Vex vexEntity = (Vex)eventIn.getEntity();
 				if (vexEntity.getOwner() != null && vexEntity.getOwner().getPersistentData().contains("InvasionMob")) {
-					vexEntity.setLimitedLife(25 + eventIn.getWorld().getRandom().nextInt(65)); //Attempt to fix lag & spawn camping with vexes
+					vexEntity.setLimitedLife(25 + eventIn.getLevel().getRandom().nextInt(65)); //Attempt to fix lag & spawn camping with vexes
 				}
 			}
 		}
@@ -326,7 +310,7 @@ public final class PSEventManager {
 	public static final class LivingEvents {
 		public static void livingConversion(LivingConversionEvent.Post eventIn) { //Needed for occasional bugginess
 			if (eventIn.getOutcome().getClassification(false) == MobCategory.MONSTER) {
-				CompoundTag persistentData = eventIn.getEntityLiving().getPersistentData();
+				CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 				CompoundTag outcomeData = eventIn.getOutcome().getPersistentData();
 				if (persistentData.contains("InvasionMob"))
 					outcomeData.putString("InvasionMob", persistentData.getString("InvasionMob"));
@@ -335,9 +319,9 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void livingUpdate(LivingEvent.LivingUpdateEvent eventIn) {
-			if (eventIn.getEntityLiving() instanceof Mob && eventIn.getEntityLiving().getPersistentData().contains("InvasionMob") && (eventIn.getEntityLiving().getLastHurtByMob() == null || !eventIn.getEntityLiving().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntityLiving().getType().getRegistryName().toString())) {
-				Mob mob = (Mob)eventIn.getEntityLiving();
+		public static void livingTick(LivingEvent.LivingTickEvent eventIn) {
+			if (eventIn.getEntity() instanceof Mob && eventIn.getEntity().getPersistentData().contains("InvasionMob") && (eventIn.getEntity().getLastHurtByMob() == null || !eventIn.getEntity().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntity().getType().getDescriptionId())) {
+				Mob mob = (Mob)eventIn.getEntity();
 				if (mob.getTarget() instanceof Player) return;
 				Player player = mob.level.getNearestPlayer(mob.getX(), mob.getY(), mob.getZ(), 144.0D, PSEntityPredicates.HYPER_AGGRESSION);
 				if (player != null && player.isAlive()) {
@@ -358,9 +342,9 @@ public final class PSEventManager {
 		}
 
 		public static void experienceDrop(LivingExperienceDropEvent eventIn) {
-			CompoundTag persistentData = eventIn.getEntityLiving().getPersistentData();
+			CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 			if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
-				ServerLevel serverWorld = (ServerLevel)eventIn.getEntityLiving().level;
+				ServerLevel serverWorld = (ServerLevel)eventIn.getEntity().level;
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
 				if (iwData != null) {
 					if (!iwData.hasFixedTime()) {
@@ -388,9 +372,9 @@ public final class PSEventManager {
 		}
 
 		public static void checkSpawn(LivingSpawnEvent.CheckSpawn eventIn) {
-			if (!eventIn.getWorld().isClientSide()) {
+			if (!eventIn.getLevel().isClientSide()) {
 				if (eventIn.getSpawnReason().equals(MobSpawnType.NATURAL)) {
-					ServerLevel serverWorld = (ServerLevel)eventIn.getWorld();
+					ServerLevel serverWorld = (ServerLevel)eventIn.getLevel();
 					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
 					if (iwData != null) {
 						if (serverWorld.random.nextInt(10000) < PSConfigValues.common.naturalSpawnChance) {
@@ -412,21 +396,21 @@ public final class PSEventManager {
 		}
 
 		public static void specialSpawn(LivingSpawnEvent.SpecialSpawn eventIn) {
-			if (!eventIn.getWorld().isClientSide() && eventIn.getEntityLiving().getClassification(false) == MobCategory.MONSTER) {
+			if (!eventIn.getLevel().isClientSide() && eventIn.getEntity().getClassification(false) == MobCategory.MONSTER) {
 				if (eventIn.getSpawnReason() == MobSpawnType.NATURAL) {
-					ServerLevel serverWorld = (ServerLevel)eventIn.getWorld();
+					ServerLevel serverWorld = (ServerLevel)eventIn.getLevel();
 					InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
 					if (iwData != null) {
 						if (!iwData.hasFixedTime()) {
 							TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-							CompoundTag persistentData = eventIn.getEntityLiving().getPersistentData();
+							CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 							if (!tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
 								persistentData.putBoolean("AntiGrief", false);
 							}
 						} else {
 							FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 							if (!fiwData.getInvasionSpawner().getInvasions().isEmpty()) {
-								eventIn.getEntityLiving().getPersistentData().putBoolean("AntiGrief", true);
+								eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", true);
 							}
 						}
 					}
@@ -435,10 +419,10 @@ public final class PSEventManager {
 		}
 
 		public static void allowDespawn(LivingSpawnEvent.AllowDespawn eventIn) {
-			if (!eventIn.getWorld().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntityLiving() instanceof Mob) {
-				ServerLevel serverWorld = (ServerLevel)eventIn.getWorld();
+			if (!eventIn.getLevel().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntity() instanceof Mob) {
+				ServerLevel serverWorld = (ServerLevel)eventIn.getLevel();
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverWorld);
-				Mob mobEntity = (Mob)eventIn.getEntityLiving();
+				Mob mobEntity = (Mob)eventIn.getEntity();
 				CompoundTag persistentData = mobEntity.getPersistentData();
 				if (iwData != null && persistentData.contains("InvasionMob")) {
 					if (!iwData.hasFixedTime()) {
@@ -479,19 +463,19 @@ public final class PSEventManager {
 
 		public static void playerRespawn(PlayerEvent.PlayerRespawnEvent eventIn) {
 			if (PSConfigValues.common.hyperAggression)
-				eventIn.getEntityLiving().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectRespawnDuration, 0));
+				eventIn.getEntity().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectRespawnDuration, 0));
 			updatePlayer(eventIn);
 		}
 
 		public static void playerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent eventIn) {
 			if (PSConfigValues.common.hyperAggression)
-				eventIn.getEntityLiving().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectDimensionChangeDuration, 0));
+				eventIn.getEntity().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectDimensionChangeDuration, 0));
 			updatePlayer(eventIn);
 		}
 
 		private static void updatePlayer(PlayerEvent eventIn) {
-			if (eventIn.getPlayer() instanceof ServerPlayer) {
-				ServerPlayer player = (ServerPlayer)eventIn.getPlayer();
+			if (eventIn.getEntity() instanceof ServerPlayer) {
+				ServerPlayer player = (ServerPlayer)eventIn.getEntity();
 				InvasionWorldData iwData = InvasionWorldData.getInvasionData().get((ServerLevel)player.level);
 				if (iwData != null) {
 					if (!iwData.hasFixedTime()) {
@@ -508,7 +492,7 @@ public final class PSEventManager {
 		}
 
 		public static void playerSleepInBed(PlayerSleepInBedEvent eventIn) {
-			ServerLevel world = (ServerLevel)eventIn.getPlayer().level;
+			ServerLevel world = (ServerLevel)eventIn.getEntity().level;
 			InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(world);
 			if (iwData != null && !iwData.hasFixedTime()) {
 				TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;

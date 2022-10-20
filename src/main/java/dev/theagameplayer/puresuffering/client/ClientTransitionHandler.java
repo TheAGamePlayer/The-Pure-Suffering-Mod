@@ -1,7 +1,7 @@
 package dev.theagameplayer.puresuffering.client;
 
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 
 public final class ClientTransitionHandler {
 	public static final int TRANSITION_TIME = 600, HALF_TRANSITION = TRANSITION_TIME/2;
@@ -63,7 +63,7 @@ public final class ClientTransitionHandler {
 	}
 
 	//FOG COLOR
-	public static void tickFogColor(EntityViewRenderEvent.FogColors eventIn, float fogRedIncIn, float fogGreenIncIn, float fogBlueIncIn, long dayTimeIn) {
+	public static void tickFogColor(ViewportEvent.ComputeFogColor eventIn, float fogRedIncIn, float fogGreenIncIn, float fogBlueIncIn, long dayTimeIn) {
 		float fogRed = 0.0F, fogGreen = 0.0F, fogBlue = 0.0F;
 		if (dayTimeIn < TRANSITION_TIME) {
 			fogRed = (fogRedIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1

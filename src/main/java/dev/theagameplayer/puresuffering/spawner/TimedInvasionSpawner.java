@@ -1,7 +1,6 @@
 package dev.theagameplayer.puresuffering.spawner;
 
 import java.util.ArrayList;
-import java.util.Random;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,6 +24,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerLevel;
 
 public final class TimedInvasionSpawner {
@@ -38,7 +38,7 @@ public final class TimedInvasionSpawner {
 
 	public void setNightInvasions(ServerLevel worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		this.nightInvasions.clear();
-		Random random = worldIn.random;
+		RandomSource random = worldIn.random;
 		this.isNightChangedToDay = false;
 		int totalInvasions = !this.queuedNightInvasions.isEmpty() ? this.queuedNightInvasions.size() : this.calculateInvasions(random, amountIn, this.nightInterval, isCanceledIn, daysIn == 0);
 		this.nightInterval = this.nightInterval > 0 ? this.nightInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.nightInvasionRarity : random.nextInt(PSConfigValues.common.nightInvasionRarity) + PSConfigValues.common.nightInvasionRarity - (int)(daysIn % PSConfigValues.common.nightInvasionRarity));
@@ -72,7 +72,7 @@ public final class TimedInvasionSpawner {
 
 	public void setDayInvasions(ServerLevel worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		this.dayInvasions.clear();
-		Random random = worldIn.random;
+		RandomSource random = worldIn.random;
 		this.isDayChangedToNight = false;
 		int totalInvasions = !this.queuedDayInvasions.isEmpty() ? this.queuedDayInvasions.size() : this.calculateInvasions(random, amountIn, this.dayInterval, isCanceledIn, daysIn == 0);
 		this.dayInterval = this.dayInterval > 0 ? this.dayInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.dayInvasionRarity : random.nextInt(PSConfigValues.common.dayInvasionRarity) + PSConfigValues.common.dayInvasionRarity - (int)(daysIn % PSConfigValues.common.dayInvasionRarity));
@@ -104,11 +104,11 @@ public final class TimedInvasionSpawner {
 		LOGGER.info("]");
 	}
 
-	private int calculateInvasions(Random randomIn, int amountIn, int intervalIn, boolean isCanceledIn, boolean isFirstDayIn) {
+	private int calculateInvasions(RandomSource randomIn, int amountIn, int intervalIn, boolean isCanceledIn, boolean isFirstDayIn) {
 		return !isFirstDayIn && intervalIn == 0 && amountIn > 0 && !isCanceledIn ? randomIn.nextInt(amountIn) + 1 : 0;
 	}
 
-	private InvasionType getInvasionType(InvasionChart invasionChartIn, Random randomIn) {
+	private InvasionType getInvasionType(InvasionChart invasionChartIn, RandomSource randomIn) {
 		return invasionChartIn.getInvasionInRange(randomIn.nextFloat());
 	}
 

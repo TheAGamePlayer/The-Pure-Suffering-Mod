@@ -21,13 +21,13 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public final class RemoveInvasionsCommand {
 	private static final DynamicCommandExceptionType ERROR_UNKNOWN_INVASION_TYPE = new DynamicCommandExceptionType(resourceLocation -> {
-		return new TranslatableComponent("commands.puresuffering.invasion_type.invasionTypeNotFound", resourceLocation);
+		return Component.translatable("commands.puresuffering.invasion_type.invasionTypeNotFound", resourceLocation);
 	});
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_CURRENT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
@@ -140,19 +140,19 @@ public final class RemoveInvasionsCommand {
 						if (ServerTimeUtil.isServerDay(ctx.getSource().getLevel(), tiwData)) {
 							Invasion invasion = getInvasion(tiwData.getInvasionSpawner().getDayInvasions(), ctx, "invasionType");
 							tiwData.getInvasionSpawner().getDayInvasions().remove(invasion);
-							ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.day." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+							ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.day." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 						} else if (ServerTimeUtil.isServerNight(ctx.getSource().getLevel(), tiwData)) {
 							Invasion invasion = getInvasion(tiwData.getInvasionSpawner().getNightInvasions(), ctx, "invasionType");
 							tiwData.getInvasionSpawner().getNightInvasions().remove(invasion);
-							ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.night." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+							ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.night." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 						} else {
-							ctx.getSource().sendFailure(new TranslatableComponent("commands.puresuffering.remove.failure").withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED)));
+							ctx.getSource().sendFailure(Component.translatable("commands.puresuffering.remove.failure").withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED)));
 						}
 					} else {
 						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(fiwData.getInvasionSpawner().getInvasions(), ctx, "invasionType");
 						fiwData.getInvasionSpawner().getInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.fixed." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.fixed." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("day").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_DAY_INVASION_TYPES).executes(ctx -> {
@@ -161,9 +161,9 @@ public final class RemoveInvasionsCommand {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(tiwData.getInvasionSpawner().getDayInvasions(), ctx, "invasionType");
 						tiwData.getInvasionSpawner().getDayInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.day." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.day." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("night").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_NIGHT_INVASION_TYPES).executes(ctx -> {
@@ -172,9 +172,9 @@ public final class RemoveInvasionsCommand {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(tiwData.getInvasionSpawner().getNightInvasions(), ctx, "invasionType");
 						tiwData.getInvasionSpawner().getNightInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.night." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.night." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("fixed").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_FIXED_INVASION_TYPES).executes(ctx -> {
@@ -183,9 +183,9 @@ public final class RemoveInvasionsCommand {
 						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(fiwData.getInvasionSpawner().getInvasions(), ctx, "invasionType");
 						fiwData.getInvasionSpawner().getInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.fixed." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.fixed." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("all").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_ALL_INVASION_TYPES).executes(ctx -> {
@@ -203,7 +203,7 @@ public final class RemoveInvasionsCommand {
 							tiwData.getInvasionSpawner().getNightInvasions().remove(invasion);
 						}
 						if (invasion != null)
-							ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+							ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
 						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						ResourceLocation resourceLocation = ctx.getArgument("invasionType", ResourceLocation.class);
@@ -213,7 +213,7 @@ public final class RemoveInvasionsCommand {
 							fiwData.getInvasionSpawner().getInvasions().remove(invasion);
 						}
 						if (invasion != null)
-							ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+							ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("queued").then(Commands.literal("day").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_QUEUED_DAY_INVASION_TYPES).executes(ctx -> {
@@ -222,9 +222,9 @@ public final class RemoveInvasionsCommand {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(tiwData.getInvasionSpawner().getQueuedDayInvasions(), ctx, "invasionType");
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.queued.day." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.queued.day." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("night").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_QUEUED_NIGHT_INVASION_TYPES).executes(ctx -> {
@@ -233,9 +233,9 @@ public final class RemoveInvasionsCommand {
 						TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(tiwData.getInvasionSpawner().getQueuedNightInvasions(), ctx, "invasionType");
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.queued.night." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.queued.night." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("fixed").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_QUEUED_FIXED_INVASION_TYPES).executes(ctx -> {
@@ -244,9 +244,9 @@ public final class RemoveInvasionsCommand {
 						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						Invasion invasion = getInvasion(fiwData.getInvasionSpawner().getQueuedInvasions(), ctx, "invasionType");
 						fiwData.getInvasionSpawner().getQueuedInvasions().remove(invasion);
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.queued.fixed." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.queued.fixed." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
-						ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
+						ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
 				}))).then(Commands.literal("all").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_ALL_INVASION_TYPES).executes(ctx -> {
@@ -264,7 +264,7 @@ public final class RemoveInvasionsCommand {
 							tiwData.getInvasionSpawner().getQueuedNightInvasions().remove(invasion);
 						}
 						if (invasion != null)
-							ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.queued.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+							ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.queued.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
 						FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						ResourceLocation resourceLocation = ctx.getArgument("invasionType", ResourceLocation.class);
@@ -274,7 +274,7 @@ public final class RemoveInvasionsCommand {
 							fiwData.getInvasionSpawner().getQueuedInvasions().remove(invasion);
 						}
 						if (invasion != null)
-							ctx.getSource().sendSuccess(new TranslatableComponent("commands.puresuffering.remove.success.queued.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+							ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.remove.success.queued.all." + (invasion.isPrimary() ? "primary" : "secondary")).append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					}
 					return 0;
 				}))));

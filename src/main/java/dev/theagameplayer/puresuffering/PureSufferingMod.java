@@ -10,13 +10,13 @@ import dev.theagameplayer.puresuffering.registries.PSMobEffects;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 //TheAGamePlayer was here :>
 @Mod(value = PureSufferingMod.MODID)
@@ -65,7 +65,7 @@ public final class PureSufferingMod {
 		DataGenerator generator = eventIn.getGenerator();
 		//ExistingFileHelper fileHelper = eventIn.getExistingFileHelper();
 		if (eventIn.includeServer()) {
-			generator.addProvider(new InvasionTypesProvider(generator));
+			generator.addProvider(true, new InvasionTypesProvider(generator));
 		}
 		LOGGER.info("Generated new data.");
 	}

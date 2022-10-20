@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -21,7 +22,7 @@ public abstract class InvasionWorldData extends SavedData {
 	}
 
 	public static String getFileId(Holder<DimensionType> dimTypeIn) {
-		return dimTypeIn.is(DimensionType.END_LOCATION) ? "invasions_end" : "invasions";
+		return dimTypeIn.is(Level.END.location()) ? "invasions_end" : "invasions";
 	}
 	
 	public static HashMap<ServerLevel, InvasionWorldData> getInvasionData() {

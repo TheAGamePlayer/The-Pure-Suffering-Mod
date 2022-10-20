@@ -1,8 +1,6 @@
 package dev.theagameplayer.puresuffering.spawner;
 
 import java.util.ArrayList;
-import java.util.Random;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,6 +18,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerLevel;
 
 public final class FixedInvasionSpawner {
@@ -30,7 +29,7 @@ public final class FixedInvasionSpawner {
 
 	public void setInvasions(ServerLevel worldIn, boolean isCanceledIn, int amountIn, long daysIn) {
 		this.invasions.clear();
-		Random random = worldIn.random;
+		RandomSource random = worldIn.random;
 		int totalInvasions = !this.queuedInvasions.isEmpty() ? this.queuedInvasions.size() : this.calculateInvasions(random, amountIn, this.interval, isCanceledIn, daysIn == 0);
 		this.interval = this.interval > 0 ? this.interval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.fixedInvasionRarity : random.nextInt(PSConfigValues.common.fixedInvasionRarity) + PSConfigValues.common.fixedInvasionRarity - (int)(daysIn % PSConfigValues.common.fixedInvasionRarity));
 		InvasionChart.refresh();
@@ -59,11 +58,11 @@ public final class FixedInvasionSpawner {
 		LOGGER.info("]");
 	}
 
-	private int calculateInvasions(Random randomIn, int amountIn, int intervalIn, boolean isCanceledIn, boolean isFirstDayIn) {
+	private int calculateInvasions(RandomSource randomIn, int amountIn, int intervalIn, boolean isCanceledIn, boolean isFirstDayIn) {
 		return !isFirstDayIn && intervalIn == 0 && amountIn > 0 && !isCanceledIn ? randomIn.nextInt(amountIn) + 1 : 0;
 	}
 
-	private InvasionType getInvasionType(InvasionChart invasionChartIn, Random randomIn) {
+	private InvasionType getInvasionType(InvasionChart invasionChartIn, RandomSource randomIn) {
 		return invasionChartIn.getInvasionInRange(randomIn.nextFloat());
 	}
 

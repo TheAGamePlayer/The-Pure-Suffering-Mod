@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 
 @Mixin(Level.class)
 public class LevelMixin {
-	@Inject(at = @At("RETURN"), method = "updateSkyBrightness()V")
+	@Inject(at = @At("RETURN"), method = "updateSkyBrightness()V", cancellable = true)
 	private void updateSkyBrightness(CallbackInfo callbackIn) {
 		Level level = (Level)(Object)this;
 		if (!level.isClientSide)
