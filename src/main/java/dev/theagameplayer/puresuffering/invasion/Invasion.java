@@ -50,8 +50,8 @@ public class Invasion {
 	private int spawnDelay;
 
 	public Invasion(final InvasionType invasionTypeIn, final int severityIn, final boolean isPrimaryIn) {
-		SeverityInfo info = invasionTypeIn.getSeverityInfo().get(severityIn);
-		int mobCap = isPrimaryIn ? PSConfigValues.common.primaryInvasionMobCap : PSConfigValues.common.secondaryInvasionMobCap;
+		final SeverityInfo info = invasionTypeIn.getSeverityInfo().get(severityIn);
+		final int mobCap = isPrimaryIn ? PSConfigValues.common.primaryInvasionMobCap : PSConfigValues.common.secondaryInvasionMobCap;
 		this.invasionType = invasionTypeIn;
 		this.severity = severityIn;
 		this.isPrimary  = isPrimaryIn;
@@ -102,7 +102,7 @@ public class Invasion {
 			this.tickEntitySpawn(worldIn);
 	}
 
-	protected void tickEntitySpawn(ServerLevel levelIn) {
+	protected void tickEntitySpawn(final ServerLevel levelIn) {
 		if (this.invasionMobs.size() < this.mobCap) {
 			//Delay check
 			if (this.spawnDelay < 0) {
@@ -113,19 +113,19 @@ public class Invasion {
 				return;
 			}
 			//Get Mobs
-			boolean flag1 = false;
 			if (levelIn.players().size() < 1) return;
-			ChunkPos chunkPos = this.getSpawnChunk(levelIn);
-			List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(levelIn, chunkPos);
+			boolean flag1 = false;
+			final ChunkPos chunkPos = this.getSpawnChunk(levelIn);
+			final List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(levelIn, chunkPos);
 			if (mobs.isEmpty()) return;
 			//Spawn Mob Cluster (Different Mobs)
-			int clusterSize = levelIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
+			final int clusterSize = levelIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
 			for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
-				MobSpawnSettings.SpawnerData spawners = mobs.get(levelIn.random.nextInt(mobs.size()));
-				int groupSize = levelIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
+				final MobSpawnSettings.SpawnerData spawners = mobs.get(levelIn.random.nextInt(mobs.size()));
+				final int groupSize = levelIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
 				this.nextSpawnData.getEntityToSpawn().putString("id", ForgeRegistries.ENTITY_TYPES.getKey(spawners.type).toString());
-				CompoundTag compoundNBT = this.nextSpawnData.getEntityToSpawn();
-				Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
+				final CompoundTag compoundNBT = this.nextSpawnData.getEntityToSpawn();
+				final Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
 				if (!optional.isPresent()) {
 					this.delay(levelIn);
 					return;
@@ -133,9 +133,9 @@ public class Invasion {
 				//Spawn Mob Group (Same Mob)
 				for(int count = 0; count < groupSize && this.invasionMobs.size() < this.mobCap; ++count) {
 					//Spawn Entity
-					BlockPos spawnPos = this.getSpawnPos(levelIn, chunkPos, false);
+					final BlockPos spawnPos = this.getSpawnPos(levelIn, chunkPos, false);
 					if (spawnPos != null && SpawnPlacements.checkSpawnRules(optional.get(), levelIn, MobSpawnType.EVENT, spawnPos, levelIn.getRandom())) {
-						Entity entity = EntityType.loadEntityRecursive(compoundNBT, levelIn, (e) -> {
+						final Entity entity = EntityType.loadEntityRecursive(compoundNBT, levelIn, (e) -> {
 							e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.getYRot(), e.getXRot());
 							return e;
 						});
@@ -145,7 +145,7 @@ public class Invasion {
 						}
 						entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), levelIn.random.nextFloat() * 360.0F, 0.0F);
 						if (entity instanceof Mob) {
-							Mob mobEntity = (Mob)entity;
+							final Mob mobEntity = (Mob)entity;
 							if (this.nextSpawnData.getEntityToSpawn().size() == 1 && this.nextSpawnData.getEntityToSpawn().contains("id", 8)) {
 								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, (LevelAccessor)levelIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, MobSpawnType.EVENT)) {
 									this.spawnInvasionMob(levelIn, mobEntity);
@@ -166,7 +166,7 @@ public class Invasion {
 		}
 	}
 
-	protected void spawnInvasionMob(ServerLevel worldIn, Mob mobEntityIn) {
+	protected void spawnInvasionMob(final ServerLevel worldIn, final Mob mobEntityIn) {
 		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.getId().toString());
 		mobEntityIn.getPersistentData().putBoolean("AntiGrief", worldIn.dimensionType().hasFixedTime());
 		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, (SpawnGroupData)null, (CompoundTag)null);
@@ -177,16 +177,16 @@ public class Invasion {
 		mobEntityIn.spawnAnim();
 	}
 
-	protected final void delay(ServerLevel worldIn) {
+	protected final void delay(final ServerLevel worldIn) {
 		this.spawnDelay = this.getSeverityInfo().getTickDelay();
 		this.spawnPotentials.getRandom(worldIn.random).ifPresent(entry -> {
 			this.nextSpawnData = entry.getData();
 		});
 	}
 
-	protected final List<MobSpawnSettings.SpawnerData> getMobSpawnList(ServerLevel worldIn, ChunkPos chunkPosIn) {
-		BlockPos biomePos = this.getSpawnPos(worldIn, chunkPosIn, true);
-		ArrayList<MobSpawnSettings.SpawnerData> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
+	protected final List<MobSpawnSettings.SpawnerData> getMobSpawnList(final ServerLevel worldIn, final ChunkPos chunkPosIn) {
+		final BlockPos biomePos = this.getSpawnPos(worldIn, chunkPosIn, true);
+		final ArrayList<MobSpawnSettings.SpawnerData> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
 		switch (this.invasionType.getSpawningSystem()) {
 		case DEFAULT: break;
 		case BIOME_BOOSTED:
@@ -196,9 +196,9 @@ public class Invasion {
 			originalList.addAll(this.getMixedSpawnList(worldIn));
 			break;
 		}
-		ArrayList<MobSpawnSettings.SpawnerData> newList = new ArrayList<>();
+		final ArrayList<MobSpawnSettings.SpawnerData> newList = new ArrayList<>();
 		if (!originalList.isEmpty()) {
-			for (MobSpawnSettings.SpawnerData spawners : originalList) {
+			for (final MobSpawnSettings.SpawnerData spawners : originalList) {
 				for (int w = 0; w < spawners.getWeight().asInt(); w++)
 					newList.add(spawners);
 			}
@@ -206,50 +206,50 @@ public class Invasion {
 		return newList;
 	}
 
-	private final ArrayList<MobSpawnSettings.SpawnerData> getBiomeSpawnList(BlockPos posIn, ChunkAccess chunkIn) {
-		ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(chunkIn.getNoiseBiome(posIn.getX(), posIn.getY(), posIn.getZ()).value().getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
+	private final ArrayList<MobSpawnSettings.SpawnerData> getBiomeSpawnList(final BlockPos posIn, final ChunkAccess chunkIn) {
+		final ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(chunkIn.getNoiseBiome(posIn.getX(), posIn.getY(), posIn.getZ()).value().getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
-			ResourceLocation name = spawner.type.getDefaultLootTable();
+			final ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
 		});
 		return spawners;
 	}
 
-	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(ServerLevel worldIn) {
-		ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
+	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(final ServerLevel worldIn) {
+		final ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
-			ResourceLocation name = spawner.type.getDefaultLootTable();
+			final ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
 		});
 		return spawners;
 	}
 
-	protected final ChunkPos getSpawnChunk(ServerLevel worldIn) {
-		ServerPlayer player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
-		ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
-		int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
-		int chunkZ = chunkPos.z - 8 + worldIn.random.nextInt(17);
-		boolean flag = chunkPos.x == chunkX && chunkPos.z == chunkZ;
-		ChunkPos chunkPos1 = new ChunkPos(flag ? chunkX + this.getChunkOffset(worldIn) : chunkX, flag ? chunkZ + this.getChunkOffset(worldIn) : chunkZ);
+	protected final ChunkPos getSpawnChunk(final ServerLevel worldIn) {
+		final ServerPlayer player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
+		final ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
+		final int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
+		final int chunkZ = chunkPos.z - 8 + worldIn.random.nextInt(17);
+		final boolean flag = chunkPos.x == chunkX && chunkPos.z == chunkZ;
+		final ChunkPos chunkPos1 = new ChunkPos(flag ? chunkX + this.getChunkOffset(worldIn) : chunkX, flag ? chunkZ + this.getChunkOffset(worldIn) : chunkZ);
 		return chunkPos1;
 	}
 
-	private final int getChunkOffset(ServerLevel worldIn) {
-		int offSet = worldIn.random.nextInt(8) + 1;
+	private final int getChunkOffset(final ServerLevel worldIn) {
+		final int offSet = worldIn.random.nextInt(8) + 1;
 		return worldIn.random.nextBoolean() ? offSet : -offSet;
 	}
 
-	protected final BlockPos getSpawnPos(ServerLevel worldIn, ChunkPos chunkPosIn, boolean biomeCheckIn) {
-		int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
-		int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
-		int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
+	protected final BlockPos getSpawnPos(final ServerLevel worldIn, final ChunkPos chunkPosIn, final boolean biomeCheckIn) {
+		final int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
+		final int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
+		final int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
 		if (biomeCheckIn || (!worldIn.dimensionType().hasCeiling() && worldIn.random.nextBoolean()))
 			return new BlockPos(x, surface, z);
-		BlockState air = Blocks.AIR.defaultBlockState();
-		BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
-		ArrayList<BlockPos> potentialPos = new ArrayList<>();
+		final BlockState air = Blocks.AIR.defaultBlockState();
+		final BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
+		final ArrayList<BlockPos> potentialPos = new ArrayList<>();
 		for (int y = 0; y < surface; y++) {
-			BlockPos pos = new BlockPos(x, y, z);
+			final BlockPos pos = new BlockPos(x, y, z);
 			if (worldIn.getBlockState(pos) != air && worldIn.getBlockState(pos) != bedrock && worldIn.getBlockState(pos.above()) == air)
 				potentialPos.add(pos.above());
 		}
@@ -257,12 +257,12 @@ public class Invasion {
 	}
 
 	@Nullable
-	public static Invasion load(CompoundTag nbtIn) {
+	public static Invasion load(final CompoundTag nbtIn) {
 		if (BaseEvents.getInvasionTypeManager().verifyInvasion(nbtIn.getString("InvasionType"))) {
-			InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
-			Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"));
-			CompoundTag invasionMobs = nbtIn.getCompound("InvasionMobs");
-			for (String name : invasionMobs.getAllKeys())
+			final InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
+			final Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"));
+			final CompoundTag invasionMobs = nbtIn.getCompound("InvasionMobs");
+			for (final String name : invasionMobs.getAllKeys())
 				invasion.invasionMobs.add(invasionMobs.getUUID(name));
 			return invasion;
 		}
@@ -270,9 +270,9 @@ public class Invasion {
 	}
 
 	public CompoundTag save() {
-		CompoundTag nbt = new CompoundTag();
-		CompoundTag mobs = new CompoundTag();
-		for (UUID id : this.invasionMobs)
+		final CompoundTag nbt = new CompoundTag();
+		final CompoundTag mobs = new CompoundTag();
+		for (final UUID id : this.invasionMobs)
 			mobs.putUUID(id.toString(), id);
 		nbt.put("InvasionMobs", mobs);
 		nbt.putString("InvasionType", this.invasionType.toString());

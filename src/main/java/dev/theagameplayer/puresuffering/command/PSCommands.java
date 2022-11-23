@@ -6,7 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 
 public final class PSCommands {
-	public static void build(CommandDispatcher<CommandSourceStack> dispatcherIn) {
+	public static void build(final CommandDispatcher<CommandSourceStack> dispatcherIn) {
 		dispatcherIn.register(LiteralArgumentBuilder.<CommandSourceStack>literal("puresuffering")
 				.then(ClearInvasionsCommand.register())
 				.then(AddInvasionsCommand.register())

@@ -15,32 +15,32 @@ public final class RemoveInvasionPacket {
 	private final InvasionSkyRenderer renderer;
 	private final InvasionListType listType;
 
-	public RemoveInvasionPacket(InvasionSkyRenderer rendererIn, InvasionListType listTypeIn) {
+	public RemoveInvasionPacket(final InvasionSkyRenderer rendererIn, final InvasionListType listTypeIn) {
 		this.renderer = rendererIn;
 		this.listType = listTypeIn;
 	}
 
-	public static void encode(RemoveInvasionPacket msgIn, FriendlyByteBuf bufIn) {
+	public static void encode(final RemoveInvasionPacket msgIn, final FriendlyByteBuf bufIn) {
 		msgIn.renderer.deconstruct().serializeToNetwork(bufIn);
 		bufIn.writeResourceLocation(msgIn.renderer.getId());
 		bufIn.writeEnum(msgIn.listType);
 	}
 
-	public static RemoveInvasionPacket decode(FriendlyByteBuf bufIn) {
-		InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
+	public static RemoveInvasionPacket decode(final FriendlyByteBuf bufIn) {
+		final InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
 		return new RemoveInvasionPacket(renderer, bufIn.readEnum(InvasionListType.class));
 	}
 
 	public static class Handler {
-		public static boolean handle(RemoveInvasionPacket msgIn, Supplier<Context> ctxIn) {
+		public static boolean handle(final RemoveInvasionPacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 
-		private static void handlePacket(RemoveInvasionPacket msgIn, Supplier<Context> ctxIn) {
-			Minecraft mc = Minecraft.getInstance();
+		private static void handlePacket(final RemoveInvasionPacket msgIn, final Supplier<Context> ctxIn) {
+			final Minecraft mc = Minecraft.getInstance();
 			switch (msgIn.listType) {
 			case DAY:
 				ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().remove(msgIn.renderer);

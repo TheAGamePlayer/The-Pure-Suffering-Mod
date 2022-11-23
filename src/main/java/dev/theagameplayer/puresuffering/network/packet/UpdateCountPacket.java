@@ -14,30 +14,30 @@ public final class UpdateCountPacket {
 	private final int count;
 	private final InvasionListType listType;
 	
-	public UpdateCountPacket(int countIn, InvasionListType listTypeIn) {
+	public UpdateCountPacket(final int countIn, final InvasionListType listTypeIn) {
 		this.count = countIn;
 		this.listType = listTypeIn;
 	}
 	
-	public static void encode(UpdateCountPacket msgIn, FriendlyByteBuf bufIn) {
+	public static void encode(final UpdateCountPacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeInt(msgIn.count);
 		bufIn.writeEnum(msgIn.listType);
 	}
 	
-	public static UpdateCountPacket decode(FriendlyByteBuf bufIn) {
+	public static UpdateCountPacket decode(final FriendlyByteBuf bufIn) {
 		return new UpdateCountPacket(bufIn.readInt(), bufIn.readEnum(InvasionListType.class));
 	}
 
 	public static class Handler {
-		public static boolean handle(UpdateCountPacket msgIn, Supplier<Context> ctxIn) {
+		public static boolean handle(final UpdateCountPacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(UpdateCountPacket msgIn, Supplier<Context> ctxIn) {
-			Minecraft mc = Minecraft.getInstance();
+		private static void handlePacket(final UpdateCountPacket msgIn, final Supplier<Context> ctxIn) {
+			final Minecraft mc = Minecraft.getInstance();
 			switch (msgIn.listType) {
 			case DAY:
 				ClientInvasionWorldInfo.getDayClientInfo(mc.level).setInvasionsCount(msgIn.count);

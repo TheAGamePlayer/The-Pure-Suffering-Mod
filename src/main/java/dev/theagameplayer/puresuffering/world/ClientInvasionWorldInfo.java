@@ -14,22 +14,22 @@ public final class ClientInvasionWorldInfo {
 	private int invasionsCount;
 	private double xpMult;
 	
-	public static ClientInvasionWorldInfo getDayClientInfo(ClientLevel worldIn) {
-		if (!DAY_RENDERERS.containsKey(worldIn))
-			DAY_RENDERERS.put(worldIn, new ClientInvasionWorldInfo());
-		return DAY_RENDERERS.get(worldIn);
+	public static ClientInvasionWorldInfo getDayClientInfo(final ClientLevel levelIn) {
+		if (!DAY_RENDERERS.containsKey(levelIn))
+			DAY_RENDERERS.put(levelIn, new ClientInvasionWorldInfo());
+		return DAY_RENDERERS.get(levelIn);
 	}
 	
-	public static ClientInvasionWorldInfo getNightClientInfo(ClientLevel worldIn) {
-		if (!NIGHT_RENDERERS.containsKey(worldIn))
-			NIGHT_RENDERERS.put(worldIn, new ClientInvasionWorldInfo());
-		return NIGHT_RENDERERS.get(worldIn);
+	public static ClientInvasionWorldInfo getNightClientInfo(final ClientLevel levelIn) {
+		if (!NIGHT_RENDERERS.containsKey(levelIn))
+			NIGHT_RENDERERS.put(levelIn, new ClientInvasionWorldInfo());
+		return NIGHT_RENDERERS.get(levelIn);
 	}
 	
-	public static ClientInvasionWorldInfo getFixedClientInfo(ClientLevel worldIn) {
-		if (!FIXED_RENDERERS.containsKey(worldIn))
-			FIXED_RENDERERS.put(worldIn, new ClientInvasionWorldInfo());
-		return FIXED_RENDERERS.get(worldIn);
+	public static ClientInvasionWorldInfo getFixedClientInfo(final ClientLevel levelIn) {
+		if (!FIXED_RENDERERS.containsKey(levelIn))
+			FIXED_RENDERERS.put(levelIn, new ClientInvasionWorldInfo());
+		return FIXED_RENDERERS.get(levelIn);
 	}
 	
 	public InvasionRendererMap getRendererMap() {
@@ -40,7 +40,7 @@ public final class ClientInvasionWorldInfo {
 		return this.isTime;
 	}
 	
-	public void updateClientTime(boolean isTimeIn) {
+	public void updateClientTime(final boolean isTimeIn) {
 		this.isTime = isTimeIn;
 	}
 	
@@ -48,7 +48,7 @@ public final class ClientInvasionWorldInfo {
 		return this.invasionsCount;
 	}
 	
-	public void setInvasionsCount(int invasionsCountIn) {
+	public void setInvasionsCount(final int invasionsCountIn) {
 		this.invasionsCount = invasionsCountIn;
 	}
 	
@@ -56,7 +56,7 @@ public final class ClientInvasionWorldInfo {
 		return this.xpMult;
 	}
 	
-	public void setXPMultiplier(double xpMultIn) {
+	public void setXPMultiplier(final double xpMultIn) {
 		this.xpMult = xpMultIn;
 	}
 }

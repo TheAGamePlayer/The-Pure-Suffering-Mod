@@ -29,19 +29,19 @@ import net.minecraft.resources.ResourceLocation;
 public final class InvasionTypeManager extends SimpleJsonResourceReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 	private static final Gson GSON = (new GsonBuilder()).create();
-	private HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
+	private final HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
 
 	public InvasionTypeManager() {
 		super(GSON, "invasion_types");
 	}
 
 	@Override
-	protected void apply(Map<ResourceLocation, JsonElement> objectIn, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
+	protected void apply(final Map<ResourceLocation, JsonElement> objectIn, final ResourceManager resourceManagerIn, final ProfilerFiller profilerIn) {
 		this.invasionTypeMap.clear();
 		objectIn.forEach((conditions, invasionType) -> {
 			try {
-				JsonObject jsonObject = GsonHelper.convertToJsonObject(invasionType, "invasion_type");
-				InvasionType invasionType1 = InvasionType.Builder.fromJson(jsonObject).build(conditions);
+				final JsonObject jsonObject = GsonHelper.convertToJsonObject(invasionType, "invasion_type");
+				final InvasionType invasionType1 = InvasionType.Builder.fromJson(jsonObject).build(conditions);
 				if (invasionType1 == null) {
 					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met.", conditions);
 					return;
@@ -51,7 +51,7 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 					return;
 				}
 				this.invasionTypeMap.put(conditions, invasionType1);
-			} catch (IllegalArgumentException | JsonParseException jsonParseExceptionIn) {
+			} catch (final IllegalArgumentException | JsonParseException jsonParseExceptionIn) {
 				LOGGER.error("Parsing error loading custom invasion types {}: {}", conditions, jsonParseExceptionIn.getMessage());	
 			}
 		});
@@ -59,7 +59,7 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	}
 	
 	@Nullable
-	public InvasionType getInvasionType(ResourceLocation idIn) {
+	public InvasionType getInvasionType(final ResourceLocation idIn) {
 		return this.invasionTypeMap.get(idIn);
 	}
 
@@ -67,8 +67,8 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 		return this.invasionTypeMap.values();
 	}
 	
-	public ArrayList<InvasionType> getInvasionTypesOf(Predicate<InvasionType> predIn) {
-		ArrayList<InvasionType> invasionList = new ArrayList<>();
+	public ArrayList<InvasionType> getInvasionTypesOf(final Predicate<InvasionType> predIn) {
+		final ArrayList<InvasionType> invasionList = new ArrayList<>();
 		for (InvasionType invasionType : this.invasionTypeMap.values()) {
 			if (predIn.test(invasionType))
 				invasionList.add(invasionType);
@@ -76,8 +76,8 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 		return invasionList;
 	}
 	
-	public boolean verifyInvasion(String idIn) {
-		for (ResourceLocation id : this.invasionTypeMap.keySet()) {
+	public boolean verifyInvasion(final String idIn) {
+		for (final ResourceLocation id : this.invasionTypeMap.keySet()) {
 			if (id.toString().matches(idIn))
 				return true;
 		}

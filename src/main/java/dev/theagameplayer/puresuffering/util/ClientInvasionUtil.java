@@ -7,65 +7,65 @@ import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 public final class ClientInvasionUtil {
-	public static float handleBrightness(float brightnessIn, ClientLevel worldIn) {
-		if (!worldIn.dimensionType().hasFixedTime()) {
+	public static float handleBrightness(final float brightnessIn, final ClientLevel levelIn) {
+		if (!levelIn.dimensionType().hasFixedTime()) {
 			float brightness = 0.0F;
-			ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(worldIn);
-			ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(worldIn);
+			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
+			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);
 			if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-				ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
+				final ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
-				for (InvasionSkyRenderer renderer : rendererList) {
+				for (final InvasionSkyRenderer renderer : rendererList) {
 					brightness += renderer.getBrightness() / rendererList.size();
 				}
-				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, worldIn.getDayTime() % 12000L);
+				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, levelIn.getDayTime() % 12000L);
 			} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-				ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
+				final ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
-				for (InvasionSkyRenderer renderer : rendererList) {
+				for (final InvasionSkyRenderer renderer : rendererList) {
 					brightness += renderer.getBrightness() / rendererList.size();
 				}
-				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, worldIn.getDayTime() % 12000L);
+				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, levelIn.getDayTime() % 12000L);
 			}
 		} else {
 			float brightness = 0.0F;
-			InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(worldIn).getRendererMap();
+			final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(levelIn).getRendererMap();
 			if (!fixedRenderers.isEmpty()) {
-				ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
+				final ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
-				for (InvasionSkyRenderer renderer : rendererList) {
+				for (final InvasionSkyRenderer renderer : rendererList) {
 					brightness += renderer.getBrightness() / rendererList.size();
 				}
-				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, worldIn.getDayTime() % 12000L);
+				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, levelIn.getDayTime() % 12000L);
 			}
 		}
 		return brightnessIn;
 	}
 	
-	public static boolean handleLightMap(boolean resultIn, ClientLevel worldIn) {
-		if (!worldIn.dimensionType().hasFixedTime()) {
-			ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(worldIn);
-			ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(worldIn);
+	public static boolean handleLightMap(final boolean resultIn, final ClientLevel levelIn) {
+		if (!levelIn.dimensionType().hasFixedTime()) {
+			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
+			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);
 			if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-				ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
+				final ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
 				if (!rendererList.isEmpty())
 					return false;
 			} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-				ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
+				final ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
 				if (!rendererList.isEmpty())
 					return false;
 			}
 		} else {
-			InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(worldIn).getRendererMap();
+			final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(levelIn).getRendererMap();
 			if (!fixedRenderers.isEmpty()) {
-				ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
+				final ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
 				if (!rendererList.isEmpty())

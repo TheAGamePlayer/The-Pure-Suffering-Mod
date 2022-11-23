@@ -42,12 +42,12 @@ public final class PureSufferingMod {
 		LOGGER.info("Created mod config.");
 	}
 	
-	private void registerAll(IEventBus busIn) {
+	private void registerAll(final IEventBus busIn) {
 		PSMobEffects.MOB_EFFECTS.register(busIn);
 		LOGGER.info("Registered all event buses.");
 	}
 	
-	private void createRegistries(IEventBus busIn) {
+	private void createRegistries(final IEventBus busIn) {
 		LOGGER.info("Created custom registries.");
 	}
 	
@@ -61,8 +61,8 @@ public final class PureSufferingMod {
 		LOGGER.info("Finished client setup.");
 	}
 	
-	private void gatherData(GatherDataEvent eventIn) {
-		DataGenerator generator = eventIn.getGenerator();
+	private void gatherData(final GatherDataEvent eventIn) {
+		final DataGenerator generator = eventIn.getGenerator();
 		//ExistingFileHelper fileHelper = eventIn.getExistingFileHelper();
 		if (eventIn.includeServer()) {
 			generator.addProvider(true, new InvasionTypesProvider(generator));

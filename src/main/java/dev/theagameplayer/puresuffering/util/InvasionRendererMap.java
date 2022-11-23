@@ -11,11 +11,11 @@ import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRenderer, Boolean>> {
 	private final HashMap<InvasionSkyRenderer, Boolean> rendererMap = new HashMap<>();
 	
-	public void add(InvasionSkyRenderer rendererIn, boolean isPrimaryIn) {
+	public void add(final InvasionSkyRenderer rendererIn, final boolean isPrimaryIn) {
 		this.rendererMap.put(rendererIn, isPrimaryIn);
 	}
 	
-	public void remove(InvasionSkyRenderer rendererIn) {
+	public void remove(final InvasionSkyRenderer rendererIn) {
 		this.rendererMap.remove(rendererIn);
 	}
 
@@ -23,9 +23,9 @@ public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRend
 		this.rendererMap.clear();
 	}
 	
-	public ArrayList<InvasionSkyRenderer> getRenderersOf(Predicate<InvasionSkyRenderer> predIn) {
-		ArrayList<InvasionSkyRenderer> rendererList = new ArrayList<>();
-		for (InvasionSkyRenderer renderer : this.rendererMap.keySet()) {
+	public ArrayList<InvasionSkyRenderer> getRenderersOf(final Predicate<InvasionSkyRenderer> predIn) {
+		final ArrayList<InvasionSkyRenderer> rendererList = new ArrayList<>();
+		for (final InvasionSkyRenderer renderer : this.rendererMap.keySet()) {
 			if (predIn.test(renderer))
 				rendererList.add(renderer);
 		}
@@ -41,11 +41,11 @@ public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRend
         return this.rendererMap.isEmpty();
     }
     
-    public boolean contains(InvasionSkyRenderer invasionIn) {
+    public boolean contains(final InvasionSkyRenderer invasionIn) {
     	return this.rendererMap.containsKey(invasionIn);
     }
     
-    public InvasionSkyRenderer get(int indexIn) {
+    public InvasionSkyRenderer get(final int indexIn) {
     	return this.get(indexIn);
     }
     

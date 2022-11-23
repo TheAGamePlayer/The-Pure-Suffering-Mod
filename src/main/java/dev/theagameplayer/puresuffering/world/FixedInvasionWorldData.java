@@ -9,12 +9,12 @@ public final class FixedInvasionWorldData extends InvasionWorldData {
 	private boolean isFirstCycle;
 	private double xpMultiplier;
 
-	public FixedInvasionWorldData(ServerLevel worldIn) {
-		super(worldIn);
+	public FixedInvasionWorldData(final ServerLevel levelIn) {
+		super(levelIn);
 	}
 
-	public static FixedInvasionWorldData load(ServerLevel worldIn, CompoundTag nbtIn) {
-		FixedInvasionWorldData fiwData = new FixedInvasionWorldData(worldIn);
+	public static FixedInvasionWorldData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
+		final FixedInvasionWorldData fiwData = new FixedInvasionWorldData(levelIn);
 		fiwData.spawner.load(nbtIn.getCompound("Spawner"));
 		fiwData.isFirstCycle = nbtIn.getBoolean("IsFirstCycle");
 		fiwData.xpMultiplier = nbtIn.getDouble("XPMultiplier");
@@ -23,7 +23,7 @@ public final class FixedInvasionWorldData extends InvasionWorldData {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag nbtIn) {
+	public CompoundTag save(final CompoundTag nbtIn) {
 		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putBoolean("IsFirstCycle", this.isFirstCycle);
 		nbtIn.putDouble("XPMultiplier", this.xpMultiplier);
@@ -38,7 +38,7 @@ public final class FixedInvasionWorldData extends InvasionWorldData {
 		return this.isFirstCycle;
 	}
 	
-	public void setFirstCycle(boolean isFirstCycleIn) {
+	public void setFirstCycle(final boolean isFirstCycleIn) {
 		this.isFirstCycle = isFirstCycleIn;
 		this.setDirty();
 	}
@@ -47,7 +47,7 @@ public final class FixedInvasionWorldData extends InvasionWorldData {
 		return this.xpMultiplier;
 	}
 	
-	public void setXPMultiplier(double xpMultiplierIn) {
+	public void setXPMultiplier(final double xpMultiplierIn) {
 		this.xpMultiplier = xpMultiplierIn;
 		this.setDirty();
 	}

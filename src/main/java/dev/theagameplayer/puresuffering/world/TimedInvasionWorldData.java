@@ -11,14 +11,14 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 	private boolean checkedDay, checkedNight;
 	private boolean prevDayCheck, prevNightCheck;
 	
-	public TimedInvasionWorldData(ServerLevel worldIn) {
-		super(worldIn);
-		this.checkedDay = ServerTimeUtil.isServerNight(worldIn, this);
-		this.checkedNight = ServerTimeUtil.isServerDay(worldIn, this);
+	public TimedInvasionWorldData(final ServerLevel levelIn) {
+		super(levelIn);
+		this.checkedDay = ServerTimeUtil.isServerNight(levelIn, this);
+		this.checkedNight = ServerTimeUtil.isServerDay(levelIn, this);
 	}
 	
-	public static TimedInvasionWorldData load(ServerLevel worldIn, CompoundTag nbtIn) {
-		TimedInvasionWorldData tiwData = new TimedInvasionWorldData(worldIn);
+	public static TimedInvasionWorldData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
+		final TimedInvasionWorldData tiwData = new TimedInvasionWorldData(levelIn);
 		tiwData.spawner.load(nbtIn.getCompound("Spawner"));
 		tiwData.dayXPMultiplier = nbtIn.getDouble("DayXPMultiplier");
 		tiwData.nightXPMultiplier = nbtIn.getDouble("NightXPMultiplier");
@@ -31,7 +31,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 	}
 
 	@Override
-	public CompoundTag save(CompoundTag nbtIn) {
+	public CompoundTag save(final CompoundTag nbtIn) {
 		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putDouble("DayXPMultiplier", this.dayXPMultiplier);
 		nbtIn.putDouble("NightXPMultiplier", this.nightXPMultiplier);
@@ -50,7 +50,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return this.dayXPMultiplier;
 	}
 	
-	public void setDayXPMultiplier(double dayXPMultiplierIn) {
+	public void setDayXPMultiplier(final double dayXPMultiplierIn) {
 		this.dayXPMultiplier = dayXPMultiplierIn;
 		this.setDirty();
 	}
@@ -59,7 +59,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return this.nightXPMultiplier;
 	}
 	
-	public void setNightXPMultiplier(double nightXPMultiplierIn) {
+	public void setNightXPMultiplier(final double nightXPMultiplierIn) {
 		this.nightXPMultiplier = nightXPMultiplierIn;
 		this.setDirty();
 	}
@@ -68,7 +68,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return this.checkedDay;
 	}
 	
-	public void setCheckedDay(boolean checkedDayIn) {
+	public void setCheckedDay(final boolean checkedDayIn) {
 		this.checkedDay = checkedDayIn;
 		this.setDirty();
 	}
@@ -77,7 +77,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return this.checkedNight;
 	}
 	
-	public void setCheckedNight(boolean checkedNightIn) {
+	public void setCheckedNight(final boolean checkedNightIn) {
 		this.checkedNight = checkedNightIn;
 		this.setDirty();
 	}
@@ -86,7 +86,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return this.prevDayCheck;
 	}
 	
-	public void setPrevDayCheck(boolean prevDayCheckIn) {
+	public void setPrevDayCheck(final boolean prevDayCheckIn) {
 		this.prevDayCheck = prevDayCheckIn;
 		this.setDirty();
 	}
@@ -95,7 +95,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return this.prevNightCheck;
 	}
 	
-	public void setPrevNightCheck(boolean prevNightCheckIn) {
+	public void setPrevNightCheck(final boolean prevNightCheckIn) {
 		this.prevNightCheck = prevNightCheckIn;
 		this.setDirty();
 	}

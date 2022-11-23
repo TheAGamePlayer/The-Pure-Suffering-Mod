@@ -15,13 +15,13 @@ public abstract class InvasionWorldData extends SavedData {
 	private final ServerLevel level;
 	protected long days;
 	
-	public InvasionWorldData(ServerLevel worldIn) {
-		this.hasFixedTime = worldIn.dimensionType().hasFixedTime();
-		this.level = worldIn;
+	public InvasionWorldData(final ServerLevel levelIn) {
+		this.hasFixedTime = levelIn.dimensionType().hasFixedTime();
+		this.level = levelIn;
 		this.setDirty();
 	}
 
-	public static String getFileId(Holder<DimensionType> dimTypeIn) {
+	public static String getFileId(final Holder<DimensionType> dimTypeIn) {
 		return dimTypeIn.is(Level.END.location()) ? "invasions_end" : "invasions";
 	}
 	
@@ -30,7 +30,7 @@ public abstract class InvasionWorldData extends SavedData {
 	}
 	
 	@Override
-	public CompoundTag save(CompoundTag nbtIn) {
+	public CompoundTag save(final CompoundTag nbtIn) {
 		nbtIn.putLong("Days", this.days);
 		return nbtIn;
 	}
@@ -47,7 +47,7 @@ public abstract class InvasionWorldData extends SavedData {
 		return this.days;
 	}
 	
-	public void setDays(long daysIn) {
+	public void setDays(final long daysIn) {
 		this.days = daysIn;
 		this.setDirty();
 	}

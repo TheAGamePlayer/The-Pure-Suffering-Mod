@@ -294,8 +294,8 @@ public final class PSConfig {
 	}
 
 	public static void initConfig() {
-		Path configPath = FMLPaths.CONFIGDIR.get();
-		Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
+		final Path configPath = FMLPaths.CONFIGDIR.get();
+		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		try {
 			Files.createDirectory(psConfigPath);
 		} catch (FileAlreadyExistsException exceptionIn) {

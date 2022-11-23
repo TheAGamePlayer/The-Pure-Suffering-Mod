@@ -18,9 +18,9 @@ public final class QueryInvasionsCommand {
 		return Commands.literal("query").requires(player -> {
 			return player.hasPermission(0);
 		}).executes(ctx -> {
-			InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 			if (!iwData.hasFixedTime()) {
-				TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
+				final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 				if (!ctx.getSource().getLevel().dimensionType().hasFixedTime()) {
 					if (ServerTimeUtil.isServerDay(ctx.getSource().getLevel(), tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) {
 						ctx.getSource().sendSuccess(InvasionText.create("commands.puresuffering.query.invasions", tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
@@ -32,7 +32,7 @@ public final class QueryInvasionsCommand {
 				}
 				ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.query.none").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
 			} else {
-				FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
+				final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 				if (ctx.getSource().getLevel().dimensionType().hasFixedTime() && !fiwData.getInvasionSpawner().getInvasions().isEmpty()) {
 					ctx.getSource().sendSuccess(InvasionText.create("commands.puresuffering.query.invasions", fiwData.getInvasionSpawner().getInvasions()).withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
 					return 0;

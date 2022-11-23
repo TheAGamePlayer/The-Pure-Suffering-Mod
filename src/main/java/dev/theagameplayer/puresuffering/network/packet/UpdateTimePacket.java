@@ -13,30 +13,30 @@ public final class UpdateTimePacket {
 	private final boolean isDay;
 	private final boolean isTime;
 	
-	public UpdateTimePacket(boolean isDayIn, boolean isTimeIn) {
+	public UpdateTimePacket(final boolean isDayIn, final boolean isTimeIn) {
 		this.isDay = isDayIn;
 		this.isTime = isTimeIn;
 	}
 	
-	public static void encode(UpdateTimePacket msgIn, FriendlyByteBuf bufIn) {
+	public static void encode(final UpdateTimePacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeBoolean(msgIn.isDay);
 		bufIn.writeBoolean(msgIn.isTime);
 	}
 
-	public static UpdateTimePacket decode(FriendlyByteBuf bufIn) {
+	public static UpdateTimePacket decode(final FriendlyByteBuf bufIn) {
 		return new UpdateTimePacket(bufIn.readBoolean(), bufIn.readBoolean());
 	}
 
 	public static class Handler {
-		public static boolean handle(UpdateTimePacket msgIn, Supplier<Context> ctxIn) {
+		public static boolean handle(final UpdateTimePacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(UpdateTimePacket msgIn, Supplier<Context> ctxIn) {
-			Minecraft mc = Minecraft.getInstance();
+		private static void handlePacket(final UpdateTimePacket msgIn, final Supplier<Context> ctxIn) {
+			final Minecraft mc = Minecraft.getInstance();
 			if (msgIn.isDay) {
 				ClientInvasionWorldInfo.getDayClientInfo(mc.level).updateClientTime(msgIn.isTime);
 			} else {

@@ -16,11 +16,11 @@ public final class InvasionList implements Iterable<Invasion> {
 	private final InvasionListType listType;
 	private boolean isCanceled;
 	
-	public InvasionList(InvasionListType listTypeIn) {
+	public InvasionList(final InvasionListType listTypeIn) {
 		this.listType = listTypeIn;
 	}
 	
-	public void setCanceled(boolean isCanceledIn) {
+	public void setCanceled(final boolean isCanceledIn) {
 		this.isCanceled = isCanceledIn;
 	}
 	
@@ -28,8 +28,8 @@ public final class InvasionList implements Iterable<Invasion> {
 		return this.isCanceled;
 	}
 	
-	public boolean add(Invasion invasionIn) {
-		boolean result = this.invasionList.add(invasionIn);
+	public boolean add(final Invasion invasionIn) {
+		final boolean result = this.invasionList.add(invasionIn);
 		if (invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer() != null) {
 			PSPacketHandler.sendToAllClients(new AddInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType, invasionIn.isPrimary()));
 		}
@@ -37,12 +37,12 @@ public final class InvasionList implements Iterable<Invasion> {
 		return result;
 	}
 	
-	public boolean remove(Invasion invasionIn) {
+	public boolean remove(final Invasion invasionIn) {
 		if (invasionIn.isPrimary()) {
 			this.clear();
 			return true;
 		}
-		boolean result = this.invasionList.remove(invasionIn);
+		final boolean result = this.invasionList.remove(invasionIn);
 		if (invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer() != null) {
 			PSPacketHandler.sendToAllClients(new RemoveInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType));
 		}
@@ -55,10 +55,10 @@ public final class InvasionList implements Iterable<Invasion> {
 		PSPacketHandler.sendToAllClients(new UpdateCountPacket(this.size(), this.listType));
 	}
 	
-	public void update(ServerPlayer playerIn) {
+	public void update(final ServerPlayer playerIn) {
 		PSPacketHandler.sendToClient(new ClearInvasionsPacket(this.listType), playerIn);
 		for (int index = 0; index < this.size(); index++) {
-			Invasion invasion = this.get(index);
+			final Invasion invasion = this.get(index);
 			if (invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getSkyRenderer() != null) {
 				PSPacketHandler.sendToClient(new AddInvasionPacket(invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getSkyRenderer(), this.listType, invasion.isPrimary()), playerIn);
 			}
@@ -75,11 +75,11 @@ public final class InvasionList implements Iterable<Invasion> {
         return this.invasionList.isEmpty();
     }
     
-    public boolean contains(Invasion invasionIn) {
+    public boolean contains(final Invasion invasionIn) {
     	return this.invasionList.contains(invasionIn);
     }
     
-    public Invasion get(int indexIn) {
+    public Invasion get(final int indexIn) {
     	return this.invasionList.get(indexIn);
     }
     

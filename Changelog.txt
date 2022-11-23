@@ -1,4 +1,9 @@
 #Minecraft 1.19.x
+Version 1.3.6R:
+- Fixed broken skybox
+- Another attempt at improving shader compatibility
+- Optimized code throughout the mod
+
 Version 1.3.5B:
 - Fixed Mistake in mods.toml
 

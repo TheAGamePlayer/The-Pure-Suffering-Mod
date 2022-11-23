@@ -11,7 +11,7 @@ public final class InvasionChart {
 	private final ArrayList<InvasionRange> rangeList = new ArrayList<>();
 	private float total = 0.0F;
 	
-	public InvasionChart(List<InvasionType> invasionListIn) {
+	public InvasionChart(final List<InvasionType> invasionListIn) {
 		this.invasionList.addAll(invasionListIn);
 		this.calcInvasionRanges();
 	}
@@ -20,11 +20,11 @@ public final class InvasionChart {
 		USED_LIST.clear();
 	}
 	
-	public InvasionType getInvasionInRange(float numberIn) {
+	public InvasionType getInvasionInRange(final float numberIn) {
 		this.invasionList.removeIf(it -> USED_LIST.contains(it));
 		this.calcInvasionRanges();
 		InvasionType invasionType = null;
-		for (InvasionRange range : this.rangeList) {
+		for (final InvasionRange range : this.rangeList) {
 			if (range.inRange(numberIn)) {
 				invasionType = range.invasionType;
 				USED_LIST.add(invasionType);
@@ -37,13 +37,13 @@ public final class InvasionChart {
 	private void calcInvasionRanges() {
 		this.total = 0.0F;
 		this.rangeList.clear();
-		for (InvasionType invasionType : this.invasionList) {
-			float rangeSize = (1.0F/this.invasionList.size())/(invasionType.getRarity() + 1);
-			InvasionRange range = new InvasionRange(invasionType, this.total, this.total + rangeSize);
+		for (final InvasionType invasionType : this.invasionList) {
+			final float rangeSize = (1.0F/this.invasionList.size())/(invasionType.getRarity() + 1);
+			final InvasionRange range = new InvasionRange(invasionType, this.total, this.total + rangeSize);
 			this.total += rangeSize;
 			this.rangeList.add(range);
 		}
-		for (InvasionRange range : this.rangeList) {
+		for (final InvasionRange range : this.rangeList) {
 			range.min *= 1.0F/this.total;
 			range.max *= 1.0F/this.total;
 		}
@@ -58,13 +58,13 @@ public final class InvasionChart {
 		private final InvasionType invasionType;
 		private float min, max;
 		
-		private InvasionRange(InvasionType invasionTypeIn, float minIn, float maxIn) {
+		private InvasionRange(final InvasionType invasionTypeIn, final float minIn, final float maxIn) {
 			this.invasionType = invasionTypeIn;
 			this.min = minIn;
 			this.max = maxIn;
 		}
 		
-		public boolean inRange(float numberIn) {
+		public boolean inRange(final float numberIn) {
 			return numberIn < this.max && numberIn >= this.min;
 		}
 		

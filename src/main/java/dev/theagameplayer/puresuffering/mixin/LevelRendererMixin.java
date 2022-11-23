@@ -18,18 +18,19 @@ import net.minecraft.world.level.material.FogType;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
+	private static final InvasionSkyRenderHandler ISR_HANDLER = new InvasionSkyRenderHandler();
+
 	@Inject(at = @At("HEAD"), method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", cancellable = true)
-	public void renderSky(PoseStack poseStackIn, Matrix4f mat4In, float partialTicksIn, Camera camIn, boolean isFoggyIn, Runnable fogTickIn, CallbackInfo callbackIn) {
-		Minecraft mc = Minecraft.getInstance();
-		ClientLevel clientLevel = mc.level;
+	public void renderSky(final PoseStack poseStackIn, final Matrix4f mat4In, final float partialTicksIn, final Camera camIn, final boolean isFoggyIn, final Runnable fogTickIn, final CallbackInfo callbackIn) {
+		final Minecraft mc = Minecraft.getInstance();
+		final ClientLevel clientLevel = mc.level;
 		if (clientLevel != null && PSConfigValues.client.useSkyBoxRenderer) {
 			fogTickIn.run();
 			if (!isFoggyIn) {
-				FogType fogType = camIn.getFluidInCamera();
+				final FogType fogType = camIn.getFluidInCamera();
 				if (fogType != FogType.POWDER_SNOW && fogType != FogType.LAVA && !mc.levelRenderer.doesMobEffectBlockSky(camIn)) {
-					InvasionSkyRenderHandler handler = new InvasionSkyRenderHandler(); //I hate the local methods, may find a fix later?
-					if (handler.hasRenderedInvasionSky(partialTicksIn, poseStackIn, clientLevel, mc))
-						callbackIn.cancel(); //Will improve mod compat in a future update
+					if (ISR_HANDLER.hasRenderedInvasionSky(partialTicksIn, poseStackIn, mat4In, clientLevel, mc))
+						callbackIn.cancel(); //Will improve mod compat in a future update?
 				}
 			}
 		}

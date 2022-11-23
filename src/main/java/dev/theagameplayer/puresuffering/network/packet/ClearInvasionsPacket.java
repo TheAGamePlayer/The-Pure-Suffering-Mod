@@ -13,28 +13,28 @@ import net.minecraftforge.network.NetworkEvent.Context;
 public final class ClearInvasionsPacket {
 	private final InvasionListType listType;
 	
-	public ClearInvasionsPacket(InvasionListType listTypeIn) {
+	public ClearInvasionsPacket(final InvasionListType listTypeIn) {
 		this.listType = listTypeIn;
 	}
 	
-	public static void encode(ClearInvasionsPacket msgIn, FriendlyByteBuf bufIn) {
+	public static void encode(final ClearInvasionsPacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeEnum(msgIn.listType);
 	}
 	
-	public static ClearInvasionsPacket decode(FriendlyByteBuf bufIn) {
+	public static ClearInvasionsPacket decode(final FriendlyByteBuf bufIn) {
 		return new ClearInvasionsPacket(bufIn.readEnum(InvasionListType.class));
 	}
 	
 	public static class Handler {
-		public static boolean handle(ClearInvasionsPacket msgIn, Supplier<Context> ctxIn) {
+		public static boolean handle(final ClearInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(ClearInvasionsPacket msgIn, Supplier<Context> ctxIn) {
-			Minecraft mc = Minecraft.getInstance();
+		private static void handlePacket(final ClearInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
+			final Minecraft mc = Minecraft.getInstance();
 			switch (msgIn.listType) {
 			case DAY:
 				ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().clear();

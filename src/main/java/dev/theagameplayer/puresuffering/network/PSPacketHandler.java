@@ -30,11 +30,11 @@ public final class PSPacketHandler {
 		CHANNEL.messageBuilder(UpdateXPMultPacket.class, id++).encoder(UpdateXPMultPacket::encode).decoder(UpdateXPMultPacket::decode).consumerMainThread(UpdateXPMultPacket.Handler::handle).add();
 	}
 	
-	public static void sendToClient(Object msgIn, ServerPlayer playerIn) {
+	public static void sendToClient(final Object msgIn, final ServerPlayer playerIn) {
 		CHANNEL.send(PacketDistributor.PLAYER.with(() -> playerIn), msgIn);
 	}
 	
-	public static void sendToAllClients(Object msgIn) {
+	public static void sendToAllClients(final Object msgIn) {
 		CHANNEL.send(PacketDistributor.ALL.noArg(), msgIn);
 	}
 }
