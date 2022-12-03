@@ -24,7 +24,6 @@ Version 1.4.0R:
 - Primary Invasions are now Underlined in chat.
 - Invasions now slightly change color based on severity in chat.
 - Fixed "[PureSuffering]" being omitted from canceled invasion messages.
-- Fixed breeding ocelots spawned by invasions hard crashing your computer when SLI is turned on.
 - Fixed small little bugs here and there.
 
 Version 1.3.6R:
