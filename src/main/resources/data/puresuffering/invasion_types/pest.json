@@ -1,115 +1,115 @@
 {
-  "Rarity": 1,
-  "Tier": 0,
-  "InvasionTime": "NIGHT",
-  "InvasionPriority": "BOTH",
-  "SpawningSystem": "DEFAULT",
-  "TimeModifier": "NONE",
-  "TimeChangeability": "DEFAULT",
-  "WeatherType": "DEFAULT",
-  "SeverityInfo": [
-    {
-      "MobSpawnList": [
-        {
-          "EntityType": "minecraft:silverfish",
-          "Weight": 3,
-          "MinCount": 1,
-          "MaxCount": 3
-        },
-        {
-          "EntityType": "minecraft:endermite",
-          "Weight": 1,
-          "MinCount": 1,
-          "MaxCount": 1
-        }
-      ],
-      "MobCapPercentage": 0.2,
-      "ForceNoSleep": false,
-      "TickDelay": 32,
-      "ClusterSize": 1
-    },
-    {
-      "MobSpawnList": [
-        {
-          "EntityType": "minecraft:silverfish",
-          "Weight": 3,
-          "MinCount": 2,
-          "MaxCount": 4
-        },
-        {
-          "EntityType": "minecraft:endermite",
-          "Weight": 1,
-          "MinCount": 1,
-          "MaxCount": 2
-        }
-      ],
-      "MobCapPercentage": 0.4,
-      "ForceNoSleep": false,
-      "TickDelay": 26,
-      "ClusterSize": 1
-    },
-    {
-      "MobSpawnList": [
-        {
-          "EntityType": "minecraft:silverfish",
-          "Weight": 3,
-          "MinCount": 2,
-          "MaxCount": 5
-        },
-        {
-          "EntityType": "minecraft:endermite",
-          "Weight": 1,
-          "MinCount": 2,
-          "MaxCount": 4
-        }
-      ],
-      "MobCapPercentage": 0.6,
-      "ForceNoSleep": false,
-      "TickDelay": 20,
-      "ClusterSize": 1
-    },
-    {
-      "MobSpawnList": [
-        {
-          "EntityType": "minecraft:silverfish",
-          "Weight": 3,
-          "MinCount": 3,
-          "MaxCount": 6
-        },
-        {
-          "EntityType": "minecraft:endermite",
-          "Weight": 1,
-          "MinCount": 2,
-          "MaxCount": 5
-        }
-      ],
-      "MobCapPercentage": 0.8,
-      "ForceNoSleep": false,
-      "TickDelay": 14,
-      "ClusterSize": 1
-    },
-    {
-      "MobSpawnList": [
-        {
-          "EntityType": "minecraft:silverfish",
-          "Weight": 3,
-          "MinCount": 3,
-          "MaxCount": 8
-        },
-        {
-          "EntityType": "minecraft:endermite",
-          "Weight": 1,
-          "MinCount": 2,
-          "MaxCount": 6
-        }
-      ],
-      "MobCapPercentage": 1.0,
-      "ForceNoSleep": false,
-      "TickDelay": 8,
-      "ClusterSize": 1
-    }
-  ],
   "Dimensions": [
     "minecraft:overworld"
-  ]
+  ],
+  "InvasionPriority": "BOTH",
+  "InvasionTime": "NIGHT",
+  "Rarity": 1,
+  "SeverityInfo": [
+    {
+      "ClusterSize": 1,
+      "ForceNoSleep": false,
+      "MobCapPercentage": 0.2,
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:silverfish",
+          "MaxCount": 3,
+          "MinCount": 1,
+          "Weight": 3
+        },
+        {
+          "EntityType": "minecraft:endermite",
+          "MaxCount": 1,
+          "MinCount": 1,
+          "Weight": 1
+        }
+      ],
+      "TickDelay": 32
+    },
+    {
+      "ClusterSize": 1,
+      "ForceNoSleep": false,
+      "MobCapPercentage": 0.4,
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:silverfish",
+          "MaxCount": 4,
+          "MinCount": 2,
+          "Weight": 3
+        },
+        {
+          "EntityType": "minecraft:endermite",
+          "MaxCount": 2,
+          "MinCount": 1,
+          "Weight": 1
+        }
+      ],
+      "TickDelay": 26
+    },
+    {
+      "ClusterSize": 1,
+      "ForceNoSleep": false,
+      "MobCapPercentage": 0.6,
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:silverfish",
+          "MaxCount": 5,
+          "MinCount": 2,
+          "Weight": 3
+        },
+        {
+          "EntityType": "minecraft:endermite",
+          "MaxCount": 4,
+          "MinCount": 2,
+          "Weight": 1
+        }
+      ],
+      "TickDelay": 20
+    },
+    {
+      "ClusterSize": 1,
+      "ForceNoSleep": false,
+      "MobCapPercentage": 0.8,
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:silverfish",
+          "MaxCount": 6,
+          "MinCount": 3,
+          "Weight": 3
+        },
+        {
+          "EntityType": "minecraft:endermite",
+          "MaxCount": 5,
+          "MinCount": 2,
+          "Weight": 1
+        }
+      ],
+      "TickDelay": 14
+    },
+    {
+      "ClusterSize": 1,
+      "ForceNoSleep": false,
+      "MobCapPercentage": 1.0,
+      "MobSpawnList": [
+        {
+          "EntityType": "minecraft:silverfish",
+          "MaxCount": 8,
+          "MinCount": 3,
+          "Weight": 3
+        },
+        {
+          "EntityType": "minecraft:endermite",
+          "MaxCount": 6,
+          "MinCount": 2,
+          "Weight": 1
+        }
+      ],
+      "TickDelay": 8
+    }
+  ],
+  "SpawningSystem": "DEFAULT",
+  "Tier": 0,
+  "TimeChangeability": "DEFAULT",
+  "TimeModifier": "NONE",
+  "WeatherType": "DEFAULT"
 }

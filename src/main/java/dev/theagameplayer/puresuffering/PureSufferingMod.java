@@ -37,31 +37,31 @@ public final class PureSufferingMod {
 		PSEventManager.attachCommonEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
 	}
 	
-	private void createConfig() {
+	private final void createConfig() {
 		PSConfig.initConfig();
 		LOGGER.info("Created mod config.");
 	}
 	
-	private void registerAll(final IEventBus busIn) {
+	private final void registerAll(final IEventBus busIn) {
 		PSMobEffects.MOB_EFFECTS.register(busIn);
 		LOGGER.info("Registered all event buses.");
 	}
 	
-	private void createRegistries(final IEventBus busIn) {
+	private final void createRegistries(final IEventBus busIn) {
 		LOGGER.info("Created custom registries.");
 	}
 	
-	private void commonSetup(final FMLCommonSetupEvent eventIn) {
+	private final void commonSetup(final FMLCommonSetupEvent eventIn) {
 		PSPacketHandler.registerPackets();
 		PSGameRulesRegistry.registerGameRules();
 		LOGGER.info("Finished common setup.");
 	}
 	
-	private void clientSetup(final FMLClientSetupEvent eventIn) {
+	private final void clientSetup(final FMLClientSetupEvent eventIn) {
 		LOGGER.info("Finished client setup.");
 	}
 	
-	private void gatherData(final GatherDataEvent eventIn) {
+	private final void gatherData(final GatherDataEvent eventIn) {
 		final DataGenerator generator = eventIn.getGenerator();
 		//ExistingFileHelper fileHelper = eventIn.getExistingFileHelper();
 		if (eventIn.includeServer()) {

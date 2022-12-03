@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
+import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionPriority;
@@ -35,13 +36,17 @@ public final class TimedInvasionSpawner {
 	private final ArrayList<Invasion> queuedDayInvasions = new ArrayList<>();
 	private boolean isNightChangedToDay, isDayChangedToNight;
 	private int nightInterval, dayInterval;
+	private int hyperNightInterval, hyperDayInterval;
+	private int mysteryNightInterval, mysteryDayInterval;
 
-	public void setNightInvasions(final ServerLevel levelIn, final boolean isCanceledIn, final int amountIn, final long daysIn) {
+	public final void setNightInvasions(final ServerLevel levelIn, final boolean isCanceledIn, final int amountIn, final long daysIn) {
 		this.nightInvasions.clear();
 		this.isNightChangedToDay = false;
 		final RandomSource random = levelIn.random;
 		final int totalInvasions = !this.queuedNightInvasions.isEmpty() ? this.queuedNightInvasions.size() : this.calculateInvasions(random, amountIn, this.nightInterval, isCanceledIn, daysIn == 0);
 		this.nightInterval = this.nightInterval > 0 ? this.nightInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.nightInvasionRarity : random.nextInt(PSConfigValues.common.nightInvasionRarity) + PSConfigValues.common.nightInvasionRarity - (int)(daysIn % PSConfigValues.common.nightInvasionRarity));
+		this.hyperNightInterval = this.hyperNightInterval > 0 ? (this.nightInterval == 0 ? (PSConfigValues.common.hyperInvasions && PSConfigValues.common.hyperCharge ? this.hyperNightInterval - 1 : this.hyperNightInterval) : this.hyperNightInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.hyperInvasionRarity : random.nextInt(PSConfigValues.common.hyperInvasionRarity) + PSConfigValues.common.hyperInvasionRarity - (int)(daysIn % PSConfigValues.common.hyperInvasionRarity));
+		this.mysteryNightInterval = this.mysteryNightInterval > 0 ? (this.hyperNightInterval == 0 ? (PSConfigValues.common.mysteryInvasions && PSConfigValues.common.hyperCharge ? this.mysteryNightInterval - 1 : this.mysteryNightInterval) : this.mysteryNightInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.mysteryInvasionRarity : random.nextInt(PSConfigValues.common.mysteryInvasionRarity) + PSConfigValues.common.mysteryInvasionRarity - (int)(daysIn % PSConfigValues.common.mysteryInvasionRarity));
 		InvasionChart.refresh();
 		final InvasionChart potentialPrimaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
 		final InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
@@ -52,17 +57,17 @@ public final class TimedInvasionSpawner {
 			for (int q = 0; q < this.queuedNightInvasions.size(); q++) {
 				final Invasion invasion = this.queuedNightInvasions.get(q);
 				this.nightInvasions.add(invasion);
-				LOGGER.info("Queued Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
+				LOGGER.info("Queued " + (invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.MYSTERY ? "Mystery " : "Hyper ") : "") + "Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}
 			this.queuedNightInvasions.clear();
 		} else {
 			for (int inv = 0; inv < totalInvasions; inv++) {
 				final InvasionType invasionType = this.getInvasionType(inv == 0 ? potentialPrimaryNightInvasions : (this.isNightChangedToDay ? potentialSecondaryDayInvasions : potentialSecondaryNightInvasions), random);
 				if (invasionType != null) {
-					final int severity = random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.nightDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
-					final Invasion invasion = new Invasion(invasionType, severity, inv == 0);
+					final int severity = this.hyperNightInterval == 0 ? invasionType.getMaxSeverity() - 1 : random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.nightDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					final Invasion invasion = new Invasion(invasionType, severity, inv == 0, this.hyperNightInterval == 0 ? (this.mysteryNightInterval == 0 ? HyperType.MYSTERY : HyperType.HYPER) : HyperType.DEFAULT);
 					this.nightInvasions.add(invasion);
-					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
+					LOGGER.info((this.hyperNightInterval == 0 ? (invasion.getHyperType() == HyperType.MYSTERY ? "Mystery " : "Hyper ") : "") + "Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
 					this.isNightChangedToDay |= invasionType.getTimeModifier() == TimeModifier.NIGHT_TO_DAY;
 				}
 			}
@@ -70,12 +75,14 @@ public final class TimedInvasionSpawner {
 		LOGGER.info("]");
 	}
 
-	public void setDayInvasions(final ServerLevel levelIn, final boolean isCanceledIn, final int amountIn, final long daysIn) {
+	public final void setDayInvasions(final ServerLevel levelIn, final boolean isCanceledIn, final int amountIn, final long daysIn) {
 		this.dayInvasions.clear();
 		this.isDayChangedToNight = false;
 		final RandomSource random = levelIn.random;
 		final int totalInvasions = !this.queuedDayInvasions.isEmpty() ? this.queuedDayInvasions.size() : this.calculateInvasions(random, amountIn, this.dayInterval, isCanceledIn, daysIn == 0);
 		this.dayInterval = this.dayInterval > 0 ? this.dayInterval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.dayInvasionRarity : random.nextInt(PSConfigValues.common.dayInvasionRarity) + PSConfigValues.common.dayInvasionRarity - (int)(daysIn % PSConfigValues.common.dayInvasionRarity));
+		this.hyperDayInterval = this.hyperDayInterval > 0 ? (this.dayInterval == 0 ? (PSConfigValues.common.hyperInvasions && PSConfigValues.common.hyperCharge ? this.hyperDayInterval - 1 : this.hyperDayInterval) : this.hyperDayInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.hyperInvasionRarity : random.nextInt(PSConfigValues.common.hyperInvasionRarity) + PSConfigValues.common.hyperInvasionRarity - (int)(daysIn % PSConfigValues.common.hyperInvasionRarity));
+		this.mysteryDayInterval = this.mysteryDayInterval > 0 ? (this.hyperDayInterval == 0 ? (PSConfigValues.common.mysteryInvasions && PSConfigValues.common.hyperCharge ? this.mysteryDayInterval - 1 : this.mysteryDayInterval) : this.mysteryDayInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.mysteryInvasionRarity : random.nextInt(PSConfigValues.common.mysteryInvasionRarity) + PSConfigValues.common.mysteryInvasionRarity - (int)(daysIn % PSConfigValues.common.mysteryInvasionRarity));
 		InvasionChart.refresh();
 		final InvasionChart potentialPrimaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
 		final InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
@@ -86,17 +93,17 @@ public final class TimedInvasionSpawner {
 			for (int q = 0; q < this.queuedDayInvasions.size(); q++) {
 				final Invasion invasion = this.queuedDayInvasions.get(q);
 				this.dayInvasions.add(invasion);
-				LOGGER.info("Queued Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
+				LOGGER.info("Queued " + (invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.MYSTERY ? "Mystery " : "Hyper ") : "") + "Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}
 			this.queuedDayInvasions.clear();
 		} else {
 			for (int inv = 0; inv < totalInvasions; inv++) {
 				final InvasionType invasionType = this.getInvasionType(inv == 0 ? potentialPrimaryDayInvasions : (this.isDayChangedToNight ? potentialSecondaryNightInvasions : potentialSecondaryDayInvasions), random);
 				if (invasionType != null) {
-					final int severity = random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.dayDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
-					final Invasion invasion = new Invasion(invasionType, severity, inv == 0);
+					final int severity = this.hyperDayInterval == 0 ? invasionType.getMaxSeverity() - 1 : random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.dayDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
+					final Invasion invasion = new Invasion(invasionType, severity, inv == 0, this.hyperDayInterval == 0 ? (this.mysteryDayInterval == 0 ? HyperType.MYSTERY : HyperType.HYPER) : HyperType.DEFAULT);
 					this.dayInvasions.add(invasion);
-					LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
+					LOGGER.info((this.hyperDayInterval == 0 ? (invasion.getHyperType() == HyperType.MYSTERY ? "Mystery " : "Hyper ") : "") + "Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
 					this.isDayChangedToNight |= invasionType.getTimeModifier() == TimeModifier.DAY_TO_NIGHT;
 				}
 			}
@@ -104,15 +111,15 @@ public final class TimedInvasionSpawner {
 		LOGGER.info("]");
 	}
 
-	private int calculateInvasions(final RandomSource randomIn, final int amountIn, final int intervalIn, final boolean isCanceledIn, final boolean isFirstDayIn) {
+	private final int calculateInvasions(final RandomSource randomIn, final int amountIn, final int intervalIn, final boolean isCanceledIn, final boolean isFirstDayIn) {
 		return !isFirstDayIn && intervalIn == 0 && amountIn > 0 && !isCanceledIn ? randomIn.nextInt(amountIn) + 1 : 0;
 	}
 
-	private InvasionType getInvasionType(final InvasionChart invasionChartIn, final RandomSource randomIn) {
+	private final InvasionType getInvasionType(final InvasionChart invasionChartIn, final RandomSource randomIn) {
 		return invasionChartIn.getInvasionInRange(randomIn.nextFloat());
 	}
 
-	public void invasionTick(final MinecraftServer serverIn, final ServerLevel levelIn) {
+	public final void invasionTick(final MinecraftServer serverIn, final ServerLevel levelIn) {
 		final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)InvasionWorldData.getInvasionData().get(levelIn);
 		if (!this.nightInvasions.isEmpty() && ServerTimeUtil.isServerNight(levelIn, tiwData)) {
 			final Invasion invasion = this.nightInvasions.get(levelIn.getRandom().nextInt(this.nightInvasions.size()));
@@ -123,7 +130,7 @@ public final class TimedInvasionSpawner {
 		}
 	}
 
-	public void load(final CompoundTag nbtIn) {
+	public final void load(final CompoundTag nbtIn) {
 		final ListTag nightInvasionsNBT = nbtIn.getList("NightInvasions", Tag.TAG_COMPOUND);
 		final ListTag dayInvasionsNBT = nbtIn.getList("DayInvasions", Tag.TAG_COMPOUND);
 		final ListTag queuedNightInvasionsNBT = nbtIn.getList("QueuedNightInvasions", Tag.TAG_COMPOUND);
@@ -140,9 +147,13 @@ public final class TimedInvasionSpawner {
 		this.isDayChangedToNight = nbtIn.getBoolean("IsDayChangedToNight");
 		this.nightInterval = nbtIn.getInt("NightInterval");
 		this.dayInterval = nbtIn.getInt("DayInterval");
+		this.hyperNightInterval = nbtIn.getInt("HyperNightInterval");
+		this.hyperDayInterval = nbtIn.getInt("HyperDayInterval");
+		this.mysteryNightInterval = nbtIn.getInt("MysteryNightInterval");
+		this.mysteryDayInterval = nbtIn.getInt("MysteryDayInterval");
 	}
 
-	public CompoundTag save() {
+	public final CompoundTag save() {
 		final CompoundTag nbt = new CompoundTag();
 		final ListTag nightInvasionsNBT = new ListTag();
 		final ListTag dayInvasionsNBT = new ListTag();
@@ -164,22 +175,26 @@ public final class TimedInvasionSpawner {
 		nbt.putBoolean("IsDayChangedToNight", this.isDayChangedToNight);
 		nbt.putInt("NightInterval", this.nightInterval);
 		nbt.putInt("DayInterval", this.dayInterval);
+		nbt.putInt("HyperNightInterval", this.hyperNightInterval);
+		nbt.putInt("HyperDayInterval", this.hyperDayInterval);
+		nbt.putInt("MysteryNightInterval", this.mysteryNightInterval);
+		nbt.putInt("MysteryDayInterval", this.mysteryDayInterval);
 		return nbt;
 	}
 
-	public InvasionList getNightInvasions() {
+	public final InvasionList getNightInvasions() {
 		return this.nightInvasions;
 	}
 
-	public InvasionList getDayInvasions() {
+	public final InvasionList getDayInvasions() {
 		return this.dayInvasions;
 	}
 
-	public ArrayList<Invasion> getQueuedNightInvasions() {
+	public final ArrayList<Invasion> getQueuedNightInvasions() {
 		return this.queuedNightInvasions;
 	}
 
-	public ArrayList<Invasion> getQueuedDayInvasions() {
+	public final ArrayList<Invasion> getQueuedDayInvasions() {
 		return this.queuedDayInvasions;
 	}
 }

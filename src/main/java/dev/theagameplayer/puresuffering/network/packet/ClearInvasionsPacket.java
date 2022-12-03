@@ -17,23 +17,23 @@ public final class ClearInvasionsPacket {
 		this.listType = listTypeIn;
 	}
 	
-	public static void encode(final ClearInvasionsPacket msgIn, final FriendlyByteBuf bufIn) {
+	public static final void encode(final ClearInvasionsPacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeEnum(msgIn.listType);
 	}
 	
-	public static ClearInvasionsPacket decode(final FriendlyByteBuf bufIn) {
+	public static final ClearInvasionsPacket decode(final FriendlyByteBuf bufIn) {
 		return new ClearInvasionsPacket(bufIn.readEnum(InvasionListType.class));
 	}
 	
-	public static class Handler {
-		public static boolean handle(final ClearInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
+	public static final class Handler {
+		public static final boolean handle(final ClearInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(final ClearInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
+		private static final void handlePacket(final ClearInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			switch (msgIn.listType) {
 			case DAY:

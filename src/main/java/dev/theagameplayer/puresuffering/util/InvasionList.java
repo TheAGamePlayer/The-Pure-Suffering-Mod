@@ -20,15 +20,15 @@ public final class InvasionList implements Iterable<Invasion> {
 		this.listType = listTypeIn;
 	}
 	
-	public void setCanceled(final boolean isCanceledIn) {
+	public final void setCanceled(final boolean isCanceledIn) {
 		this.isCanceled = isCanceledIn;
 	}
 	
-	public boolean isCanceled() {
+	public final boolean isCanceled() {
 		return this.isCanceled;
 	}
 	
-	public boolean add(final Invasion invasionIn) {
+	public final boolean add(final Invasion invasionIn) {
 		final boolean result = this.invasionList.add(invasionIn);
 		if (invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer() != null) {
 			PSPacketHandler.sendToAllClients(new AddInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType, invasionIn.isPrimary()));
@@ -37,7 +37,7 @@ public final class InvasionList implements Iterable<Invasion> {
 		return result;
 	}
 	
-	public boolean remove(final Invasion invasionIn) {
+	public final boolean remove(final Invasion invasionIn) {
 		if (invasionIn.isPrimary()) {
 			this.clear();
 			return true;
@@ -49,13 +49,13 @@ public final class InvasionList implements Iterable<Invasion> {
 		return result;
 	}
 
-	public void clear() {
+	public final void clear() {
 		this.invasionList.clear();
 		PSPacketHandler.sendToAllClients(new ClearInvasionsPacket(this.listType));
 		PSPacketHandler.sendToAllClients(new UpdateCountPacket(this.size(), this.listType));
 	}
 	
-	public void update(final ServerPlayer playerIn) {
+	public final void update(final ServerPlayer playerIn) {
 		PSPacketHandler.sendToClient(new ClearInvasionsPacket(this.listType), playerIn);
 		for (int index = 0; index < this.size(); index++) {
 			final Invasion invasion = this.get(index);
@@ -67,29 +67,29 @@ public final class InvasionList implements Iterable<Invasion> {
 	}
 	
 	//ArrayList methods
-    public int size() {
+    public final int size() {
     	return this.invasionList.size();
     }
 	
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return this.invasionList.isEmpty();
     }
     
-    public boolean contains(final Invasion invasionIn) {
+    public final boolean contains(final Invasion invasionIn) {
     	return this.invasionList.contains(invasionIn);
     }
     
-    public Invasion get(final int indexIn) {
+    public final Invasion get(final int indexIn) {
     	return this.invasionList.get(indexIn);
     }
     
     @Override
-    public String toString() {
+    public final String toString() {
     	return this.invasionList.toString();
     }
 
 	@Override
-	public Iterator<Invasion> iterator() {
+	public final Iterator<Invasion> iterator() {
 		return this.invasionList.iterator();
 	}
 }

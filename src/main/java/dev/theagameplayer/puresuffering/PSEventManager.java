@@ -1,15 +1,21 @@
 package dev.theagameplayer.puresuffering;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.common.collect.ImmutableList;
 import dev.theagameplayer.puresuffering.client.ClientTransitionHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionFogRenderer;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
+import dev.theagameplayer.puresuffering.client.renderer.entity.layers.HyperChargeLayer;
 import dev.theagameplayer.puresuffering.command.PSCommands;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.data.InvasionTypeManager;
+import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
@@ -24,10 +30,16 @@ import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
 import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
+import dev.theagameplayer.puresuffering.world.entity.PSHyperCharge;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.Vex;
@@ -46,6 +58,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -63,19 +76,21 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class PSEventManager {
 	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 
-	public static void attachClientEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
+	public static final void attachClientEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
 		//Client
+		modBusIn.addListener(ClientEvents::addLayers);
 		forgeBusIn.addListener(ClientEvents::loggedIn);
 		forgeBusIn.addListener(ClientEvents::loggedOut);
 		forgeBusIn.addListener(ClientEvents::fogColors);
 		forgeBusIn.addListener(ClientEvents::customizeGuiOverlayDebugText);
 	}
 
-	public static void attachCommonEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
+	public static final void attachCommonEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
 		//Base
 		forgeBusIn.addListener(BaseEvents::addReloadListeners);
 		forgeBusIn.addListener(BaseEvents::registerCommands);
@@ -102,11 +117,30 @@ public final class PSEventManager {
 	} 
 
 	public static final class ClientEvents {
-		public static void loggedIn(final ClientPlayerNetworkEvent.LoggingIn eventIn) {
+		public static final void addLayers(final EntityRenderersEvent.AddLayers eventIn) {
+			@SuppressWarnings("unchecked")
+			final ImmutableList<EntityType<? extends LivingEntity>> entityTypes = ImmutableList.copyOf(
+					ForgeRegistries.ENTITY_TYPES.getValues().stream()
+					.filter(DefaultAttributes::hasSupplier)
+					.map(et -> (EntityType<? extends LivingEntity>)et)
+					.collect(Collectors.toList()));
+			entityTypes.forEach(et -> {
+				LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> renderer = null;
+	            try {
+	                renderer = eventIn.getRenderer(et);
+	            } catch (final Exception eIn) {
+	            	LOGGER.warn("HyperChargeLayer failed to apply to " + ForgeRegistries.ENTITY_TYPES.getKey(et) + ", perhaps renderer is not instance of LivingEntityRenderer?");
+	            }
+				if (renderer != null)
+	                renderer.addLayer(new HyperChargeLayer<LivingEntity, EntityModel<LivingEntity>>(renderer, PSConfigValues.common.maxHyperCharge));
+			});
+		}
+		
+		public static final void loggedIn(final ClientPlayerNetworkEvent.LoggingIn eventIn) {
 			PSConfigValues.resync(PSConfigValues.client);
 		}
 
-		public static void loggedOut(final ClientPlayerNetworkEvent.LoggingOut eventIn) {
+		public static final void loggedOut(final ClientPlayerNetworkEvent.LoggingOut eventIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().clear();
 			ClientInvasionWorldInfo.getNightClientInfo(mc.level).getRendererMap().clear();
@@ -114,7 +148,7 @@ public final class PSEventManager {
 			PSConfigValues.resync(PSConfigValues.client);
 		}
 
-		public static void fogColors(final ViewportEvent.ComputeFogColor eventIn) {
+		public static final void fogColors(final ViewportEvent.ComputeFogColor eventIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			if (!mc.level.dimensionType().hasFixedTime()) {
 				float red = 0.0F, green = 0.0F, blue = 0.0F;
@@ -160,7 +194,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void customizeGuiOverlayDebugText(final CustomizeGuiOverlayEvent.DebugText eventIn) {
+		public static final void customizeGuiOverlayDebugText(final CustomizeGuiOverlayEvent.DebugText eventIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			if (mc.options.renderDebug) {
 				eventIn.getLeft().add("");
@@ -190,19 +224,19 @@ public final class PSEventManager {
 	public static final class BaseEvents {
 		private static InvasionTypeManager invasionTypeManager = new InvasionTypeManager();
 
-		public static void addReloadListeners(final AddReloadListenerEvent eventIn) {
+		public static final void addReloadListeners(final AddReloadListenerEvent eventIn) {
 			eventIn.addListener(invasionTypeManager);
 		}
 
-		public static InvasionTypeManager getInvasionTypeManager() {
+		public static final InvasionTypeManager getInvasionTypeManager() {
 			return invasionTypeManager;
 		}
 
-		public static void registerCommands(final RegisterCommandsEvent eventIn) {
+		public static final void registerCommands(final RegisterCommandsEvent eventIn) {
 			PSCommands.build(eventIn.getDispatcher());
 		}
 
-		public static void levelTick(final TickEvent.LevelTickEvent eventIn) {
+		public static final void levelTick(final TickEvent.LevelTickEvent eventIn) {
 			if (eventIn.side.isServer() && eventIn.phase == TickEvent.Phase.END) {
 				final ServerLevel level = (ServerLevel)eventIn.level;
 				final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(level);
@@ -221,13 +255,18 @@ public final class PSEventManager {
 							tiwData.setCheckedDay(false);
 							tiwData.setCheckedNight(true);
 							if (!tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || tiwData.getInvasionSpawner().getDayInvasions().isCanceled()) {
+								HyperType hyperType = HyperType.DEFAULT;
+								for (final Invasion invasion : tiwData.getInvasionSpawner().getDayInvasions()) {
+									if (invasion.getHyperType().ordinal() > hyperType.ordinal())
+										hyperType = invasion.getHyperType();
+								}
 								for (final ServerPlayer player : level.players()) {
 									if (tiwData.getInvasionSpawner().getDayInvasions().isCanceled()) {
 										player.sendSystemMessage(Component.translatable("invasion.puresuffering.day.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 										continue;
 									}
-									player.sendSystemMessage(Component.translatable("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
-									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_RED)));
+									player.sendSystemMessage(Component.translatable(hyperType != HyperType.DEFAULT ? (hyperType == HyperType.MYSTERY ? "invasion.puresuffering.message1" : "invasion.puresuffering.message2") : "invasion.puresuffering.message3").withStyle(Style.EMPTY.withColor(hyperType == HyperType.MYSTERY ? (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/2 : ChatFormatting.RED.getColor()).withBold(hyperType != HyperType.DEFAULT).withItalic(hyperType == HyperType.MYSTERY)));
+									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message4", new Color(hyperType == HyperType.MYSTERY ? (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/3 : ChatFormatting.DARK_RED.getColor()), tiwData.getInvasionSpawner().getDayInvasions()).withStyle(Style.EMPTY.withBold(hyperType != HyperType.DEFAULT).withItalic(hyperType == HyperType.MYSTERY)));
 								}
 							}
 						} else if (ServerTimeUtil.isServerNight(level, tiwData) && !tiwData.hasCheckedDay()) { //Sets events for day time
@@ -242,13 +281,18 @@ public final class PSEventManager {
 							tiwData.setCheckedDay(true);
 							tiwData.setCheckedNight(false);
 							if (!tiwData.getInvasionSpawner().getNightInvasions().isEmpty() || tiwData.getInvasionSpawner().getNightInvasions().isCanceled()) {
+								HyperType hyperType = HyperType.DEFAULT;
+								for (final Invasion invasion : tiwData.getInvasionSpawner().getNightInvasions()) {
+									if (invasion.getHyperType().ordinal() > hyperType.ordinal())
+										hyperType = invasion.getHyperType();
+								}
 								for (final ServerPlayer player : level.players()) {
 									if (tiwData.getInvasionSpawner().getNightInvasions().isCanceled()) {
 										player.sendSystemMessage(Component.translatable("invasion.puresuffering.night.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 										continue;
 									}
-									player.sendSystemMessage(Component.translatable("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
-									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message2", tiwData.getInvasionSpawner().getNightInvasions()).withStyle(ChatFormatting.DARK_RED));
+									player.sendSystemMessage(Component.translatable(hyperType != HyperType.DEFAULT ? (hyperType == HyperType.MYSTERY ? "invasion.puresuffering.message1" : "invasion.puresuffering.message2") : "invasion.puresuffering.message3").withStyle(Style.EMPTY.withColor(hyperType == HyperType.MYSTERY ? (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/2 : ChatFormatting.RED.getColor()).withBold(hyperType != HyperType.DEFAULT).withItalic(hyperType == HyperType.MYSTERY)));
+									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message4", new Color(hyperType == HyperType.MYSTERY ? (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/3 : ChatFormatting.DARK_RED.getColor()), tiwData.getInvasionSpawner().getNightInvasions()).withStyle(Style.EMPTY.withBold(hyperType != HyperType.DEFAULT).withItalic(hyperType == HyperType.MYSTERY)));
 								}
 							}
 						} else {
@@ -269,13 +313,18 @@ public final class PSEventManager {
 							PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(0.0D, InvasionListType.FIXED));
 							fiwData.setXPMultiplier(0.0D);
 							if (!fiwData.getInvasionSpawner().getInvasions().isEmpty() || fiwData.getInvasionSpawner().getInvasions().isCanceled()) {
+								HyperType hyperType = HyperType.DEFAULT;
+								for (final Invasion invasion : fiwData.getInvasionSpawner().getInvasions()) {
+									if (invasion.getHyperType().ordinal() > hyperType.ordinal())
+										hyperType = invasion.getHyperType();
+								}
 								for (final ServerPlayer player : level.players()) {
 									if (fiwData.getInvasionSpawner().getInvasions().isCanceled()) {
 										player.sendSystemMessage(Component.translatable("invasion.puresuffering.fixed.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
 										continue;
 									}
-									player.sendSystemMessage(Component.translatable("invasion.puresuffering.message1").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
-									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message2", fiwData.getInvasionSpawner().getInvasions()).withStyle(ChatFormatting.DARK_RED));
+									player.sendSystemMessage(Component.translatable(hyperType != HyperType.DEFAULT ? (hyperType == HyperType.MYSTERY ? "invasion.puresuffering.message1" : "invasion.puresuffering.message2") : "invasion.puresuffering.message3").withStyle(Style.EMPTY.withColor(hyperType == HyperType.MYSTERY ? (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/2 : ChatFormatting.RED.getColor()).withBold(hyperType != HyperType.DEFAULT).withItalic(hyperType == HyperType.MYSTERY)));
+									player.sendSystemMessage(InvasionText.create("invasion.puresuffering.message4", new Color(hyperType == HyperType.MYSTERY ? (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/3 : ChatFormatting.DARK_RED.getColor()), fiwData.getInvasionSpawner().getInvasions()).withStyle(Style.EMPTY.withBold(hyperType != HyperType.DEFAULT).withItalic(hyperType == HyperType.MYSTERY)));
 								}
 							}
 						}
@@ -286,7 +335,7 @@ public final class PSEventManager {
 	}
 
 	public static final class EntityEvents {
-		public static void joinLevel(final EntityJoinLevelEvent eventIn) {
+		public static final void joinLevel(final EntityJoinLevelEvent eventIn) {
 			if (eventIn.getEntity() instanceof TamableAnimal) {
 				final TamableAnimal tameableEntity = (TamableAnimal)eventIn.getEntity();
 				if (tameableEntity.getOwner() != null && tameableEntity.getOwner().getPersistentData().contains("AntiGrief")) {
@@ -300,7 +349,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void mobGriefing(final EntityMobGriefingEvent eventIn) {
+		public static final void mobGriefing(final EntityMobGriefingEvent eventIn) {
 			if (!PSConfigValues.common.explosionsDestroyBlocks && eventIn.getEntity() != null && eventIn.getEntity().getPersistentData().contains("AntiGrief")) {
 				eventIn.setResult(Result.DENY);
 			}
@@ -308,7 +357,7 @@ public final class PSEventManager {
 	}
 
 	public static final class LivingEvents {
-		public static void livingConversion(final LivingConversionEvent.Post eventIn) { //Needed for occasional bugginess
+		public static final void livingConversion(final LivingConversionEvent.Post eventIn) { //Needed for occasional bugginess
 			if (eventIn.getOutcome().getClassification(false) == MobCategory.MONSTER) {
 				final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 				final CompoundTag outcomeData = eventIn.getOutcome().getPersistentData();
@@ -319,7 +368,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void livingTick(final LivingEvent.LivingTickEvent eventIn) {
+		public static final void livingTick(final LivingEvent.LivingTickEvent eventIn) {
 			if (eventIn.getEntity() instanceof Mob && eventIn.getEntity().getPersistentData().contains("InvasionMob") && (eventIn.getEntity().getLastHurtByMob() == null || !eventIn.getEntity().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntity().getType().getDescriptionId())) {
 				final Mob mob = (Mob)eventIn.getEntity();
 				if (mob.getTarget() instanceof Player) return;
@@ -341,7 +390,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void experienceDrop(final LivingExperienceDropEvent eventIn) {
+		public static final void experienceDrop(final LivingExperienceDropEvent eventIn) {
 			final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 			if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
 				final ServerLevel serverLevel = (ServerLevel)eventIn.getEntity().level;
@@ -352,26 +401,29 @@ public final class PSEventManager {
 						if (ServerTimeUtil.isServerDay(serverLevel, tiwData)) {
 							tiwData.setDayXPMultiplier(tiwData.getDayXPMultiplier() + 1);
 							final double log = Math.log1p(tiwData.getDayXPMultiplier()) / Math.E;
-							eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
+							for (int hc = 0; hc < (eventIn.getEntity() instanceof PSHyperCharge ? ((PSHyperCharge)eventIn.getEntity()).psGetHyperCharge() + 1 : 1); hc++)
+								eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
 							PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(log, InvasionListType.DAY));
 						} else if (ServerTimeUtil.isServerNight(serverLevel, tiwData)) {
 							tiwData.setNightXPMultiplier(tiwData.getNightXPMultiplier() + 1);
 							final double log = Math.log1p(tiwData.getNightXPMultiplier()) / Math.E;
-							eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
+							for (int hc = 0; hc < (eventIn.getEntity() instanceof PSHyperCharge ? ((PSHyperCharge)eventIn.getEntity()).psGetHyperCharge() + 1 : 1); hc++)
+								eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
 							PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(log, InvasionListType.NIGHT));
 						}
 					} else {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						fiwData.setXPMultiplier(fiwData.getXPMultiplier() + 1);
 						final double log = Math.log1p(fiwData.getXPMultiplier()) / Math.E;
-						eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
+						for (int hc = 0; hc < (eventIn.getEntity() instanceof PSHyperCharge ? ((PSHyperCharge)eventIn.getEntity()).psGetHyperCharge() + 1 : 1); hc++)
+							eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
 						PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(log, InvasionListType.FIXED));
 					}
 				}
 			}
 		}
 
-		public static void checkSpawn(final LivingSpawnEvent.CheckSpawn eventIn) {
+		public static final void checkSpawn(final LivingSpawnEvent.CheckSpawn eventIn) {
 			if (!eventIn.getLevel().isClientSide()) {
 				if (eventIn.getSpawnReason().equals(MobSpawnType.NATURAL)) {
 					final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
@@ -395,7 +447,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void specialSpawn(final LivingSpawnEvent.SpecialSpawn eventIn) {
+		public static final void specialSpawn(final LivingSpawnEvent.SpecialSpawn eventIn) {
 			if (!eventIn.getLevel().isClientSide() && eventIn.getEntity().getClassification(false) == MobCategory.MONSTER) {
 				if (eventIn.getSpawnReason() == MobSpawnType.NATURAL) {
 					final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
@@ -417,7 +469,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void allowDespawn(final LivingSpawnEvent.AllowDespawn eventIn) {
+		public static final void allowDespawn(final LivingSpawnEvent.AllowDespawn eventIn) {
 			if (!eventIn.getLevel().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntity() instanceof Mob) {
 				final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
 				final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
@@ -456,23 +508,23 @@ public final class PSEventManager {
 	}
 
 	public static final class PlayerEvents {
-		public static void playerLoggedIn(final PlayerEvent.PlayerLoggedInEvent eventIn) {
+		public static final void playerLoggedIn(final PlayerEvent.PlayerLoggedInEvent eventIn) {
 			updatePlayer(eventIn);
 		}
 
-		public static void playerRespawn(final PlayerEvent.PlayerRespawnEvent eventIn) {
+		public static final void playerRespawn(final PlayerEvent.PlayerRespawnEvent eventIn) {
 			if (PSConfigValues.common.hyperAggression)
 				eventIn.getEntity().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectRespawnDuration, 0));
 			updatePlayer(eventIn);
 		}
 
-		public static void playerChangeDimension(final PlayerEvent.PlayerChangedDimensionEvent eventIn) {
+		public static final void playerChangeDimension(final PlayerEvent.PlayerChangedDimensionEvent eventIn) {
 			if (PSConfigValues.common.hyperAggression)
 				eventIn.getEntity().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectDimensionChangeDuration, 0));
 			updatePlayer(eventIn);
 		}
 
-		private static void updatePlayer(final PlayerEvent eventIn) {
+		private static final void updatePlayer(final PlayerEvent eventIn) {
 			if (eventIn.getEntity() instanceof ServerPlayer) {
 				final ServerPlayer player = (ServerPlayer)eventIn.getEntity();
 				final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get((ServerLevel)player.level);
@@ -490,7 +542,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void playerSleepInBed(final PlayerSleepInBedEvent eventIn) {
+		public static final void playerSleepInBed(final PlayerSleepInBedEvent eventIn) {
 			final ServerLevel level = (ServerLevel)eventIn.getEntity().level;
 			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(level);
 			if (iwData != null && !iwData.hasFixedTime()) {
@@ -515,7 +567,7 @@ public final class PSEventManager {
 	}
 
 	public static final class ServerEvents {
-		public static void serverStarted(final ServerStartedEvent eventIn) {
+		public static final void serverStarted(final ServerStartedEvent eventIn) {
 			if (PSConfigValues.common.multiThreadedInvasions) {
 				for (final InvasionWorldData iwData : InvasionWorldData.getInvasionData().values()) {
 					eventIn.getServer().addTickable(new Thread(() -> {
@@ -541,7 +593,7 @@ public final class PSEventManager {
 			}
 		}
 
-		public static void serverStarting(final ServerStartingEvent eventIn) {
+		public static final void serverStarting(final ServerStartingEvent eventIn) {
 			PSConfigValues.resync(PSConfigValues.common);
 			eventIn.getServer().getAllLevels().forEach(level -> {
 				final boolean hasFixedTime = level.dimensionType().hasFixedTime();
@@ -554,7 +606,7 @@ public final class PSEventManager {
 		}
 
 
-		public static void serverStopping(final ServerStoppingEvent eventIn) {
+		public static final void serverStopping(final ServerStoppingEvent eventIn) {
 			PSConfigValues.resync(PSConfigValues.common);
 		}
 	}

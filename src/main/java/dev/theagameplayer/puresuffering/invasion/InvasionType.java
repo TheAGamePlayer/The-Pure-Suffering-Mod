@@ -51,7 +51,7 @@ public final class InvasionType {
 		this.component = component.getString().equals(text) ? Component.translatable(this.formatDefaultText(idIn)) : component;
 	}
 	
-	private String formatDefaultText(final ResourceLocation idIn) {
+	private final String formatDefaultText(final ResourceLocation idIn) {
 		final String str = idIn.getPath().replace('_', ' ');
         if (str == null || str.length() == 0)
             return str;
@@ -69,119 +69,121 @@ public final class InvasionType {
 		return new String(buffer);
 	}
 
-	public InvasionType.Builder deconstruct() {
+	public final InvasionType.Builder deconstruct() {
 		final ArrayList<SeverityInfo.Builder> severityInfo = new ArrayList<>();
 		for (SeverityInfo info : this.severityInfo)
 			severityInfo.add(info.deconstruct());
 		return new InvasionType.Builder(this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, this.weatherType, severityInfo, this.dimensions);
 	}
 
-	public ResourceLocation getId() {
+	public final ResourceLocation getId() {
 		return this.id;
 	}
 
-	public int getRarity() {
+	public final int getRarity() {
 		return this.rarity;
 	}
 	
-	public int getTier() {
+	public final int getTier() {
 		return this.tier;
 	}
 
-	public InvasionTime getInvasionTime() {
+	public final InvasionTime getInvasionTime() {
 		return this.invasionTime;
 	}
 	
-	public InvasionPriority getInvasionPriority() {
+	public final InvasionPriority getInvasionPriority() {
 		return this.invasionPriority;
 	}
 	
-	public SpawningSystem getSpawningSystem() {
+	public final SpawningSystem getSpawningSystem() {
 		return this.spawningSystem;
 	}
 
-	public TimeModifier getTimeModifier() {
+	public final TimeModifier getTimeModifier() {
 		return this.timeModifier;
 	}
 
-	public TimeChangeability getTimeChangeability() {
+	public final TimeChangeability getTimeChangeability() {
 		return this.timeChangeability;
 	}
 	
-	public WeatherType getWeatherType() {
+	public final WeatherType getWeatherType() {
 		return this.weatherType;
 	}
 
-	public List<SeverityInfo> getSeverityInfo() {
+	public final List<SeverityInfo> getSeverityInfo() {
 		return this.severityInfo;
 	}
 	
-	public List<ResourceLocation> getDimensions() {
+	public final List<ResourceLocation> getDimensions() {
 		return this.dimensions;
 	}
 
-	public Component getComponent() {
+	public final Component getComponent() {
 		return this.component;
 	}
 
-	public int getMaxSeverity() {
+	public final int getMaxSeverity() {
 		return this.severityInfo.isEmpty() ? 1 : this.severityInfo.size();
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return this.getId().toString();
 	}
 	
 	public static enum InvasionTime {
 		BOTH,
 		NIGHT,
-		DAY
+		DAY;
 	}
 	
 	public static enum InvasionPriority {
 		BOTH,
 		PRIMARY_ONLY,
-		SECONDARY_ONLY
+		SECONDARY_ONLY;
 	}
 	
 	public static enum SpawningSystem {
 		DEFAULT,
 		BIOME_BOOSTED,
-		BIOME_MIXED
+		BIOME_MIXED;
 	}
 	
 	public static enum TimeModifier {
 		NONE,
 		DAY_TO_NIGHT,
-		NIGHT_TO_DAY
+		NIGHT_TO_DAY;
 	}
 	
 	public static enum TimeChangeability {
 		DEFAULT,
 		ONLY_NIGHT,
-		ONLY_DAY
+		ONLY_DAY;
 	}
 	
 	public static enum WeatherType {
 		DEFAULT,
 		CLEAR,
 		RAIN,
-		THUNDER
+		THUNDER;
 	}
 
-	public static class SeverityInfo {
+	public static final class SeverityInfo {
 		private final InvasionSkyRenderer skyRenderer;
 		private final List<MobSpawnSettings.SpawnerData> mobSpawnList;
+		private final List<ClusterEntitySpawnData> clusterEntitiesList;
 		private final float mobCapPercentage;
 		private final boolean forceNoSleep;
 		private final int lightLevel;
 		private final int tickDelay;
 		private final int clusterSize;
 
-		private SeverityInfo(final InvasionSkyRenderer skyRendererIn, final List<MobSpawnSettings.SpawnerData> mobSpawnListIn, final float mobCapPercentageIn, final boolean forceNoSleepIn, final int lightLevelIn, final int tickDelayIn, final int clusterSizeIn) {
+		private SeverityInfo(final InvasionSkyRenderer skyRendererIn, final List<MobSpawnSettings.SpawnerData> mobSpawnListIn, final List<ClusterEntitySpawnData> clusterEntitiesListIn, final float mobCapPercentageIn, final boolean forceNoSleepIn, final int lightLevelIn, final int tickDelayIn, final int clusterSizeIn) {
 			this.skyRenderer = skyRendererIn;
 			this.mobSpawnList = mobSpawnListIn;
+			this.clusterEntitiesList = clusterEntitiesListIn;
 			this.mobCapPercentage = mobCapPercentageIn;
 			this.forceNoSleep = forceNoSleepIn;
 			this.lightLevel = lightLevelIn;
@@ -189,51 +191,57 @@ public final class InvasionType {
 			this.clusterSize = clusterSizeIn;
 		}
 		
-		public SeverityInfo.Builder deconstruct() {
-			return new SeverityInfo.Builder(this.skyRenderer == null ? null : this.skyRenderer.deconstruct(), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
+		public final SeverityInfo.Builder deconstruct() {
+			return new SeverityInfo.Builder(this.skyRenderer == null ? null : this.skyRenderer.deconstruct(), this.mobSpawnList, this.clusterEntitiesList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
 		}
 
-		public InvasionSkyRenderer getSkyRenderer() {
+		public final InvasionSkyRenderer getSkyRenderer() {
 			return this.skyRenderer;
 		}
 
-		public List<MobSpawnSettings.SpawnerData> getMobSpawnList() {
+		public final List<MobSpawnSettings.SpawnerData> getMobSpawnList() {
 			return this.mobSpawnList;
 		}
 		
-		public float getMobCapPercentage() {
+		public final List<ClusterEntitySpawnData> getClusterEntities() {
+			return this.clusterEntitiesList;
+		}
+		
+		public final float getMobCapPercentage() {
 			return this.mobCapPercentage;
 		}
 
-		public boolean forcesNoSleep() {
+		public final boolean forcesNoSleep() {
 			return this.forceNoSleep;
 		}
 
-		public int getLightLevel() {
+		public final int getLightLevel() {
 			return this.lightLevel;
 		}
 
-		public int getTickDelay() {
+		public final int getTickDelay() {
 			return this.tickDelay;
 		}
 		
-		public int getClusterSize() {
+		public final int getClusterSize() {
 			return this.clusterSize;
 		}
 
-		public static class Builder {
+		public static final class Builder {
 			private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 			private InvasionSkyRenderer.Builder skyRenderer = null;
 			private List<MobSpawnSettings.SpawnerData> mobSpawnList;
+			private List<ClusterEntitySpawnData> clusterEntitiesList;
 			private float mobCapPercentage = 1.0F;
 			private boolean forceNoSleep = false;
 			private int lightLevel = -1;
 			private int tickDelay = 6;
 			private int clusterSize = 1;
 
-			private Builder(final InvasionSkyRenderer.Builder skyRendererIn, final List<MobSpawnSettings.SpawnerData> mobSpawnListIn, final float mobCapPercentageIn, final boolean forceNoSleepIn, final int lightLevelIn, final int tickDelayIn, final int clusterSizeIn) {
+			private Builder(final InvasionSkyRenderer.Builder skyRendererIn, final List<MobSpawnSettings.SpawnerData> mobSpawnListIn, final List<ClusterEntitySpawnData> clusterEntitiesListIn, final float mobCapPercentageIn, final boolean forceNoSleepIn, final int lightLevelIn, final int tickDelayIn, final int clusterSizeIn) {
 				this.skyRenderer = skyRendererIn;
 				this.mobSpawnList = mobSpawnListIn;
+				this.clusterEntitiesList = clusterEntitiesListIn;
 				this.mobCapPercentage = mobCapPercentageIn;
 				this.forceNoSleep = forceNoSleepIn;
 				this.lightLevel = lightLevelIn;
@@ -243,50 +251,55 @@ public final class InvasionType {
 
 			private Builder() {};
 			
-			public static SeverityInfo.Builder severityInfo() {
+			public static final SeverityInfo.Builder severityInfo() {
 				return new SeverityInfo.Builder();
 			}
 
-			public SeverityInfo.Builder skyRenderer(final InvasionSkyRenderer.Builder skyRendererIn) {
+			public final SeverityInfo.Builder skyRenderer(final InvasionSkyRenderer.Builder skyRendererIn) {
 				this.skyRenderer = skyRendererIn;
 				return this;
 			}
 
-			public SeverityInfo.Builder mobSpawnList(final List<MobSpawnSettings.SpawnerData> mobSpawnListIn) {
+			public final SeverityInfo.Builder mobSpawnList(final List<MobSpawnSettings.SpawnerData> mobSpawnListIn) {
 				this.mobSpawnList = mobSpawnListIn;
 				return this;
 			}
 			
-			public SeverityInfo.Builder setMobCapMultiplier(final float mobCapPercentageIn) {
+			public final SeverityInfo.Builder clusterEntitiesList(final List<ClusterEntitySpawnData> clusterEntitiesListIn) {
+				this.clusterEntitiesList = clusterEntitiesListIn;
+				return this;
+			}
+			
+			public final SeverityInfo.Builder setMobCapMultiplier(final float mobCapPercentageIn) {
 				this.mobCapPercentage = mobCapPercentageIn;
 				return this;
 			}
 
-			public SeverityInfo.Builder setForcesNoSleep() {
+			public final SeverityInfo.Builder setForcesNoSleep() {
 				this.forceNoSleep = true;
 				return this;
 			}
 
-			public SeverityInfo.Builder withLightLevel(final int lightLevelIn) {
+			public final SeverityInfo.Builder withLightLevel(final int lightLevelIn) {
 				this.lightLevel = lightLevelIn;
 				return this;
 			}
 
-			public SeverityInfo.Builder withTickDelay(final int tickDelayIn) {
+			public final SeverityInfo.Builder withTickDelay(final int tickDelayIn) {
 				this.tickDelay = tickDelayIn;
 				return this;
 			}
 			
-			public SeverityInfo.Builder withClusterSize(final int clusterSizeIn) {
+			public final SeverityInfo.Builder withClusterSize(final int clusterSizeIn) {
 				this.clusterSize = clusterSizeIn;
 				return this;
 			}
 
-			public SeverityInfo build(final ResourceLocation idIn) {
-				return new SeverityInfo(this.skyRenderer == null ? null : this.skyRenderer.build(idIn), this.mobSpawnList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
+			public final SeverityInfo build(final ResourceLocation idIn) {
+				return new SeverityInfo(this.skyRenderer == null ? null : this.skyRenderer.build(idIn), this.mobSpawnList, this.clusterEntitiesList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
 			}
 
-			public JsonObject serializeToJson() {
+			public final JsonObject serializeToJson() {
 				final JsonObject jsonObject = new JsonObject();
 				if (this.skyRenderer != null) {
 					jsonObject.add("SkyRenderer", this.skyRenderer.serializeToJson());
@@ -294,7 +307,7 @@ public final class InvasionType {
 				if (this.mobSpawnList != null) {
 					final JsonArray jsonArray = new JsonArray();
 					for (final MobSpawnSettings.SpawnerData spawnInfo : this.mobSpawnList) {
-						JsonObject jsonObject1 = new JsonObject();
+						final JsonObject jsonObject1 = new JsonObject();
 						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITY_TYPES.getKey(spawnInfo.type).toString());
 						jsonObject1.addProperty("Weight", spawnInfo.getWeight().asInt());
 						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
@@ -302,6 +315,18 @@ public final class InvasionType {
 						jsonArray.add(jsonObject1);
 					}
 					jsonObject.add("MobSpawnList", jsonArray);
+				}
+				if (this.clusterEntitiesList != null) {
+					final JsonArray jsonArray = new JsonArray();
+					for (final ClusterEntitySpawnData spawnInfo : this.clusterEntitiesList) {
+						final JsonObject jsonObject1 = new JsonObject();
+						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITY_TYPES.getKey(spawnInfo.getEntityType()).toString());
+						jsonObject1.addProperty("MinCount", spawnInfo.getMinCount());
+						jsonObject1.addProperty("MaxCount", spawnInfo.getMaxCount());
+						jsonObject1.addProperty("Chance", spawnInfo.getChance());
+						jsonArray.add(jsonObject1);
+					}
+					jsonObject.add("ClusterEntitiesList", jsonArray);
 				}
 				jsonObject.addProperty("MobCapPercentage", this.mobCapPercentage);
 				jsonObject.addProperty("ForceNoSleep", this.forceNoSleep);
@@ -312,10 +337,11 @@ public final class InvasionType {
 				return jsonObject;
 			}
 
-			public static InvasionType.SeverityInfo.Builder fromJson(final JsonObject jsonObjectIn) {
+			public static final InvasionType.SeverityInfo.Builder fromJson(final JsonObject jsonObjectIn) {
 				InvasionSkyRenderer.Builder skyRenderer = null;
 				boolean errored = false;
-				final List<MobSpawnSettings.SpawnerData> mobSpawnList = new ArrayList<>();
+				final ArrayList<MobSpawnSettings.SpawnerData> mobSpawnList = new ArrayList<>();
+				final ArrayList<ClusterEntitySpawnData> clusterEntitiesList = new ArrayList<>();
 				final float mobCapPercentage = Mth.clamp(jsonObjectIn.get("MobCapPercentage").getAsFloat(), 0.0F, 1.0F);
 				final boolean forceNoSleep = jsonObjectIn.get("ForceNoSleep").getAsBoolean();
 				final int lightLevel = jsonObjectIn.has("LightLevel") ? Mth.clamp(jsonObjectIn.get("LightLevel").getAsInt(), 0, 15) : -1;
@@ -350,15 +376,36 @@ public final class InvasionType {
 						errored = true;
 					}
 				}
+				final JsonElement jsonElement2 = jsonObjectIn.getAsJsonArray("ClusterEntitiesList");
+				if (jsonElement2 != null) {
+					if (jsonElement2.isJsonArray()) {
+						final JsonArray jsonArray = jsonElement2.getAsJsonArray();
+						for (final JsonElement jsonElement3 : jsonArray) {
+							if (jsonElement3.isJsonObject()) {
+								final JsonObject jsonObject = jsonElement3.getAsJsonObject();
+								final EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(jsonObject.get("EntityType").getAsString()));
+								final int minCount = jsonObject.get("MinCount").getAsInt();
+								final int maxCount = jsonObject.get("MaxCount").getAsInt();
+								final int chance = jsonObject.get("Chance").getAsInt();
+								clusterEntitiesList.add(new ClusterEntitySpawnData(type, minCount, maxCount, chance));
+							} else {
+								errored = true;
+								break;
+							}
+						}
+					} else {
+						errored = true;
+					}
+				}
 				if (errored) {
 					LOGGER.error("JsonElement is incorrectly setup: " + jsonObjectIn.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
 				}
-				return new SeverityInfo.Builder(skyRenderer, mobSpawnList, mobCapPercentage, forceNoSleep, lightLevel, tickDelay, clusterSize);
+				return new SeverityInfo.Builder(skyRenderer, mobSpawnList, clusterEntitiesList, mobCapPercentage, forceNoSleep, lightLevel, tickDelay, clusterSize);
 			}
 		}
 	}
 
-	public static class Builder {
+	public static final class Builder {
 		private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
 		private int rarity = 0;
 		private int tier = 0;
@@ -386,67 +433,67 @@ public final class InvasionType {
 
 		private Builder() {};
 
-		public static InvasionType.Builder invasionType() {
+		public static final InvasionType.Builder invasionType() {
 			return new InvasionType.Builder();
 		}
 
-		public InvasionType.Builder withRarity(final int rarityIn) {
+		public final InvasionType.Builder withRarity(final int rarityIn) {
 			this.rarity = rarityIn;
 			return this;
 		}
 		
-		public InvasionType.Builder withTier(final int tierIn) {
+		public final InvasionType.Builder withTier(final int tierIn) {
 			this.tier = tierIn;
 			return this;
 		}
 
-		public InvasionType.Builder withInvasionTime(final InvasionTime invasionTimeIn) {
+		public final InvasionType.Builder withInvasionTime(final InvasionTime invasionTimeIn) {
 			this.invasionTime = invasionTimeIn;
 			return this;
 		}
 		
-		public InvasionType.Builder withInvasionPriority(final InvasionPriority invasionPriorityIn) {
+		public final InvasionType.Builder withInvasionPriority(final InvasionPriority invasionPriorityIn) {
 			this.invasionPriority = invasionPriorityIn;
 			return this;
 		}
 		
-		public InvasionType.Builder withSpawningSystem(final SpawningSystem spawningSystemIn) {
+		public final InvasionType.Builder withSpawningSystem(final SpawningSystem spawningSystemIn) {
 			this.spawningSystem = spawningSystemIn;
 			return this;
 		}
 
-		public InvasionType.Builder withTimeModifier(final TimeModifier timeModifierIn) {
+		public final InvasionType.Builder withTimeModifier(final TimeModifier timeModifierIn) {
 			this.timeModifier = timeModifierIn;
 			return this;
 		}
 
-		public InvasionType.Builder withTimeChangeability(final TimeChangeability timeChangeabilityIn) {
+		public final InvasionType.Builder withTimeChangeability(final TimeChangeability timeChangeabilityIn) {
 			this.timeChangeability = timeChangeabilityIn;
 			return this;
 		}
 		
-		public InvasionType.Builder withWeatherType(final WeatherType weatherTypeIn) {
+		public final InvasionType.Builder withWeatherType(final WeatherType weatherTypeIn) {
 			this.weatherType = weatherTypeIn;
 			return this;
 		}
 
-		public InvasionType.Builder severityInfo(final List<SeverityInfo.Builder> severityInfoIn) {
+		public final InvasionType.Builder severityInfo(final List<SeverityInfo.Builder> severityInfoIn) {
 			this.severityInfo = severityInfoIn;
 			return this;
 		}
 		
-		public InvasionType.Builder dimensions(final List<ResourceLocation> dimensionsIn) {
+		public final InvasionType.Builder dimensions(final List<ResourceLocation> dimensionsIn) {
 			this.dimensions = dimensionsIn;
 			return this;
 		}
 
-		public InvasionType save(final Consumer<InvasionType> consumerIn, final String pathIn) {
+		public final InvasionType save(final Consumer<InvasionType> consumerIn, final String pathIn) {
 			final InvasionType invasionType = this.build(new ResourceLocation(PureSufferingMod.MODID, pathIn));
 			consumerIn.accept(invasionType);
 			return invasionType;
 		}
 
-		public InvasionType build(final ResourceLocation idIn) {
+		public final InvasionType build(final ResourceLocation idIn) {
 			final ArrayList<SeverityInfo> severityInfo = new ArrayList<>();
 			if (this.severityInfo != null)
 				for (final SeverityInfo.Builder builder : this.severityInfo)
@@ -454,7 +501,7 @@ public final class InvasionType {
 			return new InvasionType(idIn, this.rarity, this.tier, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, this.weatherType, severityInfo, this.dimensions);
 		}
 
-		public JsonObject serializeToJson() {
+		public final JsonObject serializeToJson() {
 			final JsonObject jsonObject = new JsonObject();
 			jsonObject.addProperty("Rarity", this.rarity);
 			jsonObject.addProperty("Tier", this.tier);
@@ -483,7 +530,7 @@ public final class InvasionType {
 			return jsonObject;
 		}
 
-		public static InvasionType.Builder fromJson(final JsonObject jsonObjectIn) {
+		public static final InvasionType.Builder fromJson(final JsonObject jsonObjectIn) {
 			final int rarity = jsonObjectIn.get("Rarity").getAsInt();
 			final int tier = jsonObjectIn.get("Tier").getAsInt();
 			InvasionTime invasionTime = null;

@@ -28,7 +28,7 @@ public final class InvasionTypesProvider implements DataProvider {
 	}
 	
 	@Override
-	public void run(CachedOutput cacheIn) throws IOException {
+	public final void run(CachedOutput cacheIn) throws IOException {
 		Path path = this.generator.getOutputFolder();
 		Set<ResourceLocation> set = Sets.newHashSet();
 		Consumer<InvasionType> consumer = (invasionType) -> {
@@ -48,12 +48,12 @@ public final class InvasionTypesProvider implements DataProvider {
 		}
 	}
 	
-	private static Path createPath(Path pathIn, InvasionType invasionTypeIn) {
+	private static final Path createPath(Path pathIn, InvasionType invasionTypeIn) {
 		return pathIn.resolve("generated_data/" + invasionTypeIn.getId().getNamespace() + "/invasion_types/" + invasionTypeIn.getId().getPath() + ".json");
 	}
 
 	@Override
-	public String getName() {
+	public final String getName() {
 		return "Invasion Types";
 	}
 }

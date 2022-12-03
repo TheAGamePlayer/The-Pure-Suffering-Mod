@@ -36,7 +36,7 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	}
 
 	@Override
-	protected void apply(final Map<ResourceLocation, JsonElement> objectIn, final ResourceManager resourceManagerIn, final ProfilerFiller profilerIn) {
+	protected final void apply(final Map<ResourceLocation, JsonElement> objectIn, final ResourceManager resourceManagerIn, final ProfilerFiller profilerIn) {
 		this.invasionTypeMap.clear();
 		objectIn.forEach((conditions, invasionType) -> {
 			try {
@@ -59,15 +59,15 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	}
 	
 	@Nullable
-	public InvasionType getInvasionType(final ResourceLocation idIn) {
+	public final InvasionType getInvasionType(final ResourceLocation idIn) {
 		return this.invasionTypeMap.get(idIn);
 	}
 
-	public Collection<InvasionType> getAllInvasionTypes() {
+	public final Collection<InvasionType> getAllInvasionTypes() {
 		return this.invasionTypeMap.values();
 	}
 	
-	public ArrayList<InvasionType> getInvasionTypesOf(final Predicate<InvasionType> predIn) {
+	public final ArrayList<InvasionType> getInvasionTypesOf(final Predicate<InvasionType> predIn) {
 		final ArrayList<InvasionType> invasionList = new ArrayList<>();
 		for (InvasionType invasionType : this.invasionTypeMap.values()) {
 			if (predIn.test(invasionType))
@@ -76,7 +76,7 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 		return invasionList;
 	}
 	
-	public boolean verifyInvasion(final String idIn) {
+	public final boolean verifyInvasion(final String idIn) {
 		for (final ResourceLocation id : this.invasionTypeMap.keySet()) {
 			if (id.toString().matches(idIn))
 				return true;

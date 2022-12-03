@@ -18,24 +18,24 @@ public final class UpdateTimePacket {
 		this.isTime = isTimeIn;
 	}
 	
-	public static void encode(final UpdateTimePacket msgIn, final FriendlyByteBuf bufIn) {
+	public static final void encode(final UpdateTimePacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeBoolean(msgIn.isDay);
 		bufIn.writeBoolean(msgIn.isTime);
 	}
 
-	public static UpdateTimePacket decode(final FriendlyByteBuf bufIn) {
+	public static final UpdateTimePacket decode(final FriendlyByteBuf bufIn) {
 		return new UpdateTimePacket(bufIn.readBoolean(), bufIn.readBoolean());
 	}
 
 	public static class Handler {
-		public static boolean handle(final UpdateTimePacket msgIn, final Supplier<Context> ctxIn) {
+		public static final boolean handle(final UpdateTimePacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(final UpdateTimePacket msgIn, final Supplier<Context> ctxIn) {
+		private static final void handlePacket(final UpdateTimePacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			if (msgIn.isDay) {
 				ClientInvasionWorldInfo.getDayClientInfo(mc.level).updateClientTime(msgIn.isTime);

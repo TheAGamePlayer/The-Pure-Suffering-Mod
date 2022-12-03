@@ -11,15 +11,16 @@ import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SeverityInfo;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SpawningSystem;
+import dev.theagameplayer.puresuffering.world.entity.PSHyperCharge;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.random.SimpleWeightedRandomList;
@@ -27,6 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.biome.Biome;
@@ -37,49 +39,55 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class Invasion {
+public final class Invasion {
 	private static final ArrayList<Biome> MIXED_BIOMES = new ArrayList<>(ForgeRegistries.BIOMES.getValues());
 	private final ArrayList<UUID> invasionMobs = new ArrayList<>();
 	private final InvasionType invasionType;
 	private final int severity;
 	private final boolean isPrimary;
+	private final HyperType hyperType;
 	private final int mobCap;
 	private final boolean shouldTick;
 	private final SimpleWeightedRandomList<SpawnData> spawnPotentials = SimpleWeightedRandomList.empty();
 	private SpawnData nextSpawnData = new SpawnData();
 	private int spawnDelay;
 
-	public Invasion(final InvasionType invasionTypeIn, final int severityIn, final boolean isPrimaryIn) {
+	public Invasion(final InvasionType invasionTypeIn, final int severityIn, final boolean isPrimaryIn, final HyperType hyperTypeIn) {
 		final SeverityInfo info = invasionTypeIn.getSeverityInfo().get(severityIn);
 		final int mobCap = isPrimaryIn ? PSConfigValues.common.primaryInvasionMobCap : PSConfigValues.common.secondaryInvasionMobCap;
 		this.invasionType = invasionTypeIn;
 		this.severity = severityIn;
 		this.isPrimary  = isPrimaryIn;
+		this.hyperType = hyperTypeIn;
 		this.mobCap = (int)(mobCap * info.getMobCapPercentage()) + 1;
 		this.shouldTick = info.getTickDelay() > -1 && (invasionTypeIn.getSpawningSystem() != SpawningSystem.DEFAULT || (info.getMobSpawnList() != null && invasionTypeIn.getSpawningSystem() == SpawningSystem.DEFAULT));
 	}
 
-	public InvasionType getType() {
+	public final InvasionType getType() {
 		return this.invasionType;
 	}
 
-	public int getSeverity() {
+	public final int getSeverity() {
 		return this.severity;
 	}
 
-	public boolean isPrimary() {
+	public final boolean isPrimary() {
 		return this.isPrimary;
 	}
+	
+	public final HyperType getHyperType() {
+		return this.hyperType;
+	}
 
-	public int getMobCap() {
+	public final int getMobCap() {
 		return this.mobCap;
 	}
 
-	public SeverityInfo getSeverityInfo() {
+	public final SeverityInfo getSeverityInfo() {
 		return this.invasionType.getSeverityInfo().get(this.severity);
 	}
-	
-	public void tick(final ServerLevel worldIn) {
+
+	public final void tick(final ServerLevel worldIn) {
 		this.invasionMobs.removeIf(uuid -> {
 			return worldIn.getEntity(uuid) == null || !worldIn.getEntity(uuid).isAlive();
 		});
@@ -102,7 +110,7 @@ public class Invasion {
 			this.tickEntitySpawn(worldIn);
 	}
 
-	protected void tickEntitySpawn(final ServerLevel levelIn) {
+	private final void tickEntitySpawn(final ServerLevel levelIn) {
 		if (this.invasionMobs.size() < this.mobCap) {
 			//Delay check
 			if (this.spawnDelay < 0) {
@@ -121,6 +129,15 @@ public class Invasion {
 			//Spawn Mob Cluster (Different Mobs)
 			final int clusterSize = levelIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
 			for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
+				//Spawn Cluster Entities (Entities to be summoned before a mob group is spawned)
+				final List<ClusterEntitySpawnData> clusterEntities = this.getSeverityInfo().getClusterEntities();
+				if (!clusterEntities.isEmpty() && cluster == 0) {
+					final ClusterEntitySpawnData spawnInfo = clusterEntities.get(levelIn.random.nextInt(clusterEntities.size()));
+					final int t = levelIn.random.nextInt(spawnInfo.getChance()) == 0 ? levelIn.random.nextIntBetweenInclusive(spawnInfo.getMinCount(), spawnInfo.getMaxCount()) : 0;
+					for (int c = 0; c < t; c++)
+						this.spawnClusterEntity(this.getSpawnPos(levelIn, chunkPos, false), levelIn, spawnInfo.getEntityType());
+				}
+				//Spawn Mob Group (Same Mob)
 				final MobSpawnSettings.SpawnerData spawners = mobs.get(levelIn.random.nextInt(mobs.size()));
 				final int groupSize = levelIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
 				this.nextSpawnData.getEntityToSpawn().putString("id", ForgeRegistries.ENTITY_TYPES.getKey(spawners.type).toString());
@@ -130,12 +147,11 @@ public class Invasion {
 					this.delay(levelIn);
 					return;
 				}
-				//Spawn Mob Group (Same Mob)
 				for(int count = 0; count < groupSize && this.invasionMobs.size() < this.mobCap; ++count) {
 					//Spawn Entity
 					final BlockPos spawnPos = this.getSpawnPos(levelIn, chunkPos, false);
 					if (spawnPos != null && SpawnPlacements.checkSpawnRules(optional.get(), levelIn, MobSpawnType.EVENT, spawnPos, levelIn.getRandom())) {
-						final Entity entity = EntityType.loadEntityRecursive(compoundNBT, levelIn, (e) -> {
+						final Entity entity = EntityType.loadEntityRecursive(compoundNBT, levelIn, e -> {
 							e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.getYRot(), e.getXRot());
 							return e;
 						});
@@ -166,25 +182,48 @@ public class Invasion {
 		}
 	}
 
-	protected void spawnInvasionMob(final ServerLevel worldIn, final Mob mobEntityIn) {
+	private final void spawnClusterEntity(final BlockPos posIn, final ServerLevel levelIn, final EntityType<?> entityTypeIn) {
+		if (Level.isInSpawnableBounds(posIn)) {
+			final CompoundTag compoundTag = new CompoundTag();
+			compoundTag.putString("id", ForgeRegistries.ENTITY_TYPES.getKey(entityTypeIn).toString());
+			final Entity entity = EntityType.loadEntityRecursive(compoundTag, levelIn, e -> {
+				e.moveTo(posIn.getX(), posIn.getY(), posIn.getZ(), e.getYRot(), e.getXRot());
+				return e;
+			});
+			if (entity != null) {
+				if (entity instanceof Mob)
+					((Mob)entity).finalizeSpawn(levelIn, levelIn.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.EVENT, null, null);
+				levelIn.tryAddFreshEntityWithPassengers(entity);
+			}
+		}
+	}
+
+	private final void spawnInvasionMob(final ServerLevel worldIn, final Mob mobEntityIn) {
+		final boolean hyperCharged = PSConfigValues.common.hyperCharge && PSConfigValues.common.maxHyperCharge > 1 && !PSConfigValues.common.hyperChargeBlacklist.contains(mobEntityIn.getType().getDescriptionId()) && this.hyperType != HyperType.DEFAULT ? true : worldIn.random.nextInt(PSConfigValues.common.hyperChargeChance + 1) <= this.severity;
 		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.getId().toString());
 		mobEntityIn.getPersistentData().putBoolean("AntiGrief", worldIn.dimensionType().hasFixedTime());
-		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, (SpawnGroupData)null, (CompoundTag)null);
+		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, null, null);
+		if (hyperCharged && mobEntityIn instanceof PSHyperCharge) {
+			final int hyperCharge = this.hyperType != HyperType.DEFAULT ? (this.hyperType == HyperType.MYSTERY ? PSConfigValues.common.maxHyperCharge : worldIn.random.nextInt(PSConfigValues.common.maxHyperCharge > 1 ? PSConfigValues.common.maxHyperCharge - 1 : 1) + 1) : worldIn.random.nextInt(worldIn.random.nextInt(PSConfigValues.common.maxHyperCharge - 1) + 1) + 1;
+			((PSHyperCharge)mobEntityIn).psSetHyperCharge(hyperCharge);
+			for (final AttributeInstance attribute : mobEntityIn.getAttributes().getSyncableAttributes())
+				attribute.setBaseValue(attribute.getBaseValue() * (1.0D + 0.2D * hyperCharge)); //TODO: Keep an eye out for compatability conflicts
+		}
 		if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
 			mobEntityIn.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
 		this.invasionMobs.add(mobEntityIn.getUUID());
 		worldIn.levelEvent(2004, mobEntityIn.blockPosition(), 0); //Mob Spawn Particles
 		mobEntityIn.spawnAnim();
 	}
-
-	protected final void delay(final ServerLevel worldIn) {
+	
+	private final void delay(final ServerLevel worldIn) {
 		this.spawnDelay = this.getSeverityInfo().getTickDelay();
 		this.spawnPotentials.getRandom(worldIn.random).ifPresent(entry -> {
 			this.nextSpawnData = entry.getData();
 		});
 	}
 
-	protected final List<MobSpawnSettings.SpawnerData> getMobSpawnList(final ServerLevel worldIn, final ChunkPos chunkPosIn) {
+	private final List<MobSpawnSettings.SpawnerData> getMobSpawnList(final ServerLevel worldIn, final ChunkPos chunkPosIn) {
 		final BlockPos biomePos = this.getSpawnPos(worldIn, chunkPosIn, true);
 		final ArrayList<MobSpawnSettings.SpawnerData> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
 		switch (this.invasionType.getSpawningSystem()) {
@@ -239,7 +278,7 @@ public class Invasion {
 		return worldIn.random.nextBoolean() ? offSet : -offSet;
 	}
 
-	protected final BlockPos getSpawnPos(final ServerLevel worldIn, final ChunkPos chunkPosIn, final boolean biomeCheckIn) {
+	private final BlockPos getSpawnPos(final ServerLevel worldIn, final ChunkPos chunkPosIn, final boolean biomeCheckIn) {
 		final int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
 		final int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
 		final int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
@@ -257,10 +296,10 @@ public class Invasion {
 	}
 
 	@Nullable
-	public static Invasion load(final CompoundTag nbtIn) {
+	public static final Invasion load(final CompoundTag nbtIn) {
 		if (BaseEvents.getInvasionTypeManager().verifyInvasion(nbtIn.getString("InvasionType"))) {
 			final InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
-			final Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"));
+			final Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"), PSConfigValues.common.hyperInvasions ? HyperType.values()[nbtIn.getInt("HyperType")] : HyperType.DEFAULT);
 			final CompoundTag invasionMobs = nbtIn.getCompound("InvasionMobs");
 			for (final String name : invasionMobs.getAllKeys())
 				invasion.invasionMobs.add(invasionMobs.getUUID(name));
@@ -269,7 +308,7 @@ public class Invasion {
 		return null;
 	}
 
-	public CompoundTag save() {
+	public final CompoundTag save() {
 		final CompoundTag nbt = new CompoundTag();
 		final CompoundTag mobs = new CompoundTag();
 		for (final UUID id : this.invasionMobs)
@@ -278,11 +317,12 @@ public class Invasion {
 		nbt.putString("InvasionType", this.invasionType.toString());
 		nbt.putInt("Severity", this.severity);
 		nbt.putBoolean("IsPrimary", this.isPrimary);
+		nbt.putInt("HyperType", this.hyperType.ordinal());
 		return nbt;
 	}
 
 	@Override
-	public String toString() {
+	public final String toString() {
 		return this.invasionType.toString();
 	}
 }

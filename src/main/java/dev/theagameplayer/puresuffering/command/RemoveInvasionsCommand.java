@@ -129,7 +129,7 @@ public final class RemoveInvasionsCommand {
 		return SharedSuggestionProvider.suggestResource(ImmutableList.<ResourceLocation>of().stream(), suggestionsBuilder);
 	};
 
-	public static ArgumentBuilder<CommandSourceStack, ?> register() {
+	public static final ArgumentBuilder<CommandSourceStack, ?> register() {
 		return Commands.literal("remove")
 				.requires(player -> {
 					return player.hasPermission(2);
@@ -280,7 +280,7 @@ public final class RemoveInvasionsCommand {
 				}))));
 	}
 
-	private static boolean contains(final Iterable<Invasion> invasionListIn, final InvasionType invasionTypeIn) {
+	private static final boolean contains(final Iterable<Invasion> invasionListIn, final InvasionType invasionTypeIn) {
 		for (final Invasion invasion : invasionListIn) {
 			if (invasion.getType() == invasionTypeIn)
 				return true;
@@ -288,7 +288,7 @@ public final class RemoveInvasionsCommand {
 		return false;
 	}
 
-	private static Invasion getInvasion(final Iterable<Invasion> invasionListIn, final CommandContext<CommandSourceStack> ctxIn, final String argIn) throws CommandSyntaxException {
+	private static final Invasion getInvasion(final Iterable<Invasion> invasionListIn, final CommandContext<CommandSourceStack> ctxIn, final String argIn) throws CommandSyntaxException {
 		final ResourceLocation resourceLocation = ctxIn.getArgument(argIn, ResourceLocation.class);
 		final InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation);
 		if (invasionType == null) {

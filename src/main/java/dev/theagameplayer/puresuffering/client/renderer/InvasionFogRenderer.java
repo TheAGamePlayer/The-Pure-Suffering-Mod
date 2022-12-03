@@ -18,31 +18,31 @@ public final class InvasionFogRenderer {
 		this.blue = blueIn;
 	}
 	
-	public InvasionFogRenderer.Builder deconstruct() {
+	public final InvasionFogRenderer.Builder deconstruct() {
 		return new InvasionFogRenderer.Builder(this.fogColorChanged, this.red, this.green, this.blue);
 	}
 	
-	public ResourceLocation getId() {
+	public final ResourceLocation getId() {
 		return this.id;
 	}
 	
-	public boolean isFogColorChanged() {
+	public final boolean isFogColorChanged() {
 		return this.fogColorChanged;
 	}
 	
-	public float getRedOffset() {
+	public final float getRedOffset() {
 		return this.red;
 	}
 	
-	public float getGreenOffset() {
+	public final float getGreenOffset() {
 		return this.green;
 	}
 	
-	public float getBlueOffset() {
+	public final float getBlueOffset() {
 		return this.blue;
 	}
 
-	public static class Builder {
+	public static final class Builder {
 		private boolean fogColorChanged;
 		private float red, green, blue;
 		
@@ -55,11 +55,11 @@ public final class InvasionFogRenderer {
 		
 		private Builder() {};
 		
-		public static InvasionFogRenderer.Builder fogRenderer() {
+		public final static InvasionFogRenderer.Builder fogRenderer() {
 			return new InvasionFogRenderer.Builder();
 		}
 		
-		public InvasionFogRenderer.Builder withRGB(final float redIn, final float greenIn, final float blueIn) {
+		public final InvasionFogRenderer.Builder withRGB(final float redIn, final float greenIn, final float blueIn) {
 			this.red = redIn;
 			this.green = greenIn;
 			this.blue = blueIn;
@@ -67,11 +67,11 @@ public final class InvasionFogRenderer {
 			return this;
 		}
 		
-		public InvasionFogRenderer build(final ResourceLocation idIn) {
+		public final InvasionFogRenderer build(final ResourceLocation idIn) {
 			return new InvasionFogRenderer(idIn, this.fogColorChanged, this.red, this.green, this.blue);
 		}
 		
-		public JsonObject serializeToJson() {
+		public final JsonObject serializeToJson() {
 			final JsonObject jsonObject = new JsonObject();
 			if (this.fogColorChanged) {
 				jsonObject.addProperty("RedOffset", this.red);
@@ -81,7 +81,7 @@ public final class InvasionFogRenderer {
 			return jsonObject.entrySet().isEmpty() ? null : jsonObject;
 		}
 		
-		public static InvasionFogRenderer.Builder fromJson(final JsonObject jsonObjectIn) {
+		public final static InvasionFogRenderer.Builder fromJson(final JsonObject jsonObjectIn) {
 			final boolean fogColorChanged = jsonObjectIn.has("RedOffset") && jsonObjectIn.has("GreenOffset") && jsonObjectIn.has("BlueOffset");
 			final float red = fogColorChanged ? jsonObjectIn.get("RedOffset").getAsFloat() : 0.0F;
 			final float green = fogColorChanged ? jsonObjectIn.get("GreenOffset").getAsFloat() : 0.0F;
@@ -89,14 +89,14 @@ public final class InvasionFogRenderer {
 			return new InvasionFogRenderer.Builder(fogColorChanged, red, green, blue);
 		}
 		
-		public void serializeToNetwork(final FriendlyByteBuf bufIn) {
+		public final void serializeToNetwork(final FriendlyByteBuf bufIn) {
 			bufIn.writeBoolean(this.fogColorChanged);
 			bufIn.writeFloat(this.red);
 			bufIn.writeFloat(this.green);
 			bufIn.writeFloat(this.blue);
 		}
 		
-		public static InvasionFogRenderer.Builder fromNetwork(final FriendlyByteBuf bufIn) {
+		public final static InvasionFogRenderer.Builder fromNetwork(final FriendlyByteBuf bufIn) {
 			final boolean fogColorChanged = bufIn.readBoolean();
 			final float red = bufIn.readFloat();
 			final float green = bufIn.readFloat();

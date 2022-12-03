@@ -94,6 +94,17 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         MaxCount: (Integer)
         - Most amount of mobs that can spawn in a group.
     }
+    ClusterEntitiesList: (List of Entities that can spawn when a mob cluster is spawned in an Invasion) {
+        EntityType: (ResourceLocation-String)
+        - ID of the entity that can spawn
+        Chance: (Integer)
+        - How common the mob is spawned.
+        - Bigger number is spawned more.
+        MinCount: (Integer)
+        - Least amount of entities that can spawn in a group.
+        MaxCount: (Integer)
+        - Most amount of entities that can spawn in a group.
+    }
     MobCapPercentage: (Float 0.0 - 1.0)
     - What percent of these mobs can spawn of the mob cap limit.
     - Such as 100 times 0.8 is 80% of the total mobs possible.
@@ -145,6 +156,14 @@ Another Example invasion json:
             "GreenOffset": -0.5,
             "BlueOffset": -0.5
          },
+         "ClusterEntitiesList": [
+           {
+             "Chance": 12,
+             "EntityType": "minecraft:lightning_bolt",
+             "MaxCount": 1,
+             "MinCount": 0
+           }
+         ],
          "MobSpawnList":[
             {
                "EntityType": "minecraft:bee",

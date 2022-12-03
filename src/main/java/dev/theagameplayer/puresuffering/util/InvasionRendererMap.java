@@ -11,19 +11,19 @@ import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRenderer, Boolean>> {
 	private final HashMap<InvasionSkyRenderer, Boolean> rendererMap = new HashMap<>();
 	
-	public void add(final InvasionSkyRenderer rendererIn, final boolean isPrimaryIn) {
+	public final void add(final InvasionSkyRenderer rendererIn, final boolean isPrimaryIn) {
 		this.rendererMap.put(rendererIn, isPrimaryIn);
 	}
 	
-	public void remove(final InvasionSkyRenderer rendererIn) {
+	public final void remove(final InvasionSkyRenderer rendererIn) {
 		this.rendererMap.remove(rendererIn);
 	}
 
-	public void clear() {
+	public final void clear() {
 		this.rendererMap.clear();
 	}
 	
-	public ArrayList<InvasionSkyRenderer> getRenderersOf(final Predicate<InvasionSkyRenderer> predIn) {
+	public final ArrayList<InvasionSkyRenderer> getRenderersOf(final Predicate<InvasionSkyRenderer> predIn) {
 		final ArrayList<InvasionSkyRenderer> rendererList = new ArrayList<>();
 		for (final InvasionSkyRenderer renderer : this.rendererMap.keySet()) {
 			if (predIn.test(renderer))
@@ -33,29 +33,29 @@ public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRend
 	}
 	
 	//HashMap methods
-    public int size() {
+    public final int size() {
     	return this.rendererMap.size();
     }
 	
-    public boolean isEmpty() {
+    public final boolean isEmpty() {
         return this.rendererMap.isEmpty();
     }
     
-    public boolean contains(final InvasionSkyRenderer invasionIn) {
+    public final boolean contains(final InvasionSkyRenderer invasionIn) {
     	return this.rendererMap.containsKey(invasionIn);
     }
     
-    public InvasionSkyRenderer get(final int indexIn) {
+    public final InvasionSkyRenderer get(final int indexIn) {
     	return this.get(indexIn);
     }
     
     @Override
-    public String toString() {
+    public final String toString() {
     	return this.rendererMap.toString();
     }
 
 	@Override
-	public Iterator<Entry<InvasionSkyRenderer, Boolean>> iterator() {
+	public final Iterator<Entry<InvasionSkyRenderer, Boolean>> iterator() {
 		return this.rendererMap.entrySet().iterator();
 	}
 }

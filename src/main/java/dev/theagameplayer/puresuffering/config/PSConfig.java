@@ -44,15 +44,22 @@ public final class PSConfig {
 		public final ForgeConfigSpec.IntValue dayInvasionRarity;
 		public final ForgeConfigSpec.IntValue nightInvasionRarity;
 		public final ForgeConfigSpec.IntValue fixedInvasionRarity;
+		public final ForgeConfigSpec.IntValue hyperInvasionRarity;
+		public final ForgeConfigSpec.IntValue mysteryInvasionRarity;
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canFixedInvasionsBeCanceled;
 		public final ForgeConfigSpec.DoubleValue dayCancelChanceMultiplier;
 		public final ForgeConfigSpec.DoubleValue nightCancelChanceMultiplier;
 		public final ForgeConfigSpec.DoubleValue fixedCancelChanceMultiplier;
+		public final ForgeConfigSpec.IntValue maxHyperCharge;
 		//Modifications
 		public final ForgeConfigSpec.BooleanValue hyperAggression;
+		public final ForgeConfigSpec.BooleanValue hyperCharge;
+		public final ForgeConfigSpec.BooleanValue hyperInvasions;
+		public final ForgeConfigSpec.BooleanValue mysteryInvasions;
 		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
+		public final ConfigValue<List<? extends String>> hyperChargeBlacklist;
 		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
 		public final ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
 		public final ForgeConfigSpec.BooleanValue forceInvasionSleeplessness;
@@ -62,6 +69,7 @@ public final class PSConfig {
 		public final ForgeConfigSpec.BooleanValue shouldMobsDieAtEndOfInvasions;
 		public final ForgeConfigSpec.BooleanValue shouldMobsSpawnWithMaxRange;
 		public final ForgeConfigSpec.IntValue naturalSpawnChance;
+		public final ForgeConfigSpec.IntValue hyperChargeChance;
 		public final ForgeConfigSpec.IntValue blessingEffectRespawnDuration;
 		public final ForgeConfigSpec.IntValue blessingEffectDimensionChangeDuration;
 		
@@ -144,17 +152,27 @@ public final class PSConfig {
 					.translation(CONFIG + "day_invasion_rarity")
 					.worldRestart()
 					.comment("How often should Day Invasions occur.")
-					.defineInRange("dayInvasionRarity", 21, 1, 100);
+					.defineInRange("dayInvasionRarity", 21, 1, 100); //Once every 7 hours
 			nightInvasionRarity = COMMON_BUILDER
 					.translation(CONFIG + "night_invasion_rarity")
 					.worldRestart()
 					.comment("How often should Night Invasions occur.")
-					.defineInRange("nightInvasionRarity", 3, 1, 100);
+					.defineInRange("nightInvasionRarity", 3, 1, 100); //Once every hour
 			fixedInvasionRarity = COMMON_BUILDER
 					.translation(CONFIG + "fixed_invasion_rarity")
 					.worldRestart()
 					.comment("How often should Fixed Invasions occur.")
-					.defineInRange("fixedInvasionRarity", 12, 1, 100);
+					.defineInRange("fixedInvasionRarity", 12, 1, 100); //Once every 2 hours
+			hyperInvasionRarity = COMMON_BUILDER
+					.translation(CONFIG + "hyper_invasion_rarity")
+					.worldRestart()
+					.comment("How often should Hyper Invasions occur.")
+					.defineInRange("hyperInvasionRarity", 12, 1, 100); //Once every half a day (Night Invasions)
+			mysteryInvasionRarity = COMMON_BUILDER
+					.translation(CONFIG + "mystery_invasion_rarity")
+					.worldRestart()
+					.comment("How often should Mystery Invasions occur.")
+					.defineInRange("mysteryInvasionRarity", 6, 1, 100); //Once every few actual days (Night Invasions)
 			canDayInvasionsBeCanceled = COMMON_BUILDER
 					.translation(CONFIG + "can_day_invasions_be_canceled")
 					.worldRestart()
@@ -185,6 +203,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Chance for Fixed Invasions to be canceled.", "NOTE: Multiplied by Fixed Difficulty Increase Delay.")
 					.defineInRange("fixedCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
+			maxHyperCharge = COMMON_BUILDER
+					.translation(CONFIG + "max_hyper_charge")
+					.worldRestart()
+					.comment("Maximum value in which a mob can be hypercharged", "NOTE: Max value can only occur in Extreme Invasions", "NOTE: May affect performance at higher numbers!")
+					.defineInRange("maxHyperCharge", 4, 1, 100);
 			COMMON_BUILDER.pop();
 			
 			COMMON_BUILDER.push("Modifications");
@@ -193,11 +216,33 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Should neutral invasion mobs agro the player when spawned?")
 					.define("hyperAggression", true);
+			hyperCharge = COMMON_BUILDER
+					.translation(CONFIG + "hyper_charge")
+					.worldRestart()
+					.comment("Should mobs be able to be hyper charged?")
+					.define("hyperCharge", true);
+			hyperInvasions = COMMON_BUILDER
+					.translation(CONFIG + "hyper_invasions")
+					.worldRestart()
+					.comment("Should hyper invasions be able to occur?")
+					.define("hyperInvasions", true);
+			mysteryInvasions = COMMON_BUILDER
+					.translation(CONFIG + "mystery_invasions")
+					.worldRestart()
+					.comment("Should mystery invasions be able to occur?", "NOTE: hyper invasions must be enabled.")
+					.define("mysteryInvasions", true);
 			hyperAggressionBlacklist = COMMON_BUILDER
 					.translation(CONFIG + "hyper_aggression_blacklist")
 					.worldRestart()
 					.comment("List of Mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
 					.defineList("hyperAggressionBlacklist", ImmutableList.of("minecraft:vex"), string -> {
+						return string != "";
+					});
+			hyperChargeBlacklist = COMMON_BUILDER
+					.translation(CONFIG + "hyper_charge_blacklist")
+					.worldRestart()
+					.comment("List of Mobs that can't be hyper charged. (If setting is turned on)")
+					.defineList("hyperChargeBlacklist", ImmutableList.of("minecraft:vex"), string -> {
 						return string != "";
 					});
 			modBiomeBoostedBlacklist = COMMON_BUILDER
@@ -249,6 +294,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("The Chance of a naturally spawning mob has of spawning during an Invasion.", "NOTE: May affect performance at higher numbers!")
 					.defineInRange("naturalSpawnChance", 3, 0, 10000);
+			hyperChargeChance = COMMON_BUILDER
+					.translation(CONFIG + "hyper_charge_chance")
+					.worldRestart()
+					.comment("The Chance of an invasion mob being hyper charged")
+					.defineInRange("hyperChargeChance", 20, 0, 10000);
 			blessingEffectRespawnDuration = COMMON_BUILDER
 					.translation(CONFIG + "blessing_effect_respawn_duration")
 					.worldRestart()
@@ -263,7 +313,7 @@ public final class PSConfig {
 			COMMON_BUILDER.pop();
 		}
 		
-		private ForgeConfigSpec build() {
+		private final ForgeConfigSpec build() {
 			return COMMON_BUILDER.build();
 		}
 	}
@@ -288,12 +338,12 @@ public final class PSConfig {
 			CLIENT_BUILDER.pop();
 		}
 		
-		private ForgeConfigSpec build() {
+		private final ForgeConfigSpec build() {
 			return CLIENT_BUILDER.build();
 		}
 	}
 
-	public static void initConfig() {
+	public static final void initConfig() {
 		final Path configPath = FMLPaths.CONFIGDIR.get();
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		try {
@@ -307,7 +357,7 @@ public final class PSConfig {
 		loadConfig(ClientConfig.CLIENT.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-client.toml"));
 	}
 	
-    private static void loadConfig(ForgeConfigSpec specIn, Path pathIn) {
+    private static final void loadConfig(ForgeConfigSpec specIn, Path pathIn) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(pathIn)
                 .sync()
                 .autosave()

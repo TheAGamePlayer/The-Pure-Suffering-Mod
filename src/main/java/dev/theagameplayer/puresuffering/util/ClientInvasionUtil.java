@@ -7,7 +7,7 @@ import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 public final class ClientInvasionUtil {
-	public static float handleBrightness(final float brightnessIn, final ClientLevel levelIn) {
+	public static final float handleBrightness(final float brightnessIn, final ClientLevel levelIn) {
 		if (!levelIn.dimensionType().hasFixedTime()) {
 			float brightness = 0.0F;
 			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
@@ -45,7 +45,7 @@ public final class ClientInvasionUtil {
 		return brightnessIn;
 	}
 	
-	public static boolean handleLightMap(final boolean resultIn, final ClientLevel levelIn) {
+	public static final boolean handleLightMap(final boolean resultIn, final ClientLevel levelIn) {
 		if (!levelIn.dimensionType().hasFixedTime()) {
 			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
 			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);

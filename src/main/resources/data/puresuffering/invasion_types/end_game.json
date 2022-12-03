@@ -1,69 +1,69 @@
 {
-  "Rarity": 14,
-  "Tier": 3,
-  "InvasionTime": "BOTH",
-  "InvasionPriority": "PRIMARY_ONLY",
-  "SpawningSystem": "BIOME_MIXED",
-  "TimeModifier": "NONE",
-  "TimeChangeability": "DEFAULT",
-  "WeatherType": "DEFAULT",
-  "SeverityInfo": [
-    {
-      "SkyRenderer": {
-        "FogRenderer": {
-          "RedOffset": 0.15,
-          "GreenOffset": 0.15,
-          "BlueOffset": 0.1
-        },
-        "Brightness": 0.2,
-        "RedOffset": -0.85,
-        "GreenOffset": -0.85,
-        "BlueOffset": -0.85
-      },
-      "MobCapPercentage": 0.6,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
-      "TickDelay": 60,
-      "ClusterSize": 3
-    },
-    {
-      "SkyRenderer": {
-        "FogRenderer": {
-          "RedOffset": 0.1,
-          "GreenOffset": 0.1,
-          "BlueOffset": 0.1
-        },
-        "Brightness": 0.1,
-        "RedOffset": -0.9,
-        "GreenOffset": -0.9,
-        "BlueOffset": -0.9
-      },
-      "MobCapPercentage": 0.8,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
-      "TickDelay": 40,
-      "ClusterSize": 3
-    },
-    {
-      "SkyRenderer": {
-        "FogRenderer": {
-          "RedOffset": 0.05,
-          "GreenOffset": 0.05,
-          "BlueOffset": 0.05
-        },
-        "Brightness": 0.0,
-        "RedOffset": -0.95,
-        "GreenOffset": -0.95,
-        "BlueOffset": -0.95
-      },
-      "MobCapPercentage": 1.0,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
-      "TickDelay": 20,
-      "ClusterSize": 3
-    }
-  ],
   "Dimensions": [
     "minecraft:the_end"
-  ]
+  ],
+  "InvasionPriority": "PRIMARY_ONLY",
+  "InvasionTime": "BOTH",
+  "Rarity": 14,
+  "SeverityInfo": [
+    {
+      "ClusterSize": 3,
+      "ForceNoSleep": false,
+      "LightLevel": 15,
+      "MobCapPercentage": 0.6,
+      "SkyRenderer": {
+        "BlueOffset": -0.85,
+        "Brightness": 0.2,
+        "FogRenderer": {
+          "BlueOffset": 0.1,
+          "GreenOffset": 0.15,
+          "RedOffset": 0.15
+        },
+        "GreenOffset": -0.85,
+        "RedOffset": -0.85
+      },
+      "TickDelay": 60
+    },
+    {
+      "ClusterSize": 3,
+      "ForceNoSleep": false,
+      "LightLevel": 15,
+      "MobCapPercentage": 0.8,
+      "SkyRenderer": {
+        "BlueOffset": -0.9,
+        "Brightness": 0.1,
+        "FogRenderer": {
+          "BlueOffset": 0.1,
+          "GreenOffset": 0.1,
+          "RedOffset": 0.1
+        },
+        "GreenOffset": -0.9,
+        "RedOffset": -0.9
+      },
+      "TickDelay": 40
+    },
+    {
+      "ClusterSize": 3,
+      "ForceNoSleep": false,
+      "LightLevel": 15,
+      "MobCapPercentage": 1.0,
+      "SkyRenderer": {
+        "BlueOffset": -0.95,
+        "Brightness": 0.0,
+        "FogRenderer": {
+          "BlueOffset": 0.05,
+          "GreenOffset": 0.05,
+          "RedOffset": 0.05
+        },
+        "GreenOffset": -0.95,
+        "RedOffset": -0.95
+      },
+      "TickDelay": 20
+    }
+  ],
+  "SpawningSystem": "BIOME_MIXED",
+  "Tier": 3,
+  "TimeChangeability": "DEFAULT",
+  "TimeModifier": "NONE",
+  "WeatherType": "DEFAULT"
 }

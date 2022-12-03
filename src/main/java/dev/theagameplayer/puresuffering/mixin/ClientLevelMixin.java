@@ -10,9 +10,9 @@ import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
 import net.minecraft.client.multiplayer.ClientLevel;
 
 @Mixin(ClientLevel.class)
-public class ClientLevelMixin {
+public final class ClientLevelMixin {
 	@Inject(at = @At("RETURN"), method = "getSkyDarken(F)F", cancellable = true)
-	private void getSkyDarken(final float brightnessIn, final CallbackInfoReturnable<Float> callbackIn) {
+	private final void getSkyDarken(final float brightnessIn, final CallbackInfoReturnable<Float> callbackIn) {
 		final ClientLevel level = (ClientLevel)(Object)this;
 		if (PSConfigValues.client.canInvasionsChangeBrightness)
 			callbackIn.setReturnValue(ClientInvasionUtil.handleBrightness(callbackIn.getReturnValueF(), level));

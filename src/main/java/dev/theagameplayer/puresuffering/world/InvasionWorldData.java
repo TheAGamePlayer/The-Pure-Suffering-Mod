@@ -21,11 +21,11 @@ public abstract class InvasionWorldData extends SavedData {
 		this.setDirty();
 	}
 
-	public static String getFileId(final Holder<DimensionType> dimTypeIn) {
+	public static final String getFileId(final Holder<DimensionType> dimTypeIn) {
 		return dimTypeIn.is(Level.END.location()) ? "invasions_end" : "invasions";
 	}
 	
-	public static HashMap<ServerLevel, InvasionWorldData> getInvasionData() {
+	public static final HashMap<ServerLevel, InvasionWorldData> getInvasionData() {
 		return INVASION_DATA;
 	}
 	
@@ -35,19 +35,19 @@ public abstract class InvasionWorldData extends SavedData {
 		return nbtIn;
 	}
 	
-	public ServerLevel getWorld() {
+	public final ServerLevel getWorld() {
 		return this.level;
 	}
 	
-	public boolean hasFixedTime() {
+	public final boolean hasFixedTime() {
 		return this.hasFixedTime;
 	}
 	
-	public long getDays() {
+	public final long getDays() {
 		return this.days;
 	}
 	
-	public void setDays(final long daysIn) {
+	public final void setDays(final long daysIn) {
 		this.days = daysIn;
 		this.setDirty();
 	}

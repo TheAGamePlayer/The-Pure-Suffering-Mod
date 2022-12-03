@@ -16,11 +16,11 @@ public final class InvasionChart {
 		this.calcInvasionRanges();
 	}
 	
-	public static void refresh() {
+	public static final void refresh() {
 		USED_LIST.clear();
 	}
 	
-	public InvasionType getInvasionInRange(final float numberIn) {
+	public final InvasionType getInvasionInRange(final float numberIn) {
 		this.invasionList.removeIf(it -> USED_LIST.contains(it));
 		this.calcInvasionRanges();
 		InvasionType invasionType = null;
@@ -34,7 +34,7 @@ public final class InvasionChart {
 		return invasionType;
 	}
 	
-	private void calcInvasionRanges() {
+	private final void calcInvasionRanges() {
 		this.total = 0.0F;
 		this.rangeList.clear();
 		for (final InvasionType invasionType : this.invasionList) {
@@ -50,7 +50,7 @@ public final class InvasionChart {
 	}
 	
 	@Override
-	public String toString() {
+	public final String toString() {
 		return this.rangeList.toString();
 	}
 	
@@ -64,12 +64,12 @@ public final class InvasionChart {
 			this.max = maxIn;
 		}
 		
-		public boolean inRange(final float numberIn) {
+		public final boolean inRange(final float numberIn) {
 			return numberIn < this.max && numberIn >= this.min;
 		}
 		
 		@Override
-		public String toString() {
+		public final String toString() {
 			return "[ " + this.invasionType + " - " + (this.max - this.min) + " - " + this.min + ", " + this.max + " ]";
 		}
 	}

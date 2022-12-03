@@ -3,9 +3,11 @@ package dev.theagameplayer.puresuffering.data;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
+
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionFogRenderer;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
+import dev.theagameplayer.puresuffering.invasion.ClusterEntitySpawnData;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionPriority;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionTime;
@@ -20,7 +22,7 @@ import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 
 public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 	@Override
-	public void accept(Consumer<InvasionType> consumerIn) {
+	public final void accept(Consumer<InvasionType> consumerIn) {
 		//OVERWORLD
 		InvasionType.Builder.invasionType().withRarity(7).withTier(1).withInvasionTime(InvasionTime.DAY).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_BOOSTED).withTimeModifier(TimeModifier.DAY_TO_NIGHT).withTimeChangeability(TimeChangeability.ONLY_DAY).severityInfo(ImmutableList.of(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
@@ -82,6 +84,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 						.withSkyBrightness(0.2F)
 						.withRGB(-0.1F, -0.1F, -0.1F))
 				.mobSpawnList(ImmutableList.of(new SpawnerData(EntityType.DROWNED, 10, 1, 3)))
+				.clusterEntitiesList(ImmutableList.of(new ClusterEntitySpawnData(EntityType.LIGHTNING_BOLT, 0, 1, 12)))
 				.withLightLevel(15)
 				.withTickDelay(20)
 				.withClusterSize(6)
@@ -91,6 +94,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 						.withSkyBrightness(0.1F)
 						.withRGB(-0.2F, -0.2F, -0.2F))
 				.mobSpawnList(ImmutableList.of(new SpawnerData(EntityType.DROWNED, 10, 1, 4)))
+				.clusterEntitiesList(ImmutableList.of(new ClusterEntitySpawnData(EntityType.LIGHTNING_BOLT, 0, 2, 8)))
 				.withLightLevel(15)
 				.withTickDelay(16)
 				.withClusterSize(8)
@@ -100,6 +104,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 						.withSkyBrightness(0.0F)
 						.withRGB(-0.3F, -0.3F, -0.3F))
 				.mobSpawnList(ImmutableList.of(new SpawnerData(EntityType.DROWNED, 10, 2, 5)))
+				.clusterEntitiesList(ImmutableList.of(new ClusterEntitySpawnData(EntityType.LIGHTNING_BOLT, 0, 3, 4)))
 				.withLightLevel(15)
 				.withTickDelay(12)
 				.withClusterSize(10)

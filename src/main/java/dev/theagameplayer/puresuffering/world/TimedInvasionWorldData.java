@@ -17,7 +17,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		this.checkedNight = ServerTimeUtil.isServerDay(levelIn, this);
 	}
 	
-	public static TimedInvasionWorldData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
+	public static final TimedInvasionWorldData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
 		final TimedInvasionWorldData tiwData = new TimedInvasionWorldData(levelIn);
 		tiwData.spawner.load(nbtIn.getCompound("Spawner"));
 		tiwData.dayXPMultiplier = nbtIn.getDouble("DayXPMultiplier");
@@ -31,7 +31,7 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 	}
 
 	@Override
-	public CompoundTag save(final CompoundTag nbtIn) {
+	public final CompoundTag save(final CompoundTag nbtIn) {
 		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putDouble("DayXPMultiplier", this.dayXPMultiplier);
 		nbtIn.putDouble("NightXPMultiplier", this.nightXPMultiplier);
@@ -42,60 +42,60 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		return super.save(nbtIn);
 	}
 	
-	public TimedInvasionSpawner getInvasionSpawner() {
+	public final TimedInvasionSpawner getInvasionSpawner() {
 		return this.spawner;
 	}
 	
-	public double getDayXPMultiplier() {
+	public final double getDayXPMultiplier() {
 		return this.dayXPMultiplier;
 	}
 	
-	public void setDayXPMultiplier(final double dayXPMultiplierIn) {
+	public final void setDayXPMultiplier(final double dayXPMultiplierIn) {
 		this.dayXPMultiplier = dayXPMultiplierIn;
 		this.setDirty();
 	}
 	
-	public double getNightXPMultiplier() {
+	public final double getNightXPMultiplier() {
 		return this.nightXPMultiplier;
 	}
 	
-	public void setNightXPMultiplier(final double nightXPMultiplierIn) {
+	public final void setNightXPMultiplier(final double nightXPMultiplierIn) {
 		this.nightXPMultiplier = nightXPMultiplierIn;
 		this.setDirty();
 	}
 	
-	public boolean hasCheckedDay() {
+	public final boolean hasCheckedDay() {
 		return this.checkedDay;
 	}
 	
-	public void setCheckedDay(final boolean checkedDayIn) {
+	public final void setCheckedDay(final boolean checkedDayIn) {
 		this.checkedDay = checkedDayIn;
 		this.setDirty();
 	}
 	
-	public boolean hasCheckedNight() {
+	public final boolean hasCheckedNight() {
 		return this.checkedNight;
 	}
 	
-	public void setCheckedNight(final boolean checkedNightIn) {
+	public final void setCheckedNight(final boolean checkedNightIn) {
 		this.checkedNight = checkedNightIn;
 		this.setDirty();
 	}
 	
-	public boolean getPrevDayCheck() {
+	public final boolean getPrevDayCheck() {
 		return this.prevDayCheck;
 	}
 	
-	public void setPrevDayCheck(final boolean prevDayCheckIn) {
+	public final void setPrevDayCheck(final boolean prevDayCheckIn) {
 		this.prevDayCheck = prevDayCheckIn;
 		this.setDirty();
 	}
 	
-	public boolean getPrevNightCheck() {
+	public final boolean getPrevNightCheck() {
 		return this.prevNightCheck;
 	}
 	
-	public void setPrevNightCheck(final boolean prevNightCheckIn) {
+	public final void setPrevNightCheck(final boolean prevNightCheckIn) {
 		this.prevNightCheck = prevNightCheckIn;
 		this.setDirty();
 	}

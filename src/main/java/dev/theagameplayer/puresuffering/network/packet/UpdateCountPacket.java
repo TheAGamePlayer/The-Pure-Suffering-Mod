@@ -19,24 +19,24 @@ public final class UpdateCountPacket {
 		this.listType = listTypeIn;
 	}
 	
-	public static void encode(final UpdateCountPacket msgIn, final FriendlyByteBuf bufIn) {
+	public static final void encode(final UpdateCountPacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeInt(msgIn.count);
 		bufIn.writeEnum(msgIn.listType);
 	}
 	
-	public static UpdateCountPacket decode(final FriendlyByteBuf bufIn) {
+	public static final UpdateCountPacket decode(final FriendlyByteBuf bufIn) {
 		return new UpdateCountPacket(bufIn.readInt(), bufIn.readEnum(InvasionListType.class));
 	}
 
 	public static class Handler {
-		public static boolean handle(final UpdateCountPacket msgIn, final Supplier<Context> ctxIn) {
+		public static final boolean handle(final UpdateCountPacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 		
-		private static void handlePacket(final UpdateCountPacket msgIn, final Supplier<Context> ctxIn) {
+		private static final void handlePacket(final UpdateCountPacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			switch (msgIn.listType) {
 			case DAY:

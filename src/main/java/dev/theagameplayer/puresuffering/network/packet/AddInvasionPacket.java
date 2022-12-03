@@ -22,27 +22,27 @@ public final class AddInvasionPacket {
 		this.isPrimary = isPrimaryIn;
 	}
 
-	public static void encode(final AddInvasionPacket msgIn, final FriendlyByteBuf bufIn) {
+	public static final void encode(final AddInvasionPacket msgIn, final FriendlyByteBuf bufIn) {
 		msgIn.renderer.deconstruct().serializeToNetwork(bufIn);
 		bufIn.writeResourceLocation(msgIn.renderer.getId());
 		bufIn.writeEnum(msgIn.listType);
 		bufIn.writeBoolean(msgIn.isPrimary);
 	}
 
-	public static AddInvasionPacket decode(final FriendlyByteBuf bufIn) {
+	public static final AddInvasionPacket decode(final FriendlyByteBuf bufIn) {
 		final InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
 		return new AddInvasionPacket(renderer, bufIn.readEnum(InvasionListType.class), bufIn.readBoolean());
 	}
 
-	public static class Handler {
-		public static boolean handle(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
+	public static final class Handler {
+		public static final boolean handle(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
 			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 
-		private static void handlePacket(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
+		private static final void handlePacket(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			switch (msgIn.listType) {
 			case DAY:

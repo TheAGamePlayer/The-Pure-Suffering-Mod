@@ -1,8 +1,36 @@
 #Minecraft 1.19.x
+Version 1.4.0R:
+- Added Lightning to Super Storm Invasions (Now with Charged Creepers).
+- Added "ClusterEntitiesList" Parameter for Data Packs to allow for entities to spawn when a mob cluster is about to spawn (See Super Storm for example).
+- Added chance for mobs to spawn HyperCharged (Boosted Stats).
+- Added rare Hyper Invasions where only HyperCharged mobs can spawn (Primary Invasion must be a Hyper Invasion).
+- Added even rarer Mystery Invasions ;)
+- Added "HyperType" to invasion hover text (Default, Hyper, Mystery).
+- Added "hyperInvasionRarity" Config Option to determine how often an Invasion should become a Hyper Invasion.
+- Added "mysteryInvasionRarity" Config Option to determine how often a Hyper Invasion should become a Mystery Invasion.
+- Added "hyperInvasions" Config Option to determine if Hyper Invasions should be enabled.
+- Added "mysteryInvasions" Config Option to determine if Mystery Invasions should be enabled.
+- Added "hyperCharge" Config Option to determine if mobs can be hyperCharged.
+- Added "hyperChargeBlacklist" Config Option to determine which mobs shouldn't be able to be hyper charged (includes Vexes).
+- Added "maxHyperCharge" Config Option to determine the maximum level of hyper charge that can be applied to an Invasion mob (Max level spawns in mystery invasions only).
+- Added "hyper" option when adding an invasion (This was painful to add...).
+- Added "mystery" option when adding an Invasion (This was also painful to add...).
+- Added "random" option to generate a completely random invasion (^).
+- More code optimizations.
+- Hyper charged mobs drop more experience than normal depending on the charge level.
+- Max hyper charged mobs will glow purple instead of red since they only appear in Mystery Invasions.
+- Hyper Invasions will show as Bolded in chat.
+- Mystery Invasions will show as Red-Purple, Bolded, & Italicized in chat.
+- Primary Invasions are now Underlined in chat.
+- Invasions now slightly change color based on severity in chat.
+- Fixed "[PureSuffering]" being omitted from canceled invasion messages.
+- Fixed breeding ocelots spawned by invasions hard crashing your computer when SLI is turned on.
+- Fixed small little bugs here and there.
+
 Version 1.3.6R:
-- Fixed broken skybox
-- Another attempt at improving shader compatibility
-- Optimized code throughout the mod
+- Fixed broken skybox.
+- Another attempt at improving shader compatibility.
+- Optimized code throughout the mod.
 
 Version 1.3.5B:
 - Fixed Mistake in mods.toml

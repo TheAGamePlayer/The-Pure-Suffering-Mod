@@ -17,11 +17,11 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.world.level.material.FogType;
 
 @Mixin(LevelRenderer.class)
-public class LevelRendererMixin {
+public final class LevelRendererMixin {
 	private static final InvasionSkyRenderHandler ISR_HANDLER = new InvasionSkyRenderHandler();
 
 	@Inject(at = @At("HEAD"), method = "renderSky(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/math/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", cancellable = true)
-	public void renderSky(final PoseStack poseStackIn, final Matrix4f mat4In, final float partialTicksIn, final Camera camIn, final boolean isFoggyIn, final Runnable fogTickIn, final CallbackInfo callbackIn) {
+	public final void renderSky(final PoseStack poseStackIn, final Matrix4f mat4In, final float partialTicksIn, final Camera camIn, final boolean isFoggyIn, final Runnable fogTickIn, final CallbackInfo callbackIn) {
 		final Minecraft mc = Minecraft.getInstance();
 		final ClientLevel clientLevel = mc.level;
 		if (clientLevel != null && PSConfigValues.client.useSkyBoxRenderer) {
@@ -30,7 +30,7 @@ public class LevelRendererMixin {
 				final FogType fogType = camIn.getFluidInCamera();
 				if (fogType != FogType.POWDER_SNOW && fogType != FogType.LAVA && !mc.levelRenderer.doesMobEffectBlockSky(camIn)) {
 					if (ISR_HANDLER.hasRenderedInvasionSky(partialTicksIn, poseStackIn, mat4In, clientLevel, mc))
-						callbackIn.cancel(); //Will improve mod compat in a future update?
+						callbackIn.cancel(); //TODO: Will improve mod compat in a future update?
 				}
 			}
 		}

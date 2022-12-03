@@ -43,7 +43,7 @@ public final class InvasionSkyRenderHandler {
 	private ResourceLocation sunTexture, moonTexture; //Invasion that changes the sun/moon
 	private ResourceLocation skyTexture; //Invasion that changes the sky
 
-	public boolean hasRenderedInvasionSky(final float partialTicksIn, final PoseStack poseStackIn, final Matrix4f mat4In, final ClientLevel levelIn, final Minecraft mcIn) {
+	public final boolean hasRenderedInvasionSky(final float partialTicksIn, final PoseStack poseStackIn, final Matrix4f mat4In, final ClientLevel levelIn, final Minecraft mcIn) {
 		this.rendererMap.clear();
 		if (!levelIn.players().isEmpty()) {
 			if (!levelIn.dimensionType().hasFixedTime()) {
@@ -97,7 +97,7 @@ public final class InvasionSkyRenderHandler {
 		return false;
 	}
 
-	private void renderInvasionSky(final PoseStack poseStackIn, final Matrix4f mat4In, final Minecraft mcIn, final ClientLevel levelIn, final Runnable fogTickIn, final float partialTicksIn, final long dayTimeIn) {
+	private final void renderInvasionSky(final PoseStack poseStackIn, final Matrix4f mat4In, final Minecraft mcIn, final ClientLevel levelIn, final Runnable fogTickIn, final float partialTicksIn, final long dayTimeIn) {
 		final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
 		final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);
 		final Vec3 vec3 = levelIn.getSkyColor(mcIn.gameRenderer.getMainCamera().getPosition(), partialTicksIn);
@@ -151,9 +151,8 @@ public final class InvasionSkyRenderHandler {
 		poseStackIn.pushPose();
 		final float f11 = Mth.clamp(((this.sunTexture == null && dayInfo.isClientTime()) || (this.moonTexture == null && nightInfo.isClientTime()) ? 1.0F : ClientTransitionHandler.tickSunMoonAlpha(1.0F, dayTimeIn)) - levelIn.getRainLevel(partialTicksIn), 0.0F, 1.0F);
 		float f12 = 0.0F;
-		for (final InvasionSkyRenderer renderer : this.weatherVisibilityList) {
+		for (final InvasionSkyRenderer renderer : this.weatherVisibilityList)
 			f12 += renderer.getWeatherVisibility() / this.weatherVisibilityList.size();
-		}
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, f11 + Mth.clamp(ClientTransitionHandler.tickWeatherVisibility(f12, dayTimeIn), 0.0F, 1.0F));
 		poseStackIn.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
 		poseStackIn.mulPose(Vector3f.XP.rotationDegrees(levelIn.getTimeOfDay(partialTicksIn) * 360.0F));
@@ -194,7 +193,7 @@ public final class InvasionSkyRenderHandler {
 		RenderSystem.depthMask(true);
 	}
 
-	private void renderSun(final BufferBuilder bufferBuilderIn, final Matrix4f matrix4fIn, final float f13In, final long dayTimeIn) {
+	private final void renderSun(final BufferBuilder bufferBuilderIn, final Matrix4f matrix4fIn, final float f13In, final long dayTimeIn) {
 		final boolean flag = dayTimeIn < ClientTransitionHandler.HALF_TRANSITION || dayTimeIn > 11999L - ClientTransitionHandler.HALF_TRANSITION;
 		RenderSystem.setShaderTexture(0, (this.sunTexture == null || flag) ? DEFAULT_SUN : this.sunTexture);
 		bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -205,7 +204,7 @@ public final class InvasionSkyRenderHandler {
 		BufferUploader.drawWithShader(bufferBuilderIn.end());
 	}
 
-	private void renderMoon(final BufferBuilder bufferBuilderIn, final Matrix4f matrix4fIn, final ClientLevel levelIn, final float f13In, final long dayTimeIn) {
+	private final void renderMoon(final BufferBuilder bufferBuilderIn, final Matrix4f matrix4fIn, final ClientLevel levelIn, final float f13In, final long dayTimeIn) {
 		final boolean flag = dayTimeIn < ClientTransitionHandler.HALF_TRANSITION || dayTimeIn > 11999L - ClientTransitionHandler.HALF_TRANSITION;
 		RenderSystem.setShaderTexture(0, (this.moonTexture == null || flag) ? DEFAULT_MOON : this.moonTexture);
 		final int k = levelIn.getMoonPhase();
@@ -223,7 +222,7 @@ public final class InvasionSkyRenderHandler {
 		BufferUploader.drawWithShader(bufferBuilderIn.end());
 	}
 
-	private void renderEndInvasionSkybox(final PoseStack matrixStackIn, final ClientLevel levelIn, final float partialTicksIn) {
+	private final void renderEndInvasionSkybox(final PoseStack matrixStackIn, final ClientLevel levelIn, final float partialTicksIn) {
 		RenderSystem.enableBlend();
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.depthMask(false);

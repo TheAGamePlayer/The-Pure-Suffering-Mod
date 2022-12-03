@@ -7,7 +7,7 @@ public final class ClientTransitionHandler {
 	public static final int TRANSITION_TIME = 600, HALF_TRANSITION = TRANSITION_TIME/2;
 	
 	//SUN_ALPHA
-	public static float tickSunMoonAlpha(final float sunMoonAlphaIncIn, final long dayTimeIn) {
+	public static final float tickSunMoonAlpha(final float sunMoonAlphaIncIn, final long dayTimeIn) {
 		float sunMoonAlpha = 0.0F;
 		if (dayTimeIn < HALF_TRANSITION) {
 			sunMoonAlpha = (sunMoonAlphaIncIn/HALF_TRANSITION) * (HALF_TRANSITION - dayTimeIn); //1-0
@@ -24,7 +24,7 @@ public final class ClientTransitionHandler {
 	}
 
 	//WEATHER_VISIBILITY
-	public static float tickWeatherVisibility(final float weatherVisbilityIncIn, final long dayTimeIn) {
+	public static final float tickWeatherVisibility(final float weatherVisbilityIncIn, final long dayTimeIn) {
 		float weatherVisbility = 0.0F;
 		if (dayTimeIn < TRANSITION_TIME) {
 			weatherVisbility = (weatherVisbilityIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
@@ -37,7 +37,7 @@ public final class ClientTransitionHandler {
 	}
 	
 	//SKY_COLOR
-	public static float tickSkyColor(final float skyColorIn, final float skyColorIncIn, final long dayTimeIn) {
+	public static final float tickSkyColor(final float skyColorIn, final float skyColorIncIn, final long dayTimeIn) {
 		float skyColor = 0.0F;
 		if (dayTimeIn < TRANSITION_TIME) {
 			skyColor = (skyColorIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
@@ -50,7 +50,7 @@ public final class ClientTransitionHandler {
 	}
 
 	//BRIGHTNESS
-	public static float tickBrightness(final float brightnessIn, final float brightnessIncIn, final long dayTimeIn) {
+	public static final float tickBrightness(final float brightnessIn, final float brightnessIncIn, final long dayTimeIn) {
 		float brightness = 0.0F;
 		if (dayTimeIn < TRANSITION_TIME) {
 			brightness = (brightnessIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
@@ -63,7 +63,7 @@ public final class ClientTransitionHandler {
 	}
 
 	//FOG COLOR
-	public static void tickFogColor(final ViewportEvent.ComputeFogColor eventIn, final float fogRedIncIn, final float fogGreenIncIn, final float fogBlueIncIn, final long dayTimeIn) {
+	public static final void tickFogColor(final ViewportEvent.ComputeFogColor eventIn, final float fogRedIncIn, final float fogGreenIncIn, final float fogBlueIncIn, final long dayTimeIn) {
 		float fogRed = 0.0F, fogGreen = 0.0F, fogBlue = 0.0F;
 		if (dayTimeIn < TRANSITION_TIME) {
 			fogRed = (fogRedIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1

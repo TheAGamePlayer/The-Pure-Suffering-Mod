@@ -20,7 +20,7 @@ public final class PSPacketHandler {
 			PROTOCAL_VERSION::equals, 
 			PROTOCAL_VERSION::equals);
 	
-	public static void registerPackets() {
+	public static final void registerPackets() {
 		int id = 0;
 		//PLAY DEDICATED SERVER -> CLIENT
 		CHANNEL.messageBuilder(UpdateTimePacket.class, id++).encoder(UpdateTimePacket::encode).decoder(UpdateTimePacket::decode).consumerMainThread(UpdateTimePacket.Handler::handle).add();
@@ -30,11 +30,11 @@ public final class PSPacketHandler {
 		CHANNEL.messageBuilder(UpdateXPMultPacket.class, id++).encoder(UpdateXPMultPacket::encode).decoder(UpdateXPMultPacket::decode).consumerMainThread(UpdateXPMultPacket.Handler::handle).add();
 	}
 	
-	public static void sendToClient(final Object msgIn, final ServerPlayer playerIn) {
+	public static final void sendToClient(final Object msgIn, final ServerPlayer playerIn) {
 		CHANNEL.send(PacketDistributor.PLAYER.with(() -> playerIn), msgIn);
 	}
 	
-	public static void sendToAllClients(final Object msgIn) {
+	public static final void sendToAllClients(final Object msgIn) {
 		CHANNEL.send(PacketDistributor.ALL.noArg(), msgIn);
 	}
 }

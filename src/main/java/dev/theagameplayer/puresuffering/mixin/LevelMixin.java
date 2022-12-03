@@ -10,9 +10,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
 @Mixin(Level.class)
-public class LevelMixin {
+public final class LevelMixin {
 	@Inject(at = @At("RETURN"), method = "updateSkyBrightness()V", cancellable = true)
-	private void updateSkyBrightness(final CallbackInfo callbackIn) {
+	private final void updateSkyBrightness(final CallbackInfo callbackIn) {
 		final Level level = (Level)(Object)this;
 		if (!level.isClientSide)
 			level.skyDarken = ServerInvasionUtil.handleLightLevel(level.skyDarken, (ServerLevel)level);

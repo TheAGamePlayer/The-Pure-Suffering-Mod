@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
 
 public final class ClearInvasionsCommand {
-	public static ArgumentBuilder<CommandSourceStack, ?> register() {
+	public static final ArgumentBuilder<CommandSourceStack, ?> register() {
 		return Commands.literal("clear")
 				.requires(player -> {
 					return player.hasPermission(2);

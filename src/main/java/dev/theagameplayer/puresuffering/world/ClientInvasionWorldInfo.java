@@ -14,49 +14,49 @@ public final class ClientInvasionWorldInfo {
 	private int invasionsCount;
 	private double xpMult;
 	
-	public static ClientInvasionWorldInfo getDayClientInfo(final ClientLevel levelIn) {
+	public static final ClientInvasionWorldInfo getDayClientInfo(final ClientLevel levelIn) {
 		if (!DAY_RENDERERS.containsKey(levelIn))
 			DAY_RENDERERS.put(levelIn, new ClientInvasionWorldInfo());
 		return DAY_RENDERERS.get(levelIn);
 	}
 	
-	public static ClientInvasionWorldInfo getNightClientInfo(final ClientLevel levelIn) {
+	public static final ClientInvasionWorldInfo getNightClientInfo(final ClientLevel levelIn) {
 		if (!NIGHT_RENDERERS.containsKey(levelIn))
 			NIGHT_RENDERERS.put(levelIn, new ClientInvasionWorldInfo());
 		return NIGHT_RENDERERS.get(levelIn);
 	}
 	
-	public static ClientInvasionWorldInfo getFixedClientInfo(final ClientLevel levelIn) {
+	public static final ClientInvasionWorldInfo getFixedClientInfo(final ClientLevel levelIn) {
 		if (!FIXED_RENDERERS.containsKey(levelIn))
 			FIXED_RENDERERS.put(levelIn, new ClientInvasionWorldInfo());
 		return FIXED_RENDERERS.get(levelIn);
 	}
 	
-	public InvasionRendererMap getRendererMap() {
+	public final InvasionRendererMap getRendererMap() {
 		return this.rendererMap;
 	}
 	
-	public boolean isClientTime() {
+	public final boolean isClientTime() {
 		return this.isTime;
 	}
 	
-	public void updateClientTime(final boolean isTimeIn) {
+	public final void updateClientTime(final boolean isTimeIn) {
 		this.isTime = isTimeIn;
 	}
 	
-	public int getInvasionsCount() {
+	public final int getInvasionsCount() {
 		return this.invasionsCount;
 	}
 	
-	public void setInvasionsCount(final int invasionsCountIn) {
+	public final void setInvasionsCount(final int invasionsCountIn) {
 		this.invasionsCount = invasionsCountIn;
 	}
 	
-	public double getXPMultiplier() {
+	public final double getXPMultiplier() {
 		return this.xpMult;
 	}
 	
-	public void setXPMultiplier(final double xpMultIn) {
+	public final void setXPMultiplier(final double xpMultIn) {
 		this.xpMult = xpMultIn;
 	}
 }
