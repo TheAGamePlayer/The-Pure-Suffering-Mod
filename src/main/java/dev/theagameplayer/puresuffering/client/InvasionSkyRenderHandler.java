@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.joml.Matrix4f;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -23,15 +25,13 @@ import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.DimensionSpecialEffects.SkyType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import com.mojang.math.Matrix4f;
-
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Vector3f;
 
 public final class InvasionSkyRenderHandler {
 	private static final ResourceLocation DEFAULT_SUN = new ResourceLocation("textures/environment/sun.png");
@@ -127,10 +127,10 @@ public final class InvasionSkyRenderHandler {
 			RenderSystem.disableTexture();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			poseStackIn.pushPose();
-			poseStackIn.mulPose(Vector3f.XP.rotationDegrees(90.0F));
+			poseStackIn.mulPose(Axis.XP.rotationDegrees(90.0F));
 			final float f3 = Mth.sin(levelIn.getSunAngle(partialTicksIn)) < 0.0F ? 180.0F : 0.0F;
-			poseStackIn.mulPose(Vector3f.ZP.rotationDegrees(f3));
-			poseStackIn.mulPose(Vector3f.ZP.rotationDegrees(90.0F));
+			poseStackIn.mulPose(Axis.ZP.rotationDegrees(f3));
+			poseStackIn.mulPose(Axis.ZP.rotationDegrees(90.0F));
 			final float f4 = afloat[0];
 			final float f5 = afloat[1];
 			final float f6 = afloat[2];
@@ -154,8 +154,8 @@ public final class InvasionSkyRenderHandler {
 		for (final InvasionSkyRenderer renderer : this.weatherVisibilityList)
 			f12 += renderer.getWeatherVisibility() / this.weatherVisibilityList.size();
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, f11 + Mth.clamp(ClientTransitionHandler.tickWeatherVisibility(f12, dayTimeIn), 0.0F, 1.0F));
-		poseStackIn.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
-		poseStackIn.mulPose(Vector3f.XP.rotationDegrees(levelIn.getTimeOfDay(partialTicksIn) * 360.0F));
+		poseStackIn.mulPose(Axis.YP.rotationDegrees(-90.0F));
+		poseStackIn.mulPose(Axis.XP.rotationDegrees(levelIn.getTimeOfDay(partialTicksIn) * 360.0F));
 		final Matrix4f matrix4f1 = poseStackIn.last().pose();
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		this.renderSun(bufferBuilder, matrix4f1, 30.0F, dayTimeIn);
@@ -233,15 +233,15 @@ public final class InvasionSkyRenderHandler {
 		for(int i = 0; i < 6; ++i) {
 			matrixStackIn.pushPose();
 			if (i == 1) {
-				matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90.0F));
+				matrixStackIn.mulPose(Axis.XP.rotationDegrees(90.0F));
 			} else if (i == 2) {
-				matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(-90.0F));
+				matrixStackIn.mulPose(Axis.XP.rotationDegrees(-90.0F));
 			} else if (i == 3) {
-				matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+				matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
 			} else if (i == 4) {
-				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(90.0F));
+				matrixStackIn.mulPose(Axis.ZP.rotationDegrees(90.0F));
 			} else if (i == 5) {
-				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90.0F));
+				matrixStackIn.mulPose(Axis.ZP.rotationDegrees(-90.0F));
 			}
 			final Matrix4f matrix4f = matrixStackIn.last().pose();
 			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);

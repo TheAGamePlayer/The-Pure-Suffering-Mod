@@ -20,9 +20,9 @@ public final class HyperChargeLayer<LE extends LivingEntity, EM extends EntityMo
 	private final EM model;
 	private final int maxHyperCharge;
 
-	public HyperChargeLayer(final LivingEntityRenderer<LE, EM> renderer, final int maxHyperChargeIn) {
-		super(renderer);
-		this.model = renderer.getModel();
+	public HyperChargeLayer(final LivingEntityRenderer<LE, EM> rendererIn, final int maxHyperChargeIn) {
+		super(rendererIn);
+		this.model = rendererIn.getModel();
 		this.maxHyperCharge = maxHyperChargeIn;
 	}
 

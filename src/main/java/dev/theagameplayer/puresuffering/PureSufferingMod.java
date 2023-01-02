@@ -1,5 +1,7 @@
 package dev.theagameplayer.puresuffering;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,6 +10,7 @@ import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -64,8 +67,9 @@ public final class PureSufferingMod {
 	private final void gatherData(final GatherDataEvent eventIn) {
 		final DataGenerator generator = eventIn.getGenerator();
 		//ExistingFileHelper fileHelper = eventIn.getExistingFileHelper();
+		final CompletableFuture<HolderLookup.Provider> lookupProvider = eventIn.getLookupProvider();
 		if (eventIn.includeServer()) {
-			generator.addProvider(true, new InvasionTypesProvider(generator));
+			generator.addProvider(true, new InvasionTypesProvider(generator.getPackOutput(), lookupProvider));
 		}
 		LOGGER.info("Generated new data.");
 	}

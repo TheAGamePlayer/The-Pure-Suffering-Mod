@@ -1,4 +1,7 @@
 #Minecraft 1.19.x
+Version 1.4.1R:
+- Updated to 1.19.3
+
 Version 1.4.0R:
 - Added Lightning to Super Storm Invasions (Now with Charged Creepers).
 - Added "ClusterEntitiesList" Parameter for Data Packs to allow for entities to spawn when a mob cluster is about to spawn (See Super Storm for example).
