@@ -31,9 +31,8 @@ import com.mojang.math.Matrix4f;
 
 import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Vector3f;
-import net.minecraftforge.client.ISkyRenderHandler;
 
-public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
+public final class InvasionSkyRenderHandler {
 	private static final ResourceLocation DEFAULT_SUN = new ResourceLocation("textures/environment/sun.png");
 	private static final ResourceLocation DEFAULT_MOON = new ResourceLocation("textures/environment/moon_phases.png");
 	private static final ResourceLocation DEFAULT_END_SKY = new ResourceLocation("textures/environment/end_sky.png");
@@ -42,14 +41,8 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 	private final ArrayList<InvasionSkyRenderer> skyColorList = new ArrayList<>(); //Invasions that change the sky colors
 	private ResourceLocation sunTexture, moonTexture; //Invasion that changes the sun/moon
 	private ResourceLocation skyTexture; //Invasion that changes the sky
-	private final ISkyRenderHandler skyRenderer;
-
-	public InvasionSkyRenderHandler(ISkyRenderHandler skyRendererIn) {
-		this.skyRenderer = skyRendererIn;
-	}
-
-	@Override
-	public void render(int ticksIn, float partialTicksIn, PoseStack matrixStackIn, ClientLevel worldIn, Minecraft mcIn) {
+	
+	public boolean hasRenderedInvasionSky(float partialTicksIn, PoseStack matrixStackIn, Matrix4f mat4In, ClientLevel worldIn, Minecraft mcIn) {
 		this.rendererMap.clear();
 		if (!worldIn.players().isEmpty()) {
 			if (!worldIn.dimensionType().hasFixedTime()) {
@@ -67,49 +60,41 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 					this.rendererMap.put(entry.getKey(), entry.getValue());
 			}
 		}
+		if (this.rendererMap.isEmpty()) return false;
 		Camera cam = mcIn.gameRenderer.getMainCamera();
 		boolean flag = worldIn.effects().isFoggyAt(Mth.floor(cam.getPosition().x()), Mth.floor(cam.getPosition().y())) || mcIn.gui.getBossOverlay().shouldCreateWorldFog();
 		Runnable fogTick = () -> FogRenderer.setupFog(cam, FogRenderer.FogMode.FOG_SKY, mcIn.gameRenderer.getRenderDistance(), flag, partialTicksIn);
-		if (!this.rendererMap.isEmpty()) {
-			ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(mcIn.level);
-			ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(mcIn.level);
-			if (worldIn.effects().skyType() == SkyType.NORMAL) {
-				this.weatherVisibilityList.clear();
-				this.skyColorList.clear();
-				this.sunTexture = null;
-				this.moonTexture = null;
-				for (Entry<InvasionSkyRenderer, Boolean> entry : this.rendererMap.entrySet()) {
-					InvasionSkyRenderer renderer = entry.getKey();
-					if (renderer.getSunTexture() != null && entry.getValue() && dayInfo.isClientTime())
-						this.sunTexture = renderer.getSunTexture();
-					if (renderer.getMoonTexture() != null && entry.getValue() && nightInfo.isClientTime())
-						this.moonTexture = renderer.getMoonTexture();
-					if (renderer.isWeatherVisibilityChanged())
-						this.weatherVisibilityList.add(renderer);
-					if (renderer.isSkyColorChanged())
-						this.skyColorList.add(renderer);
-				}
-				this.renderInvasionSky(matrixStackIn, matrixStackIn.last().pose(), mcIn, worldIn, fogTick, partialTicksIn, worldIn.getDayTime() % 12000L);
-				return;
-			} else if (worldIn.effects().skyType() == SkyType.END) {
-				this.skyTexture = null;
-				for (Entry<InvasionSkyRenderer, Boolean> entry : this.rendererMap.entrySet()) {
-					InvasionSkyRenderer renderer = entry.getKey();
-					if (renderer.getFixedSkyTexture() != null && entry.getValue())
-						this.skyTexture = renderer.getFixedSkyTexture();
-				}
-				this.renderEndInvasionSkybox(matrixStackIn, mcIn, worldIn, partialTicksIn, ticksIn);
-				return;
+		ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(mcIn.level);
+		ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(mcIn.level);
+		if (worldIn.effects().skyType() == SkyType.NORMAL) {
+			this.weatherVisibilityList.clear();
+			this.skyColorList.clear();
+			this.sunTexture = null;
+			this.moonTexture = null;
+			for (Entry<InvasionSkyRenderer, Boolean> entry : this.rendererMap.entrySet()) {
+				InvasionSkyRenderer renderer = entry.getKey();
+				if (renderer.getSunTexture() != null && entry.getValue() && dayInfo.isClientTime())
+					this.sunTexture = renderer.getSunTexture();
+				if (renderer.getMoonTexture() != null && entry.getValue() && nightInfo.isClientTime())
+					this.moonTexture = renderer.getMoonTexture();
+				if (renderer.isWeatherVisibilityChanged())
+					this.weatherVisibilityList.add(renderer);
+				if (renderer.isSkyColorChanged())
+					this.skyColorList.add(renderer);
 			}
+			this.renderInvasionSky(matrixStackIn, mat4In, mcIn, worldIn, fogTick, partialTicksIn, worldIn.getDayTime() % 12000L);
+			return true;
+		} else if (worldIn.effects().skyType() == SkyType.END) {
+			this.skyTexture = null;
+			for (Entry<InvasionSkyRenderer, Boolean> entry : this.rendererMap.entrySet()) {
+				InvasionSkyRenderer renderer = entry.getKey();
+				if (renderer.getFixedSkyTexture() != null && entry.getValue())
+					this.skyTexture = renderer.getFixedSkyTexture();
+			}
+			this.renderEndInvasionSkybox(matrixStackIn, worldIn, partialTicksIn);
+			return true;
 		}
-		ISkyRenderHandler renderer = worldIn.effects().getSkyRenderHandler();
-		worldIn.effects().setSkyRenderHandler(null);
-		if (this.skyRenderer == null) {
-			mcIn.levelRenderer.renderSky(matrixStackIn, matrixStackIn.last().pose(), partialTicksIn, cam, flag, fogTick);
-		} else {
-			this.skyRenderer.render(ticksIn, partialTicksIn, matrixStackIn, worldIn, mcIn);
-		}
-		worldIn.effects().setSkyRenderHandler(renderer);
+		return false;
 	}
 
 	private void renderInvasionSky(PoseStack matrixStackIn, Matrix4f mat4In, Minecraft mcIn, ClientLevel worldIn, Runnable fogTickIn, float partialTicksIn, long dayTimeIn) {
@@ -148,7 +133,6 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 			float f5 = afloat[1];
 			float f6 = afloat[2];
 			Matrix4f matrix4f = matrixStackIn.last().pose();
-			
 			bufferbuilder.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 			bufferbuilder.vertex(matrix4f, 0.0F, 100.0F, 0.0F).color(f4, f5, f6, afloat[3] / this.rendererMap.size()).endVertex();
 			for(int j = 0; j <= 16; ++j) {
@@ -204,70 +188,70 @@ public final class InvasionSkyRenderHandler implements ISkyRenderHandler {
 		RenderSystem.enableTexture();
 		RenderSystem.depthMask(true);
 	}
-
-private void renderSun(Minecraft mcIn, BufferBuilder bufferBuilderIn, Matrix4f matrix4fIn, float f13In, long dayTimeIn) {
-	boolean flag = dayTimeIn < ClientTransitionHandler.HALF_TRANSITION || dayTimeIn > 11999L - ClientTransitionHandler.HALF_TRANSITION;
-	RenderSystem.setShaderTexture(0, this.sunTexture == null || flag ? DEFAULT_SUN : this.sunTexture);
-	bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-	bufferBuilderIn.vertex(matrix4fIn, -f13In, 100.0F, -f13In).uv(0.0F, 0.0F).endVertex();
-	bufferBuilderIn.vertex(matrix4fIn, f13In, 100.0F, -f13In).uv(1.0F, 0.0F).endVertex();
-	bufferBuilderIn.vertex(matrix4fIn, f13In, 100.0F, f13In).uv(1.0F, 1.0F).endVertex();
-	bufferBuilderIn.vertex(matrix4fIn, -f13In, 100.0F, f13In).uv(0.0F, 1.0F).endVertex();
-	bufferBuilderIn.end();
-	BufferUploader.end(bufferBuilderIn);
-}
-
-private void renderMoon(Minecraft mcIn, BufferBuilder bufferBuilderIn, Matrix4f matrix4fIn, ClientLevel worldIn, float f13In, long dayTimeIn) {
-	boolean flag = dayTimeIn < ClientTransitionHandler.HALF_TRANSITION || dayTimeIn > 11999L - ClientTransitionHandler.HALF_TRANSITION;
-	RenderSystem.setShaderTexture(0, this.moonTexture == null || flag ? DEFAULT_MOON : this.moonTexture);
-	int k = worldIn.getMoonPhase();
-	int l = k % 4;
-	int i1 = k / 4 % 2;
-	float f14 = (float)(l + 0) / 4.0F;
-	float f15 = (float)(i1 + 0) / 2.0F;
-	float f16 = (float)(l + 1) / 4.0F;
-	float f17 = (float)(i1 + 1) / 2.0F;
-	bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-	bufferBuilderIn.vertex(matrix4fIn, -f13In, -100.0F, f13In).uv(f16, f17).endVertex();
-	bufferBuilderIn.vertex(matrix4fIn, f13In, -100.0F, f13In).uv(f14, f17).endVertex();
-	bufferBuilderIn.vertex(matrix4fIn, f13In, -100.0F, -f13In).uv(f14, f15).endVertex();
-	bufferBuilderIn.vertex(matrix4fIn, -f13In, -100.0F, -f13In).uv(f16, f15).endVertex();
-	bufferBuilderIn.end();
-	BufferUploader.end(bufferBuilderIn);
-}
-
-private void renderEndInvasionSkybox(PoseStack matrixStackIn, Minecraft mcIn, ClientLevel worldIn, float partialTicksIn, long dayTimeIn) {
-	RenderSystem.enableBlend();
-	RenderSystem.defaultBlendFunc();
-	RenderSystem.depthMask(false);
-	RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-	RenderSystem.setShaderTexture(0, this.skyTexture == null ? DEFAULT_END_SKY : this.skyTexture);
-	Tesselator tessellator = Tesselator.getInstance();
-	BufferBuilder bufferBuilder = tessellator.getBuilder();
-	for(int i = 0; i < 6; ++i) {
-		matrixStackIn.pushPose();
-		if (i == 1) {
-			matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90.0F));
-		} else if (i == 2) {
-			matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(-90.0F));
-		} else if (i == 3) {
-			matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(180.0F));
-		} else if (i == 4) {
-			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(90.0F));
-		} else if (i == 5) {
-			matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90.0F));
-		}
-		Matrix4f matrix4f = matrixStackIn.last().pose();
-		bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-		bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, -100.0F).uv(0.0F, 0.0F).color(40, 40, 40, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, 100.0F).uv(0.0F, 16.0F).color(40, 40, 40, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, 100.0F).uv(16.0F, 16.0F).color(40, 40, 40, 255).endVertex();
-		bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, -100.0F).uv(16.0F, 0.0F).color(40, 40, 40, 255).endVertex();
-		tessellator.end();
-		matrixStackIn.popPose();
+	
+	private void renderSun(Minecraft mcIn, BufferBuilder bufferBuilderIn, Matrix4f matrix4fIn, float f13In, long dayTimeIn) {
+		boolean flag = dayTimeIn < ClientTransitionHandler.HALF_TRANSITION || dayTimeIn > 11999L - ClientTransitionHandler.HALF_TRANSITION;
+		RenderSystem.setShaderTexture(0, this.sunTexture == null || flag ? DEFAULT_SUN : this.sunTexture);
+		bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilderIn.vertex(matrix4fIn, -f13In, 100.0F, -f13In).uv(0.0F, 0.0F).endVertex();
+		bufferBuilderIn.vertex(matrix4fIn, f13In, 100.0F, -f13In).uv(1.0F, 0.0F).endVertex();
+		bufferBuilderIn.vertex(matrix4fIn, f13In, 100.0F, f13In).uv(1.0F, 1.0F).endVertex();
+		bufferBuilderIn.vertex(matrix4fIn, -f13In, 100.0F, f13In).uv(0.0F, 1.0F).endVertex();
+		bufferBuilderIn.end();
+		BufferUploader.end(bufferBuilderIn);
 	}
-	RenderSystem.depthMask(true);
-	RenderSystem.enableTexture();
-	RenderSystem.disableBlend();
-}
+
+	private void renderMoon(Minecraft mcIn, BufferBuilder bufferBuilderIn, Matrix4f matrix4fIn, ClientLevel worldIn, float f13In, long dayTimeIn) {
+		boolean flag = dayTimeIn < ClientTransitionHandler.HALF_TRANSITION || dayTimeIn > 11999L - ClientTransitionHandler.HALF_TRANSITION;
+		RenderSystem.setShaderTexture(0, this.moonTexture == null || flag ? DEFAULT_MOON : this.moonTexture);
+		int k = worldIn.getMoonPhase();
+		int l = k % 4;
+		int i1 = k / 4 % 2;
+		float f14 = (float)(l + 0) / 4.0F;
+		float f15 = (float)(i1 + 0) / 2.0F;
+		float f16 = (float)(l + 1) / 4.0F;
+		float f17 = (float)(i1 + 1) / 2.0F;
+		bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilderIn.vertex(matrix4fIn, -f13In, -100.0F, f13In).uv(f16, f17).endVertex();
+		bufferBuilderIn.vertex(matrix4fIn, f13In, -100.0F, f13In).uv(f14, f17).endVertex();
+		bufferBuilderIn.vertex(matrix4fIn, f13In, -100.0F, -f13In).uv(f14, f15).endVertex();
+		bufferBuilderIn.vertex(matrix4fIn, -f13In, -100.0F, -f13In).uv(f16, f15).endVertex();
+		bufferBuilderIn.end();
+		BufferUploader.end(bufferBuilderIn);
+	}
+
+	private void renderEndInvasionSkybox(PoseStack matrixStackIn, ClientLevel worldIn, float partialTicksIn) {
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
+		RenderSystem.depthMask(false);
+		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+		RenderSystem.setShaderTexture(0, this.skyTexture == null ? DEFAULT_END_SKY : this.skyTexture);
+		Tesselator tessellator = Tesselator.getInstance();
+		BufferBuilder bufferBuilder = tessellator.getBuilder();
+		for(int i = 0; i < 6; ++i) {
+			matrixStackIn.pushPose();
+			if (i == 1) {
+				matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(90.0F));
+			} else if (i == 2) {
+				matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(-90.0F));
+			} else if (i == 3) {
+				matrixStackIn.mulPose(Vector3f.XP.rotationDegrees(180.0F));
+			} else if (i == 4) {
+				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(90.0F));
+			} else if (i == 5) {
+				matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(-90.0F));
+			}
+			Matrix4f matrix4f = matrixStackIn.last().pose();
+			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, -100.0F).uv(0.0F, 0.0F).color(40, 40, 40, 255).endVertex();
+			bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, 100.0F).uv(0.0F, 16.0F).color(40, 40, 40, 255).endVertex();
+			bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, 100.0F).uv(16.0F, 16.0F).color(40, 40, 40, 255).endVertex();
+			bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, -100.0F).uv(16.0F, 0.0F).color(40, 40, 40, 255).endVertex();
+			tessellator.end();
+			matrixStackIn.popPose();
+		}
+		RenderSystem.depthMask(true);
+		RenderSystem.enableTexture();
+		RenderSystem.disableBlend();
+	}
 }

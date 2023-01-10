@@ -4,7 +4,8 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "puresuffering.refmap.json",
 	"mixins": [
-		"LevelMixin"
+		"LevelMixin",
+		"LevelRendererMixin"
 	],
 	"client": [
 		"ClientLevelMixin",

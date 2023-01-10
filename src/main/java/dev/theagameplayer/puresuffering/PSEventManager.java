@@ -5,7 +5,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.client.ClientTransitionHandler;
-import dev.theagameplayer.puresuffering.client.InvasionSkyRenderHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionFogRenderer;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.command.PSCommands;
@@ -26,7 +25,6 @@ import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
 import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
@@ -46,11 +44,9 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.client.ISkyRenderHandler;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -77,7 +73,6 @@ public final class PSEventManager {
 		forgeBusIn.addListener(ClientEvents::loggedOut);
 		forgeBusIn.addListener(ClientEvents::fogColors);
 		forgeBusIn.addListener(ClientEvents::renderGameOverlayText);
-		forgeBusIn.addListener(ClientEvents::renderWorldLast);
 	}
 
 	public static void attachCommonEventListeners(IEventBus modBusIn, IEventBus forgeBusIn) {
@@ -187,17 +182,6 @@ public final class PSEventManager {
 					ClientInvasionWorldInfo fixedInfo = ClientInvasionWorldInfo.getFixedClientInfo(mc.level);
 					eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Invasions: " + fixedInfo.getInvasionsCount());
 					eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Invasion XP Multiplier: " + (PSConfigValues.common.useXPMultiplier ? fixedInfo.getXPMultiplier() + "x" : "Disabled"));
-				}
-			}
-		}
-
-		public static void renderWorldLast(RenderLevelLastEvent eventIn) {
-			Minecraft mc = Minecraft.getInstance();
-			ClientLevel clientWorld = mc.level;
-			if (clientWorld != null && PSConfigValues.client.useSkyBoxRenderer) {
-				ISkyRenderHandler skyRenderHandler = clientWorld.effects().getSkyRenderHandler();
-				if (!(skyRenderHandler instanceof InvasionSkyRenderHandler)) {
-					clientWorld.effects().setSkyRenderHandler(new InvasionSkyRenderHandler(skyRenderHandler));
 				}
 			}
 		}
