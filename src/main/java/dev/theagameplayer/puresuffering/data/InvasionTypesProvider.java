@@ -2,13 +2,11 @@ package dev.theagameplayer.puresuffering.data;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
@@ -18,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionTypesProvider implements DataProvider {
 	private final PackOutput.PathProvider pathProvider;
-	private final List<Consumer<Consumer<InvasionType>>> tabs = ImmutableList.of(new PSInvasionTypes());
+	private final List<Consumer<Consumer<InvasionType>>> tabs = List.of(new PSInvasionTypes());
 	private final CompletableFuture<HolderLookup.Provider> registries;
 
 	public InvasionTypesProvider(final PackOutput packOutputIn, final CompletableFuture<HolderLookup.Provider> lookupProviderIn) {
@@ -29,7 +27,7 @@ public final class InvasionTypesProvider implements DataProvider {
 	@Override
 	public final CompletableFuture<?> run(final CachedOutput cacheIn) {
 		return this.registries.thenCompose(path -> {
-			final Set<ResourceLocation> set = Sets.newHashSet();
+			final HashSet<ResourceLocation> set = new HashSet<>();
 			final ArrayList<CompletableFuture<?>> list = new ArrayList<>();
 			final Consumer<InvasionType> consumer = (invasionType) -> {
 				if (!set.add(invasionType.getId())) {

@@ -87,27 +87,27 @@ public final class Invasion {
 		return this.invasionType.getSeverityInfo().get(this.severity);
 	}
 
-	public final void tick(final ServerLevel worldIn) {
+	public final void tick(final ServerLevel levelIn) {
 		this.invasionMobs.removeIf(uuid -> {
-			return worldIn.getEntity(uuid) == null || !worldIn.getEntity(uuid).isAlive();
+			return levelIn.getEntity(uuid) == null || !levelIn.getEntity(uuid).isAlive();
 		});
 		switch (this.invasionType.getWeatherType()) {
 		case DEFAULT: break;
 		case CLEAR:
-			if (worldIn.isRaining() || worldIn.isThundering())
-				worldIn.setWeatherParameters(600, 0, false, false);
+			if (levelIn.isRaining() || levelIn.isThundering())
+				levelIn.setWeatherParameters(600, 0, false, false);
 			break;
 		case RAIN:
-			if (!worldIn.isRaining())
-				worldIn.setWeatherParameters(0, 600, true, false);
+			if (!levelIn.isRaining())
+				levelIn.setWeatherParameters(0, 600, true, false);
 			break;
 		case THUNDER:
-			if (!worldIn.isThundering())
-				worldIn.setWeatherParameters(0, 600, true, true);
+			if (!levelIn.isThundering())
+				levelIn.setWeatherParameters(0, 600, true, true);
 			break;
 		}
 		if (this.shouldTick)
-			this.tickEntitySpawn(worldIn);
+			this.tickEntitySpawn(levelIn);
 	}
 
 	private final void tickEntitySpawn(final ServerLevel levelIn) {
@@ -121,12 +121,12 @@ public final class Invasion {
 				return;
 			}
 			//Get Mobs
-			if (levelIn.players().size() < 1) return;
-			boolean flag1 = false;
 			final ChunkPos chunkPos = this.getSpawnChunk(levelIn);
+			if (chunkPos == null || !levelIn.isLoaded(chunkPos.getWorldPosition())) return;
 			final List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(levelIn, chunkPos);
 			if (mobs.isEmpty()) return;
 			//Spawn Mob Cluster (Different Mobs)
+			boolean flag1 = false;
 			final int clusterSize = levelIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
 			for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
 				//Spawn Cluster Entities (Entities to be summoned before a mob group is spawned)
@@ -198,13 +198,13 @@ public final class Invasion {
 		}
 	}
 
-	private final void spawnInvasionMob(final ServerLevel worldIn, final Mob mobEntityIn) {
-		final boolean hyperCharged = PSConfigValues.common.hyperCharge && PSConfigValues.common.maxHyperCharge > 1 && !PSConfigValues.common.hyperChargeBlacklist.contains(mobEntityIn.getType().getDescriptionId()) && this.hyperType != HyperType.DEFAULT ? true : worldIn.random.nextInt(PSConfigValues.common.hyperChargeChance + 1) <= this.severity;
+	private final void spawnInvasionMob(final ServerLevel levelIn, final Mob mobEntityIn) {
+		final boolean hyperCharged = PSConfigValues.common.hyperCharge && PSConfigValues.common.maxHyperCharge > 1 && !PSConfigValues.common.hyperChargeBlacklist.contains(mobEntityIn.getType().getDescriptionId()) && this.hyperType != HyperType.DEFAULT ? true : levelIn.random.nextInt(PSConfigValues.common.hyperChargeChance + 1) <= this.severity;
 		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.getId().toString());
-		mobEntityIn.getPersistentData().putBoolean("AntiGrief", worldIn.dimensionType().hasFixedTime());
-		mobEntityIn.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, null, null);
+		mobEntityIn.getPersistentData().putBoolean("AntiGrief", levelIn.dimensionType().hasFixedTime());
+		mobEntityIn.finalizeSpawn(levelIn, levelIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, null, null);
 		if (hyperCharged && mobEntityIn instanceof PSHyperCharge) {
-			final int hyperCharge = this.hyperType != HyperType.DEFAULT ? (this.hyperType == HyperType.MYSTERY ? PSConfigValues.common.maxHyperCharge : worldIn.random.nextInt(PSConfigValues.common.maxHyperCharge > 1 ? PSConfigValues.common.maxHyperCharge - 1 : 1) + 1) : worldIn.random.nextInt(worldIn.random.nextInt(PSConfigValues.common.maxHyperCharge - 1) + 1) + 1;
+			final int hyperCharge = this.hyperType != HyperType.DEFAULT ? (this.hyperType == HyperType.MYSTERY ? PSConfigValues.common.maxHyperCharge : levelIn.random.nextInt(PSConfigValues.common.maxHyperCharge > 1 ? PSConfigValues.common.maxHyperCharge - 1 : 1) + 1) : levelIn.random.nextInt(levelIn.random.nextInt(PSConfigValues.common.maxHyperCharge - 1) + 1) + 1;
 			((PSHyperCharge)mobEntityIn).psSetHyperCharge(hyperCharge);
 			for (final AttributeInstance attribute : mobEntityIn.getAttributes().getSyncableAttributes())
 				attribute.setBaseValue(attribute.getBaseValue() * (1.0D + 0.2D * hyperCharge)); //TODO: Keep an eye out for compatability conflicts
@@ -212,27 +212,27 @@ public final class Invasion {
 		if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
 			mobEntityIn.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
 		this.invasionMobs.add(mobEntityIn.getUUID());
-		worldIn.levelEvent(2004, mobEntityIn.blockPosition(), 0); //Mob Spawn Particles
+		levelIn.levelEvent(2004, mobEntityIn.blockPosition(), 0); //Mob Spawn Particles
 		mobEntityIn.spawnAnim();
 	}
 	
-	private final void delay(final ServerLevel worldIn) {
+	private final void delay(final ServerLevel levelIn) {
 		this.spawnDelay = this.getSeverityInfo().getTickDelay();
-		this.spawnPotentials.getRandom(worldIn.random).ifPresent(entry -> {
+		this.spawnPotentials.getRandom(levelIn.random).ifPresent(entry -> {
 			this.nextSpawnData = entry.getData();
 		});
 	}
 
-	private final List<MobSpawnSettings.SpawnerData> getMobSpawnList(final ServerLevel worldIn, final ChunkPos chunkPosIn) {
-		final BlockPos biomePos = this.getSpawnPos(worldIn, chunkPosIn, true);
+	private final List<MobSpawnSettings.SpawnerData> getMobSpawnList(final ServerLevel levelIn, final ChunkPos chunkPosIn) {
+		final BlockPos biomePos = this.getSpawnPos(levelIn, chunkPosIn, true);
 		final ArrayList<MobSpawnSettings.SpawnerData> originalList = new ArrayList<>(this.getSeverityInfo().getMobSpawnList());
 		switch (this.invasionType.getSpawningSystem()) {
 		case DEFAULT: break;
 		case BIOME_BOOSTED:
-			originalList.addAll(this.getBiomeSpawnList(biomePos, worldIn.getChunk(biomePos)));
+			originalList.addAll(this.getBiomeSpawnList(biomePos, levelIn.getChunk(biomePos)));
 			break;
 		case BIOME_MIXED:
-			originalList.addAll(this.getMixedSpawnList(worldIn));
+			originalList.addAll(this.getMixedSpawnList(levelIn));
 			break;
 		}
 		final ArrayList<MobSpawnSettings.SpawnerData> newList = new ArrayList<>();
@@ -254,8 +254,8 @@ public final class Invasion {
 		return spawners;
 	}
 
-	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(final ServerLevel worldIn) {
-		final ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(worldIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
+	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(final ServerLevel levelIn) {
+		final ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(levelIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
 		spawners.removeIf(spawner -> {
 			final ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());
@@ -263,36 +263,38 @@ public final class Invasion {
 		return spawners;
 	}
 
-	protected final ChunkPos getSpawnChunk(final ServerLevel worldIn) {
-		final ServerPlayer player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
-		final ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
-		final int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
-		final int chunkZ = chunkPos.z - 8 + worldIn.random.nextInt(17);
+	private final ChunkPos getSpawnChunk(final ServerLevel levelIn) {
+		final int players = levelIn.players().size();
+		if (players < 1) return null;
+		final ServerPlayer player = levelIn.players().get(levelIn.random.nextInt(players));
+		final ChunkPos chunkPos = levelIn.getChunk(player.blockPosition()).getPos();
+		final int chunkX = chunkPos.x - 8 + levelIn.random.nextInt(17);
+		final int chunkZ = chunkPos.z - 8 + levelIn.random.nextInt(17);
 		final boolean flag = chunkPos.x == chunkX && chunkPos.z == chunkZ;
-		final ChunkPos chunkPos1 = new ChunkPos(flag ? chunkX + this.getChunkOffset(worldIn) : chunkX, flag ? chunkZ + this.getChunkOffset(worldIn) : chunkZ);
+		final ChunkPos chunkPos1 = new ChunkPos(flag ? chunkX + this.getChunkOffset(levelIn) : chunkX, flag ? chunkZ + this.getChunkOffset(levelIn) : chunkZ);
 		return chunkPos1;
 	}
 
-	private final int getChunkOffset(final ServerLevel worldIn) {
-		final int offSet = worldIn.random.nextInt(8) + 1;
-		return worldIn.random.nextBoolean() ? offSet : -offSet;
+	private final int getChunkOffset(final ServerLevel levelIn) {
+		final int offSet = levelIn.random.nextInt(8) + 1;
+		return levelIn.random.nextBoolean() ? offSet : -offSet;
 	}
 
-	private final BlockPos getSpawnPos(final ServerLevel worldIn, final ChunkPos chunkPosIn, final boolean biomeCheckIn) {
-		final int x = chunkPosIn.getMinBlockX() + worldIn.random.nextInt(16);
-		final int z = chunkPosIn.getMinBlockZ() + worldIn.random.nextInt(16);
-		final int surface = worldIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
-		if (biomeCheckIn || (!worldIn.dimensionType().hasCeiling() && worldIn.random.nextBoolean()))
+	private final BlockPos getSpawnPos(final ServerLevel levelIn, final ChunkPos chunkPosIn, final boolean biomeCheckIn) {
+		final int x = chunkPosIn.getMinBlockX() + levelIn.random.nextInt(16);
+		final int z = chunkPosIn.getMinBlockZ() + levelIn.random.nextInt(16);
+		final int surface = levelIn.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
+		if (biomeCheckIn || (!levelIn.dimensionType().hasCeiling() && levelIn.random.nextBoolean()))
 			return new BlockPos(x, surface, z);
 		final BlockState air = Blocks.AIR.defaultBlockState();
 		final BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
 		final ArrayList<BlockPos> potentialPos = new ArrayList<>();
 		for (int y = 0; y < surface; y++) {
 			final BlockPos pos = new BlockPos(x, y, z);
-			if (worldIn.getBlockState(pos) != air && worldIn.getBlockState(pos) != bedrock && worldIn.getBlockState(pos.above()) == air)
+			if (levelIn.getBlockState(pos) != air && levelIn.getBlockState(pos) != bedrock && levelIn.getBlockState(pos.above()) == air)
 				potentialPos.add(pos.above());
 		}
-		return potentialPos.size() > 0 ? potentialPos.get(worldIn.random.nextInt(potentialPos.size())) : new BlockPos(x, surface, z);
+		return potentialPos.size() > 0 ? potentialPos.get(levelIn.random.nextInt(potentialPos.size())) : new BlockPos(x, surface, z);
 	}
 
 	@Nullable
