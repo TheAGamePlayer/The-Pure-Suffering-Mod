@@ -116,6 +116,7 @@ public class Invasion {
 			boolean flag1 = false;
 			if (worldIn.players().size() < 1) return;
 			ChunkPos chunkPos = this.getSpawnChunk(worldIn);
+			if (chunkPos == null || !worldIn.isLoaded(chunkPos.getWorldPosition())) return;
 			List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(worldIn, chunkPos);
 			if (mobs.isEmpty()) return;
 			//Spawn Mob Cluster (Different Mobs)
@@ -225,7 +226,9 @@ public class Invasion {
 	}
 
 	protected final ChunkPos getSpawnChunk(ServerLevel worldIn) {
-		ServerPlayer player = worldIn.players().get(worldIn.random.nextInt(worldIn.players().size()));
+		int players = worldIn.players().size();
+		if (players < 1) return null;
+		ServerPlayer player = worldIn.players().get(worldIn.random.nextInt(players));
 		ChunkPos chunkPos = worldIn.getChunk(player.blockPosition()).getPos();
 		int chunkX = chunkPos.x - 8 + worldIn.random.nextInt(17);
 		int chunkZ = chunkPos.z - 8 + worldIn.random.nextInt(17);
