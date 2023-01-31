@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
@@ -20,7 +19,7 @@ import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 public final class PSConfig {
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	private static final String CONFIG = PureSufferingMod.MODID + ".config.";
 	
 	public static final class CommonConfig {
@@ -65,7 +64,7 @@ public final class PSConfig {
 		public final ForgeConfigSpec.BooleanValue forceInvasionSleeplessness;
 		public final ForgeConfigSpec.BooleanValue weakenedVexes;
 		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
-		public final ForgeConfigSpec.BooleanValue explosionsDestroyBlocks;
+		public final ForgeConfigSpec.BooleanValue invasionAntiGrief;
 		public final ForgeConfigSpec.BooleanValue shouldMobsDieAtEndOfInvasions;
 		public final ForgeConfigSpec.BooleanValue shouldMobsSpawnWithMaxRange;
 		public final ForgeConfigSpec.IntValue naturalSpawnChance;
@@ -274,11 +273,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("This determines whether invasion mobs should have an xp boost per kill.")
 					.define("useXPMultiplier", true);
-			explosionsDestroyBlocks = COMMON_BUILDER
-					.translation(CONFIG + "explosions_destroy_blocks")
+			invasionAntiGrief = COMMON_BUILDER
+					.translation(CONFIG + "invasion_anti_grief")
 					.worldRestart()
-					.comment("Should explosions caused by invasion mobs break blocks?")
-					.define("explosionsDestroy", false);
+					.comment("Should Invasion Mobs cause fire and explosions?")
+					.define("invasionAntiGrief", false);
 			shouldMobsDieAtEndOfInvasions = COMMON_BUILDER
 					.translation(CONFIG + "should_mobs_die_at_end_of_invasions")
 					.worldRestart()
@@ -312,10 +311,6 @@ public final class PSConfig {
 			COMMON_BUILDER.pop();
 			COMMON_BUILDER.pop();
 		}
-		
-		private final ForgeConfigSpec build() {
-			return COMMON_BUILDER.build();
-		}
 	}
 	
 	public static final class ClientConfig {
@@ -337,10 +332,6 @@ public final class PSConfig {
 					.define("canInvasionsChangeBrightness", true);
 			CLIENT_BUILDER.pop();
 		}
-		
-		private final ForgeConfigSpec build() {
-			return CLIENT_BUILDER.build();
-		}
 	}
 
 	public static final void initConfig() {
@@ -348,16 +339,16 @@ public final class PSConfig {
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		try {
 			Files.createDirectory(psConfigPath);
-		} catch (FileAlreadyExistsException exceptionIn) {
+		} catch (final FileAlreadyExistsException exceptionIn) {
 			LOGGER.info("Config directory for " + PureSufferingMod.MODID + " already exists!");
-		} catch (IOException exceptionIn) {
+		} catch (final IOException exceptionIn) {
 			LOGGER.error("Failed to create " + PureSufferingMod.MODID + " config directory!", exceptionIn);
 		}
-		loadConfig(CommonConfig.COMMON.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-common.toml"));
-		loadConfig(ClientConfig.CLIENT.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-client.toml"));
+		loadConfig(CommonConfig.COMMON_BUILDER.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-common.toml"));
+		loadConfig(ClientConfig.CLIENT_BUILDER.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-client.toml"));
 	}
 	
-    private static final void loadConfig(ForgeConfigSpec specIn, Path pathIn) {
+    private static final void loadConfig(final ForgeConfigSpec specIn, final Path pathIn) {
         final CommentedFileConfig configData = CommentedFileConfig.builder(pathIn)
                 .sync()
                 .autosave()

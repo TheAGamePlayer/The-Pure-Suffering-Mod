@@ -9,7 +9,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
+import dev.theagameplayer.puresuffering.event.PSBaseEvents;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
@@ -30,7 +30,7 @@ public final class RemoveInvasionsCommand {
 		return Component.translatable("commands.puresuffering.invasion_type.invasionTypeNotFound", resourceLocation);
 	});
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_CURRENT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (!iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -49,7 +49,7 @@ public final class RemoveInvasionsCommand {
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (!iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -60,7 +60,7 @@ public final class RemoveInvasionsCommand {
 		return SharedSuggestionProvider.suggestResource(ImmutableList.<ResourceLocation>of().stream(), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (!iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -71,7 +71,7 @@ public final class RemoveInvasionsCommand {
 		return SharedSuggestionProvider.suggestResource(ImmutableList.<ResourceLocation>of().stream(), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_FIXED_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (iwData.hasFixedTime()) {
 			final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
@@ -82,7 +82,7 @@ public final class RemoveInvasionsCommand {
 		return SharedSuggestionProvider.suggestResource(ImmutableList.<ResourceLocation>of().stream(), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_ALL_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (!iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -96,7 +96,7 @@ public final class RemoveInvasionsCommand {
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_QUEUED_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (!iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -107,7 +107,7 @@ public final class RemoveInvasionsCommand {
 		return SharedSuggestionProvider.suggestResource(ImmutableList.<ResourceLocation>of().stream(), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_QUEUED_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (!iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -118,7 +118,7 @@ public final class RemoveInvasionsCommand {
 		return SharedSuggestionProvider.suggestResource(ImmutableList.<ResourceLocation>of().stream(), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_QUEUED_FIXED_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		if (iwData.hasFixedTime()) {
 			final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
@@ -194,11 +194,11 @@ public final class RemoveInvasionsCommand {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final ResourceLocation resourceLocation = ctx.getArgument("invasionType", ResourceLocation.class);
 						Invasion invasion = null;
-						if (contains(tiwData.getInvasionSpawner().getDayInvasions(), BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
+						if (contains(tiwData.getInvasionSpawner().getDayInvasions(), PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
 							invasion = getInvasion(tiwData.getInvasionSpawner().getDayInvasions(), ctx, "invasionType");
 							tiwData.getInvasionSpawner().getDayInvasions().remove(invasion);
 						}
-						if (contains(tiwData.getInvasionSpawner().getNightInvasions(), BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
+						if (contains(tiwData.getInvasionSpawner().getNightInvasions(), PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
 							invasion = getInvasion(tiwData.getInvasionSpawner().getNightInvasions(), ctx, "invasionType");
 							tiwData.getInvasionSpawner().getNightInvasions().remove(invasion);
 						}
@@ -208,7 +208,7 @@ public final class RemoveInvasionsCommand {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final ResourceLocation resourceLocation = ctx.getArgument("invasionType", ResourceLocation.class);
 						Invasion invasion = null;
-						if (contains(fiwData.getInvasionSpawner().getInvasions(), BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
+						if (contains(fiwData.getInvasionSpawner().getInvasions(), PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
 							invasion = getInvasion(fiwData.getInvasionSpawner().getInvasions(), ctx, "invasionType");
 							fiwData.getInvasionSpawner().getInvasions().remove(invasion);
 						}
@@ -255,11 +255,11 @@ public final class RemoveInvasionsCommand {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final ResourceLocation resourceLocation = ctx.getArgument("invasionType", ResourceLocation.class);
 						Invasion invasion = null;
-						if (contains(tiwData.getInvasionSpawner().getQueuedDayInvasions(), BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
+						if (contains(tiwData.getInvasionSpawner().getQueuedDayInvasions(), PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
 							invasion = getInvasion(tiwData.getInvasionSpawner().getQueuedDayInvasions(), ctx, "invasionType");
 							tiwData.getInvasionSpawner().getQueuedDayInvasions().remove(invasion);
 						}
-						if (contains(tiwData.getInvasionSpawner().getQueuedNightInvasions(), BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
+						if (contains(tiwData.getInvasionSpawner().getQueuedNightInvasions(), PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
 							invasion = getInvasion(tiwData.getInvasionSpawner().getQueuedNightInvasions(), ctx, "invasionType");
 							tiwData.getInvasionSpawner().getQueuedNightInvasions().remove(invasion);
 						}
@@ -269,7 +269,7 @@ public final class RemoveInvasionsCommand {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final ResourceLocation resourceLocation = ctx.getArgument("invasionType", ResourceLocation.class);
 						Invasion invasion = null;
-						if (contains(fiwData.getInvasionSpawner().getQueuedInvasions(), BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
+						if (contains(fiwData.getInvasionSpawner().getQueuedInvasions(), PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation))) {
 							invasion = getInvasion(fiwData.getInvasionSpawner().getQueuedInvasions(), ctx, "invasionType");
 							fiwData.getInvasionSpawner().getQueuedInvasions().remove(invasion);
 						}
@@ -290,7 +290,7 @@ public final class RemoveInvasionsCommand {
 
 	private static final Invasion getInvasion(final Iterable<Invasion> invasionListIn, final CommandContext<CommandSourceStack> ctxIn, final String argIn) throws CommandSyntaxException {
 		final ResourceLocation resourceLocation = ctxIn.getArgument(argIn, ResourceLocation.class);
-		final InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation);
+		final InvasionType invasionType = PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation);
 		if (invasionType == null) {
 			throw ERROR_UNKNOWN_INVASION_TYPE.create(resourceLocation);
 		} else {

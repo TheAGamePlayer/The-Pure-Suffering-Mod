@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
+import dev.theagameplayer.puresuffering.event.PSBaseEvents;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SeverityInfo;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SpawningSystem;
 import dev.theagameplayer.puresuffering.world.entity.PSHyperCharge;
@@ -299,8 +299,8 @@ public final class Invasion {
 
 	@Nullable
 	public static final Invasion load(final CompoundTag nbtIn) {
-		if (BaseEvents.getInvasionTypeManager().verifyInvasion(nbtIn.getString("InvasionType"))) {
-			final InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
+		if (PSBaseEvents.getInvasionTypeManager().verifyInvasion(nbtIn.getString("InvasionType"))) {
+			final InvasionType invasionType = PSBaseEvents.getInvasionTypeManager().getInvasionType(ResourceLocation.tryParse(nbtIn.getString("InvasionType")));
 			final Invasion invasion = new Invasion(invasionType, nbtIn.getInt("Severity"), nbtIn.getBoolean("IsPrimary"), PSConfigValues.common.hyperInvasions ? HyperType.values()[nbtIn.getInt("HyperType")] : HyperType.DEFAULT);
 			final CompoundTag invasionMobs = nbtIn.getCompound("InvasionMobs");
 			for (final String name : invasionMobs.getAllKeys())

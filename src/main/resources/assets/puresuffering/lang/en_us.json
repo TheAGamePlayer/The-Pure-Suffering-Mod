@@ -115,7 +115,7 @@
 	"puresuffering.config.mob_biome_boosted_blacklist": "Mob Biome Boosted Blacklist",
 	"puresuffering.config.force_invasion_sleeplessness": "Force Invasion Sleeplessness",
 	"puresuffering.config.use_xp_multiplier": "Use XP Multiplier",
-	"puresuffering.config.explosions_destroy_blocks": "Explosions Destroy Blocks",
+	"puresuffering.config.invasion_anti_grief": "Invasion Anti-Grief",
 	"puresuffering.config.should_mobs_die_at_end_of_invasions": "Should Mobs Die at End of Invasions",
 	"puresuffering.config.should_mobs_spawn_with_max_range": "Should Mobs Spawn With Max Range",
 	"puresuffering.config.natural_spawn_chance": "Natural Spawn Chance",

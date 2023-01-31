@@ -11,7 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 
-import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
+import dev.theagameplayer.puresuffering.event.PSBaseEvents;
 import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
@@ -38,42 +38,42 @@ public final class AddInvasionsCommand {
 		return Component.translatable("commands.puresuffering.invasion_type.invasionTypeNotFound", resourceLocation);
 	});
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_PRIMARY_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT;
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_SECONDARY_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && (containsDayChangingInvasion(((TimedInvasionWorldData)iwData).getInvasionSpawner().getQueuedDayInvasions()) ? it.getInvasionTime() != InvasionTime.DAY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY : it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT);
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_PRIMARY_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && it.getInvasionTime() != InvasionTime.DAY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY;
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_SECONDARY_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && (containsNightChangingInvasion(((TimedInvasionWorldData)iwData).getInvasionSpawner().getQueuedNightInvasions()) ? it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT : it.getInvasionTime() != InvasionTime.DAY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY);
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_PRIMARY_FIXED_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY;
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_SECONDARY_FIXED_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
-		final Collection<InvasionType> collection = BaseEvents.getInvasionTypeManager().getAllInvasionTypes();
+		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY;
@@ -588,7 +588,7 @@ public final class AddInvasionsCommand {
 
 	private static final Invasion getInvasion(final CommandContext<CommandSourceStack> ctxIn, final String argIn, final String arg1In, final boolean isPrimaryIn, final HyperType hyperTypeIn) throws CommandSyntaxException {
 		final ResourceLocation resourceLocation = ctxIn.getArgument(argIn, ResourceLocation.class);
-		final InvasionType invasionType = BaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation);
+		final InvasionType invasionType = PSBaseEvents.getInvasionTypeManager().getInvasionType(resourceLocation);
 		if (invasionType == null) {
 			throw ERROR_UNKNOWN_INVASION_TYPE.create(resourceLocation);
 		} else {
@@ -598,7 +598,7 @@ public final class AddInvasionsCommand {
 	}
 	
 	private static final Invasion getRandomInvasion(final CommandContext<CommandSourceStack> ctxIn, final InvasionWorldData iwDataIn, final boolean hasFixedTimeIn, final boolean isDayIn, final boolean isPrimaryIn) throws CommandSyntaxException {
-		final ArrayList<InvasionType> list = new ArrayList<>(BaseEvents.getInvasionTypeManager().getAllInvasionTypes());
+		final ArrayList<InvasionType> list = new ArrayList<>(PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes());
 		list.removeIf(it -> {
 			boolean result = false;
 			if (hasFixedTimeIn) {

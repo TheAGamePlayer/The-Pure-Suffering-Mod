@@ -1,4 +1,8 @@
 #Minecraft 1.19.x
+Version 1.4.2.0R:
+- Changed "explosionsDestroyBlocks" Config option to "invasionAntiGrief" to include fire spreading.
+- Slight performance optimizations.
+
 Version 1.4.1.1R:
 - Fixed a desync issue bricking players out of their world.
 

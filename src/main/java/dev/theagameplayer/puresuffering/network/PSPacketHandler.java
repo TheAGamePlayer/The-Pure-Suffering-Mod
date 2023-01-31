@@ -10,12 +10,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraft.resources.ResourceLocation;
 
 public final class PSPacketHandler {
 	private static final String PROTOCAL_VERSION = "1";
 	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-			new ResourceLocation(PureSufferingMod.MODID, "main_network_channel"), 
+			PureSufferingMod.namespace("main_network_channel"), 
 			() -> PROTOCAL_VERSION, 
 			PROTOCAL_VERSION::equals, 
 			PROTOCAL_VERSION::equals);

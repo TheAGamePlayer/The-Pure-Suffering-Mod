@@ -1,12 +1,11 @@
 package dev.theagameplayer.puresuffering.spawner;
 
 import java.util.ArrayList;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
-import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
+import dev.theagameplayer.puresuffering.event.PSBaseEvents;
 import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
@@ -23,7 +22,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerLevel;
 
 public final class FixedInvasionSpawner {
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	private final InvasionList invasions = new InvasionList(InvasionListType.FIXED);
 	private final ArrayList<Invasion> queuedInvasions = new ArrayList<>();
 	private int interval;
@@ -38,8 +37,8 @@ public final class FixedInvasionSpawner {
 		this.hyperInterval = this.hyperInterval > 0 ? (this.interval == 0 ? (PSConfigValues.common.hyperInvasions && PSConfigValues.common.hyperCharge ? this.hyperInterval - 1 : this.hyperInterval) : this.hyperInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.hyperInvasionRarity : random.nextInt(PSConfigValues.common.hyperInvasionRarity) + PSConfigValues.common.hyperInvasionRarity - (int)(daysIn % PSConfigValues.common.hyperInvasionRarity));
 		this.mysteryInterval = this.mysteryInterval > 0 ? (this.hyperInterval == 0 ? (PSConfigValues.common.mysteryInvasions && PSConfigValues.common.hyperCharge ? this.mysteryInterval - 1 : this.mysteryInterval) : this.mysteryInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.mysteryInvasionRarity : random.nextInt(PSConfigValues.common.mysteryInvasionRarity) + PSConfigValues.common.mysteryInvasionRarity - (int)(daysIn % PSConfigValues.common.mysteryInvasionRarity));
 		InvasionChart.refresh();
-		final InvasionChart potentialPrimaryInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.fixedDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
-		final InvasionChart potentialSecondaryInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.fixedDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
+		final InvasionChart potentialPrimaryInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.fixedDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
+		final InvasionChart potentialSecondaryInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.fixedDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
 		LOGGER.info("Setting Fixed Invasions: [");
 		this.invasions.setCanceled(this.queuedInvasions.isEmpty() && isCanceledIn);
 		if (!this.queuedInvasions.isEmpty()) {

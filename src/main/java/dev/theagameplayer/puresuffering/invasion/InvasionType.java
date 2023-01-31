@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.JsonArray;
@@ -228,7 +227,7 @@ public final class InvasionType {
 		}
 
 		public static final class Builder {
-			private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+			private static final Logger LOGGER = PureSufferingMod.LOGGER;
 			private InvasionSkyRenderer.Builder skyRenderer = null;
 			private List<MobSpawnSettings.SpawnerData> mobSpawnList;
 			private List<ClusterEntitySpawnData> clusterEntitiesList;
@@ -406,7 +405,7 @@ public final class InvasionType {
 	}
 
 	public static final class Builder {
-		private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+		private static final Logger LOGGER = PureSufferingMod.LOGGER;
 		private int rarity = 0;
 		private int tier = 0;
 		private InvasionTime invasionTime;
@@ -488,7 +487,7 @@ public final class InvasionType {
 		}
 
 		public final InvasionType save(final Consumer<InvasionType> consumerIn, final String pathIn) {
-			final InvasionType invasionType = this.build(new ResourceLocation(PureSufferingMod.MODID, pathIn));
+			final InvasionType invasionType = this.build(PureSufferingMod.namespace(pathIn));
 			consumerIn.accept(invasionType);
 			return invasionType;
 		}

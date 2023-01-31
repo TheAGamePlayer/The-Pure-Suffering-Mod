@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -27,7 +26,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionTypeManager extends SimpleJsonResourceReloadListener {
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	private static final Gson GSON = (new GsonBuilder()).create();
 	private final HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
 

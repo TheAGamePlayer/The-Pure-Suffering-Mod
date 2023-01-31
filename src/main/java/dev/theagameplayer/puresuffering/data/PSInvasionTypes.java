@@ -15,7 +15,6 @@ import dev.theagameplayer.puresuffering.invasion.InvasionType.TimeChangeability;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.TimeModifier;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.WeatherType;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 
@@ -26,7 +25,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 		InvasionType.Builder.invasionType().withRarity(7).withTier(1).withInvasionTime(InvasionTime.DAY).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_BOOSTED).withTimeModifier(TimeModifier.DAY_TO_NIGHT).withTimeChangeability(TimeChangeability.ONLY_DAY).severityInfo(List.of(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.15F, 0.15F, 0.15F))
-						.sunTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/solar_eclipse_sun.png"))
+						.sunTexture(PureSufferingMod.namespace("textures/environment/solar_eclipse_sun.png"))
 						.withSkyBrightness(0.15F)
 						.withRGB(-0.85F, -0.85F, -0.85F))
 				.setForcesNoSleep()
@@ -35,7 +34,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 				.setMobCapMultiplier(0.6F),
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.1F, 0.1F, 0.1F))
-						.sunTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/solar_eclipse_sun.png"))
+						.sunTexture(PureSufferingMod.namespace("textures/environment/solar_eclipse_sun.png"))
 						.withSkyBrightness(0.1F)
 						.withRGB(-0.9F, -0.9F, -0.9F))
 				.setForcesNoSleep()
@@ -44,7 +43,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 				.setMobCapMultiplier(0.8F),
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.05F, 0.05F, 0.05F))
-						.sunTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/solar_eclipse_sun.png"))
+						.sunTexture(PureSufferingMod.namespace("textures/environment/solar_eclipse_sun.png"))
 						.withSkyBrightness(0.05F)
 						.withRGB(-0.95F, -0.95F, -0.95F))
 				.setForcesNoSleep()
@@ -56,21 +55,21 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 		InvasionType.Builder.invasionType().withRarity(7).withTier(1).withInvasionTime(InvasionTime.NIGHT).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_BOOSTED).withTimeModifier(TimeModifier.NONE).withTimeChangeability(TimeChangeability.ONLY_NIGHT).severityInfo(List.of(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.05F, 0, 0))
-						.moonTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/lunar_eclipse_moon.png"))
+						.moonTexture(PureSufferingMod.namespace("textures/environment/lunar_eclipse_moon.png"))
 						.weatherVisibility(0.1F)
 						.withRGB(0, -0.1F, -0.1F))
 				.withTickDelay(25)
 				.setMobCapMultiplier(0.6F),
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.1F, 0, 0))
-						.moonTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/lunar_eclipse_moon.png"))
+						.moonTexture(PureSufferingMod.namespace("textures/environment/lunar_eclipse_moon.png"))
 						.weatherVisibility(0.2F)
 						.withRGB(0, -0.2F, -0.2F))
 				.withTickDelay(20)
 				.setMobCapMultiplier(0.8F),
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.15F, 0, 0))
-						.moonTexture(new ResourceLocation(PureSufferingMod.MODID, "textures/environment/lunar_eclipse_moon.png"))
+						.moonTexture(PureSufferingMod.namespace("textures/environment/lunar_eclipse_moon.png"))
 						.weatherVisibility(0.3F)
 						.withRGB(0, -0.3F, -0.3F))
 				.withTickDelay(15)

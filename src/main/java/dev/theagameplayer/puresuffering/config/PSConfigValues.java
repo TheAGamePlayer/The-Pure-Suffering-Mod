@@ -2,17 +2,16 @@ package dev.theagameplayer.puresuffering.config;
 
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 
 public abstract class PSConfigValues {
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	public static CommonValues common = new CommonValues();
 	public static ClientValues client = new ClientValues();
 	
-	public static final <C extends PSConfigValues> void resync(C configIn) {
+	public static final <C extends PSConfigValues> void resync(final C configIn) {
 		if (configIn == common) {
 			common = new CommonValues();
 		} else if (configIn == client) {
@@ -61,7 +60,7 @@ public abstract class PSConfigValues {
 		public final boolean forceInvasionSleeplessness;
 		public final boolean weakenedVexes;
 		public final boolean useXPMultiplier;
-		public final boolean explosionsDestroyBlocks;
+		public final boolean invasionAntiGrief;
 		public final boolean shouldMobsDieAtEndOfInvasions;
 		public final boolean shouldMobsSpawnWithMaxRange;
 		public final int naturalSpawnChance;
@@ -108,7 +107,7 @@ public abstract class PSConfigValues {
 			this.forceInvasionSleeplessness = PSConfig.CommonConfig.COMMON.forceInvasionSleeplessness.get();
 			this.weakenedVexes = PSConfig.CommonConfig.COMMON.weakenedVexes.get();
 			this.useXPMultiplier = PSConfig.CommonConfig.COMMON.useXPMultiplier.get();
-			this.explosionsDestroyBlocks = PSConfig.CommonConfig.COMMON.explosionsDestroyBlocks.get();
+			this.invasionAntiGrief = PSConfig.CommonConfig.COMMON.invasionAntiGrief.get();
 			this.shouldMobsDieAtEndOfInvasions = PSConfig.CommonConfig.COMMON.shouldMobsDieAtEndOfInvasions.get();
 			this.shouldMobsSpawnWithMaxRange = PSConfig.CommonConfig.COMMON.shouldMobsSpawnWithMaxRange.get();
 			this.naturalSpawnChance = PSConfig.CommonConfig.COMMON.naturalSpawnChance.get();

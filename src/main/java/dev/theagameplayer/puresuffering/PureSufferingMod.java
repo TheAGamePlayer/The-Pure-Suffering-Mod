@@ -7,11 +7,18 @@ import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.config.PSConfig;
 import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
+import dev.theagameplayer.puresuffering.event.PSBaseEvents;
+import dev.theagameplayer.puresuffering.event.PSClientEvents;
+import dev.theagameplayer.puresuffering.event.PSEntityEvents;
+import dev.theagameplayer.puresuffering.event.PSLivingEvents;
+import dev.theagameplayer.puresuffering.event.PSPlayerEvents;
+import dev.theagameplayer.puresuffering.event.PSServerEvents;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -25,7 +32,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 @Mod(value = PureSufferingMod.MODID)
 public final class PureSufferingMod {
 	public static final String MODID = "puresuffering";
-	private static final Logger LOGGER = LogManager.getLogger(MODID);
+	public static final Logger LOGGER = LogManager.getLogger(MODID);
 
 	public PureSufferingMod() {
 		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -36,8 +43,12 @@ public final class PureSufferingMod {
 		modEventBus.addListener(this::clientSetup);
 		modEventBus.addListener(this::gatherData);
 		if (FMLEnvironment.dist.isClient())
-			PSEventManager.attachClientEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
-		PSEventManager.attachCommonEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
+			attachClientEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
+		attachCommonEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
+	}
+	
+	public static final ResourceLocation namespace(final String nameIn) {
+		return new ResourceLocation(MODID, nameIn);
 	}
 	
 	private final void createConfig() {
@@ -45,13 +56,48 @@ public final class PureSufferingMod {
 		LOGGER.info("Created mod config.");
 	}
 	
+	private final void createRegistries(final IEventBus busIn) {
+		LOGGER.info("Created custom registries.");
+	}
+	
 	private final void registerAll(final IEventBus busIn) {
 		PSMobEffects.MOB_EFFECTS.register(busIn);
 		LOGGER.info("Registered all event buses.");
 	}
 	
-	private final void createRegistries(final IEventBus busIn) {
-		LOGGER.info("Created custom registries.");
+	public static final void attachClientEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
+		//Client
+		modBusIn.addListener(PSClientEvents::addLayers);
+		forgeBusIn.addListener(PSClientEvents::loggedIn);
+		forgeBusIn.addListener(PSClientEvents::loggedOut);
+		forgeBusIn.addListener(PSClientEvents::fogColors);
+		forgeBusIn.addListener(PSClientEvents::customizeGuiOverlayDebugText);
+	}
+
+	public static final void attachCommonEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
+		//Base
+		forgeBusIn.addListener(PSBaseEvents::addReloadListeners);
+		forgeBusIn.addListener(PSBaseEvents::registerCommands);
+		forgeBusIn.addListener(PSBaseEvents::levelTick);
+		//Entity
+		forgeBusIn.addListener(PSEntityEvents::joinLevel);
+		forgeBusIn.addListener(PSEntityEvents::mobGriefing);
+		//Living
+		forgeBusIn.addListener(PSLivingEvents::livingConversion);
+		forgeBusIn.addListener(PSLivingEvents::livingTick);
+		forgeBusIn.addListener(PSLivingEvents::experienceDrop);
+		forgeBusIn.addListener(PSLivingEvents::checkSpawn);
+		forgeBusIn.addListener(PSLivingEvents::specialSpawn);
+		forgeBusIn.addListener(PSLivingEvents::allowDespawn);
+		//Player
+		forgeBusIn.addListener(PSPlayerEvents::playerLoggedIn);
+		forgeBusIn.addListener(PSPlayerEvents::playerRespawn);
+		forgeBusIn.addListener(PSPlayerEvents::playerChangeDimension);
+		forgeBusIn.addListener(PSPlayerEvents::playerSleepInBed);
+		//Server
+		forgeBusIn.addListener(PSServerEvents::serverStarted);
+		forgeBusIn.addListener(PSServerEvents::serverStarting);
+		forgeBusIn.addListener(PSServerEvents::serverStopping);
 	}
 	
 	private final void commonSetup(final FMLCommonSetupEvent eventIn) {

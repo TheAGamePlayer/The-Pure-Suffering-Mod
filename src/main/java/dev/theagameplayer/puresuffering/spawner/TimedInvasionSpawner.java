@@ -1,12 +1,11 @@
 package dev.theagameplayer.puresuffering.spawner;
 
 import java.util.ArrayList;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
-import dev.theagameplayer.puresuffering.PSEventManager.BaseEvents;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
+import dev.theagameplayer.puresuffering.event.PSBaseEvents;
 import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
@@ -29,7 +28,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.server.level.ServerLevel;
 
 public final class TimedInvasionSpawner {
-	private static final Logger LOGGER = LogManager.getLogger(PureSufferingMod.MODID);
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	private final InvasionList nightInvasions = new InvasionList(InvasionListType.NIGHT);
 	private final InvasionList dayInvasions = new InvasionList(InvasionListType.DAY);
 	private final ArrayList<Invasion> queuedNightInvasions = new ArrayList<>();
@@ -48,9 +47,9 @@ public final class TimedInvasionSpawner {
 		this.hyperNightInterval = this.hyperNightInterval > 0 ? (this.nightInterval == 0 ? (PSConfigValues.common.hyperInvasions && PSConfigValues.common.hyperCharge ? this.hyperNightInterval - 1 : this.hyperNightInterval) : this.hyperNightInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.hyperInvasionRarity : random.nextInt(PSConfigValues.common.hyperInvasionRarity) + PSConfigValues.common.hyperInvasionRarity - (int)(daysIn % PSConfigValues.common.hyperInvasionRarity));
 		this.mysteryNightInterval = this.mysteryNightInterval > 0 ? (this.hyperNightInterval == 0 ? (PSConfigValues.common.mysteryInvasions && PSConfigValues.common.hyperCharge ? this.mysteryNightInterval - 1 : this.mysteryNightInterval) : this.mysteryNightInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.mysteryInvasionRarity : random.nextInt(PSConfigValues.common.mysteryInvasionRarity) + PSConfigValues.common.mysteryInvasionRarity - (int)(daysIn % PSConfigValues.common.mysteryInvasionRarity));
 		InvasionChart.refresh();
-		final InvasionChart potentialPrimaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
-		final InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
-		final InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY));
+		final InvasionChart potentialPrimaryNightInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
+		final InvasionChart potentialSecondaryNightInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
+		final InvasionChart potentialSecondaryDayInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.nightDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY));
 		LOGGER.info("Setting Night Invasions: [");
 		this.nightInvasions.setCanceled(this.queuedNightInvasions.isEmpty() && isCanceledIn);
 		if (!this.queuedNightInvasions.isEmpty()) {
@@ -84,9 +83,9 @@ public final class TimedInvasionSpawner {
 		this.hyperDayInterval = this.hyperDayInterval > 0 ? (this.dayInterval == 0 ? (PSConfigValues.common.hyperInvasions && PSConfigValues.common.hyperCharge ? this.hyperDayInterval - 1 : this.hyperDayInterval) : this.hyperDayInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.hyperInvasionRarity : random.nextInt(PSConfigValues.common.hyperInvasionRarity) + PSConfigValues.common.hyperInvasionRarity - (int)(daysIn % PSConfigValues.common.hyperInvasionRarity));
 		this.mysteryDayInterval = this.mysteryDayInterval > 0 ? (this.hyperDayInterval == 0 ? (PSConfigValues.common.mysteryInvasions && PSConfigValues.common.hyperCharge ? this.mysteryDayInterval - 1 : this.mysteryDayInterval) : this.mysteryDayInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.mysteryInvasionRarity : random.nextInt(PSConfigValues.common.mysteryInvasionRarity) + PSConfigValues.common.mysteryInvasionRarity - (int)(daysIn % PSConfigValues.common.mysteryInvasionRarity));
 		InvasionChart.refresh();
-		final InvasionChart potentialPrimaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
-		final InvasionChart potentialSecondaryDayInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
-		final InvasionChart potentialSecondaryNightInvasions = new InvasionChart(BaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT));
+		final InvasionChart potentialPrimaryDayInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
+		final InvasionChart potentialSecondaryDayInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.NIGHT && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
+		final InvasionChart potentialSecondaryNightInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getInvasionTime() != InvasionTime.DAY && it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.dayDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT));
 		LOGGER.info("Setting Day Invasions: [");
 		this.dayInvasions.setCanceled(this.queuedDayInvasions.isEmpty() && isCanceledIn);
 		if (!this.queuedDayInvasions.isEmpty()) {
