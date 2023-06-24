@@ -19,6 +19,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 
 public final class FixedInvasionSpawner {
@@ -72,8 +73,9 @@ public final class FixedInvasionSpawner {
 
 	public final void invasionTick(final MinecraftServer serverIn, final ServerLevel levelIn) {
 		if (!this.invasions.isEmpty()) {
-			Invasion invasion = this.invasions.get(levelIn.getRandom().nextInt(this.invasions.size()));
-			invasion.tick(levelIn);
+			final Invasion invasion = this.invasions.get(levelIn.getRandom().nextInt(this.invasions.size()));
+			final ServerChunkCache chunkSource = levelIn.getChunkSource();
+			invasion.tick(levelIn, chunkSource.spawnEnemies, chunkSource.spawnFriendlies);
 		}
 	}
 

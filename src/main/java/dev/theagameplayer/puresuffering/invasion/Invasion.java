@@ -27,20 +27,20 @@ import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public final class Invasion {
-	private static final ArrayList<Biome> MIXED_BIOMES = new ArrayList<>(ForgeRegistries.BIOMES.getValues());
+public final class Invasion implements CustomSpawner {
 	private final ArrayList<UUID> invasionMobs = new ArrayList<>();
 	private final InvasionType invasionType;
 	private final int severity;
@@ -87,7 +87,7 @@ public final class Invasion {
 		return this.invasionType.getSeverityInfo().get(this.severity);
 	}
 
-	public final void tick(final ServerLevel levelIn) {
+	public final int tick(final ServerLevel levelIn, final boolean spawnEnemiesIn, final boolean spawnFriendliesIn) {
 		this.invasionMobs.removeIf(uuid -> {
 			return levelIn.getEntity(uuid) == null || !levelIn.getEntity(uuid).isAlive();
 		});
@@ -106,11 +106,13 @@ public final class Invasion {
 				levelIn.setWeatherParameters(0, 600, true, true);
 			break;
 		}
-		if (this.shouldTick)
-			this.tickEntitySpawn(levelIn);
+		if (this.shouldTick && spawnEnemiesIn)
+			return this.tickEntitySpawn(levelIn);
+		return 0;
 	}
 
-	private final void tickEntitySpawn(final ServerLevel levelIn) {
+	private final int tickEntitySpawn(final ServerLevel levelIn) {
+		int spawnedEntities = 0;
 		if (this.invasionMobs.size() < this.mobCap) {
 			//Delay check
 			if (this.spawnDelay < 0) {
@@ -118,13 +120,13 @@ public final class Invasion {
 			}
 			if (this.spawnDelay > 0) {
 				--this.spawnDelay;
-				return;
+				return spawnedEntities;
 			}
 			//Get Mobs
 			final ChunkPos chunkPos = this.getSpawnChunk(levelIn);
-			if (chunkPos == null || !levelIn.isLoaded(chunkPos.getWorldPosition())) return;
+			if (chunkPos == null || !levelIn.isLoaded(chunkPos.getWorldPosition())) return spawnedEntities;
 			final List<MobSpawnSettings.SpawnerData> mobs = this.getMobSpawnList(levelIn, chunkPos);
-			if (mobs.isEmpty()) return;
+			if (mobs.isEmpty()) return spawnedEntities;
 			//Spawn Mob Cluster (Different Mobs)
 			boolean flag1 = false;
 			final int clusterSize = levelIn.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
@@ -145,7 +147,7 @@ public final class Invasion {
 				final Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
 				if (!optional.isPresent()) {
 					this.delay(levelIn);
-					return;
+					return spawnedEntities;
 				}
 				for(int count = 0; count < groupSize && this.invasionMobs.size() < this.mobCap; ++count) {
 					//Spawn Entity
@@ -157,20 +159,19 @@ public final class Invasion {
 						});
 						if (entity == null) {
 							this.delay(levelIn);
-							return;
+							return spawnedEntities;
 						}
 						entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), levelIn.random.nextFloat() * 360.0F, 0.0F);
 						if (entity instanceof Mob) {
 							final Mob mobEntity = (Mob)entity;
 							if (this.nextSpawnData.getEntityToSpawn().size() == 1 && this.nextSpawnData.getEntityToSpawn().contains("id", 8)) {
-								if (!ForgeEventFactory.doSpecialSpawn(mobEntity, (LevelAccessor)levelIn, (float)mobEntity.getX(), (float)mobEntity.getY(), (float)mobEntity.getZ(), null, MobSpawnType.EVENT)) {
-									this.spawnInvasionMob(levelIn, mobEntity);
-								}
+								this.spawnInvasionMob(levelIn, mobEntity);
+								spawnedEntities++;
 							}
 						}
 						if (!levelIn.tryAddFreshEntityWithPassengers(entity)) {
 							this.delay(levelIn);
-							return;
+							return spawnedEntities;
 						}
 						flag1 = true;
 					}
@@ -180,9 +181,11 @@ public final class Invasion {
 				this.delay(levelIn);
 			}
 		}
+		return spawnedEntities;
 	}
 
-	private final void spawnClusterEntity(final BlockPos posIn, final ServerLevel levelIn, final EntityType<?> entityTypeIn) {
+	@SuppressWarnings("deprecation")
+	private final boolean spawnClusterEntity(final BlockPos posIn, final ServerLevel levelIn, final EntityType<?> entityTypeIn) {
 		if (Level.isInSpawnableBounds(posIn)) {
 			final CompoundTag compoundTag = new CompoundTag();
 			compoundTag.putString("id", ForgeRegistries.ENTITY_TYPES.getKey(entityTypeIn).toString());
@@ -194,10 +197,13 @@ public final class Invasion {
 				if (entity instanceof Mob)
 					((Mob)entity).finalizeSpawn(levelIn, levelIn.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.EVENT, null, null);
 				levelIn.tryAddFreshEntityWithPassengers(entity);
+				return entity instanceof Mob;
 			}
 		}
+		return false;
 	}
 
+	@SuppressWarnings("deprecation")
 	private final void spawnInvasionMob(final ServerLevel levelIn, final Mob mobEntityIn) {
 		final boolean hyperCharged = PSConfigValues.common.hyperCharge && PSConfigValues.common.maxHyperCharge > 1 && !PSConfigValues.common.hyperChargeBlacklist.contains(mobEntityIn.getType().getDescriptionId()) && this.hyperType != HyperType.DEFAULT ? true : levelIn.random.nextInt(PSConfigValues.common.hyperChargeChance + 1) <= this.severity;
 		mobEntityIn.getPersistentData().putString("InvasionMob", this.invasionType.getId().toString());
@@ -255,7 +261,8 @@ public final class Invasion {
 	}
 
 	private final ArrayList<MobSpawnSettings.SpawnerData> getMixedSpawnList(final ServerLevel levelIn) {
-		final ArrayList<MobSpawnSettings.SpawnerData> spawners = new ArrayList<>(MIXED_BIOMES.get(levelIn.random.nextInt(MIXED_BIOMES.size())).getMobSettings().getMobs(MobCategory.MONSTER).unwrap());
+		final Optional<Holder.Reference<Biome>> optional = levelIn.registryAccess().registryOrThrow(Registries.BIOME).getRandom(levelIn.random);
+		final ArrayList<MobSpawnSettings.SpawnerData> spawners = optional.isPresent() && !optional.isEmpty() ? new ArrayList<>(optional.get().get().getMobSettings().getMobs(MobCategory.MONSTER).unwrap()) : new ArrayList<>();
 		spawners.removeIf(spawner -> {
 			final ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());

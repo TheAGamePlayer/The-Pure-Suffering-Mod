@@ -25,6 +25,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 
 public final class TimedInvasionSpawner {
@@ -122,10 +123,12 @@ public final class TimedInvasionSpawner {
 		final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)InvasionWorldData.getInvasionData().get(levelIn);
 		if (!this.nightInvasions.isEmpty() && ServerTimeUtil.isServerNight(levelIn, tiwData)) {
 			final Invasion invasion = this.nightInvasions.get(levelIn.getRandom().nextInt(this.nightInvasions.size()));
-			invasion.tick(levelIn);
+			final ServerChunkCache chunkSource = levelIn.getChunkSource();
+			invasion.tick(levelIn, chunkSource.spawnEnemies, chunkSource.spawnFriendlies);
 		} else if (!this.dayInvasions.isEmpty() && ServerTimeUtil.isServerDay(levelIn, tiwData)) {
 			final Invasion invasion = this.dayInvasions.get(levelIn.getRandom().nextInt(this.dayInvasions.size()));
-			invasion.tick(levelIn);
+			final ServerChunkCache chunkSource = levelIn.getChunkSource();
+			invasion.tick(levelIn, chunkSource.spawnEnemies, chunkSource.spawnFriendlies);
 		}
 	}
 

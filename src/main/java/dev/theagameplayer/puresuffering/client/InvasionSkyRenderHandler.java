@@ -111,7 +111,6 @@ public final class InvasionSkyRenderHandler {
 		final float f1 = ClientTransitionHandler.tickSkyColor((float)vec3.y, g, dayTimeIn);
 		final float f2 = ClientTransitionHandler.tickSkyColor((float)vec3.z, b, dayTimeIn);
 		final BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-		RenderSystem.disableTexture();
 		FogRenderer.levelFogColor();
 		RenderSystem.depthMask(false);
 		RenderSystem.setShaderColor(f, f1, f2, 1.0F);
@@ -120,11 +119,9 @@ public final class InvasionSkyRenderHandler {
 		mcIn.levelRenderer.skyBuffer.drawWithShader(poseStackIn.last().pose(), mat4In, shaderInstance);
 		VertexBuffer.unbind();
 		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
 		final float[] afloat = levelIn.effects().getSunriseColor(levelIn.getTimeOfDay(partialTicksIn), partialTicksIn);
 		if (afloat != null) {
 			RenderSystem.setShader(GameRenderer::getPositionColorShader);
-			RenderSystem.disableTexture();
 			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			poseStackIn.pushPose();
 			poseStackIn.mulPose(Axis.XP.rotationDegrees(90.0F));
@@ -146,7 +143,6 @@ public final class InvasionSkyRenderHandler {
 			BufferUploader.drawWithShader(bufferBuilder.end());
 			poseStackIn.popPose();
 		}
-		RenderSystem.enableTexture();
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		poseStackIn.pushPose();
 		final float f11 = Mth.clamp(((this.sunTexture == null && dayInfo.isClientTime()) || (this.moonTexture == null && nightInfo.isClientTime()) ? 1.0F : ClientTransitionHandler.tickSunMoonAlpha(1.0F, dayTimeIn)) - levelIn.getRainLevel(partialTicksIn), 0.0F, 1.0F);
@@ -160,7 +156,6 @@ public final class InvasionSkyRenderHandler {
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		this.renderSun(bufferBuilder, matrix4f1, 30.0F, dayTimeIn);
 		this.renderMoon(bufferBuilder, matrix4f1, levelIn, 20.0F, dayTimeIn);
-		RenderSystem.disableTexture();
 		final float f10 = levelIn.getStarBrightness(partialTicksIn) * f11;
 		if (f10 > 0.0F) {
 			RenderSystem.setShaderColor(f10, f10, f10, f10 / this.rendererMap.size());
@@ -172,8 +167,8 @@ public final class InvasionSkyRenderHandler {
 		}
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableBlend();
+		RenderSystem.defaultBlendFunc();
 		poseStackIn.popPose();
-		RenderSystem.disableTexture();
 		RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
 		final double d0 = mcIn.player.getEyePosition(partialTicksIn).y - levelIn.getLevelData().getHorizonHeight(levelIn);
 		if (d0 < 0.0D) {
@@ -184,12 +179,7 @@ public final class InvasionSkyRenderHandler {
 			VertexBuffer.unbind();
 			poseStackIn.popPose();
 		}
-		if (levelIn.effects().hasGround()) {
-			RenderSystem.setShaderColor(f * 0.2F + 0.04F, f1 * 0.2F + 0.04F, f2 * 0.6F + 0.1F, 1.0F);
-		} else {
-			RenderSystem.setShaderColor(f, f1, f2, 1.0F);
-		}
-		RenderSystem.enableTexture();
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.depthMask(true);
 	}
 
@@ -224,7 +214,6 @@ public final class InvasionSkyRenderHandler {
 
 	private final void renderEndInvasionSkybox(final PoseStack matrixStackIn, final ClientLevel levelIn, final float partialTicksIn) {
 		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
 		RenderSystem.depthMask(false);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		RenderSystem.setShaderTexture(0, this.skyTexture == null ? DEFAULT_END_SKY : this.skyTexture);
@@ -253,7 +242,6 @@ public final class InvasionSkyRenderHandler {
 			matrixStackIn.popPose();
 		}
 		RenderSystem.depthMask(true);
-		RenderSystem.enableTexture();
 		RenderSystem.disableBlend();
 	}
 }

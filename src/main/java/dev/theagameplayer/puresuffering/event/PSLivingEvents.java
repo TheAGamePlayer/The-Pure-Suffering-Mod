@@ -24,7 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 
 public final class PSLivingEvents {
@@ -94,12 +94,13 @@ public final class PSLivingEvents {
 		}
 	}
 
-	public static final void checkSpawn(final LivingSpawnEvent.CheckSpawn eventIn) {
+	public static final void finalizeSpawn(final MobSpawnEvent.FinalizeSpawn eventIn) {
 		if (!eventIn.getLevel().isClientSide()) {
-			if (eventIn.getSpawnReason().equals(MobSpawnType.NATURAL)) {
+			if (eventIn.getSpawnType() == MobSpawnType.NATURAL) {
 				final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
 				final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
 				if (iwData != null) {
+					final boolean flag = eventIn.getEntity().getClassification(false) == MobCategory.MONSTER;
 					if (serverLevel.random.nextInt(10000) < PSConfigValues.common.naturalSpawnChance) {
 						eventIn.setResult(Result.DEFAULT);
 					} else {
@@ -107,10 +108,14 @@ public final class PSLivingEvents {
 							final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 							if ((ServerTimeUtil.isServerDay(serverLevel, tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) || (ServerTimeUtil.isServerNight(serverLevel, tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()))
 								eventIn.setResult(Result.DENY);
+							if (flag && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || !tiwData.getInvasionSpawner().getNightInvasions().isEmpty())
+								eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", false);
 						} else {
 							final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 							if (!fiwData.getInvasionSpawner().getInvasions().isEmpty())
 								eventIn.setResult(Result.DENY);
+							if (flag && !fiwData.getInvasionSpawner().getInvasions().isEmpty())
+								eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", true);
 						}
 					}
 				}
@@ -118,34 +123,11 @@ public final class PSLivingEvents {
 		}
 	}
 
-	public static final void specialSpawn(final LivingSpawnEvent.SpecialSpawn eventIn) {
-		if (!eventIn.getLevel().isClientSide() && eventIn.getEntity().getClassification(false) == MobCategory.MONSTER) {
-			if (eventIn.getSpawnReason() == MobSpawnType.NATURAL) {
-				final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
-				final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
-				if (iwData != null) {
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						if (!tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
-							eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", false);
-						}
-					} else {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						if (!fiwData.getInvasionSpawner().getInvasions().isEmpty()) {
-							eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", true);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	public static final void allowDespawn(final LivingSpawnEvent.AllowDespawn eventIn) {
+	public static final void allowDespawn(final MobSpawnEvent.AllowDespawn eventIn) {
 		if (!eventIn.getLevel().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntity() instanceof Mob) {
 			final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
 			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
-			final Mob mobEntity = (Mob)eventIn.getEntity();
-			final CompoundTag persistentData = mobEntity.getPersistentData();
+			final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 			if (iwData != null && persistentData.contains("InvasionMob")) {
 				if (!iwData.hasFixedTime()) {
 					final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;

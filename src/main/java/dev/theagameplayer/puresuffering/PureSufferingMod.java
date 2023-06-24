@@ -27,6 +27,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.registries.ForgeRegistries;
 
 //TheAGamePlayer was here :>
 @Mod(value = PureSufferingMod.MODID)
@@ -45,6 +46,7 @@ public final class PureSufferingMod {
 		if (FMLEnvironment.dist.isClient())
 			attachClientEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
 		attachCommonEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
+		LOGGER.info(ForgeRegistries.BIOMES.getValues());
 	}
 	
 	public static final ResourceLocation namespace(final String nameIn) {
@@ -86,8 +88,7 @@ public final class PureSufferingMod {
 		forgeBusIn.addListener(PSLivingEvents::livingConversion);
 		forgeBusIn.addListener(PSLivingEvents::livingTick);
 		forgeBusIn.addListener(PSLivingEvents::experienceDrop);
-		forgeBusIn.addListener(PSLivingEvents::checkSpawn);
-		forgeBusIn.addListener(PSLivingEvents::specialSpawn);
+		forgeBusIn.addListener(PSLivingEvents::finalizeSpawn);
 		forgeBusIn.addListener(PSLivingEvents::allowDespawn);
 		//Player
 		forgeBusIn.addListener(PSPlayerEvents::playerLoggedIn);
