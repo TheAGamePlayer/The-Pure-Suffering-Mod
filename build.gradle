@@ -20,7 +20,7 @@ apply plugin: 'maven-publish'
 version = mod_version
 group = mod_group_id
 base {
-    archivesName = mod_id
+    archivesName = mod_file_name
 }
 //Java Info
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
