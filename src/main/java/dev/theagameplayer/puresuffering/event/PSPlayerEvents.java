@@ -34,7 +34,7 @@ public final class PSPlayerEvents {
 	private static final void updatePlayer(final PlayerEvent eventIn) {
 		if (eventIn.getEntity() instanceof ServerPlayer) {
 			final ServerPlayer player = (ServerPlayer)eventIn.getEntity();
-			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get((ServerLevel)player.level);
+			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get((ServerLevel)player.level());
 			if (iwData != null) {
 				if (!iwData.hasFixedTime()) {
 					final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -50,7 +50,7 @@ public final class PSPlayerEvents {
 	}
 
 	public static final void playerSleepInBed(final PlayerSleepInBedEvent eventIn) {
-		final ServerLevel level = (ServerLevel)eventIn.getEntity().level;
+		final ServerLevel level = (ServerLevel)eventIn.getEntity().level();
 		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(level);
 		if (iwData != null && !iwData.hasFixedTime()) {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;

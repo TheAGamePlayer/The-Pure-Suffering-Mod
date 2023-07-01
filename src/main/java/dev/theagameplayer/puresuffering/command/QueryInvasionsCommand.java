@@ -25,21 +25,21 @@ public final class QueryInvasionsCommand {
 				final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 				if (!ctx.getSource().getLevel().dimensionType().hasFixedTime()) {
 					if (ServerTimeUtil.isServerDay(ctx.getSource().getLevel(), tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) {
-						ctx.getSource().sendSuccess(InvasionText.create("commands.puresuffering.query.invasions", new Color(ChatFormatting.GOLD.getColor()), tiwData.getInvasionSpawner().getDayInvasions()), false);
+						ctx.getSource().sendSuccess(() -> InvasionText.create("commands.puresuffering.query.invasions", new Color(ChatFormatting.GOLD.getColor()), tiwData.getInvasionSpawner().getDayInvasions()), false);
 						return 0;
 					} else if (ServerTimeUtil.isServerNight(ctx.getSource().getLevel(), tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
-						ctx.getSource().sendSuccess(InvasionText.create("commands.puresuffering.query.invasions", new Color(ChatFormatting.GOLD.getColor()), tiwData.getInvasionSpawner().getNightInvasions()), false);
+						ctx.getSource().sendSuccess(() -> InvasionText.create("commands.puresuffering.query.invasions", new Color(ChatFormatting.GOLD.getColor()), tiwData.getInvasionSpawner().getNightInvasions()), false);
 						return 0;
 					}
 				}
-				ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.query.none").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
+				ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.query.none").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
 			} else {
 				final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 				if (ctx.getSource().getLevel().dimensionType().hasFixedTime() && !fiwData.getInvasionSpawner().getInvasions().isEmpty()) {
-					ctx.getSource().sendSuccess(InvasionText.create("commands.puresuffering.query.invasions", new Color(ChatFormatting.GOLD.getColor()), fiwData.getInvasionSpawner().getInvasions()), false);
+					ctx.getSource().sendSuccess(() -> InvasionText.create("commands.puresuffering.query.invasions", new Color(ChatFormatting.GOLD.getColor()), fiwData.getInvasionSpawner().getInvasions()), false);
 					return 0;
 				}
-				ctx.getSource().sendSuccess(Component.translatable("commands.puresuffering.query.none").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
+				ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.query.none").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
 			}
 			return 0;
 		});

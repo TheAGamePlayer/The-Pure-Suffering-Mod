@@ -20,7 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
@@ -33,20 +33,20 @@ public final class PSClientEvents {
 	
 	public static final void addLayers(final EntityRenderersEvent.AddLayers eventIn) {
 		@SuppressWarnings("unchecked")
-		final ImmutableList<EntityType<? extends LivingEntity>> entityTypes = ImmutableList.copyOf(
+		final ImmutableList<EntityType<? extends Mob>> entityTypes = ImmutableList.copyOf(
 				ForgeRegistries.ENTITY_TYPES.getValues().stream()
 				.filter(DefaultAttributes::hasSupplier)
-				.map(et -> (EntityType<? extends LivingEntity>)et)
+				.map(et -> (EntityType<? extends Mob>)et)
 				.collect(Collectors.toList()));
 		entityTypes.forEach(et -> {
-			LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> renderer = null;
+			LivingEntityRenderer<Mob, EntityModel<Mob>> renderer = null;
 			try {
 				renderer = eventIn.getRenderer(et);
 			} catch (final Exception eIn) {
 				LOGGER.warn("HyperChargeLayer failed to apply to " + ForgeRegistries.ENTITY_TYPES.getKey(et) + ", perhaps renderer is not instance of LivingEntityRenderer?");
 			}
 			if (renderer != null)
-				renderer.addLayer(new HyperChargeLayer<LivingEntity, EntityModel<LivingEntity>>(renderer));
+				renderer.addLayer(new HyperChargeLayer<Mob, EntityModel<Mob>>(renderer));
 		});
 	}
 

@@ -43,7 +43,7 @@ public final class PSLivingEvents {
 		if (eventIn.getEntity() instanceof Mob && eventIn.getEntity().getPersistentData().contains("InvasionMob") && (eventIn.getEntity().getLastHurtByMob() == null || !eventIn.getEntity().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntity().getType().getDescriptionId())) {
 			final Mob mob = (Mob)eventIn.getEntity();
 			if (mob.getTarget() instanceof Player) return;
-			final Player player = mob.level.getNearestPlayer(mob.getX(), mob.getY(), mob.getZ(), 144.0D, PSEntityPredicates.HYPER_AGGRESSION);
+			final Player player = mob.level().getNearestPlayer(mob.getX(), mob.getY(), mob.getZ(), 144.0D, PSEntityPredicates.HYPER_AGGRESSION);
 			if (player != null && player.isAlive()) {
 				if (mob instanceof AbstractPiglin) { //If your wondering why a mob doesn't get aggressive, its because it didn't use the default targeting...
 					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ANGRY_AT, player.getUUID(), 12000L);
@@ -64,7 +64,7 @@ public final class PSLivingEvents {
 	public static final void experienceDrop(final LivingExperienceDropEvent eventIn) {
 		final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 		if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
-			final ServerLevel serverLevel = (ServerLevel)eventIn.getEntity().level;
+			final ServerLevel serverLevel = (ServerLevel)eventIn.getEntity().level();
 			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
 			if (iwData != null) {
 				if (!iwData.hasFixedTime()) {

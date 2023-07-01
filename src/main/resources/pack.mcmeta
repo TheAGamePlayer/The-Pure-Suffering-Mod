@@ -1,7 +1,10 @@
 {
-    "pack": {
-        "description": "PureSuffering resources",
-        "forge:server_data_pack_format": 12,
-    	"pack_format": 13
-    }
+  "pack": {
+    "description": {
+      "text": "puresuffering resources"
+    },
+    "pack_format": 15,
+    "forge:resource_pack_format": 15,
+    "forge:data_pack_format": 15
+  }
 }

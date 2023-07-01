@@ -28,9 +28,9 @@ public final class ServerTimeUtil {
 	}
 	
 	public static final void updateTime(final ServerPlayer playerIn) {
-		final ServerLevel world = playerIn.getLevel();
-		final boolean result = !world.dimensionType().hasFixedTime() && isDayTime(world);
-		final boolean result1 = !world.dimensionType().hasFixedTime() && !isDayTime(world);
+		final ServerLevel level = playerIn.serverLevel();
+		final boolean result = !level.dimensionType().hasFixedTime() && isDayTime(level);
+		final boolean result1 = !level.dimensionType().hasFixedTime() && !isDayTime(level);
 		PSPacketHandler.sendToClient(new UpdateTimePacket(true, result), playerIn);
 		PSPacketHandler.sendToClient(new UpdateTimePacket(false, result1), playerIn);
 	}
