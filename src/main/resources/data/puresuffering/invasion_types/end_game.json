@@ -14,6 +14,7 @@
       "SkyRenderer": {
         "BlueOffset": -0.85,
         "Brightness": 0.2,
+        "FixedSkyTexture": "puresuffering:textures/environment/end_game_sky.png",
         "FogRenderer": {
           "BlueOffset": 0.1,
           "GreenOffset": 0.15,
@@ -32,6 +33,7 @@
       "SkyRenderer": {
         "BlueOffset": -0.9,
         "Brightness": 0.1,
+        "FixedSkyTexture": "puresuffering:textures/environment/end_game_sky.png",
         "FogRenderer": {
           "BlueOffset": 0.1,
           "GreenOffset": 0.1,
@@ -50,6 +52,7 @@
       "SkyRenderer": {
         "BlueOffset": -0.95,
         "Brightness": 0.0,
+        "FixedSkyTexture": "puresuffering:textures/environment/end_game_sky.png",
         "FogRenderer": {
           "BlueOffset": 0.05,
           "GreenOffset": 0.05,

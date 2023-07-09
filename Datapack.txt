@@ -56,11 +56,11 @@ WeatherType: (String)
 SeverityInfo: (List of info for each severity of this invasion, every entry is 1 more severity) {
     SkyRenderer: (Skybox attributes changed by this invasion) {
         FogRenderer: (Fog attributes changed by this invasion) {
-            RedOffset: (Float)
+            RedOffset: (Float -1.0 - 1.0)
             - Red color value offset to the default fog color.
-            GreenOffset: (Float)
+            GreenOffset: (Float -1.0 - 1.0)
             - Green color value offset to the default fog color.
-            BlueOffset: (Float)
+            BlueOffset: (Float -1.0 - 1.0)
             - Blue color value offset to the default fog color.
         }
         SunTexture: (ResourceLocation-String)
@@ -76,11 +76,11 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - How bright the world is when your invasion occurs.
         - 1.0 for default daytime, 0.2 for default nighttime.
         - lower numbers for lower brightness.
-        RedOffset: (Float)
+        RedOffset: (Float -1.0 - 1.0)
         - Red color value offset to the default sky color.
-        GreenOffset: (Float)
+        GreenOffset: (Float -1.0 - 1.0)
         - Green color value offset to the default sky color.
-        BlueOffset: (Float)
+        BlueOffset: (Float -1.0 - 1.0)
         - Blue color value offset to the default sky color.
     }
     MobSpawnList: (List of mobs spawned by the invasion) {
@@ -127,7 +127,7 @@ Dimensions: (List of Strings)
 
 Additional Tools to help...
 
-Pure Suffering Mutant Beasts Datapack: https://github.com/TheAGamePlayer/PSMB-Datapack
+Pure Suffering Mutant Monsters Datapack: https://github.com/TheAGamePlayer/PSMM-Datapack
 
 Example Pure Suffering Invasion Jsons: https://github.com/TheAGamePlayer/The-Pure-Suffering-Mod/tree/main/src/main/resources/data/puresuffering/invasion_types
 

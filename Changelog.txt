@@ -1,4 +1,29 @@
 #Minecraft 1.20.x
+Version 1.5.0.0R:
+- Added "max" option to add invasions command.
+- Changed mystery invasions to nightmare invasions.
+- Added new vortex particle effects for hyper & nightmare invasions.
+- Changed mob spawning particles based on invasion hypertype (default, hyper, & nightmare variants).
+- Changed mob spawning particle count based on invasion hypertype (default, hyper, & nightmare variants).
+- Added starting sound effects to invasions based on hypertype (default, hyper, & nightmare variants).
+- Made Invasion messages delayed to be timed with the new sound effects.
+- Made nightmare invasions more fun :>
+- Added "overworldLikeDimensions" Config option to make overworld invasions occur in other dimensions.
+- Added "netherLikeDimensions" Config option to make nether invasions occur in other dimensions.
+- Added "endLikeDimensions" Config option to make end invasions occur in other dimensions.
+- Added "enableVortexParticles" Config option to enable the new vortex particles.
+- Added "minVortexParticleLifespan" Config option to set the minimum lifespan of a vortex particle.
+- Added "maxVortexParticleLifespan" Config option to set the maximum lifespan of a vortex particle.
+- Added "vortexParticleSpread" Config option to set the delay between vortex particles spawning.
+- Added "useInvasionSoundEffects" Config option to set if Invasion sound effects should be enabled.
+- Changed End Game Invasion Sky Box.
+- Fixed hoglins not keeping their hyper charge when becoming zoglins in the end game invasion.
+- Fixed adding custom end sky boxes breaking all changes to the sky.
+- Fixed logging in to the end dimension during an invasion in singleplayer not applying changes to the sky.
+- Fixed Nether & End Invasions not applying client side changes sometimes.
+- Fixed secondary invasions occuring without a primary invasion.
+- Fixed armor stands & smithies crashing the world when applying the hypercharge layer.
+
 Version 1.4.4.0R:
 - Updated to 1.20.1
 - Fixed hyper charge layer rendering on non-mob entities.

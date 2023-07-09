@@ -190,6 +190,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 		InvasionType.Builder.invasionType().withRarity(14).withTier(3).withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_MIXED).severityInfo(List.of(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.15F, 0.15F, 0.1F))
+						.fixedSkyTexture(PureSufferingMod.namespace("textures/environment/end_game_sky.png"))
 						.withSkyBrightness(0.2F)
 						.withRGB(-0.85F, -0.85F, -0.85F))
 				.withLightLevel(15)
@@ -198,6 +199,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 				.setMobCapMultiplier(0.6F),
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.1F, 0.1F, 0.1F))
+						.fixedSkyTexture(PureSufferingMod.namespace("textures/environment/end_game_sky.png"))
 						.withSkyBrightness(0.1F)
 						.withRGB(-0.90F, -0.90F, -0.90F))
 				.withLightLevel(15)
@@ -206,6 +208,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 				.setMobCapMultiplier(0.8F),
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.05F, 0.05F, 0.05F))
+						.fixedSkyTexture(PureSufferingMod.namespace("textures/environment/end_game_sky.png"))
 						.withSkyBrightness(0.0F)
 						.withRGB(-0.95F, -0.95F, -0.95F))
 				.withLightLevel(15)

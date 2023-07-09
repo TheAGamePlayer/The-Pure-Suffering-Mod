@@ -1,5 +1,6 @@
 package dev.theagameplayer.puresuffering.util;
 
+import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
 import dev.theagameplayer.puresuffering.world.InvasionWorldData;
@@ -15,6 +16,7 @@ public final class ServerInvasionUtil {
 				if (ServerTimeUtil.isServerDay(levelIn, tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) {
 					int lightLevel = 0, changed = 0;
 					for (final Invasion invasion : tiwData.getInvasionSpawner().getDayInvasions()) {
+						if (invasion.isPrimary() && invasion.getHyperType() == HyperType.NIGHTMARE) return 15;
 						final int amount = invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getLightLevel();
 						if (amount > -1) {
 							lightLevel += amount;
@@ -25,6 +27,7 @@ public final class ServerInvasionUtil {
 				} else if (ServerTimeUtil.isServerNight(levelIn, tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
 					int lightLevel = 0, changed = 0;
 					for (final Invasion invasion : tiwData.getInvasionSpawner().getNightInvasions()) {
+						if (invasion.isPrimary() && invasion.getHyperType() == HyperType.NIGHTMARE) return 15;
 						final int amount = invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getLightLevel();
 						if (amount > -1) {
 							lightLevel += amount;
@@ -38,6 +41,7 @@ public final class ServerInvasionUtil {
 				if (!fiwData.getInvasionSpawner().getInvasions().isEmpty()) {
 					int lightLevel = 0, changed = 0;
 					for (final Invasion invasion : fiwData.getInvasionSpawner().getInvasions()) {
+						if (invasion.isPrimary() && invasion.getHyperType() == HyperType.NIGHTMARE) return 15;
 						final int amount = invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getLightLevel();
 						if (amount > -1) {
 							lightLevel += amount;

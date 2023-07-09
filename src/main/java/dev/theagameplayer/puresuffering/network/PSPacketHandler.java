@@ -3,6 +3,8 @@ package dev.theagameplayer.puresuffering.network;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.network.packet.AddInvasionPacket;
 import dev.theagameplayer.puresuffering.network.packet.ClearInvasionsPacket;
+import dev.theagameplayer.puresuffering.network.packet.InvasionMobParticlesPacket;
+import dev.theagameplayer.puresuffering.network.packet.InvasionSoundPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateCountPacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateTimePacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
@@ -19,7 +21,7 @@ public final class PSPacketHandler {
 			PROTOCAL_VERSION::equals, 
 			PROTOCAL_VERSION::equals);
 	
-	public static final void registerPackets() {
+	public static final void registerPackets() { //Using message builder instead of register message due to log spam of "Unknown custom packet identifier: puresuffering:main_network_channel"
 		int id = 0;
 		//PLAY DEDICATED SERVER -> CLIENT
 		CHANNEL.messageBuilder(UpdateTimePacket.class, id++).encoder(UpdateTimePacket::encode).decoder(UpdateTimePacket::decode).consumerMainThread(UpdateTimePacket.Handler::handle).add();
@@ -27,6 +29,8 @@ public final class PSPacketHandler {
 		CHANNEL.messageBuilder(ClearInvasionsPacket.class, id++).encoder(ClearInvasionsPacket::encode).decoder(ClearInvasionsPacket::decode).consumerMainThread(ClearInvasionsPacket.Handler::handle).add();
 		CHANNEL.messageBuilder(UpdateCountPacket.class, id++).encoder(UpdateCountPacket::encode).decoder(UpdateCountPacket::decode).consumerMainThread(UpdateCountPacket.Handler::handle).add();
 		CHANNEL.messageBuilder(UpdateXPMultPacket.class, id++).encoder(UpdateXPMultPacket::encode).decoder(UpdateXPMultPacket::decode).consumerMainThread(UpdateXPMultPacket.Handler::handle).add();
+		CHANNEL.messageBuilder(InvasionSoundPacket.class, id++).encoder(InvasionSoundPacket::encode).decoder(InvasionSoundPacket::decode).consumerMainThread(InvasionSoundPacket.Handler::handle).add();
+		CHANNEL.messageBuilder(InvasionMobParticlesPacket.class, id++).encoder(InvasionMobParticlesPacket::encode).decoder(InvasionMobParticlesPacket::decode).consumerMainThread(InvasionMobParticlesPacket.Handler::handle).add();
 	}
 	
 	public static final void sendToClient(final Object msgIn, final ServerPlayer playerIn) {

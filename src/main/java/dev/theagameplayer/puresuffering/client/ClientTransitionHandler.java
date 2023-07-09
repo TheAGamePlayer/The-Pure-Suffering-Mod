@@ -5,8 +5,9 @@ import net.minecraftforge.client.event.ViewportEvent;
 
 public final class ClientTransitionHandler {
 	public static final int TRANSITION_TIME = 600, HALF_TRANSITION = TRANSITION_TIME/2;
+	private static final float MYSTERY_INVASION_DARKNESS = 0.25F;
 	
-	//SUN_ALPHA
+	//SUN_&_MOON_ALPHA
 	public static final float tickSunMoonAlpha(final float sunMoonAlphaIncIn, final long dayTimeIn) {
 		float sunMoonAlpha = 0.0F;
 		if (dayTimeIn < HALF_TRANSITION) {
@@ -60,6 +61,19 @@ public final class ClientTransitionHandler {
 			brightness = brightnessIncIn;
 		}
 		return Mth.clamp(brightnessIn - brightness, 0.0F, 1.0F);
+	}
+	
+	//LIGHT_TEXTURE_DARKNESS
+	public static final float tickLightTextureDarkness(final float darknessIn, final long dayTimeIn) {
+		float darkness = 0.0F;
+		if (dayTimeIn < TRANSITION_TIME) {
+			darkness = (MYSTERY_INVASION_DARKNESS/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
+			darkness = (MYSTERY_INVASION_DARKNESS/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+		} else {
+			darkness = MYSTERY_INVASION_DARKNESS;
+		}
+		return Math.max(0.0F, darknessIn + darkness);
 	}
 
 	//FOG COLOR

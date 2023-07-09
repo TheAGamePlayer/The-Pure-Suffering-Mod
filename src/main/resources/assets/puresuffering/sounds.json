@@ -1,0 +1,29 @@
+{
+	"default_invasion_start": {
+		"subtitle": "puresuffering.subtitle.default_invasion_start",
+		"sounds": [
+			{
+				"name": "puresuffering:default_invasion_start",
+				"stream": true
+			}
+		]
+	},
+	"hyper_invasion_start": {
+		"subtitle": "puresuffering.subtitle.hyper_invasion_start",
+		"sounds": [
+			{
+				"name": "puresuffering:hyper_invasion_start",
+				"stream": true
+			}
+		]
+	},
+	"nightmare_invasion_start": {
+		"subtitle": "puresuffering.subtitle.nightmare_invasion_start",
+		"sounds": [
+			{
+				"name": "puresuffering:nightmare_invasion_start",
+				"stream": true
+			}
+		]
+	}
+}

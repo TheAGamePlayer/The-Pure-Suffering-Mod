@@ -1,6 +1,7 @@
 package dev.theagameplayer.puresuffering.event;
 
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
+import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
 import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
@@ -56,14 +57,14 @@ public final class PSPlayerEvents {
 			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 			if (ServerTimeUtil.isServerDay(level, tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) { //Added day check for Mods that allow sleeping during the day
 				for (final Invasion invasion : tiwData.getInvasionSpawner().getDayInvasions()) {
-					if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
+					if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getHyperType() == HyperType.NIGHTMARE || invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
 						eventIn.setResult(BedSleepingProblem.NOT_POSSIBLE_NOW);
 						return;
 					}
 				}
 			} else if (ServerTimeUtil.isServerNight(level, tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
 				for (final Invasion invasion : tiwData.getInvasionSpawner().getNightInvasions()) {
-					if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
+					if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getHyperType() == HyperType.NIGHTMARE|| invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
 						eventIn.setResult(BedSleepingProblem.NOT_POSSIBLE_NOW);
 						return;
 					}

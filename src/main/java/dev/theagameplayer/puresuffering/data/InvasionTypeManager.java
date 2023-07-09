@@ -68,7 +68,7 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	
 	public final ArrayList<InvasionType> getInvasionTypesOf(final Predicate<InvasionType> predIn) {
 		final ArrayList<InvasionType> invasionList = new ArrayList<>();
-		for (InvasionType invasionType : this.invasionTypeMap.values()) {
+		for (final InvasionType invasionType : this.invasionTypeMap.values()) {
 			if (predIn.test(invasionType))
 				invasionList.add(invasionType);
 		}

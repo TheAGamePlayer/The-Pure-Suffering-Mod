@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 
 public final class FixedInvasionWorldData extends InvasionWorldData {
 	private final FixedInvasionSpawner spawner = new FixedInvasionSpawner();
-	private boolean isFirstCycle;
+	private boolean requiresUpdate, isFirstCycle;
 	private double xpMultiplier;
 
 	public FixedInvasionWorldData(final ServerLevel levelIn) {
@@ -32,6 +32,14 @@ public final class FixedInvasionWorldData extends InvasionWorldData {
 	
 	public final FixedInvasionSpawner getInvasionSpawner() {
 		return this.spawner;
+	}
+	
+	public final boolean requiresUpdate() {
+		return this.requiresUpdate;
+	}
+	
+	public final void setUpdateRequired(final boolean valueIn) {
+		this.requiresUpdate = valueIn;
 	}
 	
 	public final boolean isFirstCycle() {

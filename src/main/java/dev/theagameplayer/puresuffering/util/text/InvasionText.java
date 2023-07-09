@@ -50,7 +50,7 @@ public class InvasionText {
 			final MutableComponent component2 = invasion.getType().getComponent().copy().withStyle(style -> {
 				return style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, component1));
 			});
-			component.append(component2.withStyle(Style.EMPTY.withColor(new Color(baseIn.getRed(), getInvColor(baseIn.getGreen(), invasion), invasion.getHyperType() == HyperType.MYSTERY ? baseIn.getBlue() : getInvColor(baseIn.getBlue(), invasion)).getRGB()).withUnderlined(invasion.isPrimary())));
+			component.append(component2.withStyle(Style.EMPTY.withColor(new Color(baseIn.getRed(), getInvColor(baseIn.getGreen(), invasion), invasion.getHyperType() == HyperType.NIGHTMARE ? baseIn.getBlue() : getInvColor(baseIn.getBlue(), invasion)).getRGB()).withUnderlined(invasion.isPrimary())));
 		}
 		return component;
 	}

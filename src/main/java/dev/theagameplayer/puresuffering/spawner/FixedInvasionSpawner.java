@@ -28,7 +28,7 @@ public final class FixedInvasionSpawner {
 	private final ArrayList<Invasion> queuedInvasions = new ArrayList<>();
 	private int interval;
 	private int hyperInterval;
-	private int mysteryInterval;
+	private int nightmareInterval;
 
 	public final void setInvasions(final ServerLevel levelIn, final boolean isCanceledIn, final int amountIn, final long daysIn) {
 		this.invasions.clear();
@@ -36,17 +36,17 @@ public final class FixedInvasionSpawner {
 		final int totalInvasions = !this.queuedInvasions.isEmpty() ? this.queuedInvasions.size() : this.calculateInvasions(random, amountIn, this.interval, isCanceledIn, daysIn == 0);
 		this.interval = this.interval > 0 ? this.interval - 1 : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.fixedInvasionRarity : random.nextInt(PSConfigValues.common.fixedInvasionRarity) + PSConfigValues.common.fixedInvasionRarity - (int)(daysIn % PSConfigValues.common.fixedInvasionRarity));
 		this.hyperInterval = this.hyperInterval > 0 ? (this.interval == 0 ? (PSConfigValues.common.hyperInvasions && PSConfigValues.common.hyperCharge ? this.hyperInterval - 1 : this.hyperInterval) : this.hyperInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.hyperInvasionRarity : random.nextInt(PSConfigValues.common.hyperInvasionRarity) + PSConfigValues.common.hyperInvasionRarity - (int)(daysIn % PSConfigValues.common.hyperInvasionRarity));
-		this.mysteryInterval = this.mysteryInterval > 0 ? (this.hyperInterval == 0 ? (PSConfigValues.common.mysteryInvasions && PSConfigValues.common.hyperCharge ? this.mysteryInterval - 1 : this.mysteryInterval) : this.mysteryInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.mysteryInvasionRarity : random.nextInt(PSConfigValues.common.mysteryInvasionRarity) + PSConfigValues.common.mysteryInvasionRarity - (int)(daysIn % PSConfigValues.common.mysteryInvasionRarity));
+		this.nightmareInterval = this.nightmareInterval > 0 ? (this.hyperInterval == 0 ? (PSConfigValues.common.nightmareInvasions && PSConfigValues.common.hyperCharge ? this.nightmareInterval - 1 : this.nightmareInterval) : this.nightmareInterval) : (PSConfigValues.common.consistentInvasions ? PSConfigValues.common.nightmareInvasionRarity : random.nextInt(PSConfigValues.common.nightmareInvasionRarity) + PSConfigValues.common.nightmareInvasionRarity - (int)(daysIn % PSConfigValues.common.nightmareInvasionRarity));
 		InvasionChart.refresh();
 		final InvasionChart potentialPrimaryInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.fixedDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() ? true : PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()))));
 		final InvasionChart potentialSecondaryInvasions = new InvasionChart(PSBaseEvents.getInvasionTypeManager().getInvasionTypesOf(it -> it.getDimensions().contains(levelIn.dimension().location()) && (PSConfigValues.common.tieredInvasions ? daysIn >= it.getTier() * PSConfigValues.common.fixedDifficultyIncreaseDelay : true) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY));
-		LOGGER.info("Setting Fixed Invasions: [");
+		LOGGER.info("Setting Fixed Invasions: [" + potentialPrimaryInvasions);
 		this.invasions.setCanceled(this.queuedInvasions.isEmpty() && isCanceledIn);
 		if (!this.queuedInvasions.isEmpty()) {
 			for (int q = 0; q < this.queuedInvasions.size(); q++) {
 				final Invasion invasion = this.queuedInvasions.get(q);
 				this.invasions.add(invasion);
-				LOGGER.info("Queued " + (invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.MYSTERY ? "Mystery " : "Hyper ") : "") + "Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
+				LOGGER.info("Queued " + (invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "Nightmare " : "Hyper ") : "") + "Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}
 			this.queuedInvasions.clear();
 		} else {
@@ -54,9 +54,11 @@ public final class FixedInvasionSpawner {
 				final InvasionType invasionType = this.getInvasionType(inv == 0 ? potentialPrimaryInvasions : potentialSecondaryInvasions, random);
 				if (invasionType != null) {
 					final int severity = this.hyperInterval == 0 ? invasionType.getMaxSeverity() - 1 : random.nextInt(random.nextInt(Mth.clamp((int)daysIn/PSConfigValues.common.fixedDifficultyIncreaseDelay - invasionType.getTier(), 1, invasionType.getMaxSeverity())) + 1);
-					final Invasion invasion = new Invasion(invasionType, severity, inv == 0, this.hyperInterval == 0 ? (this.mysteryInterval == 0 ? HyperType.MYSTERY : HyperType.HYPER) : HyperType.DEFAULT);
+					final Invasion invasion = new Invasion(invasionType, severity, inv == 0, this.hyperInterval == 0 ? (this.nightmareInterval == 0 ? HyperType.NIGHTMARE : HyperType.HYPER) : HyperType.DEFAULT);
 					this.invasions.add(invasion);
-					LOGGER.info((this.hyperInterval == 0 ? (invasion.getHyperType() == HyperType.MYSTERY ? "Mystery " : "Hyper ") : "") + "Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
+					LOGGER.info((this.hyperInterval == 0 ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "Nightmare " : "Hyper ") : "") + "Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
+				} else {
+					break;
 				}
 			}
 		}
@@ -88,7 +90,7 @@ public final class FixedInvasionSpawner {
 			this.queuedInvasions.add(Invasion.load((CompoundTag)inbt));
 		this.interval = nbtIn.getInt("Interval");
 		this.hyperInterval = nbtIn.getInt("HyperInterval");
-		this.mysteryInterval = nbtIn.getInt("MysteryInterval");
+		this.nightmareInterval = nbtIn.getInt("NightmareInterval");
 	}
 
 	public final CompoundTag save() {
@@ -103,7 +105,7 @@ public final class FixedInvasionSpawner {
 		nbt.put("QueuedInvasions", queuedInvasionsNBT);
 		nbt.putInt("Interval", this.interval);
 		nbt.putInt("HyperInterval", this.hyperInterval);
-		nbt.putInt("MysteryInterval", this.mysteryInterval);
+		nbt.putInt("NightmareInterval", this.nightmareInterval);
 		return nbt;
 	}
 

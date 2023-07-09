@@ -39,12 +39,15 @@ public final class PSConfig {
 		public final ForgeConfigSpec.BooleanValue tieredInvasions;
 		public final ConfigValue<List<? extends String>> invasionBlacklist;
 		public final ConfigValue<List<? extends String>> primaryWhitelist;
+		public final ConfigValue<List<? extends String>> overworldLikeDimensions;
+		public final ConfigValue<List<? extends String>> netherLikeDimensions;
+		public final ConfigValue<List<? extends String>> endLikeDimensions;
 		//Balancing
 		public final ForgeConfigSpec.IntValue dayInvasionRarity;
 		public final ForgeConfigSpec.IntValue nightInvasionRarity;
 		public final ForgeConfigSpec.IntValue fixedInvasionRarity;
 		public final ForgeConfigSpec.IntValue hyperInvasionRarity;
-		public final ForgeConfigSpec.IntValue mysteryInvasionRarity;
+		public final ForgeConfigSpec.IntValue nightmareInvasionRarity;
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canFixedInvasionsBeCanceled;
@@ -56,7 +59,7 @@ public final class PSConfig {
 		public final ForgeConfigSpec.BooleanValue hyperAggression;
 		public final ForgeConfigSpec.BooleanValue hyperCharge;
 		public final ForgeConfigSpec.BooleanValue hyperInvasions;
-		public final ForgeConfigSpec.BooleanValue mysteryInvasions;
+		public final ForgeConfigSpec.BooleanValue nightmareInvasions;
 		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
 		public final ConfigValue<List<? extends String>> hyperChargeBlacklist;
 		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
@@ -133,15 +136,36 @@ public final class PSConfig {
 			invasionBlacklist = COMMON_BUILDER
 					.translation(CONFIG + "invasion_blacklist")
 					.worldRestart()
-					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (must be surrounded by quotation marks)")
+					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (swap '' with quotation marks)")
 					.defineList("invasionBlacklist", ImmutableList.of(), string -> {
 						return string != "";
 					});
 			primaryWhitelist = COMMON_BUILDER
 					.translation(CONFIG + "primary_whitelist")
 					.worldRestart()
-					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (must be surrounded by quotation marks)")
+					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'lostcities:lostcity' (swap '' with quotation marks)")
 					.defineList("primaryWhitelist", ImmutableList.of(), string -> {
+						return string != "";
+					});
+			overworldLikeDimensions = COMMON_BUILDER
+					.translation(CONFIG + "overworld_like_dimensions")
+					.worldRestart()
+					.comment("List of Dimensions that should use Overworld Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("overworldLikeDimensions", ImmutableList.of(), string -> {
+						return string != "";
+					});
+			netherLikeDimensions = COMMON_BUILDER
+					.translation(CONFIG + "nether_like_dimensions")
+					.worldRestart()
+					.comment("List of Dimensions that should use Nether Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("netherLikeDimensions", ImmutableList.of(), string -> {
+						return string != "";
+					});
+			endLikeDimensions = COMMON_BUILDER
+					.translation(CONFIG + "end_like_dimensions")
+					.worldRestart()
+					.comment("List of Dimensions that should use End Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("endLikeDimensions", ImmutableList.of(), string -> {
 						return string != "";
 					});
 			COMMON_BUILDER.pop();
@@ -167,11 +191,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("How often should Hyper Invasions occur.")
 					.defineInRange("hyperInvasionRarity", 12, 1, 100); //Once every half a day (Night Invasions)
-			mysteryInvasionRarity = COMMON_BUILDER
-					.translation(CONFIG + "mystery_invasion_rarity")
+			nightmareInvasionRarity = COMMON_BUILDER
+					.translation(CONFIG + "nightmare_invasion_rarity")
 					.worldRestart()
-					.comment("How often should Mystery Invasions occur.")
-					.defineInRange("mysteryInvasionRarity", 6, 1, 100); //Once every few actual days (Night Invasions)
+					.comment("How often should Nightmare Invasions occur.")
+					.defineInRange("nightmareInvasionRarity", 6, 1, 100); //Once every few actual days (Night Invasions)
 			canDayInvasionsBeCanceled = COMMON_BUILDER
 					.translation(CONFIG + "can_day_invasions_be_canceled")
 					.worldRestart()
@@ -225,11 +249,11 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Should hyper invasions be able to occur?")
 					.define("hyperInvasions", true);
-			mysteryInvasions = COMMON_BUILDER
-					.translation(CONFIG + "mystery_invasions")
+			nightmareInvasions = COMMON_BUILDER
+					.translation(CONFIG + "nightmare_invasions")
 					.worldRestart()
-					.comment("Should mystery invasions be able to occur?", "NOTE: hyper invasions must be enabled.")
-					.define("mysteryInvasions", true);
+					.comment("Should nightmare invasions be able to occur?", "NOTE: hyper invasions must be enabled.")
+					.define("nightmareInvasions", true);
 			hyperAggressionBlacklist = COMMON_BUILDER
 					.translation(CONFIG + "hyper_aggression_blacklist")
 					.worldRestart()
@@ -318,7 +342,12 @@ public final class PSConfig {
 		public static final ClientConfig CLIENT = new ClientConfig();
 		
 		public final ForgeConfigSpec.BooleanValue useSkyBoxRenderer;
+		public final ForgeConfigSpec.BooleanValue useInvasionSoundEffects;
 		public final ForgeConfigSpec.BooleanValue canInvasionsChangeBrightness;
+		public final ForgeConfigSpec.BooleanValue enableVortexParticles;
+		public final ForgeConfigSpec.IntValue minVortexParticleLifespan;
+		public final ForgeConfigSpec.IntValue maxVortexParticleLifespan;
+		public final ForgeConfigSpec.IntValue vortexParticleSpread;
 		
 		private ClientConfig() {
 			CLIENT_BUILDER.push("Rendering");
@@ -326,10 +355,30 @@ public final class PSConfig {
 					.translation(CONFIG + "use_sky_box_renderer")
 					.comment("Can render Invasions with a custom sky box renderer?", "NOTE: Set false with incompatible shaders!")
 					.define("useSkyBoxRenderer", true);
+			useInvasionSoundEffects = CLIENT_BUILDER
+					.translation(CONFIG + "use_invasion_sound_effects")
+					.comment("Should the sound effects signaling invasion be used?")
+					.define("useInvasionSoundEffects", true);
 			canInvasionsChangeBrightness = CLIENT_BUILDER
 					.translation(CONFIG + "can_invasions_change_brightness")
 					.comment("Can Invasions change the brightness Values?", "NOTE: Set false with incompatible shaders!")
 					.define("canInvasionsChangeBrightness", true);
+			enableVortexParticles = CLIENT_BUILDER
+					.translation(CONFIG + "enable_vortex_particles")
+					.comment("Should Hyper Invasion vortex particles be enabled?", "NOTE: Set false with incompatible shaders!", "NOTE: May effect performance in hyper & nightmare invasions!")
+					.define("enableVortexParticles", true);
+			minVortexParticleLifespan = CLIENT_BUILDER
+					.translation(CONFIG + "min_vortex_particle_lifespan")
+					.comment("Minimum lifespan for vortex particles in Hyper Invasions.", "NOTE: Set to 'enableVortexParticles' to false to disable.")
+					.defineInRange("minVortexParticleLifespan", 300, 1, Integer.MAX_VALUE);
+			maxVortexParticleLifespan = CLIENT_BUILDER
+					.translation(CONFIG + "max_vortex_particles_lifespan")
+					.comment("Maximum lifespan for vortex particles in Hyper Invasions.", "NOTE: Set to 'enableVortexParticles' to false to disable.")
+					.defineInRange("maxVortexParticleLifespan", 6300, 1, Integer.MAX_VALUE);
+			vortexParticleSpread = CLIENT_BUILDER
+					.translation(CONFIG + "vortex_particle_spread")
+					.comment("Spread value for vortex particles (Delay between particles).")
+					.defineInRange("vortexParticleSpread", 6, 1, Integer.MAX_VALUE);
 			CLIENT_BUILDER.pop();
 		}
 	}

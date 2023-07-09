@@ -16,7 +16,16 @@ public final class DimensionSpecialEffectsMixin {
 	private final void forceBrightLightmap(final CallbackInfoReturnable<Boolean> callbackIn) {
 		if (PSConfigValues.client.canInvasionsChangeBrightness) {
 			final Minecraft mc = Minecraft.getInstance();
-			callbackIn.setReturnValue(ClientInvasionUtil.handleLightMap(callbackIn.getReturnValueZ(), mc.level));
+			callbackIn.setReturnValue(ClientInvasionUtil.handleDimensionLight(callbackIn.getReturnValueZ(), mc.level));
 		}
 	}
+	
+	//TODO: Fix Nether in Mystery Invasions.
+	/*@Inject(at = @At("RETURN"), method = "constantAmbientLight()Z", cancellable = true)
+	private final void constantAmbientLight(final CallbackInfoReturnable<Boolean> callbackIn) {
+		if (PSConfigValues.client.canInvasionsChangeBrightness) {
+			final Minecraft mc = Minecraft.getInstance();
+			callbackIn.setReturnValue(ClientInvasionUtil.handleDimensionLight(callbackIn.getReturnValueZ(), mc.level));
+		}
+	}*/
 }

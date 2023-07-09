@@ -35,12 +35,15 @@ public abstract class PSConfigValues {
 		public final boolean tieredInvasions;
 		public final List<? extends String> invasionBlacklist;
 		public final List<? extends String> primaryWhitelist;
+		public final List<? extends String> overworldLikeDimensions;
+		public final List<? extends String> netherLikeDimensions;
+		public final List<? extends String> endLikeDimensions;
 		
 		public final int dayInvasionRarity;
 		public final int nightInvasionRarity;
 		public final int fixedInvasionRarity;
 		public final int hyperInvasionRarity;
-		public final int mysteryInvasionRarity;
+		public final int nightmareInvasionRarity;
 		public final boolean canDayInvasionsBeCanceled;
 		public final boolean canNightInvasionsBeCanceled;
 		public final boolean canFixedInvasionsBeCanceled;
@@ -52,7 +55,7 @@ public abstract class PSConfigValues {
 		public final boolean hyperAggression;
 		public final boolean hyperCharge;
 		public final boolean hyperInvasions;
-		public final boolean mysteryInvasions;
+		public final boolean nightmareInvasions;
 		public final List<? extends String> hyperAggressionBlacklist;
 		public final List<? extends String> hyperChargeBlacklist;
 		public final List<? extends String> modBiomeBoostedBlacklist;
@@ -82,12 +85,15 @@ public abstract class PSConfigValues {
 			this.tieredInvasions = PSConfig.CommonConfig.COMMON.tieredInvasions.get();
 			this.invasionBlacklist = PSConfig.CommonConfig.COMMON.invasionBlacklist.get();
 			this.primaryWhitelist = PSConfig.CommonConfig.COMMON.primaryWhitelist.get();
+			this.overworldLikeDimensions = PSConfig.CommonConfig.COMMON.overworldLikeDimensions.get();
+			this.netherLikeDimensions = PSConfig.CommonConfig.COMMON.netherLikeDimensions.get();
+			this.endLikeDimensions = PSConfig.CommonConfig.COMMON.endLikeDimensions.get();
 			
 			this.dayInvasionRarity = PSConfig.CommonConfig.COMMON.dayInvasionRarity.get();
 			this.nightInvasionRarity = PSConfig.CommonConfig.COMMON.nightInvasionRarity.get();
 			this.fixedInvasionRarity = PSConfig.CommonConfig.COMMON.fixedInvasionRarity.get();
 			this.hyperInvasionRarity = PSConfig.CommonConfig.COMMON.hyperInvasionRarity.get();
-			this.mysteryInvasionRarity = PSConfig.CommonConfig.COMMON.mysteryInvasionRarity.get();
+			this.nightmareInvasionRarity = PSConfig.CommonConfig.COMMON.nightmareInvasionRarity.get();
 			this.canDayInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canDayInvasionsBeCanceled.get();
 			this.canNightInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canNightInvasionsBeCanceled.get();
 			this.canFixedInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canFixedInvasionsBeCanceled.get();
@@ -99,7 +105,7 @@ public abstract class PSConfigValues {
 			this.hyperAggression = PSConfig.CommonConfig.COMMON.hyperAggression.get();
 			this.hyperCharge = PSConfig.CommonConfig.COMMON.hyperCharge.get();
 			this.hyperInvasions = PSConfig.CommonConfig.COMMON.hyperInvasions.get();
-			this.mysteryInvasions = PSConfig.CommonConfig.COMMON.mysteryInvasions.get();
+			this.nightmareInvasions = PSConfig.CommonConfig.COMMON.nightmareInvasions.get();
 			this.hyperAggressionBlacklist = PSConfig.CommonConfig.COMMON.hyperAggressionBlacklist.get();
 			this.hyperChargeBlacklist = PSConfig.CommonConfig.COMMON.hyperChargeBlacklist.get();
 			this.modBiomeBoostedBlacklist = PSConfig.CommonConfig.COMMON.modBiomeBoostedBlacklist.get();
@@ -119,11 +125,21 @@ public abstract class PSConfigValues {
 	
 	public static final class ClientValues extends PSConfigValues {
 		public final boolean useSkyBoxRenderer;
+		public final boolean useInvasionSoundEffects;
 		public final boolean canInvasionsChangeBrightness;
+		public final boolean enableVortexParticles;
+		public final int minVortexParticleLifespan;
+		public final int maxVortexParticleLifespan;
+		public final int vortexParticleSpread;
 		
 		private ClientValues() {
 			this.useSkyBoxRenderer = PSConfig.ClientConfig.CLIENT.useSkyBoxRenderer.get();
+			this.useInvasionSoundEffects = PSConfig.ClientConfig.CLIENT.useInvasionSoundEffects.get();
 			this.canInvasionsChangeBrightness = PSConfig.ClientConfig.CLIENT.canInvasionsChangeBrightness.get();
+			this.enableVortexParticles = PSConfig.ClientConfig.CLIENT.enableVortexParticles.get();
+			this.minVortexParticleLifespan = PSConfig.ClientConfig.CLIENT.minVortexParticleLifespan.get();
+			this.maxVortexParticleLifespan = PSConfig.ClientConfig.CLIENT.maxVortexParticleLifespan.get();
+			this.vortexParticleSpread = PSConfig.ClientConfig.CLIENT.vortexParticleSpread.get();
 		}
 	}
 }

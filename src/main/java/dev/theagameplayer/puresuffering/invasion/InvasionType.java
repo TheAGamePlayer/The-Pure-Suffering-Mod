@@ -12,11 +12,13 @@ import com.google.gson.JsonObject;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class InvasionType {
@@ -396,9 +398,8 @@ public final class InvasionType {
 						errored = true;
 					}
 				}
-				if (errored) {
+				if (errored)
 					LOGGER.error("JsonElement is incorrectly setup: " + jsonObjectIn.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
-				}
 				return new SeverityInfo.Builder(skyRenderer, mobSpawnList, clusterEntitiesList, mobCapPercentage, forceNoSleep, lightLevel, tickDelay, clusterSize);
 			}
 		}
@@ -599,7 +600,18 @@ public final class InvasionType {
 				if (jsonElement2.isJsonArray()) {
 					final JsonArray jsonArray = jsonElement2.getAsJsonArray();
 					for (int dim = 0; dim < jsonArray.size(); dim++) {
-						dimensions.add(ResourceLocation.tryParse(jsonArray.get(dim).getAsString()));
+						final ResourceLocation dimId = ResourceLocation.tryParse(jsonArray.get(dim).getAsString());
+						dimensions.add(dimId);
+						if (dimId == LevelStem.OVERWORLD.location()) {
+							for (final String modDim : PSConfigValues.common.overworldLikeDimensions)
+								dimensions.add(ResourceLocation.tryParse(modDim));
+						} else if (dimId == LevelStem.NETHER.location()) {
+							for (final String modDim : PSConfigValues.common.netherLikeDimensions)
+								dimensions.add(ResourceLocation.tryParse(modDim));
+						} else if (dimId == LevelStem.END.location()) {
+							for (final String modDim : PSConfigValues.common.endLikeDimensions)
+								dimensions.add(ResourceLocation.tryParse(modDim));
+						}
 					}
 				} else {
 					errored = true;

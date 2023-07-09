@@ -11,6 +11,8 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.event.PSBaseEvents;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SeverityInfo;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SpawningSystem;
+import dev.theagameplayer.puresuffering.network.PSPacketHandler;
+import dev.theagameplayer.puresuffering.network.packet.InvasionMobParticlesPacket;
 import dev.theagameplayer.puresuffering.world.entity.PSHyperCharge;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -74,7 +76,7 @@ public final class Invasion implements CustomSpawner {
 	public final boolean isPrimary() {
 		return this.isPrimary;
 	}
-	
+
 	public final HyperType getHyperType() {
 		return this.hyperType;
 	}
@@ -210,7 +212,7 @@ public final class Invasion implements CustomSpawner {
 		mobEntityIn.getPersistentData().putBoolean("AntiGrief", levelIn.dimensionType().hasFixedTime());
 		mobEntityIn.finalizeSpawn(levelIn, levelIn.getCurrentDifficultyAt(mobEntityIn.blockPosition()), MobSpawnType.EVENT, null, null);
 		if (hyperCharged && mobEntityIn instanceof PSHyperCharge) {
-			final int hyperCharge = this.hyperType != HyperType.DEFAULT ? (this.hyperType == HyperType.MYSTERY ? PSConfigValues.common.maxHyperCharge : levelIn.random.nextInt(PSConfigValues.common.maxHyperCharge > 1 ? PSConfigValues.common.maxHyperCharge - 1 : 1) + 1) : levelIn.random.nextInt(levelIn.random.nextInt(PSConfigValues.common.maxHyperCharge - 1) + 1) + 1;
+			final int hyperCharge = this.hyperType != HyperType.DEFAULT ? (this.hyperType == HyperType.NIGHTMARE ? PSConfigValues.common.maxHyperCharge : levelIn.random.nextInt(PSConfigValues.common.maxHyperCharge > 1 ? PSConfigValues.common.maxHyperCharge - 1 : 1) + 1) : levelIn.random.nextInt(levelIn.random.nextInt(PSConfigValues.common.maxHyperCharge - 1) + 1) + 1;
 			((PSHyperCharge)mobEntityIn).psSetHyperCharge(hyperCharge);
 			for (final AttributeInstance attribute : mobEntityIn.getAttributes().getSyncableAttributes())
 				attribute.setBaseValue(attribute.getBaseValue() * (1.0D + 0.2D * hyperCharge)); //TODO: Keep an eye out for compatability conflicts
@@ -218,10 +220,10 @@ public final class Invasion implements CustomSpawner {
 		if (PSConfigValues.common.shouldMobsSpawnWithMaxRange)
 			mobEntityIn.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(2048.0D);
 		this.invasionMobs.add(mobEntityIn.getUUID());
-		levelIn.levelEvent(2004, mobEntityIn.blockPosition(), 0); //Mob Spawn Particles
+		PSPacketHandler.sendToAllClients(new InvasionMobParticlesPacket(this.hyperType, mobEntityIn.position()));
 		mobEntityIn.spawnAnim();
 	}
-	
+
 	private final void delay(final ServerLevel levelIn) {
 		this.spawnDelay = this.getSeverityInfo().getTickDelay();
 		this.spawnPotentials.getRandom(levelIn.random).ifPresent(entry -> {

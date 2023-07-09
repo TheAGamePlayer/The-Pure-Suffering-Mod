@@ -36,6 +36,8 @@ public final class PSLivingEvents {
 				outcomeData.putString("InvasionMob", persistentData.getString("InvasionMob"));
 			if (persistentData.contains("AntiGrief"))
 				outcomeData.putString("AntiGrief", persistentData.getString("AntiGrief"));
+			if (persistentData.contains("HyperCharge")) //TODO: May still have bugginess??
+				outcomeData.putString("HyperCharge", persistentData.getString("HyperCharge"));
 		}
 	}
 

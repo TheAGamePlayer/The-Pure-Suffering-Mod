@@ -15,6 +15,7 @@ import dev.theagameplayer.puresuffering.event.PSPlayerEvents;
 import dev.theagameplayer.puresuffering.event.PSServerEvents;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
+import dev.theagameplayer.puresuffering.registries.PSSoundEvents;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRulesRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
@@ -64,6 +65,7 @@ public final class PureSufferingMod {
 	
 	private final void registerAll(final IEventBus busIn) {
 		PSMobEffects.MOB_EFFECTS.register(busIn);
+		PSSoundEvents.SOUND_EVENTS.register(busIn);
 		LOGGER.info("Registered all event buses.");
 	}
 	
@@ -74,6 +76,7 @@ public final class PureSufferingMod {
 		forgeBusIn.addListener(PSClientEvents::loggedOut);
 		forgeBusIn.addListener(PSClientEvents::fogColors);
 		forgeBusIn.addListener(PSClientEvents::customizeGuiOverlayDebugText);
+		forgeBusIn.addListener(PSClientEvents::renderLevelStage);
 	}
 
 	public static final void attachCommonEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {

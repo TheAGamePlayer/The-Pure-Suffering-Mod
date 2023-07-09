@@ -10,7 +10,8 @@
 	"client": [
 		"ClientLevelMixin",
 		"DimensionSpecialEffectsMixin",
-		"LevelRendererMixin"
+		"LevelRendererMixin",
+		"LightTextureMixin"
 	],
 	"server": [],
 	"injectors": {
