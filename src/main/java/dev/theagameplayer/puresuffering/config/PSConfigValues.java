@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 
-public abstract class PSConfigValues {
+public abstract class PSConfigValues { //Exists so that the config file doesn't have to be read every time a value is needed.
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	public static CommonValues common = new CommonValues();
 	public static ClientValues client = new ClientValues();
@@ -47,9 +47,9 @@ public abstract class PSConfigValues {
 		public final boolean canDayInvasionsBeCanceled;
 		public final boolean canNightInvasionsBeCanceled;
 		public final boolean canFixedInvasionsBeCanceled;
-		public final double dayCancelChanceMultiplier;
-		public final double nightCancelChanceMultiplier;
-		public final double fixedCancelChanceMultiplier;
+		public final int dayCancelChance;
+		public final int nightCancelChance;
+		public final int fixedCancelChance;
 		public final int maxHyperCharge;
 		
 		public final boolean hyperAggression;
@@ -97,9 +97,9 @@ public abstract class PSConfigValues {
 			this.canDayInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canDayInvasionsBeCanceled.get();
 			this.canNightInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canNightInvasionsBeCanceled.get();
 			this.canFixedInvasionsBeCanceled = PSConfig.CommonConfig.COMMON.canFixedInvasionsBeCanceled.get();
-			this.dayCancelChanceMultiplier = PSConfig.CommonConfig.COMMON.dayCancelChanceMultiplier.get();
-			this.nightCancelChanceMultiplier = PSConfig.CommonConfig.COMMON.nightCancelChanceMultiplier.get();
-			this.fixedCancelChanceMultiplier = PSConfig.CommonConfig.COMMON.fixedCancelChanceMultiplier.get();
+			this.dayCancelChance = PSConfig.CommonConfig.COMMON.dayCancelChance.get();
+			this.nightCancelChance = PSConfig.CommonConfig.COMMON.nightCancelChance.get();
+			this.fixedCancelChance = PSConfig.CommonConfig.COMMON.fixedCancelChance.get();
 			this.maxHyperCharge = PSConfig.CommonConfig.COMMON.maxHyperCharge.get();
 			
 			this.hyperAggression = PSConfig.CommonConfig.COMMON.hyperAggression.get();

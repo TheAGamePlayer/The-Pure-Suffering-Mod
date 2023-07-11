@@ -1,4 +1,29 @@
 #Minecraft 1.20.x
+Version 1.5.1.0R:
+- Added sound effect for invasions being canceled (It seemed off without it).
+- Made adding hyper & nightmare invasions through a command only able have the max severity like it does naturally.
+- Made the query invasions command now correctly bolden and italicize based on invasion hypertype (default, hyper, & nightmare variants).
+- Queued Invasions will now delay natural invasions rather than override them.
+- Canceling invasions now works like the invasion rarity system (1 in every 'value' invasions is canceled).
+- Hyper & nightmare invasions can no longer be canceled.
+- Vortex particles no longer run on a paused screen.
+- "vortexParticleSpread" is now 0 by default.
+- "dayIncreaseDelay" is now reduced to 50 by default.
+- "nightIncreaseDelay" is now reduced to 30 by default.
+- "fixedIncreaseDelay" is now reduced to 40 by default.
+- End Game is now a Tier 2 invasion.
+- Replaced "dayCancelChanceMultiplier" Config option with "dayCancelChance" to be more intuitive (Works like Invasion rarity now).
+- Replaced "nightCancelChanceMultiplier" Config option with "nightCancelChance" to be more intuitive (Works like Invasion rarity now).
+- Replaced "fixedCancelChanceMultiplier" Config option with "fixedCancelChance" to be more intuitive (Works like Invasion rarity now).
+- Removed some needless overhead reducing performance while picking invasions.
+- Fixed a bug where hyper & nightmare invasions were impossible to occur naturally.
+- Fixed subtitles not being added for new sound effects.
+- Fixed hyper & nightmare invasions on client side not updating properly.
+- Fixed extreme lag with new Vortex particles.
+- Fixed vortex particles persisting between dimensions.
+- Fixed "vortexParticleSpread" being unable to be set to 0;
+- Fixed delay between invasions accidentally skipping a day.
+
 Version 1.5.0.0R:
 - Added "max" option to add invasions command.
 - Changed mystery invasions to nightmare invasions.

@@ -39,42 +39,42 @@ public final class AddInvasionsCommand {
 	});
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_PRIMARY_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT;
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_SECONDARY_DAY_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && (containsDayChangingInvasion(((TimedInvasionWorldData)iwData).getInvasionSpawner().getQueuedDayInvasions()) ? it.getInvasionTime() != InvasionTime.DAY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY : it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT);
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_PRIMARY_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && it.getInvasionTime() != InvasionTime.DAY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY;
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_SECONDARY_NIGHT_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return !iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY && (containsNightChangingInvasion(((TimedInvasionWorldData)iwData).getInvasionSpawner().getQueuedNightInvasions()) ? it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeChangeability() != TimeChangeability.ONLY_NIGHT : it.getInvasionTime() != InvasionTime.DAY && it.getTimeChangeability() != TimeChangeability.ONLY_DAY);
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_PRIMARY_FIXED_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY;
 		}).map(InvasionType::getId), suggestionsBuilder);
 	};
 	private static final SuggestionProvider<CommandSourceStack> SUGGEST_SECONDARY_FIXED_INVASION_TYPES = (ctx, suggestionsBuilder) -> {
 		final Collection<InvasionType> collection = PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes();
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 		return SharedSuggestionProvider.suggestResource(collection.stream().filter(it -> {
 			return iwData.hasFixedTime() && it.getDimensions().contains(ctx.getSource().getLevel().dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY;
 		}).map(InvasionType::getId), suggestionsBuilder);
@@ -85,10 +85,10 @@ public final class AddInvasionsCommand {
 				.requires(player -> {
 					return player.hasPermission(2);
 				}).then(Commands.literal("day").then(Commands.literal("primary").then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getRandomInvasion(ctx, iwData, false, true, true);
+						final Invasion invasion = getRandomInvasion(ctx, tiwData, false, true, true);
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().removeIf(i -> i.isPrimary());
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
 						ctx.getSource().sendSuccess(() -> Component.translatable(invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "commands.puresuffering.add.success.day.primary.nightmare" : "commands.puresuffering.add.success.day.primary.hyper") : "commands.puresuffering.add.success.day.primary").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
@@ -96,32 +96,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_DAY_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.primary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.primary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_DAY_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.HYPER);
@@ -132,32 +108,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_DAY_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.primary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.primary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_DAY_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.NIGHTMARE);
@@ -169,7 +121,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_DAY_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.DEFAULT);
@@ -181,7 +133,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.DEFAULT);
@@ -193,7 +145,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.DEFAULT);
@@ -205,40 +157,18 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.literal("secondary").then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getRandomInvasion(ctx, iwData, false, true, false);
+						final Invasion invasion = getRandomInvasion(ctx, tiwData, false, true, false);
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
 						ctx.getSource().sendSuccess(() -> Component.translatable(invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "commands.puresuffering.add.success.day.primary.nightmare" : "commands.puresuffering.add.success.day.primary.hyper") : "commands.puresuffering.add.success.day.primary").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_DAY_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.secondary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.secondary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_DAY_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.HYPER);
@@ -248,30 +178,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_DAY_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.secondary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedDayInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.day.secondary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_DAY_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.NIGHTMARE);
@@ -282,7 +190,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_DAY_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.DEFAULT);
@@ -293,7 +201,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.DEFAULT);
@@ -304,7 +212,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.DEFAULT);
@@ -315,10 +223,10 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				}))))).then(Commands.literal("night").then(Commands.literal("primary").then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getRandomInvasion(ctx, iwData, false, false, true);
+						final Invasion invasion = getRandomInvasion(ctx, tiwData, false, false, true);
 						tiwData.getInvasionSpawner().getQueuedNightInvasions().removeIf(i -> i.isPrimary());
 						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
 						ctx.getSource().sendSuccess(() -> Component.translatable(invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "commands.puresuffering.add.success.day.primary.nightmare" : "commands.puresuffering.add.success.day.primary.hyper") : "commands.puresuffering.add.success.day.primary").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
@@ -326,32 +234,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_NIGHT_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.primary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.primary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_NIGHT_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.HYPER);
@@ -362,32 +246,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_NIGHT_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.primary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().removeIf(i -> i.isPrimary());
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.primary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_NIGHT_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.NIGHTMARE);
@@ -399,7 +259,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_NIGHT_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.DEFAULT);
@@ -411,7 +271,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.DEFAULT);
@@ -423,7 +283,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.DEFAULT);
@@ -435,40 +295,18 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.literal("secondary").then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getRandomInvasion(ctx, iwData, false, false, false);
+						final Invasion invasion = getRandomInvasion(ctx, tiwData, false, false, false);
 						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
 						ctx.getSource().sendSuccess(() -> Component.translatable(invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "commands.puresuffering.add.success.day.primary.nightmare" : "commands.puresuffering.add.success.day.primary.hyper") : "commands.puresuffering.add.success.day.primary").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_NIGHT_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.secondary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.HYPER);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.secondary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_NIGHT_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.HYPER);
@@ -478,30 +316,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_NIGHT_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.secondary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (!iwData.hasFixedTime()) {
-						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.NIGHTMARE);
-						tiwData.getInvasionSpawner().getQueuedNightInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.night.secondary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.nonfixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_NIGHT_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.NIGHTMARE);
@@ -512,7 +328,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_NIGHT_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.DEFAULT);
@@ -523,7 +339,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.DEFAULT);
@@ -534,7 +350,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.DEFAULT);
@@ -545,10 +361,10 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				}))))).then(Commands.literal("fixed").then(Commands.literal("primary").then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getRandomInvasion(ctx, iwData, true, false, true);
+						final Invasion invasion = getRandomInvasion(ctx, fiwData, true, false, true);
 						fiwData.getInvasionSpawner().getQueuedInvasions().removeIf(i -> i.isPrimary());
 						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
 						ctx.getSource().sendSuccess(() -> Component.translatable(invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "commands.puresuffering.add.success.day.primary.nightmare" : "commands.puresuffering.add.success.day.primary.hyper") : "commands.puresuffering.add.success.day.primary").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
@@ -556,32 +372,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_FIXED_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.HYPER);
-						fiwData.getInvasionSpawner().getQueuedInvasions().removeIf(i -> i.isPrimary());
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.primary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.HYPER);
-						fiwData.getInvasionSpawner().getQueuedInvasions().removeIf(i -> i.isPrimary());
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.primary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_FIXED_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.HYPER);
@@ -592,32 +384,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_FIXED_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.NIGHTMARE);
-						fiwData.getInvasionSpawner().getQueuedInvasions().removeIf(i -> i.isPrimary());
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.primary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.NIGHTMARE);
-						fiwData.getInvasionSpawner().getQueuedInvasions().removeIf(i -> i.isPrimary());
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.primary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_FIXED_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.NIGHTMARE);
@@ -629,7 +397,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_PRIMARY_FIXED_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.NONE, HyperType.DEFAULT);
@@ -641,7 +409,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.RANDOM, HyperType.DEFAULT);
@@ -653,7 +421,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, true, SeverityArg.MAX, HyperType.DEFAULT);
@@ -665,40 +433,18 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.literal("secondary").then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getRandomInvasion(ctx, iwData, true, false, false);
+						final Invasion invasion = getRandomInvasion(ctx, fiwData, true, false, false);
 						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
 						ctx.getSource().sendSuccess(() -> Component.translatable(invasion.getHyperType() != HyperType.DEFAULT ? (invasion.getHyperType() == HyperType.NIGHTMARE ? "commands.puresuffering.add.success.day.primary.nightmare" : "commands.puresuffering.add.success.day.primary.hyper") : "commands.puresuffering.add.success.day.primary").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 					} else {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_FIXED_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.HYPER);
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.secondary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.HYPER);
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.secondary.hyper").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					})).then(Commands.literal("hyper").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_FIXED_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.HYPER);
@@ -708,30 +454,8 @@ public final class AddInvasionsCommand {
 						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
 					}
 					return 0;
-				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_FIXED_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.NIGHTMARE);
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.secondary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
-					if (iwData.hasFixedTime()) {
-						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.NIGHTMARE);
-						fiwData.getInvasionSpawner().getQueuedInvasions().add(invasion);
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success.fixed.secondary.nightmare").append(invasion.getType().getComponent()).append("!").withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
-					} else {
-						ctx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.fixed").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true);
-					}
-					return 0;
-				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+				})))).then(Commands.literal("nightmare").then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_FIXED_INVASION_TYPES).then(Commands.literal("max").executes(ctx -> {
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.NIGHTMARE);
@@ -742,7 +466,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})))).then(Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(SUGGEST_SECONDARY_FIXED_INVASION_TYPES).then(Commands.argument("severity", IntegerArgumentType.integer(1)).executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.NONE, HyperType.DEFAULT);
@@ -753,7 +477,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("random").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.RANDOM, HyperType.DEFAULT);
@@ -764,7 +488,7 @@ public final class AddInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("max").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						final Invasion invasion = getInvasion(ctx, false, SeverityArg.MAX, HyperType.DEFAULT);
@@ -804,7 +528,7 @@ public final class AddInvasionsCommand {
 		}
 	}
 	
-	private static final Invasion getRandomInvasion(final CommandContext<CommandSourceStack> ctxIn, final InvasionWorldData iwDataIn, final boolean hasFixedTimeIn, final boolean isDayIn, final boolean isPrimaryIn) throws CommandSyntaxException {
+	private static final Invasion getRandomInvasion(final CommandContext<CommandSourceStack> ctxIn, final InvasionWorldData<?> iwDataIn, final boolean hasFixedTimeIn, final boolean isDayIn, final boolean isPrimaryIn) throws CommandSyntaxException {
 		final ArrayList<InvasionType> list = new ArrayList<>(PSBaseEvents.getInvasionTypeManager().getAllInvasionTypes());
 		list.removeIf(it -> {
 			boolean result = false;

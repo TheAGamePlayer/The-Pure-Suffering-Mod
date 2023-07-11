@@ -14,7 +14,7 @@ public final class ClientInvasionUtil {
 			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
 			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);
 			if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-				if (!dayInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE)) {
+				if (dayInfo.getRendererMap().getHyperType() != HyperType.NIGHTMARE) {
 					final ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
 						return renderer.isBrightnessChanged();
 					});
@@ -26,7 +26,7 @@ public final class ClientInvasionUtil {
 				}
 				return ClientTransitionHandler.tickBrightness(brightnessIn, brightness, levelIn.getDayTime() % 12000L);
 			} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-				if (!nightInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE)) {
+				if (nightInfo.getRendererMap().getHyperType() != HyperType.NIGHTMARE) {
 					final ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
 						return renderer.isBrightnessChanged();
 					});
@@ -42,7 +42,7 @@ public final class ClientInvasionUtil {
 			float brightness = 0.0F;
 			final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(levelIn).getRendererMap();
 			if (!fixedRenderers.isEmpty()) {
-				if (!fixedRenderers.containsHyperType(HyperType.NIGHTMARE)) {
+				if (fixedRenderers.getHyperType() != HyperType.NIGHTMARE) {
 					final ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
 						return renderer.isBrightnessChanged();
 					});
@@ -63,13 +63,13 @@ public final class ClientInvasionUtil {
 			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
 			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);
 			if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-				if (dayInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE)) return false;
+				if (dayInfo.getRendererMap().getHyperType() == HyperType.NIGHTMARE) return false;
 				final ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
 				if (!rendererList.isEmpty()) return false;
 			} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-				if (nightInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE)) return false;
+				if (nightInfo.getRendererMap().getHyperType() == HyperType.NIGHTMARE) return false;
 				final ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
@@ -78,7 +78,7 @@ public final class ClientInvasionUtil {
 		} else {
 			final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(levelIn).getRendererMap();
 			if (!fixedRenderers.isEmpty()) {
-				if (fixedRenderers.containsHyperType(HyperType.NIGHTMARE)) return false;
+				if (fixedRenderers.getHyperType() == HyperType.NIGHTMARE) return false;
 				final ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
 					return renderer.isBrightnessChanged();
 				});
@@ -93,18 +93,16 @@ public final class ClientInvasionUtil {
 			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(levelIn);
 			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(levelIn);
 			if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-				if (dayInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE))
+				if (dayInfo.getRendererMap().getHyperType() == HyperType.NIGHTMARE)
 					return ClientTransitionHandler.tickLightTextureDarkness(darknessIn, levelIn.getDayTime() % 12000L);
 			} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-				if (nightInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE))
+				if (nightInfo.getRendererMap().getHyperType() == HyperType.NIGHTMARE)
 					return ClientTransitionHandler.tickLightTextureDarkness(darknessIn, levelIn.getDayTime() % 12000L);
 			}
 		} else {
 			final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(levelIn).getRendererMap();
-			if (!fixedRenderers.isEmpty()) {
-				if (fixedRenderers.containsHyperType(HyperType.NIGHTMARE))
-					return ClientTransitionHandler.tickLightTextureDarkness(darknessIn, levelIn.getDayTime() % 12000L);
-			}
+			if (!fixedRenderers.isEmpty() && fixedRenderers.getHyperType() == HyperType.NIGHTMARE)
+				return ClientTransitionHandler.tickLightTextureDarkness(darknessIn, levelIn.getDayTime() % 12000L);
 		}
 		return darknessIn;
 	}

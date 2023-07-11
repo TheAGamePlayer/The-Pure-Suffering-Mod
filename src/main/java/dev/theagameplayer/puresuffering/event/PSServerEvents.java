@@ -11,7 +11,7 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 public final class PSServerEvents {
 	public static final void serverStarted(final ServerStartedEvent eventIn) {
 		if (PSConfigValues.common.multiThreadedInvasions) {
-			for (final InvasionWorldData iwData : InvasionWorldData.getInvasionData().values()) {
+			for (final InvasionWorldData<?> iwData : InvasionWorldData.getInvasionData().values()) {
 				eventIn.getServer().addTickable(new Thread(() -> {
 					if (!iwData.hasFixedTime()) {
 						((TimedInvasionWorldData)iwData).getInvasionSpawner().invasionTick(eventIn.getServer(), iwData.getWorld());
@@ -22,7 +22,7 @@ public final class PSServerEvents {
 			}
 		} else {
 			eventIn.getServer().addTickable(new Thread(() -> {
-				for (final InvasionWorldData iwData : InvasionWorldData.getInvasionData().values()) {
+				for (final InvasionWorldData<?> iwData : InvasionWorldData.getInvasionData().values()) {
 					if (!iwData.getWorld().players().isEmpty()) {
 						if (!iwData.hasFixedTime()) {
 							((TimedInvasionWorldData)iwData).getInvasionSpawner().invasionTick(eventIn.getServer(), iwData.getWorld());

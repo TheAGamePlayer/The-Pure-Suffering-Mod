@@ -187,7 +187,7 @@ public final class PSInvasionTypes implements Consumer<Consumer<InvasionType>> {
 		.dimensions(List.of(Level.NETHER.location()))
 		.save(consumerIn, "pigs_galore");
 		//END
-		InvasionType.Builder.invasionType().withRarity(14).withTier(3).withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_MIXED).severityInfo(List.of(
+		InvasionType.Builder.invasionType().withRarity(14).withTier(1).withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_MIXED).severityInfo(List.of(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderer(
 						InvasionSkyRenderer.Builder.skyRenderer().withFog(InvasionFogRenderer.Builder.fogRenderer().withRGB(0.15F, 0.15F, 0.1F))
 						.fixedSkyTexture(PureSufferingMod.namespace("textures/environment/end_game_sky.png"))

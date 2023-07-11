@@ -18,7 +18,7 @@ public final class ClearInvasionsCommand {
 				.requires(player -> {
 					return player.hasPermission(2);
 				}).then(Commands.literal("current").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						if (ServerTimeUtil.isServerDay(ctx.getSource().getLevel(), tiwData)) {
@@ -37,7 +37,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("day").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						tiwData.getInvasionSpawner().getDayInvasions().clear();
@@ -47,7 +47,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("night").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						tiwData.getInvasionSpawner().getNightInvasions().clear();
@@ -57,7 +57,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("fixed").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						fiwData.getInvasionSpawner().getInvasions().clear();
@@ -67,7 +67,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("all").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						tiwData.getInvasionSpawner().getDayInvasions().clear();
@@ -80,7 +80,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("queued").then(Commands.literal("day").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().clear();
@@ -90,7 +90,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("night").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						tiwData.getInvasionSpawner().getQueuedNightInvasions().clear();
@@ -100,7 +100,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("fixed").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (iwData.hasFixedTime()) {
 						final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
 						fiwData.getInvasionSpawner().getQueuedInvasions().clear();
@@ -110,7 +110,7 @@ public final class ClearInvasionsCommand {
 					}
 					return 0;
 				})).then(Commands.literal("all").executes(ctx -> {
-					final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
+					final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(ctx.getSource().getLevel());
 					if (!iwData.hasFixedTime()) {
 						final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
 						tiwData.getInvasionSpawner().getQueuedDayInvasions().clear();

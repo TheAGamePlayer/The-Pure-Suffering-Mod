@@ -67,7 +67,7 @@ public final class PSLivingEvents {
 		final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 		if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
 			final ServerLevel serverLevel = (ServerLevel)eventIn.getEntity().level();
-			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
+			final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(serverLevel);
 			if (iwData != null) {
 				if (!iwData.hasFixedTime()) {
 					final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
@@ -100,7 +100,7 @@ public final class PSLivingEvents {
 		if (!eventIn.getLevel().isClientSide()) {
 			if (eventIn.getSpawnType() == MobSpawnType.NATURAL) {
 				final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
-				final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
+				final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(serverLevel);
 				if (iwData != null) {
 					final boolean flag = eventIn.getEntity().getClassification(false) == MobCategory.MONSTER;
 					if (serverLevel.random.nextInt(10000) < PSConfigValues.common.naturalSpawnChance) {
@@ -128,7 +128,7 @@ public final class PSLivingEvents {
 	public static final void allowDespawn(final MobSpawnEvent.AllowDespawn eventIn) {
 		if (!eventIn.getLevel().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntity() instanceof Mob) {
 			final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
-			final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(serverLevel);
+			final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(serverLevel);
 			final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 			if (iwData != null && persistentData.contains("InvasionMob")) {
 				if (!iwData.hasFixedTime()) {

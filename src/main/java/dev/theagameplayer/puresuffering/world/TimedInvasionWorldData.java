@@ -5,34 +5,32 @@ import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 
-public final class TimedInvasionWorldData extends InvasionWorldData {
-	private final TimedInvasionSpawner spawner = new TimedInvasionSpawner();
+public final class TimedInvasionWorldData extends InvasionWorldData<TimedInvasionSpawner> {
 	private double dayXPMultiplier, nightXPMultiplier;
 	private boolean checkedDay, checkedNight;
 	private boolean prevDayCheck, prevNightCheck;
 	
 	public TimedInvasionWorldData(final ServerLevel levelIn) {
-		super(levelIn);
+		super(levelIn, new TimedInvasionSpawner());
 		this.checkedDay = ServerTimeUtil.isServerNight(levelIn, this);
 		this.checkedNight = ServerTimeUtil.isServerDay(levelIn, this);
 	}
 	
 	public static final TimedInvasionWorldData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
 		final TimedInvasionWorldData tiwData = new TimedInvasionWorldData(levelIn);
-		tiwData.spawner.load(nbtIn.getCompound("Spawner"));
 		tiwData.dayXPMultiplier = nbtIn.getDouble("DayXPMultiplier");
 		tiwData.nightXPMultiplier = nbtIn.getDouble("NightXPMultiplier");
 		tiwData.checkedDay = nbtIn.getBoolean("CheckedDay");
 		tiwData.checkedNight = nbtIn.getBoolean("CheckedNight");
 		tiwData.prevDayCheck = nbtIn.getBoolean("PrevDayCheck");
 		tiwData.prevNightCheck = nbtIn.getBoolean("PrevNightCheck");
+		tiwData.getInvasionSpawner().load(nbtIn.getCompound("Spawner"));
 		tiwData.days = nbtIn.getLong("Days");
 		return tiwData;
 	}
 
 	@Override
 	public final CompoundTag save(final CompoundTag nbtIn) {
-		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putDouble("DayXPMultiplier", this.dayXPMultiplier);
 		nbtIn.putDouble("NightXPMultiplier", this.nightXPMultiplier);
 		nbtIn.putBoolean("CheckedDay", this.checkedDay);
@@ -40,10 +38,6 @@ public final class TimedInvasionWorldData extends InvasionWorldData {
 		nbtIn.putBoolean("PrevDayCheck", this.prevDayCheck);
 		nbtIn.putBoolean("PrevNightCheck", this.prevNightCheck);
 		return super.save(nbtIn);
-	}
-	
-	public final TimedInvasionSpawner getInvasionSpawner() {
-		return this.spawner;
 	}
 	
 	public final double getDayXPMultiplier() {

@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerLevel;
 
 public final class ServerInvasionUtil {
 	public static final int handleLightLevel(final int lightLevelIn, final ServerLevel levelIn) {
-		final InvasionWorldData iwData = InvasionWorldData.getInvasionData().get(levelIn);
+		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(levelIn);
 		if (iwData != null) {
 			if (!iwData.hasFixedTime()) {
 				final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;

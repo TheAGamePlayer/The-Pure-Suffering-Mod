@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import dev.theagameplayer.puresuffering.client.SkyParticle;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
 import dev.theagameplayer.puresuffering.invasion.HyperType;
 
@@ -24,14 +25,15 @@ public final class InvasionRendererMap implements Iterable<Entry<InvasionSkyRend
 
 	public final void clear() {
 		this.rendererMap.clear();
+		SkyParticle.clearParticles();
 	}
 
-	public final boolean containsHyperType(final HyperType hyperTypeIn) {
+	public final HyperType getHyperType() {
 		for (final Pair<Boolean, HyperType> pair : this.rendererMap.values()) {
-			if (pair.getLeft() && pair.getRight() == hyperTypeIn)
-				return true;
+			if (pair.getLeft())
+				return pair.getRight();
 		}
-		return false;
+		return HyperType.DEFAULT;
 	}
 
 	public final ArrayList<InvasionSkyRenderer> getRenderersOf(final Predicate<InvasionSkyRenderer> predIn) {

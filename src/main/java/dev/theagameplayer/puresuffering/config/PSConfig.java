@@ -51,9 +51,9 @@ public final class PSConfig {
 		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
 		public final ForgeConfigSpec.BooleanValue canFixedInvasionsBeCanceled;
-		public final ForgeConfigSpec.DoubleValue dayCancelChanceMultiplier;
-		public final ForgeConfigSpec.DoubleValue nightCancelChanceMultiplier;
-		public final ForgeConfigSpec.DoubleValue fixedCancelChanceMultiplier;
+		public final ForgeConfigSpec.IntValue dayCancelChance;
+		public final ForgeConfigSpec.IntValue nightCancelChance;
+		public final ForgeConfigSpec.IntValue fixedCancelChance;
 		public final ForgeConfigSpec.IntValue maxHyperCharge;
 		//Modifications
 		public final ForgeConfigSpec.BooleanValue hyperAggression;
@@ -92,17 +92,17 @@ public final class PSConfig {
 					.translation(CONFIG + "day_difficulty_increase_delay")
 					.worldRestart()
 					.comment("How many days should pass when the Day Invasion Difficulty increases?")
-					.defineInRange("dayDifficultyIncreaseDelay", 60, 0, Integer.MAX_VALUE);
+					.defineInRange("dayDifficultyIncreaseDelay", 50, 0, Integer.MAX_VALUE);
 			nightDifficultyIncreaseDelay = COMMON_BUILDER
 					.translation(CONFIG + "night_difficulty_increase_delay")
 					.worldRestart()
 					.comment("How many days should pass when the Night Invasion Difficulty increases?")
-					.defineInRange("nightDifficultyIncreaseDelay", 40, 0, Integer.MAX_VALUE);
+					.defineInRange("nightDifficultyIncreaseDelay", 30, 0, Integer.MAX_VALUE);
 			fixedDifficultyIncreaseDelay = COMMON_BUILDER
 					.translation(CONFIG + "fixed_difficulty_increase_delay")
 					.worldRestart()
 					.comment("How many days should pass when the Fixed Invasion Difficulty increases?")
-					.defineInRange("fixedDifficultyIncreaseDelay", 50, 0, Integer.MAX_VALUE);
+					.defineInRange("fixedDifficultyIncreaseDelay", 40, 0, Integer.MAX_VALUE);
 			maxDayInvasions = COMMON_BUILDER
 					.translation(CONFIG + "max_day_invasions")
 					.worldRestart()
@@ -211,21 +211,21 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("Can Fixed Invasions have a random chance to be canceled?")
 					.define("canFixedInvasionsBeCanceled", true);
-			dayCancelChanceMultiplier = COMMON_BUILDER
-					.translation(CONFIG + "day_cancel_chance_multiplier")
+			dayCancelChance = COMMON_BUILDER
+					.translation(CONFIG + "day_cancel_chance")
 					.worldRestart()
-					.comment("Chance for Day Invasions to be canceled.", "NOTE: Multiplied by Day Difficulty Increase Delay.")
-					.defineInRange("dayCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
-			nightCancelChanceMultiplier = COMMON_BUILDER
-					.translation(CONFIG + "night_cancel_chance_multiplier")
+					.comment("Chance for Day Invasions to be canceled.", "NOTE: An invasion is canceled once in every 'value' day invasions.", "NOTE: If an invasion is set to be cancel on the same day as a hyper/nightmare invasion, it will not be cancled.")
+					.defineInRange("dayCancelChance", 84, 0, 100);
+			nightCancelChance = COMMON_BUILDER
+					.translation(CONFIG + "night_cancel_chance")
 					.worldRestart()
-					.comment("Chance for Night Invasions to be canceled.", "NOTE: Multiplied by Night Difficulty Increase Delay.")
-					.defineInRange("nightCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
-			fixedCancelChanceMultiplier = COMMON_BUILDER
-					.translation(CONFIG + "fixed_cancel_chance_multiplier")
+					.comment("Chance for Night Invasions to be canceled.", "NOTE: An invasion is canceled once in every 'value' night invasions.", "NOTE: If an invasion is set to be cancel on the same night as a hyper/nightmare invasion, it will not be cancled.")
+					.defineInRange("nightCancelChance", 12, 0, 100);
+			fixedCancelChance = COMMON_BUILDER
+					.translation(CONFIG + "fixed_cancel_chance")
 					.worldRestart()
-					.comment("Chance for Fixed Invasions to be canceled.", "NOTE: Multiplied by Fixed Difficulty Increase Delay.")
-					.defineInRange("fixedCancelChanceMultiplier", 2.5D, 0.0D, 10.0D);
+					.comment("Chance for Fixed Invasions to be canceled.", "NOTE: An invasion is canceled once in every 'value' fixed invasions.", "NOTE: If an invasion is set to be cancel on the same cycle as a hyper/nightmare invasion, it will not be cancled.")
+					.defineInRange("fixedCancelChance", 24, 0, 100);
 			maxHyperCharge = COMMON_BUILDER
 					.translation(CONFIG + "max_hyper_charge")
 					.worldRestart()
@@ -370,15 +370,15 @@ public final class PSConfig {
 			minVortexParticleLifespan = CLIENT_BUILDER
 					.translation(CONFIG + "min_vortex_particle_lifespan")
 					.comment("Minimum lifespan for vortex particles in Hyper Invasions.", "NOTE: Set to 'enableVortexParticles' to false to disable.")
-					.defineInRange("minVortexParticleLifespan", 300, 1, Integer.MAX_VALUE);
+					.defineInRange("minVortexParticleLifespan", 30, 1, Integer.MAX_VALUE);
 			maxVortexParticleLifespan = CLIENT_BUILDER
 					.translation(CONFIG + "max_vortex_particles_lifespan")
 					.comment("Maximum lifespan for vortex particles in Hyper Invasions.", "NOTE: Set to 'enableVortexParticles' to false to disable.")
-					.defineInRange("maxVortexParticleLifespan", 6300, 1, Integer.MAX_VALUE);
+					.defineInRange("maxVortexParticleLifespan", 630, 1, Integer.MAX_VALUE);
 			vortexParticleSpread = CLIENT_BUILDER
 					.translation(CONFIG + "vortex_particle_spread")
 					.comment("Spread value for vortex particles (Delay between particles).")
-					.defineInRange("vortexParticleSpread", 6, 1, Integer.MAX_VALUE);
+					.defineInRange("vortexParticleSpread", 0, 0, Integer.MAX_VALUE);
 			CLIENT_BUILDER.pop();
 		}
 	}

@@ -72,7 +72,7 @@ public final class PSClientEvents {
 			final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(mc.level);
 			final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(mc.level);
 			if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-				if (!dayInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE)) {
+				if (dayInfo.getRendererMap().getHyperType() != HyperType.NIGHTMARE) {
 					final ArrayList<InvasionSkyRenderer> rendererList = dayInfo.getRendererMap().getRenderersOf(renderer -> {
 						return renderer.getFogRenderer().isFogColorChanged();
 					});
@@ -88,7 +88,7 @@ public final class PSClientEvents {
 					blue = -1.0F;
 				}
 			} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-				if (!nightInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE)) {
+				if (nightInfo.getRendererMap().getHyperType() != HyperType.NIGHTMARE) {
 					final ArrayList<InvasionSkyRenderer> rendererList = nightInfo.getRendererMap().getRenderersOf(renderer -> {
 						return renderer.getFogRenderer().isFogColorChanged();
 					});
@@ -109,7 +109,7 @@ public final class PSClientEvents {
 			float red = 0.0F, green = 0.0F, blue = 0.0F;
 			final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(mc.level).getRendererMap();
 			if (!fixedRenderers.isEmpty()) {
-				if (!fixedRenderers.containsHyperType(HyperType.NIGHTMARE)) {
+				if (fixedRenderers.getHyperType() != HyperType.NIGHTMARE) {
 					final ArrayList<InvasionSkyRenderer> rendererList = fixedRenderers.getRenderersOf(renderer -> {
 						return renderer.getFogRenderer().isFogColorChanged();
 					});
@@ -161,23 +161,15 @@ public final class PSClientEvents {
 			if (!mc.level.dimensionType().hasFixedTime()) {
 				final ClientInvasionWorldInfo dayInfo = ClientInvasionWorldInfo.getDayClientInfo(mc.level);
 				final ClientInvasionWorldInfo nightInfo = ClientInvasionWorldInfo.getNightClientInfo(mc.level);
-				if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty()) {
-					if (dayInfo.getRendererMap().containsHyperType(HyperType.HYPER))
-						SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level, mc.level.dayTime() % 12000L, HyperType.HYPER, 0.225F * mc.level.getRainLevel(eventIn.getPartialTick()));
-					if (dayInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE))
-						SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level, mc.level.dayTime() % 12000L, HyperType.NIGHTMARE, 0.225F * mc.level.getRainLevel(eventIn.getPartialTick()));
-				} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty()) {
-					if (nightInfo.getRendererMap().containsHyperType(HyperType.HYPER))
-						SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level, mc.level.dayTime() % 12000L, HyperType.HYPER, 0.225F * mc.level.getRainLevel(eventIn.getPartialTick()));
-					if (nightInfo.getRendererMap().containsHyperType(HyperType.NIGHTMARE))
-						SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level, mc.level.dayTime() % 12000L, HyperType.NIGHTMARE, 0.225F * mc.level.getRainLevel(eventIn.getPartialTick()));
+				if (dayInfo.isClientTime() && !dayInfo.getRendererMap().isEmpty() && dayInfo.getRendererMap().getHyperType() != HyperType.DEFAULT) {
+					SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level.getRainLevel(eventIn.getPartialTick()), eventIn.getPartialTick());
+				} else if (nightInfo.isClientTime() && !nightInfo.getRendererMap().isEmpty() && nightInfo.getRendererMap().getHyperType() != HyperType.DEFAULT) {
+					SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level.getRainLevel(eventIn.getPartialTick()), eventIn.getPartialTick());
 				}
 			} else {
 				final InvasionRendererMap fixedRenderers = ClientInvasionWorldInfo.getFixedClientInfo(mc.level).getRendererMap();
-				if (fixedRenderers.containsHyperType(HyperType.HYPER))
-					SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level, mc.level.dayTime() % 12000L, HyperType.HYPER, 0.225F * mc.level.getRainLevel(eventIn.getPartialTick()));
-				if (fixedRenderers.containsHyperType(HyperType.NIGHTMARE))
-					SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level, mc.level.dayTime() % 12000L, HyperType.NIGHTMARE, 0.225F * mc.level.getRainLevel(eventIn.getPartialTick()));
+				if (!fixedRenderers.isEmpty() && fixedRenderers.getHyperType() != HyperType.DEFAULT)
+					SkyParticle.renderParticles(eventIn.getPoseStack(), mc.level.getRainLevel(eventIn.getPartialTick()), eventIn.getPartialTick());
 			}
 		}
 	}

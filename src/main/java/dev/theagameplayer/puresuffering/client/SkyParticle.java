@@ -3,7 +3,6 @@ package dev.theagameplayer.puresuffering.client;
 import java.util.ArrayList;
 
 import org.joml.Matrix4f;
-
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -27,44 +26,66 @@ public final class SkyParticle {
 	private final float speed, halfSpeed;
 	private final float degreesStart, degreesFinish;
 	private final float maxSize, maxAlpha;
-	private final Axis xAxis, zAxis;
+	private final Axis yAxis, xAxis, zAxis;
+	private final float r, g, b;
+	private float yRot, xRot, zRot;
+	private float pyRot, pxRot, pzRot;
 	private float ticksAlive;
 	private float size, alpha;
 	
-	private SkyParticle(final ClientLevel levelIn) {
+	private SkyParticle(final ClientLevel levelIn, final HyperType hyperTypeIn) {
 		this.speed = levelIn.random.nextInt(PSConfigValues.client.maxVortexParticleLifespan - PSConfigValues.client.minVortexParticleLifespan + 1) + PSConfigValues.client.minVortexParticleLifespan;
 		this.halfSpeed = this.speed/2;
 		this.degreesStart = levelIn.random.nextInt(360);
 		this.degreesFinish = levelIn.random.nextInt(360) + 180;
 		this.maxSize = levelIn.random.nextFloat() + 0.75F;
 		this.maxAlpha = levelIn.random.nextFloat() * 0.5F + 0.5F;
+		this.yAxis = hyperTypeIn == HyperType.NIGHTMARE ? Axis.YN : Axis.YP;
 		this.xAxis = levelIn.random.nextBoolean() ? Axis.XP : Axis.XN;
 		this.zAxis = levelIn.random.nextBoolean() ? Axis.ZP : Axis.ZN;
+		this.r = hyperTypeIn == HyperType.NIGHTMARE ? 0.375F : 0.75F;
+		this.g = hyperTypeIn == HyperType.NIGHTMARE ? 0.0625F : 0.0F;
+		this.b = hyperTypeIn == HyperType.NIGHTMARE ? 0.5F : 0.0F;
 		this.ticksAlive = this.speed;
 		particleDelay = PSConfigValues.client.vortexParticleSpread;
 	}
 	
-	public static final void renderParticles(final PoseStack poseStackIn, final ClientLevel levelIn, final long dayTimeIn, final HyperType hyperTypeIn, final float weatherVisibilityIn) {
+	public static final void clearParticles() {
+		SKY_PARTICLES.clear();
+	}
+	
+	public static final void tickParticles(final ClientLevel levelIn, final long dayTimeIn, final HyperType hyperTypeIn) {
 		if (dayTimeIn > ClientTransitionHandler.HALF_TRANSITION && dayTimeIn < 12000L - ClientTransitionHandler.HALF_TRANSITION && particleDelay < 0)
-			SKY_PARTICLES.add(new SkyParticle(levelIn));
+			SKY_PARTICLES.add(new SkyParticle(levelIn, hyperTypeIn));
 		particleDelay--;
-		final float r = hyperTypeIn == HyperType.NIGHTMARE ? 0.375F : 0.75F;
-		final float g = hyperTypeIn == HyperType.NIGHTMARE ? 0.0625F : 0.0F;
-		final float b = hyperTypeIn == HyperType.NIGHTMARE ? 0.5F : 0.0F;
-		final Axis yAxis = hyperTypeIn == HyperType.NIGHTMARE ? Axis.YN : Axis.YP;
+		SKY_PARTICLES.removeIf(particle -> {
+			final float percentAlive = particle.ticksAlive/particle.speed;
+			particle.alpha = vortexValue(particle, particle.alpha, particle.maxAlpha, dayTimeIn);
+			particle.pyRot = particle.yRot;
+			particle.pxRot = particle.xRot;
+			particle.pzRot = particle.zRot;
+			particle.yRot = particle.degreesStart + percentAlive * particle.degreesFinish;
+			particle.xRot = percentAlive > 0.5F ? percentAlive * 180.0F : 180.0F - percentAlive * 180.0F;
+			particle.zRot = percentAlive > 0.5F ? 180.0F - percentAlive * 180.0F : 180.0F - percentAlive * 180.0F;
+			particle.ticksAlive--;
+			particle.size = vortexValue(particle, particle.size, particle.maxSize, dayTimeIn);
+			if (particle.ticksAlive < 1) return true;
+			return false;
+		});
+	}
+	
+	public static final void renderParticles(final PoseStack poseStackIn, final float weatherVisibilityIn, final float partialTicksIn) { //Uses partial ticks, do computing work on client level tick
 		final BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
 		RenderSystem.depthMask(false);
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		SKY_PARTICLES.removeIf(particle -> {
+		SKY_PARTICLES.forEach(particle -> {
 			poseStackIn.pushPose();
-			final float percentAlive = particle.ticksAlive/particle.speed;
-			particle.alpha = vortexValue(particle, particle.alpha, particle.maxAlpha, dayTimeIn);
-			RenderSystem.setShaderColor(r, g, b, particle.alpha - weatherVisibilityIn);
-			poseStackIn.mulPose(yAxis.rotationDegrees(particle.degreesStart + percentAlive * particle.degreesFinish));
-			poseStackIn.mulPose(particle.xAxis.rotationDegrees(percentAlive > 0.5F ? percentAlive * 180.0F : 180.0F - percentAlive * 180.0F));
-			poseStackIn.mulPose(particle.zAxis.rotationDegrees(percentAlive > 0.5F ? 180.0F - percentAlive * 180.0F : 180.0F - percentAlive * 180.0F));
+			RenderSystem.setShaderColor(particle.r, particle.g, particle.b, particle.alpha - weatherVisibilityIn);
+			poseStackIn.mulPose(particle.yAxis.rotationDegrees(particle.pyRot + (particle.yRot - particle.pyRot) * partialTicksIn));
+			poseStackIn.mulPose(particle.xAxis.rotationDegrees(particle.pxRot + (particle.xRot - particle.pxRot) * partialTicksIn));
+			poseStackIn.mulPose(particle.zAxis.rotationDegrees(particle.pzRot + (particle.zRot - particle.pzRot) * partialTicksIn));
 			final Matrix4f matrix4f1 = poseStackIn.last().pose();
 			RenderSystem.setShaderTexture(0, SKY_PARTICLE);
 			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
@@ -74,10 +95,6 @@ public final class SkyParticle {
 			bufferBuilder.vertex(matrix4f1, -particle.size, 100.0F, particle.size).uv(0.0F, 1.0F).endVertex();
 			BufferUploader.drawWithShader(bufferBuilder.end());
 			poseStackIn.popPose();
-			particle.ticksAlive--;
-			particle.size = vortexValue(particle, particle.size, particle.maxSize, dayTimeIn);
-			if (particle.ticksAlive < 1) return true;
-			return false;
 		});
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.disableBlend();

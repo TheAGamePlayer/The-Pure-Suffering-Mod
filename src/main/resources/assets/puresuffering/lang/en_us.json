@@ -51,10 +51,10 @@
 	"commands.puresuffering.query.invasions": "[PureSuffering] Current Invasion Types: ",
 	"commands.puresuffering.query.none": "[PureSuffering] Currently No Invasions?!",
 
-	"invasion.puresuffering.message1": "[PureSuffering] Hyper Invasions are now beginning???",
+	"invasion.puresuffering.message1": "[PureSuffering] Invasions are now beginning!",
 	"invasion.puresuffering.message2": "[PureSuffering] Hyper Invasions are now beginning!",
-	"invasion.puresuffering.message3": "[PureSuffering] Invasions are now beginning!",
-	"invasion.puresuffering.message4": "Invasion Types: ",
+	"invasion.puresuffering.message3": "[PureSuffering] Hyper Invasions are now beginning???",
+	"invasion.puresuffering.message0": "Invasion Types: ",
 	"invasion.puresuffering.info1": "IsPrimary: ",
 	"invasion.puresuffering.info2": "Severity: ",
 	"invasion.puresuffering.info3": "HyperType: ",
@@ -78,6 +78,11 @@
 	"invasion.puresuffering.blazing_inferno": "Blazing Inferno",
 	"invasion.puresuffering.pigs_galore": "Pigs Galore",
 	"invasion.puresuffering.end_game": "End Game",
+	
+	"puresuffering.subtitle.default_invasion_start": "Default Invasion Start",
+	"puresuffering.subtitle.hyper_invasion_start": "Hyper Invasion Start",
+	"puresuffering.subtitle.nightmare_invasion_start": "Nightmare Invasion Start",
+	"puresuffering.subtitle.cancel_invasion": "Cancel Invasion",
 	
 	"puresuffering.config.primary_invasion_mob_cap": "Primary Invasion Mob Cap",
 	"puresuffering.config.secondary_invasion_mob_cap": "Secondary Invasion Mob Cap",
@@ -104,9 +109,9 @@
 	"puresuffering.config.can_day_invasions_be_canceled": "Can Day Invasions be Canceled",
 	"puresuffering.config.can_night_invasions_be_canceled": "Can Night Invasions be Canceled",
 	"puresuffering.config.can_fixed_invasions_be_canceled": "Can Night Invasions be Canceled",
-	"puresuffering.config.day_cancel_chance_multiplier": "Day Cancel Chance Multiplier",
-	"puresuffering.config.night_cancel_chance_multiplier": "Night Cancel Chance Multiplier",
-	"puresuffering.config.fixed_cancel_chance_multiplier": "Fixed Cancel Chance Multiplier",
+	"puresuffering.config.day_cancel_chance": "Day Cancel Chance",
+	"puresuffering.config.night_cancel_chance": "Night Cancel Chance",
+	"puresuffering.config.fixed_cancel_chance": "Fixed Cancel Chance",
 	"puresuffering.config.max_hyper_charge": "Max Hyper Charge",
 	
 	"puresuffering.config.hyper_aggression": "Hyper Aggression",

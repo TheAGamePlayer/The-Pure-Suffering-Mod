@@ -4,34 +4,28 @@ import dev.theagameplayer.puresuffering.spawner.FixedInvasionSpawner;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 
-public final class FixedInvasionWorldData extends InvasionWorldData {
-	private final FixedInvasionSpawner spawner = new FixedInvasionSpawner();
+public final class FixedInvasionWorldData extends InvasionWorldData<FixedInvasionSpawner> {
 	private boolean requiresUpdate, isFirstCycle;
 	private double xpMultiplier;
 
 	public FixedInvasionWorldData(final ServerLevel levelIn) {
-		super(levelIn);
+		super(levelIn, new FixedInvasionSpawner());
 	}
 
 	public static final FixedInvasionWorldData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
 		final FixedInvasionWorldData fiwData = new FixedInvasionWorldData(levelIn);
-		fiwData.spawner.load(nbtIn.getCompound("Spawner"));
 		fiwData.isFirstCycle = nbtIn.getBoolean("IsFirstCycle");
 		fiwData.xpMultiplier = nbtIn.getDouble("XPMultiplier");
+		fiwData.getInvasionSpawner().load(nbtIn.getCompound("Spawner"));
 		fiwData.days = nbtIn.getLong("Days");
 		return fiwData;
 	}
 
 	@Override
 	public final CompoundTag save(final CompoundTag nbtIn) {
-		nbtIn.put("Spawner", this.spawner.save());
 		nbtIn.putBoolean("IsFirstCycle", this.isFirstCycle);
 		nbtIn.putDouble("XPMultiplier", this.xpMultiplier);
 		return super.save(nbtIn);
-	}
-	
-	public final FixedInvasionSpawner getInvasionSpawner() {
-		return this.spawner;
 	}
 	
 	public final boolean requiresUpdate() {

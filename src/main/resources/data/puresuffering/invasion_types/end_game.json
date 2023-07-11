@@ -65,7 +65,7 @@
     }
   ],
   "SpawningSystem": "BIOME_MIXED",
-  "Tier": 3,
+  "Tier": 1,
   "TimeChangeability": "DEFAULT",
   "TimeModifier": "NONE",
   "WeatherType": "DEFAULT"

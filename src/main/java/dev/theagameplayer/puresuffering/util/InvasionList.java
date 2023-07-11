@@ -3,6 +3,7 @@ package dev.theagameplayer.puresuffering.util;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import dev.theagameplayer.puresuffering.invasion.HyperType;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.network.packet.AddInvasionPacket;
@@ -28,10 +29,17 @@ public final class InvasionList implements Iterable<Invasion> {
 		return this.isCanceled;
 	}
 	
+	public final HyperType getHyperType() {
+		for (final Invasion invasion : this.invasionList) {
+			if (invasion.isPrimary())
+				return invasion.getHyperType();
+		}
+		return HyperType.DEFAULT;
+	}
+	
 	public final boolean add(final Invasion invasionIn) {
 		final boolean result = this.invasionList.add(invasionIn);
-		if (invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer() != null)
-			PSPacketHandler.sendToAllClients(new AddInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType, invasionIn.isPrimary(), invasionIn.getHyperType()));
+		PSPacketHandler.sendToAllClients(new AddInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType, invasionIn.isPrimary(), invasionIn.getHyperType()));
 		PSPacketHandler.sendToAllClients(new UpdateCountPacket(this.size(), this.listType));
 		return result;
 	}
@@ -42,8 +50,7 @@ public final class InvasionList implements Iterable<Invasion> {
 			return true;
 		}
 		final boolean result = this.invasionList.remove(invasionIn);
-		if (invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer() != null)
-			PSPacketHandler.sendToAllClients(new RemoveInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType));
+		PSPacketHandler.sendToAllClients(new RemoveInvasionPacket(invasionIn.getType().getSeverityInfo().get(invasionIn.getSeverity()).getSkyRenderer(), this.listType));
 		return result;
 	}
 
@@ -57,8 +64,7 @@ public final class InvasionList implements Iterable<Invasion> {
 		PSPacketHandler.sendToClient(new ClearInvasionsPacket(this.listType), playerIn);
 		for (int index = 0; index < this.size(); index++) {
 			final Invasion invasion = this.get(index);
-			if (invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getSkyRenderer() != null)
-				PSPacketHandler.sendToClient(new AddInvasionPacket(invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getSkyRenderer(), this.listType, invasion.isPrimary(), invasion.getHyperType()), playerIn);
+			PSPacketHandler.sendToClient(new AddInvasionPacket(invasion.getType().getSeverityInfo().get(invasion.getSeverity()).getSkyRenderer(), this.listType, invasion.isPrimary(), invasion.getHyperType()), playerIn);
 		}
 		PSPacketHandler.sendToClient(new UpdateCountPacket(this.size(), this.listType), playerIn);
 	}

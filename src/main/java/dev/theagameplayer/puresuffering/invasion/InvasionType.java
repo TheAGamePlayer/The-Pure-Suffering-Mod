@@ -297,7 +297,7 @@ public final class InvasionType {
 			}
 
 			public final SeverityInfo build(final ResourceLocation idIn) {
-				return new SeverityInfo(this.skyRenderer == null ? null : this.skyRenderer.build(idIn), this.mobSpawnList, this.clusterEntitiesList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
+				return new SeverityInfo(this.skyRenderer == null ? InvasionSkyRenderer.Builder.skyRenderer().build(idIn) : this.skyRenderer.build(idIn), this.mobSpawnList, this.clusterEntitiesList, this.mobCapPercentage, this.forceNoSleep, this.lightLevel, this.tickDelay, this.clusterSize);
 			}
 
 			public final JsonObject serializeToJson() {

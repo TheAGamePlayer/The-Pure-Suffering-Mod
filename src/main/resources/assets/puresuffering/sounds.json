@@ -25,5 +25,14 @@
 				"stream": true
 			}
 		]
+	},
+	"cancel_invasion": {
+		"subtitle": "puresuffering.subtitle.cancel_invasion",
+		"sounds": [
+			{
+				"name": "puresuffering:cancel_invasion",
+				"stream": true
+			}
+		]
 	}
 }
