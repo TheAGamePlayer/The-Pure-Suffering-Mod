@@ -17,71 +17,106 @@ Step4: Setup your invasion json file.
 --------------------------------------------------------
 
 All Invasion Values:
+OverridesExisting: (Optional - Boolean)
+- Used for datapacks to override an existing invasion with custom mobs, visual effects, etc...
+DefaultName: (Optional - String)
+- Used for datapacks to set a name for the invasion without the need of a custom resourcepack to have an en_us file.
 Rarity: (Integer 0+)
 - How rare your invasion is, higher numbers are more rare.
 Tier: (Integer 0+)
 - The Tier of your invasion, increased numbers occurring after so many difficulty bumps.
+StopConversions: (Optional - Boolean)
+- Will determine if invasion mobs will be unable to convert into another hostile mob.
 InvasionTime: (String)
 - When your invasion occurs.
 - "DAY" The invasion occurs only in the day.
 - "NIGHT" The invasions occurs only at night.
 - "BOTH" The invasions occurs in the day and at night.
-InvasionPriority: (String)
+InvasionPriority: (Optional - String)
 - The priority of the invasion when the event occurs.
 - "SECONDARY_ONLY" The invasion can only serve as a support to another invasion.
 - "PRIMARY_ONLY" The invasion can only serve as the main invasion.
 - "BOTH" By default, the invasion can serve as either the main invasion or a support invasion.
-SpawningSystem: (String)
+SpawningSystem: (Optional - String)
 - The spawning method used by this invasion.
 - "DEFAULT" The invasion uses the mob list provided to choose mobs to spawn.
 - "BIOME_BOOSTED" The invasion uses the biome's monster spawn list to choose mobs to spawn.
 - "BIOME_MIXED" The invasion uses every biome monster spawn list to choose mobs to spawn.
-TimeModifier: (String)
+TimeModifier: (Optional - String)
 - How your invasion changes the what day/night invasions can be chosen.
 - This is preferably only changed as a primary invasion, but is possible to experiment.
-- "NONE" This invasion does not change anything.
+- "NONE" By default, this invasion does not change anything.
 - "DAY_TO_NIGHT" This invasion is a day time invasion that makes night invasions occur with it.
 - "NIGHT_TO_DAY" This invasion is a night time invasion that makes day invasions occur with it.
-TimeChangeability: (String)
+TimeChangeability: (Optional - String)
 - How this invasion is affected by a previous invasion's time modifier.
 - Typically used when this invasion is chosen as a secondary invasion.
 - "DEFAULT" The invasion is affected normally.
 - "ONLY_NIGHT" The invasion cannot be chosen when a day invasion makes night invasions occur.
 - "ONLY_DAY" The invasion cannot be chosen when a night invasion makes day invasions occur.
-WeatherType: (String)
+WeatherType: (Optional - String)
 - "DEFAULT" Weather is unchanged.
 - "CLEAR" Weather is forced to be clear during the invasion.
 - "RAIN" Weather is forced to be raining during the invasion.
 - "THUNDER" Weather is forced to be thundering during the invasion.
+- "UNSTABLE" Weather is constantly changing during the invasion.
+DayNightCycleRequirement: (Optional - String)
+- Used to determine if the invasion requires a day/night cycle, none at all, or is uneffected.
+- "NONE" By default, works with or without a day/night cycle.
+- "NEEDS_CYCLE" Requires a day/night cycle.
+- "NO_CYCLE" Requires the absense of a day/night cycle.
 SeverityInfo: (List of info for each severity of this invasion, every entry is 1 more severity) {
-    SkyRenderer: (Skybox attributes changed by this invasion) {
-        FogRenderer: (Fog attributes changed by this invasion) {
-            RedOffset: (Float -1.0 - 1.0)
-            - Red color value offset to the default fog color.
-            GreenOffset: (Float -1.0 - 1.0)
-            - Green color value offset to the default fog color.
-            BlueOffset: (Float -1.0 - 1.0)
-            - Blue color value offset to the default fog color.
+    SkyRenderInfo: (Skybox attributes changed by this invasion) {
+        FogRenderInfo: (Optional - Fog attributes changed by this invasion) {
+            RGBOffset: (Optional - Float Array)
+            - Red color offset to the default fog color (Float -1.0 - 1.0).
+            - Green color offset to the default fog color (Float -1.0 - 1.0).
+            - Blue color offset to the default fog color (Float -1.0 - 1.0).
+            FlickerRGBOffset: (Optional - Float Array)
+            - Red color offset to the default fog color (Float -1.0 - 1.0).
+            - Green color offset to the default fog color (Float -1.0 - 1.0).
+            - Blue color offset to the default fog color (Float -1.0 - 1.0).
+            - MinDelay between flickers (Int 0+).
+            - MaxDelay between flickers (Int 0+).
         }
-        SunTexture: (ResourceLocation-String)
+        SunMoonAlpha: (Optional - Float)
+        - Alpha value for the sun & moon.
+        SunTexture: (Optional - ResourceLocation-String)
         - The texture used for the sun if the invasion occurs in the day.
-        MoonTexture: (ResourceLocation-String)
+        MoonTexture: (Optional - ResourceLocation-String)
         - The texture used for the moon if the invasion occurs at night.
-        FixedSkyTexture: (ResourceLocation-String)
+        FixedSkyTexture: (Optional - ResourceLocation-String)
         - The texture used for the end sky when the invasion occurs (May not work in other dimensions, but nothing I can do to fix it).
-        WeatherVisibility: (Float 0.0 - 1.0)
+        FlickerVisibility: (Optional - Float Array (Sun & Moon Visibility))
+        - Min Visibility of the flicker (Float 0.0 - 1.0).
+        - Max Visibility of the flicker (Float 0.0 - 1.0).
+        - MinDelay between flickers (Int 0+).
+        - MaxDelay between flickers (Int 0+).
+        FlickerBrightness: (Optional - Float Array)
+        - Min Brightness of the flicker (Float 0.0 - 1.0).
+        - Max Brightness of the flicker (Float 0.0 - 1.0).
+        - MinDelay between flickers (Int 0+).
+        - MaxDelay between flickers (Int 0+).
+        FlickerRGBOffset: (Optional - Float Array)
+        - Red color offset to the default fog color (Float -1.0 - 1.0).
+        - Green color offset to the default fog color (Float -1.0 - 1.0).
+        - Blue color offset to the default fog color (Float -1.0 - 1.0).
+        - MinDelay between flickers (Int 0+).
+        - MaxDelay between flickers (Int 0+).
+        WeatherVisibility: (Optional - Float 0.0 - 1.0)
         - How visible the sun/moon is in rain/thunder.
         - Higher values are more visible.
-        Brightness: (Float 0.0 - 1.0)
+        Brightness: (Optional - Float 0.0 - 1.0)
         - How bright the world is when your invasion occurs.
         - 1.0 for default daytime, 0.2 for default nighttime.
         - lower numbers for lower brightness.
-        RedOffset: (Float -1.0 - 1.0)
-        - Red color value offset to the default sky color.
-        GreenOffset: (Float -1.0 - 1.0)
-        - Green color value offset to the default sky color.
-        BlueOffset: (Float -1.0 - 1.0)
-        - Blue color value offset to the default sky color.
+        LightLevel: (Integer 0 - 15)
+    	- Light level of the world when the invasion occurs.
+    	- The values are inverted so 15 will result in a light level of 0.
+        RGBOffset: (Optional - Float Array)
+        - Red color offset to the default fog color (Float -1.0 - 1.0).
+        - Green color offset to the default fog color (Float -1.0 - 1.0).
+        - Blue color offset to the default fog color (Float -1.0 - 1.0).
     }
     MobSpawnList: (List of mobs spawned by the invasion) {
         EntityType: (ResourceLocation-String)
@@ -93,8 +128,12 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - Least amount of mobs that can spawn in a group.
         MaxCount: (Integer)
         - Most amount of mobs that can spawn in a group.
+        IgnoreSpawnerRules: (Optional - Boolean)
+        - If true, this entity will use default mob spawning rules instead of it's specialized rules.
+        ForceDespawn: (Optional - Boolean)
+        - If true. this entity will be forced to despawn at the end of an invasion.
     }
-    ClusterEntitiesList: (List of Entities that can spawn when a mob cluster is spawned in an Invasion) {
+    AdditionalEntitiesList: (List of Entities to spawn that aren't mobs) {
         EntityType: (ResourceLocation-String)
         - ID of the entity that can spawn
         Chance: (Integer)
@@ -104,21 +143,25 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - Least amount of entities that can spawn in a group.
         MaxCount: (Integer)
         - Most amount of entities that can spawn in a group.
+        IsSurfaceSpawn: (Optional - Boolean)
+        - Determines if this entity only spawns on the surface.
     }
     MobCapPercentage: (Float 0.0 - 1.0)
     - What percent of these mobs can spawn of the mob cap limit.
     - Such as 100 times 0.8 is 80% of the total mobs possible.
     - Can go higher, but is unrecommended due to performance limitations.
-    ForceNoSleep: (Boolean)
+    FixedMobCap: (Integer 0+)
+    - A fixed number for the mob cap limit.
+    - Recommended to use on Invasions that spawn a few powerful mobs instead of a horde of mobs.
+    - MobCapPercentage will apply to this value instead of the config value.
+    ForceNoSleep: (Optional - Boolean)
     - Should this invasion force players to not be able to sleep as it occurs?
-    LightLevel: (Integer 0 - 15)
-    - The server-side light level of the world when the invasion occurs.
-    - The values are inverted so 15 will result in a light level of 0.
     TickDelay: (Integer 0+)
     - The delay in ticks for when a mob should spawn.
     - Negative tick delay will prevent the invasion from ticking.
-    ClusterSize: (Integer 1+)
+    ClusterSize: (Optional - Integer 1+)
     - The amount of mobs spawn in a cluster per chunk picked by the invasion.
+    - Defaults to 1.
 }
 Dimensions: (List of Strings)
 - The Ids of every dimension this invasion can occur in.
@@ -130,129 +173,3 @@ Additional Tools to help...
 Pure Suffering Mutant Monsters Datapack: https://github.com/TheAGamePlayer/PSMM-Datapack
 
 Example Pure Suffering Invasion Jsons: https://github.com/TheAGamePlayer/The-Pure-Suffering-Mod/tree/main/src/main/resources/data/puresuffering/invasion_types
-
-Another Example invasion json:
-{
-   "Rarity": 3,
-   "Tier": 0,
-   "InvasionTime": "DAY",
-   "InvasionPriority": "BOTH",
-   "SpawningSystem": "DEFAULT",
-   "TimeModifier": "NONE",
-   "TimeChangeability": "DEFAULT",
-   "SeverityInfo": [
-      {
-         "SkyRenderer": {
-            "FogRenderer": {
-               "RedOffset": 0.25,
-               "GreenOffset": 0.25,
-               "BlueOffset": 0.05
-            },
-            "SunTexture": "examplepack:textures/environment/example_sun.png",
-            "MoonTexture": "examplepack:textures/environment/example_moon.png",
-            "WeatherVisibility": 0.2,
-            "Brightness": 0.5,
-            "RedOffset": -0.5,
-            "GreenOffset": -0.5,
-            "BlueOffset": -0.5
-         },
-         "ClusterEntitiesList": [
-           {
-             "Chance": 12,
-             "EntityType": "minecraft:lightning_bolt",
-             "MaxCount": 1,
-             "MinCount": 0
-           }
-         ],
-         "MobSpawnList":[
-            {
-               "EntityType": "minecraft:bee",
-               "Weight": 10,
-               "MinCount": 1,
-               "MaxCount": 3
-            },
-            {
-               "EntityType": "minecraft:llama",
-               "Weight": 5,
-               "MinCount": 1,
-               "MaxCount": 2
-            }
-         ],
-         "MobCapPercentage": 0.6,
-         "ForceNoSleep": true,
-         "LightLevel": 5,
-         "TickDelay": 12
-      },
-      {
-         "SkyRenderer": {
-            "FogRenderer": {
-               "RedOffset": 0.25,
-               "GreenOffset": 0.25,
-               "BlueOffset": 0.05
-            },
-            "SunTexture": "examplepack:textures/environment/example_sun.png",
-            "MoonTexture": "examplepack:textures/environment/example_moon.png",
-            "WeatherVisibility": 0.2,
-            "Brightness": 0.6,
-            "RedOffset": -0.5,
-            "GreenOffset": -0.5,
-            "BlueOffset": -0.5
-         },
-         "MobSpawnList":[
-            {
-               "EntityType": "minecraft:bee",
-               "Weight": 10,
-               "MinCount": 1,
-               "MaxCount": 4
-            },
-            {
-               "EntityType": "minecraft:llama",
-               "Weight": 5,
-               "MinCount": 1,
-               "MaxCount": 3
-            }
-         ],
-         "MobCapPercentage": 0.8,
-         "ForceNoSleep": true,
-         "LightLevel": 5,
-         "TickDelay": 9
-      },
-      {
-         "SkyRenderer": {
-            "FogRenderer": {
-               "RedOffset": 0.25,
-               "GreenOffset": 0.25,
-               "BlueOffset": 0.05
-            },
-            "SunTexture": "examplepack:textures/environment/example_sun.png",
-            "MoonTexture": "examplepack:textures/environment/example_moon.png",
-            "WeatherVisibility": 0.2,
-            "Brightness": 0.7,
-            "RedOffset": -0.5,
-            "GreenOffset": -0.5,
-            "BlueOffset": -0.5
-         },
-         "MobSpawnList": [
-            {
-               "EntityType": "minecraft:bee",
-               "Weight": 10,
-               "MinCount": 2,
-               "MaxCount": 5
-            },
-            {
-               "EntityType": "minecraft:llama",
-               "Weight": 5,
-               "MinCount": 1,
-               "MaxCount": 4
-            }
-         ],
-         "MobCapPercentage": 1.0,
-         "ForceNoSleep": true,
-         "LightLevel": 5,
-         "TickDelay": 6
-      }
-   ],
-   "Dimensions": [
-      "minecraft:overworld"
-   ]
-}

@@ -1,18 +1,20 @@
 package dev.theagameplayer.puresuffering.event;
 
+import java.util.List;
+
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
+import dev.theagameplayer.puresuffering.invasion.InvasionSession;
 import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
 import dev.theagameplayer.puresuffering.registries.other.PSEntityPredicates;
-import dev.theagameplayer.puresuffering.util.InvasionListType;
-import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
-import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
-import dev.theagameplayer.puresuffering.world.InvasionWorldData;
-import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
-import dev.theagameplayer.puresuffering.world.entity.PSHyperCharge;
+import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.world.entity.PSInvasionMob;
+import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.MobSpawnType;
@@ -20,7 +22,8 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.Zoglin;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.monster.warden.Warden;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingConversionEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -28,34 +31,77 @@ import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 
 public final class PSLivingEvents {
-	public static final void livingConversion(final LivingConversionEvent.Post eventIn) { //Needed for occasional bugginess
-		if (eventIn.getOutcome().getClassification(false) == MobCategory.MONSTER) {
+	public static final void conversionPre(final LivingConversionEvent.Pre eventIn) {
+		if (eventIn.getOutcome().getCategory() != MobCategory.MONSTER || !eventIn.getEntity().getPersistentData().contains(Invasion.INVASION_MOB)) return;
+		if (eventIn.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
+			final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
+			if (session == null || !session.stopsConversions() || !session.hasMob(mob)) return;
+			eventIn.setCanceled(true);
+			eventIn.setConversionTimer(12000 - (int)(level.dayTime() % 12000L));
+		}
+	}
+
+	public static final void conversionPost(final LivingConversionEvent.Post eventIn) {
+		if (eventIn.getOutcome().getClassification(false) != MobCategory.MONSTER) return;
+		if (eventIn.getOutcome() instanceof Mob resultMob) {
 			final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
-			final CompoundTag outcomeData = eventIn.getOutcome().getPersistentData();
-			if (persistentData.contains("InvasionMob"))
-				outcomeData.putString("InvasionMob", persistentData.getString("InvasionMob"));
-			if (persistentData.contains("AntiGrief"))
-				outcomeData.putString("AntiGrief", persistentData.getString("AntiGrief"));
-			if (persistentData.contains("HyperCharge")) //TODO: May still have bugginess??
-				outcomeData.putString("HyperCharge", persistentData.getString("HyperCharge"));
+			final CompoundTag outcomeData = resultMob.getPersistentData();
+			if (persistentData.contains(Invasion.INVASION_MOB))
+				outcomeData.putInt(Invasion.INVASION_MOB, persistentData.getInt(Invasion.INVASION_MOB));
+			if (persistentData.contains(Invasion.ANTI_GRIEF))
+				outcomeData.putBoolean(Invasion.ANTI_GRIEF, persistentData.getBoolean(Invasion.ANTI_GRIEF));
+			if (persistentData.contains(Invasion.DESPAWN_LOGIC))
+				outcomeData.putIntArray(Invasion.DESPAWN_LOGIC, persistentData.getIntArray(Invasion.DESPAWN_LOGIC));
+			if (eventIn.getEntity() instanceof Mob mob) {
+				if (eventIn.getEntity() instanceof PSInvasionMob im1 && resultMob instanceof PSInvasionMob im2) {
+					im2.psSetHyperCharge(im1.psGetHyperCharge());
+					PSInvasionMob.applyHyperEffects(mob);
+				}
+				if (mob.level() instanceof ServerLevel level) {
+					final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
+					if (session == null || !session.hasMob(mob)) return;
+					session.replaceMob(mob, resultMob);
+				}
+			}
 		}
 	}
 
 	public static final void livingTick(final LivingEvent.LivingTickEvent eventIn) {
-		if (eventIn.getEntity() instanceof Mob && eventIn.getEntity().getPersistentData().contains("InvasionMob") && (eventIn.getEntity().getLastHurtByMob() == null || !eventIn.getEntity().getLastHurtByMob().isAlive()) && PSConfigValues.common.hyperAggression && !PSConfigValues.common.hyperAggressionBlacklist.contains(eventIn.getEntity().getType().getDescriptionId())) {
-			final Mob mob = (Mob)eventIn.getEntity();
-			if (mob.getTarget() instanceof Player) return;
-			final Player player = mob.level().getNearestPlayer(mob.getX(), mob.getY(), mob.getZ(), 144.0D, PSEntityPredicates.HYPER_AGGRESSION);
-			if (player != null && player.isAlive()) {
+		if (eventIn.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
+			final CompoundTag persistentData = mob.getPersistentData();
+			final boolean flag1 = PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(mob.getType().getDescriptionId());
+			final boolean flag2 = mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive();
+			if (persistentData.contains(Invasion.DESPAWN_LOGIC)) {
+				final int[] despawnLogic = persistentData.getIntArray(Invasion.DESPAWN_LOGIC);
+				final BlockPos pos = mob.blockPosition();
+				if (pos.getX() != despawnLogic[0] || pos.getY() != despawnLogic[1] || pos.getZ() != despawnLogic[2]) {
+					despawnLogic[0] = pos.getX();
+					despawnLogic[1] = pos.getY();
+					despawnLogic[2] = pos.getZ();
+					despawnLogic[3] = 0;
+				} else if (getNearestPlayer(level, mob.position(), true) != null) {
+					despawnLogic[3]++;
+				}
+			}
+			if (persistentData.contains(Invasion.INVASION_MOB) && flag1 && flag2) {
+				final ServerPlayer player = getNearestPlayer(level, mob.position(), true);
+				if (player == null) {
+					mob.setTarget(null);
+					return;
+				}
+				if (player.equals(mob.getTarget())) return;
 				if (mob instanceof AbstractPiglin) { //If your wondering why a mob doesn't get aggressive, its because it didn't use the default targeting...
-					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ANGRY_AT, player.getUUID(), 12000L);
+					mob.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ANGRY_AT, player.getUUID(), Invasion.TRANSITION_TIME);
 				} else if (mob instanceof Hoglin) {
 					mob.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
 					mob.getBrain().eraseMemory(MemoryModuleType.BREED_TARGET);
-					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, 12000L);
+					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, Invasion.TRANSITION_TIME);
 				} else if (mob instanceof Zoglin) {
 					mob.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
-					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, 12000L);
+					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, Invasion.TRANSITION_TIME);
+				} else if (mob instanceof Warden warden) { //Warden requires special method due to anger logic
+					warden.increaseAngerAt(player, 80, !player.equals(warden.getTarget())); //Golems will be a weakness to invasion Wardens. Fix Maybe?
 				} else {
 					mob.setTarget(player);
 				}
@@ -63,100 +109,66 @@ public final class PSLivingEvents {
 		}
 	}
 
+	private static final ServerPlayer getNearestPlayer(final ServerLevel levelIn, final Vec3 posIn, final boolean hyperAggressionIn) {
+		ServerPlayer target = null;
+		double dist = -1.0F;
+		final List<ServerPlayer> players = hyperAggressionIn ? levelIn.getPlayers(PSEntityPredicates.HYPER_AGGRESSION) : levelIn.players();
+		for (final ServerPlayer player : players) {
+			final double d = player.distanceToSqr(posIn);
+			if (dist < 0.0F || d < dist) {
+				dist = d;
+				target = player;
+			}
+		}
+		return target;
+	}
+
 	public static final void experienceDrop(final LivingExperienceDropEvent eventIn) {
-		final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
-		if (PSConfigValues.common.useXPMultiplier && persistentData.contains("InvasionMob")) {
-			final ServerLevel serverLevel = (ServerLevel)eventIn.getEntity().level();
-			final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(serverLevel);
-			if (iwData != null) {
-				if (!iwData.hasFixedTime()) {
-					final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-					if (ServerTimeUtil.isServerDay(serverLevel, tiwData)) {
-						tiwData.setDayXPMultiplier(tiwData.getDayXPMultiplier() + 1);
-						final double log = Math.log1p(tiwData.getDayXPMultiplier()) / Math.E;
-						for (int hc = 0; hc < (eventIn.getEntity() instanceof PSHyperCharge ? ((PSHyperCharge)eventIn.getEntity()).psGetHyperCharge() + 1 : 1); hc++)
-							eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
-						PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(log, InvasionListType.DAY));
-					} else if (ServerTimeUtil.isServerNight(serverLevel, tiwData)) {
-						tiwData.setNightXPMultiplier(tiwData.getNightXPMultiplier() + 1);
-						final double log = Math.log1p(tiwData.getNightXPMultiplier()) / Math.E;
-						for (int hc = 0; hc < (eventIn.getEntity() instanceof PSHyperCharge ? ((PSHyperCharge)eventIn.getEntity()).psGetHyperCharge() + 1 : 1); hc++)
-							eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
-						PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(log, InvasionListType.NIGHT));
-					}
-				} else {
-					final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-					fiwData.setXPMultiplier(fiwData.getXPMultiplier() + 1);
-					final double log = Math.log1p(fiwData.getXPMultiplier()) / Math.E;
-					for (int hc = 0; hc < (eventIn.getEntity() instanceof PSHyperCharge ? ((PSHyperCharge)eventIn.getEntity()).psGetHyperCharge() + 1 : 1); hc++)
-						eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log));
-					PSPacketHandler.sendToAllClients(new UpdateXPMultPacket(log, InvasionListType.FIXED));
-				}
+		if (eventIn.getEntity() instanceof Mob mob && mob instanceof PSInvasionMob invasionMob) {
+			final ServerLevel level = (ServerLevel)mob.level();
+			final InvasionLevelData ilData = InvasionLevelData.get(level);
+			final InvasionSession session = ilData.getInvasionManager().getActiveSession(level);
+			if (session == null || !session.hasMob(mob)) {
+				eventIn.setDroppedExperience(eventIn.getOriginalExperience() + eventIn.getOriginalExperience()/3 * invasionMob.psGetHyperCharge());
+			} else if (PSGameRules.USE_XP_MULTIPLIER.get(level) && eventIn.getAttackingPlayer() != null) {
+				ilData.setXPMultiplier(ilData.getXPMultiplier() + 1);
+				final double log = Math.log1p(ilData.getXPMultiplier())/Math.E;
+				eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log) + eventIn.getOriginalExperience()/3 * invasionMob.psGetHyperCharge());
+				PSPacketHandler.sendToClientsIn(new UpdateXPMultPacket(log), level);
 			}
 		}
 	}
 
 	public static final void finalizeSpawn(final MobSpawnEvent.FinalizeSpawn eventIn) {
-		if (!eventIn.getLevel().isClientSide()) {
-			if (eventIn.getSpawnType() == MobSpawnType.NATURAL) {
-				final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
-				final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(serverLevel);
-				if (iwData != null) {
-					final boolean flag = eventIn.getEntity().getClassification(false) == MobCategory.MONSTER;
-					if (serverLevel.random.nextInt(10000) < PSConfigValues.common.naturalSpawnChance) {
-						eventIn.setResult(Result.DEFAULT);
-					} else {
-						if (!iwData.hasFixedTime()) {
-							final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-							if ((ServerTimeUtil.isServerDay(serverLevel, tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) || (ServerTimeUtil.isServerNight(serverLevel, tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()))
-								eventIn.setResult(Result.DENY);
-							if (flag && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty() || !tiwData.getInvasionSpawner().getNightInvasions().isEmpty())
-								eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", false);
-						} else {
-							final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-							if (!fiwData.getInvasionSpawner().getInvasions().isEmpty())
-								eventIn.setResult(Result.DENY);
-							if (flag && !fiwData.getInvasionSpawner().getInvasions().isEmpty())
-								eventIn.getEntity().getPersistentData().putBoolean("AntiGrief", true);
-						}
-					}
-				}
-			}
-		}
+		final Mob mob = eventIn.getEntity();
+		if (eventIn.getSpawnType() != MobSpawnType.NATURAL || mob.getClassification(false) != MobCategory.MONSTER) return;
+		final ServerLevel level = (ServerLevel)eventIn.getLevel();
+		if (PSConfigValues.common.naturalSpawnChance < level.random.nextDouble()) return;
+		final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
+		if (session == null) return;
+		eventIn.setSpawnCancelled(true);
 	}
 
 	public static final void allowDespawn(final MobSpawnEvent.AllowDespawn eventIn) {
-		if (!eventIn.getLevel().isClientSide() && PSConfigValues.common.shouldMobsDieAtEndOfInvasions && eventIn.getEntity() instanceof Mob) {
-			final ServerLevel serverLevel = (ServerLevel)eventIn.getLevel();
-			final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(serverLevel);
-			final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
-			if (iwData != null && persistentData.contains("InvasionMob")) {
-				if (!iwData.hasFixedTime()) {
-					final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-					if (ServerTimeUtil.isServerDay(serverLevel, tiwData)) {
-						for (final Invasion invasion : tiwData.getInvasionSpawner().getDayInvasions()) {
-							if (persistentData.getString("InvasionMob").equals(invasion.getType().getId().toString())) {
-								return;
-							}
-						}
-						eventIn.setResult(Result.ALLOW);
-					} else if (ServerTimeUtil.isServerNight(serverLevel, tiwData)) {
-						for (final Invasion invasion : tiwData.getInvasionSpawner().getNightInvasions()) {
-							if (persistentData.getString("InvasionMob").equals(invasion.getType().getId().toString())) {
-								return;
-							}
-						}
-						eventIn.setResult(Result.ALLOW);
-					}
-				} else {
-					final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-					for (final Invasion invasion : fiwData.getInvasionSpawner().getInvasions()) {
-						if (persistentData.getString("InvasionMob").equals(invasion.getType().getId().toString())) {
-							return;
-						}
-					}
-					eventIn.setResult(Result.ALLOW);
-				}
+		final Mob mob = eventIn.getEntity();
+		final CompoundTag persistentData = mob.getPersistentData();
+		if (!mob.isAlive() || !persistentData.contains(Invasion.DESPAWN_LOGIC)) return;
+		final ServerLevel level = (ServerLevel)eventIn.getLevel();
+		final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
+		final int[] despawnLogic = persistentData.getIntArray(Invasion.DESPAWN_LOGIC);
+		final boolean flag1 = despawnLogic[3] > 150 || mob.isInWall();
+		final boolean flag2 = despawnLogic.length == 6;
+		if (session != null && session.hasMob(mob)) {
+			if (flag1) session.relocateMob(mob);
+			if (flag2) despawnLogic[4] = 0;
+		}
+		if (flag2) {
+			if (despawnLogic[4] > despawnLogic[5]) {
+				level.broadcastEntityEvent(mob, (byte)60);
+				eventIn.setResult(Result.ALLOW);
+				return;
+			} else {
+				despawnLogic[4]++;
 			}
 		}
 	}

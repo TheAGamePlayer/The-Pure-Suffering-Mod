@@ -1,99 +1,87 @@
 package dev.theagameplayer.puresuffering.client;
 
-import net.minecraft.util.Mth;
-import net.minecraftforge.client.event.ViewportEvent;
+import dev.theagameplayer.puresuffering.invasion.Invasion;
 
 public final class ClientTransitionHandler {
-	public static final int TRANSITION_TIME = 600, HALF_TRANSITION = TRANSITION_TIME/2;
-	private static final float MYSTERY_INVASION_DARKNESS = 0.25F;
-	
-	//SUN_&_MOON_ALPHA
-	public static final float tickSunMoonAlpha(final float sunMoonAlphaIncIn, final long dayTimeIn) {
-		float sunMoonAlpha = 0.0F;
-		if (dayTimeIn < HALF_TRANSITION) {
-			sunMoonAlpha = (sunMoonAlphaIncIn/HALF_TRANSITION) * (HALF_TRANSITION - dayTimeIn); //1-0
-		} else if (dayTimeIn < TRANSITION_TIME) {
-			sunMoonAlpha = (sunMoonAlphaIncIn/HALF_TRANSITION) * (dayTimeIn - HALF_TRANSITION + 1); //0-1
-		} else if (dayTimeIn > 11999L - HALF_TRANSITION) {
-			sunMoonAlpha = (sunMoonAlphaIncIn/HALF_TRANSITION) * (HALF_TRANSITION - (12000L - dayTimeIn - 1)); //0-1
-		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
-			sunMoonAlpha = (sunMoonAlphaIncIn/HALF_TRANSITION) * (12000L - dayTimeIn - HALF_TRANSITION); //1-0
-		} else {
-			sunMoonAlpha = sunMoonAlphaIncIn;
+	private static final float NIGHTMARE_INVASION_DARKNESS = 0.25F;
+
+	//SUN/MOON ALPHA
+	public static final float getSunMoonAlpha(final boolean newTextureIn, final float alphaOffsetIn, final long dayTimeIn) {
+		float alpha = alphaOffsetIn;
+		if (newTextureIn) {
+			if (dayTimeIn < Invasion.HALF_TRANSITION) {
+				alpha = (1.0F/Invasion.HALF_TRANSITION) * (Invasion.HALF_TRANSITION - dayTimeIn); //1-0
+			} else if (dayTimeIn < Invasion.TRANSITION_TIME) {
+				alpha = (alphaOffsetIn/Invasion.HALF_TRANSITION) * (dayTimeIn - Invasion.HALF_TRANSITION + 1); //0-1
+			} else if (dayTimeIn > 11999L - Invasion.HALF_TRANSITION) {
+				alpha = (1.0F/Invasion.HALF_TRANSITION) * (Invasion.HALF_TRANSITION - (12000L - dayTimeIn - 1)); //0-1
+			} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+				alpha = (alphaOffsetIn/Invasion.HALF_TRANSITION) * (12000L - dayTimeIn - Invasion.HALF_TRANSITION); //1-0
+			}
+			return alpha;
 		}
-		return sunMoonAlpha;
+		if (dayTimeIn < Invasion.TRANSITION_TIME) {
+			alpha = (alphaOffsetIn/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+			alpha = (alphaOffsetIn/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		}
+		return alpha;
 	}
 
 	//WEATHER_VISIBILITY
-	public static final float tickWeatherVisibility(final float weatherVisbilityIncIn, final long dayTimeIn) {
-		float weatherVisbility = 0.0F;
-		if (dayTimeIn < TRANSITION_TIME) {
-			weatherVisbility = (weatherVisbilityIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
-			weatherVisbility = (weatherVisbilityIncIn/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-		} else {
-			weatherVisbility = weatherVisbilityIncIn;
+	public static final float getWeatherVisibility(final float visbilityOffsetIn, final long dayTimeIn) {
+		float visbility = visbilityOffsetIn;
+		if (dayTimeIn < Invasion.TRANSITION_TIME) {
+			visbility = (visbilityOffsetIn/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+			visbility = (visbilityOffsetIn/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
 		}
-		return weatherVisbility;
+		return visbility;
 	}
-	
+
 	//SKY_COLOR
-	public static final float tickSkyColor(final float skyColorIn, final float skyColorIncIn, final long dayTimeIn) {
-		float skyColor = 0.0F;
-		if (dayTimeIn < TRANSITION_TIME) {
-			skyColor = (skyColorIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
-			skyColor = (skyColorIncIn/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-		} else {
-			skyColor = skyColorIncIn;
+	public static final void getSkyColor(final float[] rgbIn, final long dayTimeIn) {
+		if (dayTimeIn < Invasion.TRANSITION_TIME) {
+			rgbIn[0] = (rgbIn[0]/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+			rgbIn[1] = (rgbIn[1]/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+			rgbIn[2] = (rgbIn[2]/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+			rgbIn[0] = (rgbIn[0]/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+			rgbIn[1] = (rgbIn[1]/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+			rgbIn[2] = (rgbIn[2]/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
 		}
-		return skyColorIn + skyColor;
 	}
 
 	//BRIGHTNESS
-	public static final float tickBrightness(final float brightnessIn, final float brightnessIncIn, final long dayTimeIn) {
-		float brightness = 0.0F;
-		if (dayTimeIn < TRANSITION_TIME) {
-			brightness = (brightnessIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
-			brightness = (brightnessIncIn/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-		} else {
-			brightness = brightnessIncIn;
+	public static final float getBrightness(final float brightnessOffsetIn, final long dayTimeIn) {
+		if (dayTimeIn < Invasion.TRANSITION_TIME) {
+			return (brightnessOffsetIn/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+			return (brightnessOffsetIn/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
 		}
-		return Mth.clamp(brightnessIn - brightness, 0.0F, 1.0F);
+		return brightnessOffsetIn;
 	}
-	
+
 	//LIGHT_TEXTURE_DARKNESS
-	public static final float tickLightTextureDarkness(final float darknessIn, final long dayTimeIn) {
-		float darkness = 0.0F;
-		if (dayTimeIn < TRANSITION_TIME) {
-			darkness = (MYSTERY_INVASION_DARKNESS/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
-			darkness = (MYSTERY_INVASION_DARKNESS/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-		} else {
-			darkness = MYSTERY_INVASION_DARKNESS;
+	public static final float getLightTextureDarkness(final long dayTimeIn) {
+		if (dayTimeIn < Invasion.TRANSITION_TIME) {
+			return (NIGHTMARE_INVASION_DARKNESS/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+			return (NIGHTMARE_INVASION_DARKNESS/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
 		}
-		return Math.max(0.0F, darknessIn + darkness);
+		return NIGHTMARE_INVASION_DARKNESS;
 	}
 
 	//FOG COLOR
-	public static final void tickFogColor(final ViewportEvent.ComputeFogColor eventIn, final float fogRedIncIn, final float fogGreenIncIn, final float fogBlueIncIn, final long dayTimeIn) {
-		float fogRed = 0.0F, fogGreen = 0.0F, fogBlue = 0.0F;
-		if (dayTimeIn < TRANSITION_TIME) {
-			fogRed = (fogRedIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-			fogGreen = (fogGreenIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-			fogBlue = (fogBlueIncIn/TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-		} else if (dayTimeIn > 11999L - TRANSITION_TIME) {
-			fogRed = (fogRedIncIn/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-			fogGreen = (fogGreenIncIn/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-			fogBlue = (fogBlueIncIn/TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
-		} else {
-			fogRed = fogRedIncIn;
-			fogGreen = fogGreenIncIn;
-			fogBlue = fogBlueIncIn;
+	public static final void getFogColor(final float[] rgbIn, final long dayTimeIn) {
+		if (dayTimeIn < Invasion.TRANSITION_TIME) {
+			rgbIn[0] = (rgbIn[0]/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+			rgbIn[1] = (rgbIn[1]/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+			rgbIn[2] = (rgbIn[2]/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
+		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
+			rgbIn[0] = (rgbIn[0]/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+			rgbIn[1] = (rgbIn[1]/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+			rgbIn[2] = (rgbIn[2]/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
 		}
-		eventIn.setRed(eventIn.getRed() + fogRed);
-		eventIn.setGreen(eventIn.getGreen() + fogGreen);
-		eventIn.setBlue(eventIn.getBlue() + fogBlue);
 	}
 }

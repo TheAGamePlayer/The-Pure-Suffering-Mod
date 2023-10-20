@@ -1,14 +1,17 @@
 package dev.theagameplayer.puresuffering.event;
 
+import java.util.Optional;
+
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
-import dev.theagameplayer.puresuffering.invasion.HyperType;
-import dev.theagameplayer.puresuffering.invasion.Invasion;
+import dev.theagameplayer.puresuffering.invasion.InvasionSession;
+import dev.theagameplayer.puresuffering.network.PSPacketHandler;
+import dev.theagameplayer.puresuffering.network.packet.SendInvasionsPacket;
+import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
-import dev.theagameplayer.puresuffering.util.ServerTimeUtil;
-import dev.theagameplayer.puresuffering.world.FixedInvasionWorldData;
-import dev.theagameplayer.puresuffering.world.InvasionWorldData;
-import dev.theagameplayer.puresuffering.world.TimedInvasionWorldData;
-import net.minecraft.server.level.ServerLevel;
+import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
@@ -17,59 +20,46 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
 public final class PSPlayerEvents {
 	public static final void playerLoggedIn(final PlayerEvent.PlayerLoggedInEvent eventIn) {
-		updatePlayer(eventIn);
+		final ServerPlayer player = (ServerPlayer)eventIn.getEntity();
+		PSGameRules.syncToServer(player);
+		updatePlayer(player, true, 0);
 	}
 
 	public static final void playerRespawn(final PlayerEvent.PlayerRespawnEvent eventIn) {
-		if (PSConfigValues.common.hyperAggression)
-			eventIn.getEntity().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectRespawnDuration, 0));
-		updatePlayer(eventIn);
+		final ServerPlayer player = (ServerPlayer)eventIn.getEntity();
+		if (eventIn.isEndConquered()) {
+			updatePlayer(player, true, PSConfigValues.common.blessingEffectDimensionChangeDuration);
+			return;
+		}
+		final Optional<GlobalPos> deathPos = player.getLastDeathLocation();
+		updatePlayer(player, deathPos.isPresent() && !deathPos.get().dimension().equals(player.level().dimension()), PSConfigValues.common.blessingEffectRespawnDuration);
 	}
 
 	public static final void playerChangeDimension(final PlayerEvent.PlayerChangedDimensionEvent eventIn) {
-		if (PSConfigValues.common.hyperAggression)
-			eventIn.getEntity().addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), PSConfigValues.common.blessingEffectDimensionChangeDuration, 0));
-		updatePlayer(eventIn);
+		if (eventIn.getTo().equals(eventIn.getEntity().level().dimension()))
+			updatePlayer((ServerPlayer)eventIn.getEntity(), true, PSConfigValues.common.blessingEffectDimensionChangeDuration);
 	}
 
-	private static final void updatePlayer(final PlayerEvent eventIn) {
-		if (eventIn.getEntity() instanceof ServerPlayer) {
-			final ServerPlayer player = (ServerPlayer)eventIn.getEntity();
-			final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get((ServerLevel)player.level());
-			if (iwData != null) {
-				if (!iwData.hasFixedTime()) {
-					final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-					tiwData.getInvasionSpawner().getDayInvasions().update(player);
-					tiwData.getInvasionSpawner().getNightInvasions().update(player);
-				} else {
-					final FixedInvasionWorldData fiwData = (FixedInvasionWorldData)iwData;
-					fiwData.getInvasionSpawner().getInvasions().update(player);
-				}
-			}
-			ServerTimeUtil.updateTime(player);
-		}
+	private static final void updatePlayer(final ServerPlayer playerIn, final boolean informPlayerIn, final int blessingDurationIn) {
+		final InvasionLevelData ilData = InvasionLevelData.get(playerIn.serverLevel());
+		final InvasionSession session = ilData.getInvasionManager().getActiveSession(playerIn.serverLevel());
+		if (session == null) return;
+		session.updateClient(playerIn);
+		PSPacketHandler.sendToClient(new UpdateXPMultPacket(Math.log1p(ilData.getXPMultiplier())/Math.E), playerIn);
+		if (blessingDurationIn > 0)
+			playerIn.addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), blessingDurationIn, 0));
+		if (informPlayerIn) PSPacketHandler.sendToClient(new SendInvasionsPacket(true), playerIn);
 	}
 
 	public static final void playerSleepInBed(final PlayerSleepInBedEvent eventIn) {
-		final ServerLevel level = (ServerLevel)eventIn.getEntity().level();
-		final InvasionWorldData<?> iwData = InvasionWorldData.getInvasionData().get(level);
-		if (iwData != null && !iwData.hasFixedTime()) {
-			final TimedInvasionWorldData tiwData = (TimedInvasionWorldData)iwData;
-			if (ServerTimeUtil.isServerDay(level, tiwData) && !tiwData.getInvasionSpawner().getDayInvasions().isEmpty()) { //Added day check for Mods that allow sleeping during the day
-				for (final Invasion invasion : tiwData.getInvasionSpawner().getDayInvasions()) {
-					if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getHyperType() == HyperType.NIGHTMARE || invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
-						eventIn.setResult(BedSleepingProblem.NOT_POSSIBLE_NOW);
-						return;
-					}
-				}
-			} else if (ServerTimeUtil.isServerNight(level, tiwData) && !tiwData.getInvasionSpawner().getNightInvasions().isEmpty()) {
-				for (final Invasion invasion : tiwData.getInvasionSpawner().getNightInvasions()) {
-					if (PSConfigValues.common.forceInvasionSleeplessness || invasion.getHyperType() == HyperType.NIGHTMARE|| invasion.getType().getSeverityInfo().get(invasion.getSeverity()).forcesNoSleep()) {
-						eventIn.setResult(BedSleepingProblem.NOT_POSSIBLE_NOW);
-						return;
-					}
-				}
-			}
+		final ServerPlayer player = (ServerPlayer)eventIn.getEntity();
+		final InvasionSession session = InvasionLevelData.get(player.serverLevel()).getInvasionManager().getActiveSession(player.serverLevel());
+		if (session == null) return;
+		if (PSGameRules.FORCE_INVASION_SLEEPLESSNESS.get(player.level()) || session.forcesNoSleep()) {
+			if (eventIn.getOptionalPos().isPresent())
+				player.setRespawnPosition(player.serverLevel().dimension(), eventIn.getPos(), player.getYRot(), false, true);
+			eventIn.setResult(BedSleepingProblem.OTHER_PROBLEM);
+			player.displayClientMessage(Component.translatable("block.minecraft.bed.invasion").withStyle(session.getStyle().withColor(session.getDifficulty().getColor(false))), true);
 		}
 	}
 }

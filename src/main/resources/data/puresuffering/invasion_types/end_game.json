@@ -4,69 +4,105 @@
   ],
   "InvasionPriority": "PRIMARY_ONLY",
   "InvasionTime": "BOTH",
-  "Rarity": 14,
+  "Rarity": 3,
   "SeverityInfo": [
     {
-      "ClusterSize": 3,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
+      "AdditionalEntitiesList": [
+        {
+          "Chance": 312,
+          "EntityType": "minecraft:lightning_bolt",
+          "IsSurfaceSpawn": true,
+          "MaxCount": 1,
+          "MinCount": 0
+        }
+      ],
       "MobCapPercentage": 0.6,
-      "SkyRenderer": {
-        "BlueOffset": -0.85,
+      "MobClusterSize": 3,
+      "SkyRenderInfo": {
         "Brightness": 0.2,
         "FixedSkyTexture": "puresuffering:textures/environment/end_game_sky.png",
-        "FogRenderer": {
-          "BlueOffset": 0.1,
-          "GreenOffset": 0.15,
-          "RedOffset": 0.15
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.15,
+            0.15,
+            0.15
+          ]
         },
-        "GreenOffset": -0.85,
-        "RedOffset": -0.85
+        "LightLevel": 0,
+        "RGBOffset": [
+          -0.85,
+          -0.85,
+          -0.85
+        ],
+        "SunMoonAlpha": 0.0
       },
       "TickDelay": 60
     },
     {
-      "ClusterSize": 3,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
+      "AdditionalEntitiesList": [
+        {
+          "Chance": 273,
+          "EntityType": "minecraft:lightning_bolt",
+          "IsSurfaceSpawn": true,
+          "MaxCount": 2,
+          "MinCount": 0
+        }
+      ],
       "MobCapPercentage": 0.8,
-      "SkyRenderer": {
-        "BlueOffset": -0.9,
+      "MobClusterSize": 3,
+      "SkyRenderInfo": {
         "Brightness": 0.1,
         "FixedSkyTexture": "puresuffering:textures/environment/end_game_sky.png",
-        "FogRenderer": {
-          "BlueOffset": 0.1,
-          "GreenOffset": 0.1,
-          "RedOffset": 0.1
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.1,
+            0.1,
+            0.1
+          ]
         },
-        "GreenOffset": -0.9,
-        "RedOffset": -0.9
+        "LightLevel": 0,
+        "RGBOffset": [
+          -0.9,
+          -0.9,
+          -0.9
+        ],
+        "SunMoonAlpha": 0.0
       },
       "TickDelay": 40
     },
     {
-      "ClusterSize": 3,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
+      "AdditionalEntitiesList": [
+        {
+          "Chance": 234,
+          "EntityType": "minecraft:lightning_bolt",
+          "IsSurfaceSpawn": true,
+          "MaxCount": 3,
+          "MinCount": 0
+        }
+      ],
       "MobCapPercentage": 1.0,
-      "SkyRenderer": {
-        "BlueOffset": -0.95,
+      "MobClusterSize": 3,
+      "SkyRenderInfo": {
         "Brightness": 0.0,
         "FixedSkyTexture": "puresuffering:textures/environment/end_game_sky.png",
-        "FogRenderer": {
-          "BlueOffset": 0.05,
-          "GreenOffset": 0.05,
-          "RedOffset": 0.05
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.05,
+            0.05,
+            0.05
+          ]
         },
-        "GreenOffset": -0.95,
-        "RedOffset": -0.95
+        "LightLevel": 0,
+        "RGBOffset": [
+          -0.95,
+          -0.95,
+          -0.95
+        ],
+        "SunMoonAlpha": 0.0
       },
       "TickDelay": 20
     }
   ],
   "SpawningSystem": "BIOME_MIXED",
-  "Tier": 1,
-  "TimeChangeability": "DEFAULT",
-  "TimeModifier": "NONE",
-  "WeatherType": "DEFAULT"
+  "Tier": 1
 }

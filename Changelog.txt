@@ -1,4 +1,209 @@
 #Minecraft 1.20.x
+Version 1.6.0.0R:
+- INVASION ANTI GRIEF IS NOW DISABLED BY DEFAULT!
+- Added invasion music that's able to be added by the player (Via .ogg files).
+- Added "Hell On Earth" Primary Invasion to the overworld.
+- Added "World's End" Primary Invasion to the overworld (forces sleeplessness).
+- Added "Ghasts Galore" Secondary Invasion to the Nether (As I've been requested to add).
+- Added "Slime Time" Secondary Invasion to the overworld.
+- Added "Warden" Secondary Invasion to the overworld & end (forces sleeplessness).
+- Added "Wither" Secondary Invasion to the nether (forces sleeplessness)
+- Added end variant of Pest invasions.
+- Added lightning to the End Game invasion.
+- Added smarter spawning system to replace the old one (Slightly more CPU usage).
+- Added invasion relocation feature to relocate mobs that aren't able to reach a player or are suffocating when spawned.
+- Added cycle command to set the world time to the next time invasion chances are being rolled.
+- Added sync command to set pure suffering values like game rules to their config values.
+- Added custom bed message for when players are trying to sleep during an invasion that disables sleeping.
+- Added new message to inform players of current invasions when logging in or changing dimensions (With new sound effect).
+- Added poof particle effects for when mobs are forcibly despawned.
+- Added new visual effects to go with Invasion start sound effects.
+- Added reverb effects to invasion start sounds and nightmare invasions.
+- Added invasion ambience feature to play a sound before an invasion is about to happen.
+- Added new dimension configs to edit invasion properties specific to the dimension (Generates on server start or joining a world).
+- Improved vortex particle effects to be more pleasant (Uses old effects on Fast graphics).
+- Renamed "Pigs Galore" Invasion to "Porkinator".
+- Renamed "Blazing Inferno" Invasion to just "Inferno"
+- Renamed Invasion "HyperType" to "Difficulty" as it makes more sense.
+- Replaced the Cancel Invasion sound with an improved one since the sound file had a blip in it.
+- Invasion mobs now have an increased despawn and no despawn radius (Fixes boss mobs randomly despawning when spawned by invasions).
+- Hyper invasions are now more difficult with mob hyper-charge now more likely to choose higher values.
+- Hyper charged mobs are now more difficult and fine tuned to be less buggy (Mod compatibility conflicts fixed and no longer editing non-essential attributes).
+- The Mixed Biome Spawning System now chooses a dimension-type before picking a biome.
+- Invasion mobs now take 5-10 seconds of being alive before being able to despawn.
+- Pillagers slightly less common in "Mega Raid" invasions.
+- Piglin Brutes are no longer present in severity 1 Porkinator invasions.
+- Changed Rarity values of multiple invasions.
+- Solar Eclipse Invasions no longer force sleeplessness.
+- Invasions tick in sequence rather than by chance.
+- Canceling invasions will now send the same message in every dimension.
+- Considering the hover text for invasion messages inform players about non-type specific information, the invasion message now lists invasions themselves instead of the invasion types.
+- Reduced Nightmare invasion rarity from 6 to 5 by default (They will now happen once every two and a half real life days instead of 3 real life days).
+- Weather caused by an invasion now correctly ends at the end of an invasion.
+- Mobs are now required to be in the "Monster" Mob Category in order to spawn in an invasion.
+- Increased rarity of phantom zone from 6 to 7.
+- The xp multiplier for invasion mobs now only works during the invasion session.
+- Invasion Mobs now require the player to kill them to drop an xp bonus.
+- Blessing effect is now only applied during invasions.
+- Hyper & Nightmare invasions can no longer occur when the difficulty is set to Easy.
+- Redid the Invasion Hover text to now include invasion session info (In preparation for 1.7.x).
+- Nightmare invasion start text now only has one question mark.
+- Villagers now act during invasions like they do in raids.
+- Blessing effect respawn duration is now set to 20 seconds instead of 30.
+- Blessing effect dimension change duration is now set to 10 seconds instead of 15.
+- Invasions are no longer bias towards lower severity values.
+- Invasions are now more common in the Nether & End.
+- Hyper & Nightmare invasions are now slightly more common in the end than other dimensions.
+- The severity/maxSeverity of a secondary invasion can no longer exceed that of the primary invasion.
+- The difficulty in server.properties is now set to hard by default.
+- The difficulty in the world creation menu is now set to hard by default.
+- Hyper invasions now occur after 3 difficulty tier increases instead of 1.
+- Nightmare invasions now occur after 4 difficulty tier increases instead of 2.
+- Invasions can now be canceled after 2 tier increases instead of 1.
+- Updated Hyper Charge animation.
+- Changed the way hyper charged mobs drop xp.
+- Changed the server-side xp multiplier value to be an integer.
+- Tier Increase Delay config option when set to false now makes invasion severity able to be max on any day.
+- Tier Increase Delay config option when set to false now makes hyper & nightmare invasions able to occur early.
+- Tier Increase Delay config option when set to false now allows invasions to be canceled earlier.
+- Hyper Charge on Default invasions is now determined by the tier increase delay.
+- Natural spawn chance is now slightly increased.
+- Naturally spawned mobs during invasions no longer have anti-grief attached (This broke other mods).
+- End Game is now a tier 1 invasion.
+- Nether Again now makes the fog & sky color black.
+- Cluster Entities have been renamed to "Additonal Entities" as they no longer spawn within a mob cluster (Minimal performance hit, but avoids bugs like lightning spam in the twilight forest).
+- The Add, Clear, & Remove Invasion commands now adjust to the day/night cycle.
+- Rewrote the Add Invasions command from the scratch.
+- Restructured the entire config layout to make more sense.
+- "dayInvasionRarity" is moved to dimension-specific config file.
+- "nightInvasionRarity" is moved to dimension-specific config file.
+- "fixedInvasionRarity" is moved to dimension-specific config file.
+- "hyperInvasionRarity" is moved to dimension-specific config file.
+- "nightmareInvasionRarity" is moved to dimension-specific config file.
+- "cancelableInvasions" is moved to dimension-specific config file.
+- "cancelRarity" is moved to dimension-specific config file.
+- "maxDayInvasions" is moved to dimension-specific config file.
+- "maxNightInvasions" is moved to dimension-specific config file.
+- "maxFixedInvasions" is moved to dimension-specific config file.
+- "dayTierIncreaseDelay" is moved to dimension-specific config file.
+- "nightTierIncreaseDelay" is moved to dimension-specific config file.
+- "fixedTierIncreaseDelay" is moved to dimension-specific config file.
+- "enableHyperInvasions" config option is now also a gamerule.
+- "enableNightmareInvasions" config option is now also a gamerule.
+- "invasionAntiGrief" config option is now also a gamerule.
+- "consistentInvasions" config option is now also a gamerule.
+- "tieredInvasions" config option is now also a gamerule.
+- "hyperAggression" config option is now also a gamerule.
+- "hyperCharge" config option is now also a gamerule.
+- "primaryInvasionMobCap" config option is now also a gamerule.
+- "secondaryInvasionMobCap" config option is now also a gamerule.
+- "useXPMultiplier" config option is now also a gamerule.
+- "naturalSpawnChance" config option is now a double value.
+- "hyperChargeChance" config option is now a double value.
+- Added "overrideGameRules" config option to make the config file take precedence over the puresuffering game rules (useful for modpacks).
+- Added "IgnoreSpawnRules" parameter to invasion entities to determine if a mob should ignore its special spawning rules and use default mob spawning rules instead.
+- Added "DespawnLogic" parameter to invasion entities to determine if a mob should despawn at the end of an invasion.
+- Added "StopConversions" peramter to invasions to force invasion mobs not to convert into other hostile mobs (Hoglins -> Zoglins).
+- Added "SunMoonAlpha" parameter to invasion sky renderers to allow an invasion to edit the visibility of the sun & moon.
+- Added "RGBOffset" parameter to invasion sky renderers to replace the old red/green/blue offset parameters.
+- Added "RGBOffset" parameter to invasion fog renderers to replace the old red/green/blue offset parameters.
+- Added flickering parameters to invasion sky renderers to allow rgb, brightness, or sun/moon visibility values to flicker.
+- Added flickering parameters to invasion fog renderers to allow rgb values to flicker.
+- Added "DayNightCycleRequirement" parameter to determine if an invasion requires a day/night cycle (Optional, used to help with mod dimension compatibility).
+- Added "Unstable" weather type option to make the weather constantly change during an invasion.
+- Added "FixedMobCap" parameter for invasions to set a hard limit instead of a percentage limit for the mob cap.
+- Added "IsSurfaceSpawn" parameter for Cluster Entities.
+- Added "OverridesExisting" parameter for invasions so that datapacks can override existing invasions with custom mobs.
+- Added "DefaultName" parameter for invasions so that datapacks can set a name for an invasion without needing a resourcepack en_us language file.
+- Made "LightLevel" parameter for invasions no longer inverted (requires reworking datapacks).
+- Made "ForceNoSleep" parameter no longer required to be in the invasion.
+- Made "ClusterSize" parameter no longer required to be in the invasion.
+- Made "InvasionPriority" parameter no longer required to be in the invasion.
+- Made "SpawningSystem" parameter no longer required to be in the invasion.
+- Made "TimeModifier" parameter no longer required to be in the invasion.
+- Made "TimeChangeability" parameter no longer required to be in the invasion.
+- Made "WeatherType" parameter no longer required to be in the invasion.
+- Moved "LightLevel" parameter to be under "SkyRenderInfo".
+- Renamed "SkyRenderer" parameter to "SkyRenderInfo".
+- Renamed "FogRenderer" parameter to "FogRenderInfo".
+- Renamed "enableVortexParticles" config option to "enableSkyEffects" to include all the new effects.
+- Renamed "vortexParticleSpread" config option to "vortexParticleDelay".
+- Renamed "dayDifficultyIncreaseDelay" to "dayTierIncreaseDelay" to better represent what it does.
+- Renamed "nightDifficultyIncreaseDelay" to "nightTierIncreaseDelay" to better represent what it does.
+- Renamed "fixedDifficultyIncreaseDelay" to "fixedTierIncreaseDelay" to better represent what it does.
+- Removed "shouldMobsSpawnWithMaxRange" config option as it no longer does anything useful.
+- Removed "multiThreadedInvasions" config option as it's benefits are negligible when turned off and caused a weird bug with very delayed mob spawning when having ~5+ dimensions in a world (This is now enabled by default).
+- Removed "maxHyperCharge" config option since raising the values above 5 typically caused mobs to bug out anyways.
+- Removed error messages using a pure suffering command in the wrong dimension (No longer necessary).
+- Redid the entire backbone of the mod to optimize the code to help lower end devices (More so on Linux than Windows).
+- Small optimizations to code all over returning values earlier instead of wrapping them with if statements.
+- Improved the way invasion data is stored to the level.
+- Improved the targeting method for invasion mobs to be slightly less demanding on the CPU.
+- Improved some networking code to send packets to players based on dimension rather than the whole server.
+- Redid Client side rendering to be slightly less demanding on the cpu.
+- Shrunk packets and removed many unnecessary packets that would be sent on a regular basis.
+- Condensed en_us commands.
+- Fixed vortex particles not working properly during Super Storm Invasions.
+- Fixed random option in add invasion commands not correctly replacing primary invasions.
+- Fixed dimensions not being read correctly from the config file causing invasions not to work in modded dimensions properly.
+- Fixed bug causing nightmare invasion mobs to spawn during hyper invasions.
+- Fixed invasion ticks accidentally being called on multiple threads.
+- Fixed invasion mobs not properly despawning if another invasion of the same type occurs right after.
+- Fixed Zoglins not being added to an invasion's mob list when being spawned as a Hoglin during an invasion.
+- Fixed hypercharge not being applied to Zoglins after transformation from Hoglin.
+- Fixed anti-grief not being applied to Zoglins.
+- Fixed invasion mob persistent data conflicting with other mods (invasion mobs of previous versions will no longer count as invasion mobs).
+- Fixed invasion mobs not readding themselves to an invasion.
+- Fixed hypercharge getting applied to non-mob entities.
+- Fixed invasions not sending error message with a tick delay below 0.
+- Fixed projectile entities not working with anti-grief.
+- Fixed removing invasions causing the world to brick.
+- Fixed hyper charge not being applied correctly to default invasions.
+- Fixed client side not updating invasions when a player dies in another dimension.
+- Fixed players still being targeted by invasion mobs when invisible, creative, or spectator.
+- Fixed gamerules not in en_us.
+- Fixed entity duplication bug occurring whenever a spawn position is checking for spawning conditions (caused major performance problems).
+- Fixed hypercharge not showing the correct texture when manually set above 4.
+- Fixed Anti Grief not applying to lightning.
+- Fixed "nightmareInvasionRarity" config still being labeled as "mysteryInvasionRarity" in en_us.
+- Fixed "mobCap" info in invasion hover text being under the type info.
+- Fixed some level data not being set as dirty, therefore not being added when saving the level.
+- Fixed hyper charged mobs not dropping the correct amount of experience.
+- Fixed invasions finalizing spawns not using the forge method.
+- Fixed invasions blocking non-monster modded mobs from spawning naturally.
+- Fixed hyper charged mobs spawned via ways other than invasions not being buffed.
+- Fixed relogging or changing dimensions causing the client to lag during invasions.
+- Fixed piglins not having hyper aggression being applied to them.
+- Fixed blessing effect applying respawn delay instead of dimension change delay when returning from the end.
+- Fixed light level not updating on client side (This is not the brightness value).
+- Fixed Client Config generating in server config folder.
+- Fixed invasion tick delay being increased when multiple invasions are present.
+- Fixed "HyperChargeChance" config option not being in en_us.
+- Fixed secondary invasions unable to occur during super storm invasions.
+- Fixed datapack invasions not saving to world properly.
+- Fixed hyper aggression not correctly making invasion mobs retaliate against other attackers.
+- Fixed Invasion Text appearing as white on the server side.
+- Fixed the invasion query command breaking when used by a non-player source.
+- Fixed Invasion start sound playing with no invasions occurring.
+- Fixed Tier Increase Delay being able to be set to 0.
+- Fixed Max Invasions being able to be set to 0.
+- Fixed canceling invasions following the tier increase delay when tiered invasions is turned off.
+- Fixed Hyper & Nightmare invasions following the tier increase delay when tiered invasions is turned off.
+- Fixed Hyper Charge spawn rates not scaling with severity correctly.
+- Fixed lightning spawning underground in Super Storm invasions.
+- Fixed End Game not having the proper fog rgb value for severity 1.
+- Fixed Mobs spawning incorrectly from invasions compared to their natural spawn rules.
+- Fixed Mobs spawning in walls.
+- Fixed tier & rarity values being 1 below their actual values in their json files.
+- Fixed invasions going over their mob cap by 1.
+- Fixed invasion fog colors not applying correctly for lava, powdered snow, darkness & blindness effects, etc...
+- Fixed Vortex particles not rendering properly on fabulous graphics.
+- Fixed Nightmare invasions not updating the weather.
+- Fixed player respawn point unable to be set when invasions prevent sleeping.
+- Fixed multi threading mode not properly synchronizing across threads.
+- Fixed spawn delay not being saved in invasions.
+- Somehow fixed nether sky darkening during nightmare invasions.
+
 Version 1.5.1.0R:
 - Added sound effect for invasions being canceled (It seemed off without it).
 - Made adding hyper & nightmare invasions through a command only able have the max severity like it does naturally.
@@ -155,7 +360,7 @@ Version 1.3.0R:
 - Solar Eclipses now have a square sun cause the Minecraft sun is not a circle...
 - New Spawning System Biome Mixed containing monster spawns of every biome.
 - Biome Boosted and Biome Mixed Invasions can now have additional mobs in the mob spawn list.
-- New WeatherType perameter for Invasions allowing weather to occur during an invasion.
+- New WeatherType parameter for Invasions allowing weather to occur during an invasion.
 - Added Nether Again Invasion for The Nether, acts similar to an eclipse.
 - Added Blazing Inferno Invasion for The Nether.
 - Added Pigs Galore Invasion for The Nether.

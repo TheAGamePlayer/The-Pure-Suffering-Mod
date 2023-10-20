@@ -2,40 +2,63 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
-import dev.theagameplayer.puresuffering.invasion.HyperType;
-import dev.theagameplayer.puresuffering.util.InvasionListType;
-import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
-import net.minecraft.client.Minecraft;
+import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
+import dev.theagameplayer.puresuffering.client.invasion.InvasionSkyRenderInfo;
+import dev.theagameplayer.puresuffering.invasion.Invasion;
+import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
+import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class AddInvasionPacket {
-	private final InvasionSkyRenderer renderer;
-	private final InvasionListType listType;
+	private final InvasionSessionType sessionType;
+	private final InvasionDifficulty difficulty;
+	private final InvasionSkyRenderInfo renderer;
 	private final boolean isPrimary;
-	private final HyperType hyperType;
+	private final int severity, mobCap;
+	private final int maxSeverity;
+	private final int rarity, tier;
+	private final Component component;
 
-	public AddInvasionPacket(final InvasionSkyRenderer rendererIn, final InvasionListType listTypeIn, final boolean isPrimaryIn, final HyperType hyperTypeIn) {
+	public AddInvasionPacket(final InvasionSessionType sessionTypeIn, final InvasionDifficulty difficultyIn, final Invasion invasionIn) {
+		this(sessionTypeIn, difficultyIn, invasionIn.getSeverityInfo().getSkyRenderInfo(), invasionIn.isPrimary(), invasionIn.getSeverity(), invasionIn.getMobCap(), invasionIn.getType().getMaxSeverity(), invasionIn.getType().getRarity(), invasionIn.getType().getTier(), invasionIn.getType().getComponent());
+	}
+	
+	private AddInvasionPacket(final InvasionSessionType sessionTypeIn, final InvasionDifficulty difficultyIn, final InvasionSkyRenderInfo rendererIn, final boolean isPrimaryIn, final int severityIn, final int mobCapIn, final int maxSeverityIn, final int rarityIn, final int tierIn, final Component componentIn) {
+		this.sessionType = sessionTypeIn;
+		this.difficulty = difficultyIn;
 		this.renderer = rendererIn;
-		this.listType = listTypeIn;
 		this.isPrimary = isPrimaryIn;
-		this.hyperType = hyperTypeIn;
+		this.severity = severityIn;
+		this.mobCap = mobCapIn;
+		this.maxSeverity = maxSeverityIn;
+		this.rarity = rarityIn;
+		this.tier = tierIn;
+		this.component = componentIn;
 	}
 
 	public static final void encode(final AddInvasionPacket msgIn, final FriendlyByteBuf bufIn) {
+		bufIn.writeEnum(msgIn.sessionType);
+		bufIn.writeEnum(msgIn.difficulty);
 		msgIn.renderer.deconstruct().serializeToNetwork(bufIn);
 		bufIn.writeResourceLocation(msgIn.renderer.getId());
-		bufIn.writeEnum(msgIn.listType);
 		bufIn.writeBoolean(msgIn.isPrimary);
-		bufIn.writeEnum(msgIn.hyperType);
+		bufIn.writeInt(msgIn.severity);
+		bufIn.writeInt(msgIn.mobCap);
+		bufIn.writeInt(msgIn.maxSeverity);
+		bufIn.writeInt(msgIn.rarity);
+		bufIn.writeInt(msgIn.tier);
+		bufIn.writeComponent(msgIn.component);
 	}
 
 	public static final AddInvasionPacket decode(final FriendlyByteBuf bufIn) {
-		final InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
-		return new AddInvasionPacket(renderer, bufIn.readEnum(InvasionListType.class), bufIn.readBoolean(), bufIn.readEnum(HyperType.class));
+		final InvasionSessionType sessionType = bufIn.readEnum(InvasionSessionType.class);
+		final InvasionDifficulty difficulty = bufIn.readEnum(InvasionDifficulty.class);
+		final InvasionSkyRenderInfo renderer = InvasionSkyRenderInfo.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
+		return new AddInvasionPacket(sessionType, difficulty, renderer, bufIn.readBoolean(), bufIn.readInt(), bufIn.readInt(), bufIn.readInt(), bufIn.readInt(), bufIn.readInt(), bufIn.readComponent());
 	}
 
 	public static final class Handler {
@@ -47,18 +70,7 @@ public final class AddInvasionPacket {
 		}
 
 		private static final void handlePacket(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
-			final Minecraft mc = Minecraft.getInstance();
-			switch (msgIn.listType) {
-			case DAY:
-				ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().add(msgIn.renderer, msgIn.isPrimary, msgIn.hyperType);
-				break;
-			case NIGHT:
-				ClientInvasionWorldInfo.getNightClientInfo(mc.level).getRendererMap().add(msgIn.renderer, msgIn.isPrimary, msgIn.hyperType);
-				break;
-			case FIXED:
-				ClientInvasionWorldInfo.getFixedClientInfo(mc.level).getRendererMap().add(msgIn.renderer, msgIn.isPrimary, msgIn.hyperType);
-				break;
-			}
+			ClientInvasionSession.add(msgIn.sessionType, msgIn.difficulty, msgIn.renderer, msgIn.isPrimary, msgIn.severity, msgIn.mobCap, msgIn.maxSeverity, msgIn.rarity, msgIn.tier, msgIn.component);
 		}
 	}
 }

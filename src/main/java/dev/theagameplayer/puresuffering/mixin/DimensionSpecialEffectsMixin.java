@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
-import dev.theagameplayer.puresuffering.util.ClientInvasionUtil;
+import dev.theagameplayer.puresuffering.util.invasion.ClientInvasionHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 
@@ -16,16 +16,7 @@ public final class DimensionSpecialEffectsMixin {
 	private final void forceBrightLightmap(final CallbackInfoReturnable<Boolean> callbackIn) {
 		if (PSConfigValues.client.canInvasionsChangeBrightness) {
 			final Minecraft mc = Minecraft.getInstance();
-			callbackIn.setReturnValue(ClientInvasionUtil.handleDimensionLight(callbackIn.getReturnValueZ(), mc.level));
+			callbackIn.setReturnValue(ClientInvasionHandler.handleBrightLightmap(callbackIn.getReturnValueZ(), mc.level));
 		}
 	}
-	
-	//TODO: Fix Nether in Mystery Invasions.
-	/*@Inject(at = @At("RETURN"), method = "constantAmbientLight()Z", cancellable = true)
-	private final void constantAmbientLight(final CallbackInfoReturnable<Boolean> callbackIn) {
-		if (PSConfigValues.client.canInvasionsChangeBrightness) {
-			final Minecraft mc = Minecraft.getInstance();
-			callbackIn.setReturnValue(ClientInvasionUtil.handleDimensionLight(callbackIn.getReturnValueZ(), mc.level));
-		}
-	}*/
 }

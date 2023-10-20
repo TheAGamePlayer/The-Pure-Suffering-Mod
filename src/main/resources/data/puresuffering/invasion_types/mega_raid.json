@@ -2,20 +2,17 @@
   "Dimensions": [
     "minecraft:overworld"
   ],
-  "InvasionPriority": "BOTH",
   "InvasionTime": "NIGHT",
-  "Rarity": 3,
+  "Rarity": 4,
   "SeverityInfo": [
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.2,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:pillager",
           "MaxCount": 2,
           "MinCount": 1,
-          "Weight": 15
+          "Weight": 13
         },
         {
           "EntityType": "minecraft:vindicator",
@@ -33,15 +30,13 @@
       "TickDelay": 45
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.4,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:pillager",
           "MaxCount": 3,
           "MinCount": 1,
-          "Weight": 15
+          "Weight": 13
         },
         {
           "EntityType": "minecraft:vindicator",
@@ -65,15 +60,13 @@
       "TickDelay": 36
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.6,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:pillager",
           "MaxCount": 4,
           "MinCount": 2,
-          "Weight": 15
+          "Weight": 13
         },
         {
           "EntityType": "minecraft:vindicator",
@@ -103,15 +96,13 @@
       "TickDelay": 27
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.8,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:pillager",
           "MaxCount": 5,
           "MinCount": 2,
-          "Weight": 15
+          "Weight": 13
         },
         {
           "EntityType": "minecraft:vindicator",
@@ -141,15 +132,13 @@
       "TickDelay": 18
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 1.0,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:pillager",
           "MaxCount": 5,
           "MinCount": 2,
-          "Weight": 15
+          "Weight": 13
         },
         {
           "EntityType": "minecraft:vindicator",
@@ -177,6 +166,7 @@
         },
         {
           "EntityType": "minecraft:illusioner",
+          "ForceDespawn": true,
           "MaxCount": 1,
           "MinCount": 1,
           "Weight": 1
@@ -185,9 +175,5 @@
       "TickDelay": 9
     }
   ],
-  "SpawningSystem": "DEFAULT",
-  "Tier": 1,
-  "TimeChangeability": "DEFAULT",
-  "TimeModifier": "NONE",
-  "WeatherType": "DEFAULT"
+  "Tier": 2
 }

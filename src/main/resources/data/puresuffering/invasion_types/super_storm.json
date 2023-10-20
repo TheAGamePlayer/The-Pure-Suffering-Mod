@@ -7,18 +7,17 @@
   "Rarity": 10,
   "SeverityInfo": [
     {
-      "ClusterEntitiesList": [
+      "AdditionalEntitiesList": [
         {
-          "Chance": 12,
+          "Chance": 156,
           "EntityType": "minecraft:lightning_bolt",
+          "IsSurfaceSpawn": true,
           "MaxCount": 1,
           "MinCount": 0
         }
       ],
-      "ClusterSize": 6,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
       "MobCapPercentage": 0.6,
+      "MobClusterSize": 6,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:drowned",
@@ -27,32 +26,36 @@
           "Weight": 10
         }
       ],
-      "SkyRenderer": {
-        "BlueOffset": -0.1,
+      "SkyRenderInfo": {
         "Brightness": 0.2,
-        "FogRenderer": {
-          "BlueOffset": 0.1,
-          "GreenOffset": 0.1,
-          "RedOffset": 0.1
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.1,
+            0.1,
+            0.1
+          ]
         },
-        "GreenOffset": -0.1,
-        "RedOffset": -0.1
+        "LightLevel": 0,
+        "RGBOffset": [
+          -0.1,
+          -0.1,
+          -0.1
+        ]
       },
       "TickDelay": 20
     },
     {
-      "ClusterEntitiesList": [
+      "AdditionalEntitiesList": [
         {
-          "Chance": 8,
+          "Chance": 104,
           "EntityType": "minecraft:lightning_bolt",
+          "IsSurfaceSpawn": true,
           "MaxCount": 2,
           "MinCount": 0
         }
       ],
-      "ClusterSize": 8,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
       "MobCapPercentage": 0.8,
+      "MobClusterSize": 8,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:drowned",
@@ -61,32 +64,36 @@
           "Weight": 10
         }
       ],
-      "SkyRenderer": {
-        "BlueOffset": -0.2,
+      "SkyRenderInfo": {
         "Brightness": 0.1,
-        "FogRenderer": {
-          "BlueOffset": 0.2,
-          "GreenOffset": 0.2,
-          "RedOffset": 0.2
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.2,
+            0.2,
+            0.2
+          ]
         },
-        "GreenOffset": -0.2,
-        "RedOffset": -0.2
+        "LightLevel": 0,
+        "RGBOffset": [
+          -0.2,
+          -0.2,
+          -0.2
+        ]
       },
       "TickDelay": 16
     },
     {
-      "ClusterEntitiesList": [
+      "AdditionalEntitiesList": [
         {
-          "Chance": 4,
+          "Chance": 52,
           "EntityType": "minecraft:lightning_bolt",
+          "IsSurfaceSpawn": true,
           "MaxCount": 3,
           "MinCount": 0
         }
       ],
-      "ClusterSize": 10,
-      "ForceNoSleep": false,
-      "LightLevel": 15,
       "MobCapPercentage": 1.0,
+      "MobClusterSize": 10,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:drowned",
@@ -95,23 +102,27 @@
           "Weight": 10
         }
       ],
-      "SkyRenderer": {
-        "BlueOffset": -0.3,
+      "SkyRenderInfo": {
         "Brightness": 0.0,
-        "FogRenderer": {
-          "BlueOffset": 0.3,
-          "GreenOffset": 0.3,
-          "RedOffset": 0.3
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.3,
+            0.3,
+            0.3
+          ]
         },
-        "GreenOffset": -0.3,
-        "RedOffset": -0.3
+        "LightLevel": 0,
+        "RGBOffset": [
+          -0.3,
+          -0.3,
+          -0.3
+        ]
       },
       "TickDelay": 12
     }
   ],
   "SpawningSystem": "BIOME_BOOSTED",
-  "Tier": 2,
-  "TimeChangeability": "DEFAULT",
+  "Tier": 3,
   "TimeModifier": "DAY_TO_NIGHT",
   "WeatherType": "THUNDER"
 }

@@ -1,0 +1,26 @@
+package dev.theagameplayer.puresuffering.mixin;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import dev.theagameplayer.puresuffering.invasion.Invasion;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.sensing.Sensor;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+
+@Mixin(Sensor.class)
+public final class SensorMixin {
+	private static final TargetingConditions INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_LINE_OF_SIGHT = TargetingConditions.forCombat().ignoreLineOfSight();
+	private static final TargetingConditions INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT = TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting();
+
+	//A temporary fix to an annoying problem with Piglins being unable to have hyper aggression applied.
+	@Inject(at = @At("HEAD"), method = "isEntityAttackableIgnoringLineOfSight(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z", cancellable = true)
+	private static final void isEntityAttackableIgnoringLineOfSight(final LivingEntity entityIn, final LivingEntity targetIn, final CallbackInfoReturnable<Boolean> callbackIn) {
+		if (entityIn.getPersistentData().contains(Invasion.INVASION_MOB) && entityIn instanceof AbstractPiglin)
+			callbackIn.setReturnValue(entityIn.getBrain().isMemoryValue(MemoryModuleType.ATTACK_TARGET, targetIn) ? INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT.test(entityIn, targetIn) : INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_LINE_OF_SIGHT.test(entityIn, targetIn));
+	}
+}

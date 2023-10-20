@@ -5,15 +5,19 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
-import com.google.common.collect.ImmutableList;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
+import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
+import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -21,390 +25,391 @@ import net.minecraftforge.fml.loading.FMLPaths;
 public final class PSConfig {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	private static final String CONFIG = PureSufferingMod.MODID + ".config.";
-	
+	protected static final CommonConfig COMMON = new CommonConfig();
+	protected static final ClientConfig CLIENT = new ClientConfig();
+	protected static final HashMap<ServerLevel, LevelConfig> LEVELS = new HashMap<>();
+
 	public static final class CommonConfig {
-		public static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
-		public static final CommonConfig COMMON = new CommonConfig();
-		//Invasion
-		public final ForgeConfigSpec.IntValue primaryInvasionMobCap;
-		public final ForgeConfigSpec.IntValue secondaryInvasionMobCap;
-		public final ForgeConfigSpec.IntValue dayDifficultyIncreaseDelay;
-		public final ForgeConfigSpec.IntValue nightDifficultyIncreaseDelay;
-		public final ForgeConfigSpec.IntValue fixedDifficultyIncreaseDelay;
-		public final ForgeConfigSpec.IntValue maxDayInvasions;
-		public final ForgeConfigSpec.IntValue maxNightInvasions;
-		public final ForgeConfigSpec.IntValue maxFixedInvasions;
-		public final ForgeConfigSpec.BooleanValue multiThreadedInvasions;
+		private static final String NOTE_HN_PERFORMANCE = "NOTE: May affect performance at higher numbers!";
+		private static final String NOTE_REDUCE_FOR_PERFORMANCE = "NOTE: Reduce for increased performance!";
+		private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+		//GameRules - Boolean
+		public final ForgeConfigSpec.BooleanValue overrideGameRules;
+		public final ForgeConfigSpec.BooleanValue enableHyperInvasions;
+		public final ForgeConfigSpec.BooleanValue enableNightmareInvasions;
+		public final ForgeConfigSpec.BooleanValue invasionAntiGrief;
 		public final ForgeConfigSpec.BooleanValue consistentInvasions;
 		public final ForgeConfigSpec.BooleanValue tieredInvasions;
+		public final ForgeConfigSpec.BooleanValue hyperAggression;
+		public final ForgeConfigSpec.BooleanValue hyperCharge;
+		public final ForgeConfigSpec.BooleanValue forceInvasionSleeplessness;
+		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
+		public final ForgeConfigSpec.BooleanValue mobsDieAtEndOfInvasions;
+		public final ForgeConfigSpec.BooleanValue weakenedInvasionVexes;
+		public final ForgeConfigSpec.BooleanValue enableInvasionAmbience;
+		//GameRules - Integer
+		public final ForgeConfigSpec.IntValue primaryInvasionMobCap;
+		public final ForgeConfigSpec.IntValue secondaryInvasionMobCap;
+		//Invasions
 		public final ConfigValue<List<? extends String>> invasionBlacklist;
 		public final ConfigValue<List<? extends String>> primaryWhitelist;
 		public final ConfigValue<List<? extends String>> overworldLikeDimensions;
 		public final ConfigValue<List<? extends String>> netherLikeDimensions;
 		public final ConfigValue<List<? extends String>> endLikeDimensions;
-		//Balancing
-		public final ForgeConfigSpec.IntValue dayInvasionRarity;
-		public final ForgeConfigSpec.IntValue nightInvasionRarity;
-		public final ForgeConfigSpec.IntValue fixedInvasionRarity;
-		public final ForgeConfigSpec.IntValue hyperInvasionRarity;
-		public final ForgeConfigSpec.IntValue nightmareInvasionRarity;
-		public final ForgeConfigSpec.BooleanValue canDayInvasionsBeCanceled;
-		public final ForgeConfigSpec.BooleanValue canNightInvasionsBeCanceled;
-		public final ForgeConfigSpec.BooleanValue canFixedInvasionsBeCanceled;
-		public final ForgeConfigSpec.IntValue dayCancelChance;
-		public final ForgeConfigSpec.IntValue nightCancelChance;
-		public final ForgeConfigSpec.IntValue fixedCancelChance;
-		public final ForgeConfigSpec.IntValue maxHyperCharge;
-		//Modifications
-		public final ForgeConfigSpec.BooleanValue hyperAggression;
-		public final ForgeConfigSpec.BooleanValue hyperCharge;
-		public final ForgeConfigSpec.BooleanValue hyperInvasions;
-		public final ForgeConfigSpec.BooleanValue nightmareInvasions;
 		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
 		public final ConfigValue<List<? extends String>> hyperChargeBlacklist;
 		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
 		public final ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
-		public final ForgeConfigSpec.BooleanValue forceInvasionSleeplessness;
-		public final ForgeConfigSpec.BooleanValue weakenedVexes;
-		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
-		public final ForgeConfigSpec.BooleanValue invasionAntiGrief;
-		public final ForgeConfigSpec.BooleanValue shouldMobsDieAtEndOfInvasions;
-		public final ForgeConfigSpec.BooleanValue shouldMobsSpawnWithMaxRange;
-		public final ForgeConfigSpec.IntValue naturalSpawnChance;
-		public final ForgeConfigSpec.IntValue hyperChargeChance;
+		public final ForgeConfigSpec.DoubleValue naturalSpawnChance;
+		public final ForgeConfigSpec.DoubleValue hyperChargeChance;
 		public final ForgeConfigSpec.IntValue blessingEffectRespawnDuration;
 		public final ForgeConfigSpec.IntValue blessingEffectDimensionChangeDuration;
-		
+
 		private CommonConfig() {
-			COMMON_BUILDER.push("Gameplay");
-			COMMON_BUILDER.push("InvasionDifficulty");
-			primaryInvasionMobCap = COMMON_BUILDER
-					.translation(CONFIG + "primary_invasion_mob_cap")
+			this.builder.push("GameRules");
+			this.overrideGameRules = this.builder
+					.translation(CONFIG + "override_game_rules")
 					.worldRestart()
-					.comment("The Max amount of mobs that can spawn from Primary Invasions at once.", "NOTE: Reduce for increased performance!")
-					.defineInRange("primaryInvasionMobCap", 100, 0, Integer.MAX_VALUE);
-			secondaryInvasionMobCap = COMMON_BUILDER
-					.translation(CONFIG + "secondary_invasion_mob_cap")
-					.worldRestart()
-					.comment("The Max amount of mobs that can spawn from Primary Invasions at once.", "NOTE: Reduce for increased performance!")
-					.defineInRange("secondaryInvasionMobCap", 25, 0, Integer.MAX_VALUE);
-			dayDifficultyIncreaseDelay = COMMON_BUILDER
-					.translation(CONFIG + "day_difficulty_increase_delay")
-					.worldRestart()
-					.comment("How many days should pass when the Day Invasion Difficulty increases?")
-					.defineInRange("dayDifficultyIncreaseDelay", 50, 0, Integer.MAX_VALUE);
-			nightDifficultyIncreaseDelay = COMMON_BUILDER
-					.translation(CONFIG + "night_difficulty_increase_delay")
-					.worldRestart()
-					.comment("How many days should pass when the Night Invasion Difficulty increases?")
-					.defineInRange("nightDifficultyIncreaseDelay", 30, 0, Integer.MAX_VALUE);
-			fixedDifficultyIncreaseDelay = COMMON_BUILDER
-					.translation(CONFIG + "fixed_difficulty_increase_delay")
-					.worldRestart()
-					.comment("How many days should pass when the Fixed Invasion Difficulty increases?")
-					.defineInRange("fixedDifficultyIncreaseDelay", 40, 0, Integer.MAX_VALUE);
-			maxDayInvasions = COMMON_BUILDER
-					.translation(CONFIG + "max_day_invasions")
-					.worldRestart()
-					.comment("Max Day Invasions that can occur.")
-					.defineInRange("maxDayInvasions", 3, 0, Integer.MAX_VALUE);
-			maxNightInvasions = COMMON_BUILDER
-					.translation(CONFIG + "max_night_invasions")
-					.worldRestart()
-					.comment("Max Night Invasions that can occur.")
-					.defineInRange("maxNightInvasions", 3, 0, Integer.MAX_VALUE);
-			maxFixedInvasions = COMMON_BUILDER
-					.translation(CONFIG + "max_fixed_invasions")
-					.worldRestart()
-					.comment("Max Fixed Invasions that can occur.")
-					.defineInRange("maxFixedInvasions", 3, 0, Integer.MAX_VALUE);
-			multiThreadedInvasions = COMMON_BUILDER
-					.translation(CONFIG + "multi_threaded_invasions")
-					.worldRestart()
-					.comment("Should a thread be added for every dimension's Invasion Spawner instead of just 1 for all?", "NOTE: This can boost performance on multi-threaded CPUs!")
-					.define("multiThreadedInvasions", false);
-			consistentInvasions = COMMON_BUILDER
-					.translation(CONFIG + "consistent_invasions")
-					.worldRestart()
-					.comment("Should the rarity of Invasions act as a set delay between Invasions instead?")
-					.define("consistentInvasions", false);
-			tieredInvasions = COMMON_BUILDER
-					.translation(CONFIG + "tiered_invasions")
-					.worldRestart()
-					.comment("Should invasions follow the tier system?")
-					.define("tieredInvasions", true);
-			invasionBlacklist = COMMON_BUILDER
-					.translation(CONFIG + "invasion_blacklist")
-					.worldRestart()
-					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (swap '' with quotation marks)")
-					.defineList("invasionBlacklist", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			primaryWhitelist = COMMON_BUILDER
-					.translation(CONFIG + "primary_whitelist")
-					.worldRestart()
-					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("primaryWhitelist", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			overworldLikeDimensions = COMMON_BUILDER
-					.translation(CONFIG + "overworld_like_dimensions")
-					.worldRestart()
-					.comment("List of Dimensions that should use Overworld Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("overworldLikeDimensions", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			netherLikeDimensions = COMMON_BUILDER
-					.translation(CONFIG + "nether_like_dimensions")
-					.worldRestart()
-					.comment("List of Dimensions that should use Nether Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("netherLikeDimensions", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			endLikeDimensions = COMMON_BUILDER
-					.translation(CONFIG + "end_like_dimensions")
-					.worldRestart()
-					.comment("List of Dimensions that should use End Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("endLikeDimensions", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			COMMON_BUILDER.pop();
-			
-			COMMON_BUILDER.push("Balancing");
-			dayInvasionRarity = COMMON_BUILDER
-					.translation(CONFIG + "day_invasion_rarity")
-					.worldRestart()
-					.comment("How often should Day Invasions occur.")
-					.defineInRange("dayInvasionRarity", 21, 1, 100); //Once every 7 hours
-			nightInvasionRarity = COMMON_BUILDER
-					.translation(CONFIG + "night_invasion_rarity")
-					.worldRestart()
-					.comment("How often should Night Invasions occur.")
-					.defineInRange("nightInvasionRarity", 3, 1, 100); //Once every hour
-			fixedInvasionRarity = COMMON_BUILDER
-					.translation(CONFIG + "fixed_invasion_rarity")
-					.worldRestart()
-					.comment("How often should Fixed Invasions occur.")
-					.defineInRange("fixedInvasionRarity", 12, 1, 100); //Once every 2 hours
-			hyperInvasionRarity = COMMON_BUILDER
-					.translation(CONFIG + "hyper_invasion_rarity")
-					.worldRestart()
-					.comment("How often should Hyper Invasions occur.")
-					.defineInRange("hyperInvasionRarity", 12, 1, 100); //Once every half a day (Night Invasions)
-			nightmareInvasionRarity = COMMON_BUILDER
-					.translation(CONFIG + "nightmare_invasion_rarity")
-					.worldRestart()
-					.comment("How often should Nightmare Invasions occur.")
-					.defineInRange("nightmareInvasionRarity", 6, 1, 100); //Once every few actual days (Night Invasions)
-			canDayInvasionsBeCanceled = COMMON_BUILDER
-					.translation(CONFIG + "can_day_invasions_be_canceled")
-					.worldRestart()
-					.comment("Can Day Invasions have a random chance to be canceled?")
-					.define("canDayInvasionsBeCanceled", true);
-			canNightInvasionsBeCanceled = COMMON_BUILDER
-					.translation(CONFIG + "can_night_invasions_be_canceled")
-					.worldRestart()
-					.comment("Can Night Invasions have a random chance to be canceled?")
-					.define("canNightInvasionsBeCanceled", true);
-			canFixedInvasionsBeCanceled = COMMON_BUILDER
-					.translation(CONFIG + "can_fixed_invasions_be_canceled")
-					.worldRestart()
-					.comment("Can Fixed Invasions have a random chance to be canceled?")
-					.define("canFixedInvasionsBeCanceled", true);
-			dayCancelChance = COMMON_BUILDER
-					.translation(CONFIG + "day_cancel_chance")
-					.worldRestart()
-					.comment("Chance for Day Invasions to be canceled.", "NOTE: An invasion is canceled once in every 'value' day invasions.", "NOTE: If an invasion is set to be cancel on the same day as a hyper/nightmare invasion, it will not be cancled.")
-					.defineInRange("dayCancelChance", 84, 0, 100);
-			nightCancelChance = COMMON_BUILDER
-					.translation(CONFIG + "night_cancel_chance")
-					.worldRestart()
-					.comment("Chance for Night Invasions to be canceled.", "NOTE: An invasion is canceled once in every 'value' night invasions.", "NOTE: If an invasion is set to be cancel on the same night as a hyper/nightmare invasion, it will not be cancled.")
-					.defineInRange("nightCancelChance", 12, 0, 100);
-			fixedCancelChance = COMMON_BUILDER
-					.translation(CONFIG + "fixed_cancel_chance")
-					.worldRestart()
-					.comment("Chance for Fixed Invasions to be canceled.", "NOTE: An invasion is canceled once in every 'value' fixed invasions.", "NOTE: If an invasion is set to be cancel on the same cycle as a hyper/nightmare invasion, it will not be cancled.")
-					.defineInRange("fixedCancelChance", 24, 0, 100);
-			maxHyperCharge = COMMON_BUILDER
-					.translation(CONFIG + "max_hyper_charge")
-					.worldRestart()
-					.comment("Maximum value in which a mob can be hypercharged", "NOTE: Max value can only occur in Extreme Invasions", "NOTE: May affect performance at higher numbers!")
-					.defineInRange("maxHyperCharge", 4, 1, 100);
-			COMMON_BUILDER.pop();
-			
-			COMMON_BUILDER.push("Modifications");
-			hyperAggression = COMMON_BUILDER
-					.translation(CONFIG + "hyper_aggression")
-					.worldRestart()
-					.comment("Should neutral invasion mobs agro the player when spawned?")
-					.define("hyperAggression", true);
-			hyperCharge = COMMON_BUILDER
-					.translation(CONFIG + "hyper_charge")
-					.worldRestart()
-					.comment("Should mobs be able to be hyper charged?")
-					.define("hyperCharge", true);
-			hyperInvasions = COMMON_BUILDER
+					.comment("This will make these config options override their game rule values.", "NOTE: Can be used to help modpack creators enforce certain settings.")
+					.define("overrideGameRules", false);
+			this.builder.push("Boolean");
+			this.enableHyperInvasions = this.builder
 					.translation(CONFIG + "hyper_invasions")
 					.worldRestart()
 					.comment("Should hyper invasions be able to occur?")
-					.define("hyperInvasions", true);
-			nightmareInvasions = COMMON_BUILDER
+					.define("enableHyperInvasions", true);
+			this.enableNightmareInvasions = this.builder
 					.translation(CONFIG + "nightmare_invasions")
 					.worldRestart()
-					.comment("Should nightmare invasions be able to occur?", "NOTE: hyper invasions must be enabled.")
-					.define("nightmareInvasions", true);
-			hyperAggressionBlacklist = COMMON_BUILDER
-					.translation(CONFIG + "hyper_aggression_blacklist")
+					.comment("Should nightmare invasions be able to occur?", "NOTE: Hyper invasions must be enabled.")
+					.define("enableNightmareInvasions", true);
+			this.invasionAntiGrief = this.builder
+					.translation(CONFIG + "invasion_anti_grief")
 					.worldRestart()
-					.comment("List of Mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
-					.defineList("hyperAggressionBlacklist", ImmutableList.of("minecraft:vex"), string -> {
-						return string != "";
-					});
-			hyperChargeBlacklist = COMMON_BUILDER
-					.translation(CONFIG + "hyper_charge_blacklist")
+					.comment("Will disable explosions, fire, etc... from entities spawned by invasions.")
+					.define("invasionAntiGrief", false);
+			this.consistentInvasions = this.builder
+					.translation(CONFIG + "consistent_invasions")
 					.worldRestart()
-					.comment("List of Mobs that can't be hyper charged. (If setting is turned on)")
-					.defineList("hyperChargeBlacklist", ImmutableList.of("minecraft:vex"), string -> {
-						return string != "";
-					});
-			modBiomeBoostedBlacklist = COMMON_BUILDER
-					.translation(CONFIG + "mod_biome_boosted_blacklist")
+					.comment("Rather than the invasion occuring once in every 'rarity' days, it will instead be set to occur every 'rarity' days.")
+					.define("consistentInvasions", false);
+			this.tieredInvasions = this.builder
+					.translation(CONFIG + "tiered_invasions")
 					.worldRestart()
-					.comment("List of Mods that won't be allowed to have their mobs spawn in Biome Boosted Invasions.", "Ex: 'johncraft', 'mutantbeasts'")
-					.defineList("modBiomeBoostedBlacklist", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			mobBiomeBoostedBlacklist = COMMON_BUILDER
-					.translation(CONFIG + "mob_biome_boosted_blacklist")
+					.comment("Tiers make certain invasions only able to occur after so many days, turning this off will make the world ignore the day count when selecting invasions.")
+					.define("tieredInvasions", true);
+			this.hyperAggression = this.builder
+					.translation(CONFIG + "hyper_aggression")
 					.worldRestart()
-					.comment("List of Mobs that won't be allowed to spawn in Biome Boosted Invasions.", "Ex: 'minecraft:enderman', 'mutantbeasts:mutant_creeper'")
-					.defineList("mobBiomeBoostedBlacklist", ImmutableList.of(), string -> {
-						return string != "";
-					});
-			forceInvasionSleeplessness = COMMON_BUILDER
+					.comment("Hyper Aggression is what invasion mobs have to target the player from across the world, turning this off will make them use default targeting.")
+					.define("hyperAggression", true);
+			this.hyperCharge = this.builder
+					.translation(CONFIG + "hyper_charge")
+					.worldRestart()
+					.comment("Hyper Charge is what the buffed mobs spawned by invasions have, turning this off will disabled these buffed mobs from spawning (This also disables Hyper invasions).")
+					.define("hyperCharge", true);
+			this.forceInvasionSleeplessness = this.builder
 					.translation(CONFIG + "force_invasion_sleeplessness")
 					.worldRestart()
-					.comment("Should players be unable to sleep during all invasions?")
+					.comment("This determines whether players will be unable to sleep during all invasions.")
 					.define("forceInvasionSleeplessness", false);
-			weakenedVexes = COMMON_BUILDER
-					.translation(CONFIG + "weakened_vexes")
-					.worldRestart()
-					.comment("Should vexes in Invasions be weakened?")
-					.define("weakenedVexes", true);
-			useXPMultiplier = COMMON_BUILDER
+			this.useXPMultiplier = this.builder
 					.translation(CONFIG + "use_xp_multiplier")
 					.worldRestart()
 					.comment("This determines whether invasion mobs should have an xp boost per kill.")
 					.define("useXPMultiplier", true);
-			invasionAntiGrief = COMMON_BUILDER
-					.translation(CONFIG + "invasion_anti_grief")
+			this.mobsDieAtEndOfInvasions = this.builder
+					.translation(CONFIG + "mobs_die_at_end_of_invasions")
 					.worldRestart()
-					.comment("Should Invasion Mobs cause fire and explosions?")
-					.define("invasionAntiGrief", false);
-			shouldMobsDieAtEndOfInvasions = COMMON_BUILDER
-					.translation(CONFIG + "should_mobs_die_at_end_of_invasions")
+					.comment("Determines if invasion mobs should die when the invasions are over.", "NOTE: Can be used to reduce server lag.")
+					.define("mobsDieAtEndOfInvasions", false);
+			this.weakenedInvasionVexes = this.builder
+					.translation(CONFIG + "weakened_invasion_vexes")
 					.worldRestart()
-					.comment("Should Invasion Mobs die when the Invasions are over?", "NOTE: Can be used to reduce server lag.")
-					.define("shouldMobsDieAtEndOfInvasions", false);
-			shouldMobsSpawnWithMaxRange = COMMON_BUILDER
-					.translation(CONFIG + "should_mobs_spawn_with_max_range")
+					.comment("Determines vexes in invasions have a limited lifespan.")
+					.define("weakenedInvasionVexes", true);
+			this.enableInvasionAmbience = this.builder
+					.translation(CONFIG + "enable_invasion_ambience")
 					.worldRestart()
-					.comment("Should Invasion Mobs spawn with max follow range?", "NOTE: Very Taxing on server performance!")
-					.define("shouldMobsSpawnWithMaxRange", false);
-			naturalSpawnChance = COMMON_BUILDER
+					.comment("Should invasion ambient sounds be broadcasted before invasions?")
+					.define("enableInvasionAmbience", true);
+			this.builder.pop();
+			this.builder.push("Integer");
+			this.primaryInvasionMobCap = this.builder
+					.translation(CONFIG + "primary_invasion_mob_cap")
+					.worldRestart()
+					.comment("The max amount of mobs that can spawn from Primary Invasions at once.", NOTE_REDUCE_FOR_PERFORMANCE)
+					.defineInRange("primaryInvasionMobCap", 100, 0, Integer.MAX_VALUE);
+			this.secondaryInvasionMobCap = this.builder
+					.translation(CONFIG + "secondary_invasion_mob_cap")
+					.worldRestart()
+					.comment("The max amount of mobs that can spawn from Secondary Invasions at once.", NOTE_REDUCE_FOR_PERFORMANCE)
+					.defineInRange("secondaryInvasionMobCap", 25, 0, Integer.MAX_VALUE);
+			this.builder.pop();
+			this.builder.pop();
+			this.builder.push("Invasions");
+			this.invasionBlacklist = this.builder
+					.translation(CONFIG + "invasion_blacklist")
+					.worldRestart()
+					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (swap '' with quotation marks)")
+					.defineList("invasionBlacklist", List.of(), string -> {
+						return string != "";
+					});
+			this.primaryWhitelist = this.builder
+					.translation(CONFIG + "primary_whitelist")
+					.worldRestart()
+					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("primaryWhitelist", List.of(), string -> {
+						return string != "";
+					});
+			this.overworldLikeDimensions = this.builder
+					.translation(CONFIG + "overworld_like_dimensions")
+					.worldRestart()
+					.comment("List of Dimensions that should use Overworld Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("overworldLikeDimensions", List.of(), string -> {
+						return string != "";
+					});
+			this.netherLikeDimensions = this.builder
+					.translation(CONFIG + "nether_like_dimensions")
+					.worldRestart()
+					.comment("List of Dimensions that should use Nether Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("netherLikeDimensions", List.of(), string -> {
+						return string != "";
+					});
+			this.endLikeDimensions = this.builder
+					.translation(CONFIG + "end_like_dimensions")
+					.worldRestart()
+					.comment("List of Dimensions that should use End Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
+					.defineList("endLikeDimensions", List.of(), string -> {
+						return string != "";
+					});
+			this.hyperAggressionBlacklist = this.builder
+					.translation(CONFIG + "hyper_aggression_blacklist")
+					.worldRestart()
+					.comment("List of mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
+					.defineList("hyperAggressionBlacklist", List.of("minecraft:vex"), string -> {
+						return string != "";
+					});
+			this.hyperChargeBlacklist = this.builder
+					.translation(CONFIG + "hyper_charge_blacklist")
+					.worldRestart()
+					.comment("List of mobs that can't be hyper charged. (If setting is turned on)")
+					.defineList("hyperChargeBlacklist", List.of("minecraft:vex"), string -> {
+						return string != "";
+					});
+			this.modBiomeBoostedBlacklist = this.builder
+					.translation(CONFIG + "mod_biome_boosted_blacklist")
+					.worldRestart()
+					.comment("List of mods that won't be allowed to have their mobs spawn in Biome Boosted Invasions.", "Ex: 'twilightforest', 'mutantbeasts'")
+					.defineList("modBiomeBoostedBlacklist", List.of(), string -> {
+						return string != "";
+					});
+			this.mobBiomeBoostedBlacklist = this.builder
+					.translation(CONFIG + "mob_biome_boosted_blacklist")
+					.worldRestart()
+					.comment("List of mobs that won't be allowed to spawn in Biome Boosted Invasions.", "Ex: 'minecraft:enderman', 'mutantbeasts:mutant_creeper'")
+					.defineList("mobBiomeBoostedBlacklist", List.of(), string -> {
+						return string != "";
+					});
+			this.naturalSpawnChance = this.builder
 					.translation(CONFIG + "natural_spawn_chance")
 					.worldRestart()
-					.comment("The Chance of a naturally spawning mob has of spawning during an Invasion.", "NOTE: May affect performance at higher numbers!")
-					.defineInRange("naturalSpawnChance", 3, 0, 10000);
-			hyperChargeChance = COMMON_BUILDER
+					.comment("The chance of a naturally spawning mob has of spawning during an invasion.", NOTE_HN_PERFORMANCE)
+					.defineInRange("naturalSpawnChance", 0.0005D, 0.0D, 1.0D);
+			this.hyperChargeChance = this.builder
 					.translation(CONFIG + "hyper_charge_chance")
 					.worldRestart()
-					.comment("The Chance of an invasion mob being hyper charged")
-					.defineInRange("hyperChargeChance", 20, 0, 10000);
-			blessingEffectRespawnDuration = COMMON_BUILDER
+					.comment("The chance of an invasion mob being hyper charged.")
+					.defineInRange("hyperChargeChance", 0.2D, 0.0D, 1.0D);
+			this.blessingEffectRespawnDuration = this.builder
 					.translation(CONFIG + "blessing_effect_respawn_duration")
 					.worldRestart()
 					.comment("How many ticks the Blessing Effect lasts when respawning.")
-					.defineInRange("blessingEffectRespawnDuration", 600, 0, Integer.MAX_VALUE);
-			blessingEffectDimensionChangeDuration = COMMON_BUILDER
+					.defineInRange("blessingEffectRespawnDuration", 400, 0, Integer.MAX_VALUE);
+			this.blessingEffectDimensionChangeDuration = this.builder
 					.translation(CONFIG + "blessing_effect_dimension_change_duration")
 					.worldRestart()
 					.comment("How many ticks the Blessing Effect lasts when changing dimensions.")
-					.defineInRange("blessingEffectDimensionChangeDuration", 300, 0, Integer.MAX_VALUE);
-			COMMON_BUILDER.pop();
-			COMMON_BUILDER.pop();
-		}
-	}
-	
-	public static final class ClientConfig {
-		public static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-		public static final ClientConfig CLIENT = new ClientConfig();
-		
-		public final ForgeConfigSpec.BooleanValue useSkyBoxRenderer;
-		public final ForgeConfigSpec.BooleanValue useInvasionSoundEffects;
-		public final ForgeConfigSpec.BooleanValue canInvasionsChangeBrightness;
-		public final ForgeConfigSpec.BooleanValue enableVortexParticles;
-		public final ForgeConfigSpec.IntValue minVortexParticleLifespan;
-		public final ForgeConfigSpec.IntValue maxVortexParticleLifespan;
-		public final ForgeConfigSpec.IntValue vortexParticleSpread;
-		
-		private ClientConfig() {
-			CLIENT_BUILDER.push("Rendering");
-			useSkyBoxRenderer = CLIENT_BUILDER
-					.translation(CONFIG + "use_sky_box_renderer")
-					.comment("Can render Invasions with a custom sky box renderer?", "NOTE: Set false with incompatible shaders!")
-					.define("useSkyBoxRenderer", true);
-			useInvasionSoundEffects = CLIENT_BUILDER
-					.translation(CONFIG + "use_invasion_sound_effects")
-					.comment("Should the sound effects signaling invasion be used?")
-					.define("useInvasionSoundEffects", true);
-			canInvasionsChangeBrightness = CLIENT_BUILDER
-					.translation(CONFIG + "can_invasions_change_brightness")
-					.comment("Can Invasions change the brightness Values?", "NOTE: Set false with incompatible shaders!")
-					.define("canInvasionsChangeBrightness", true);
-			enableVortexParticles = CLIENT_BUILDER
-					.translation(CONFIG + "enable_vortex_particles")
-					.comment("Should Hyper Invasion vortex particles be enabled?", "NOTE: Set false with incompatible shaders!", "NOTE: May effect performance in hyper & nightmare invasions!")
-					.define("enableVortexParticles", true);
-			minVortexParticleLifespan = CLIENT_BUILDER
-					.translation(CONFIG + "min_vortex_particle_lifespan")
-					.comment("Minimum lifespan for vortex particles in Hyper Invasions.", "NOTE: Set to 'enableVortexParticles' to false to disable.")
-					.defineInRange("minVortexParticleLifespan", 30, 1, Integer.MAX_VALUE);
-			maxVortexParticleLifespan = CLIENT_BUILDER
-					.translation(CONFIG + "max_vortex_particles_lifespan")
-					.comment("Maximum lifespan for vortex particles in Hyper Invasions.", "NOTE: Set to 'enableVortexParticles' to false to disable.")
-					.defineInRange("maxVortexParticleLifespan", 630, 1, Integer.MAX_VALUE);
-			vortexParticleSpread = CLIENT_BUILDER
-					.translation(CONFIG + "vortex_particle_spread")
-					.comment("Spread value for vortex particles (Delay between particles).")
-					.defineInRange("vortexParticleSpread", 0, 0, Integer.MAX_VALUE);
-			CLIENT_BUILDER.pop();
+					.defineInRange("blessingEffectDimensionChangeDuration", 200, 0, Integer.MAX_VALUE);
+			this.builder.pop();
 		}
 	}
 
-	public static final void initConfig() {
+	public static final class ClientConfig {
+		private static final String NOTE_INCOMPATIBLE_SHADERS = "NOTE: Set false with incompatible shaders!";
+		private static final String NOTE_DISABLE_SKY_EFFECTS = "NOTE: Set to 'enableSkyEffects' to false to disable.";
+		private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+
+		public final ForgeConfigSpec.BooleanValue useSkyBoxRenderer;
+		public final ForgeConfigSpec.BooleanValue canInvasionsChangeBrightness;
+		public final ForgeConfigSpec.BooleanValue enableInvasionStartEffects;
+		public final ForgeConfigSpec.BooleanValue enableSkyFlickering;
+		public final ForgeConfigSpec.BooleanValue enableSkyEffects;
+		public final ForgeConfigSpec.BooleanValue useFastEffects;
+		public final ForgeConfigSpec.IntValue minVortexParticleLifespan;
+		public final ForgeConfigSpec.IntValue maxVortexParticleLifespan;
+		public final ForgeConfigSpec.IntValue vortexParticleDelay;
+
+		public final ForgeConfigSpec.BooleanValue useInvasionSoundEffects;
+
+		private ClientConfig() {
+			this.builder.push("Rendering");
+			this.useSkyBoxRenderer = this.builder
+					.translation(CONFIG + "use_sky_box_renderer")
+					.comment("Can render Invasions with a custom sky box renderer?", NOTE_INCOMPATIBLE_SHADERS)
+					.define("useSkyBoxRenderer", true);
+			this.canInvasionsChangeBrightness = this.builder
+					.translation(CONFIG + "can_invasions_change_brightness")
+					.comment("Can Invasions change the brightness Values?", NOTE_INCOMPATIBLE_SHADERS)
+					.define("canInvasionsChangeBrightness", true);
+			this.enableInvasionStartEffects = this.builder
+					.translation(CONFIG + "enable_invasion_start_effects")
+					.comment("Should Invasion start effects be enabled?", NOTE_INCOMPATIBLE_SHADERS)
+					.define("enableInvasionStartEffects", true);
+			this.enableSkyFlickering = this.builder
+					.translation(CONFIG + "enable_sky_flickering")
+					.comment("Should sky flickering effects be enabled?", NOTE_INCOMPATIBLE_SHADERS)
+					.define("enableSkyFlickering", true);
+			this.enableSkyEffects = this.builder
+					.translation(CONFIG + "enable_sky_effects")
+					.comment("Should Hyper Invasion sky effects be enabled?", NOTE_INCOMPATIBLE_SHADERS, "NOTE: May effect performance in hyper invasions!")
+					.define("enableSkyEffects", true);
+			this.useFastEffects = this.builder
+					.translation(CONFIG + "use_fast_effects")
+					.comment("Should sky effects be rendered in their fast graphics mode?", NOTE_INCOMPATIBLE_SHADERS, "NOTE: This can improve performance, even when fast graphics are on.")
+					.define("useFastEffects", false);
+			this.minVortexParticleLifespan = this.builder
+					.translation(CONFIG + "min_vortex_particle_lifespan")
+					.comment("Minimum lifespan for vortex particles in Hyper Invasions.", NOTE_DISABLE_SKY_EFFECTS)
+					.defineInRange("minVortexParticleLifespan", 30, 1, Integer.MAX_VALUE);
+			this.maxVortexParticleLifespan = this.builder
+					.translation(CONFIG + "max_vortex_particles_lifespan")
+					.comment("Maximum lifespan for vortex particles in Hyper Invasions.", NOTE_DISABLE_SKY_EFFECTS)
+					.defineInRange("maxVortexParticleLifespan", 630, 1, Integer.MAX_VALUE);
+			this.vortexParticleDelay = this.builder
+					.translation(CONFIG + "vortex_particle_delay")
+					.comment("Delay value for spawning vortex particles.", "NOTE: Increasing the delay will result in less particles, increasing performance.", "NOTE: total particle = particles * 1/(value + 1)")
+					.defineInRange("vortexParticleDelay", 1, 0, Integer.MAX_VALUE);
+			this.builder.pop();
+			this.builder.push("Sound");
+			this.useInvasionSoundEffects = this.builder
+					.translation(CONFIG + "use_invasion_sound_effects")
+					.comment("Should the sound effects signaling invasion be used?")
+					.define("useInvasionSoundEffects", true);
+			this.builder.pop();
+		}
+	}
+
+	public static final class LevelConfig {
+		private static final int[][] DEFAULT_FIXED_RARITY = new int[][] {{12}, {12, 5}, {40}};
+		private static final int[][] OVERWORLD_RARITY = new int[][] {{21, 3}, {12, 5}, {50, 30}};
+		private static final int[][] NETHER_RARITY = new int[][] {{8}, {12, 5}, {40}};
+		private static final int[][] END_RARITY = new int[][] {{8}, {10, 4}, {40}};
+		private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+
+		public final ForgeConfigSpec.IntValue[] invasionSessionTypeRarity;
+		public final ForgeConfigSpec.IntValue[] invasionDifficultyRarity;
+		public final ForgeConfigSpec.BooleanValue[] cancelableInvasions;
+		public final ForgeConfigSpec.IntValue[] cancelInvasionRarity;
+		public final ForgeConfigSpec.IntValue[] maxInvasions;
+		public final ForgeConfigSpec.IntValue[] tierIncreaseDelay;
+		
+		private LevelConfig(final ServerLevel levelIn) {
+			final boolean hasFixedTime = levelIn.dimensionType().hasFixedTime();
+			int[][] values = new int[0][0];
+			if (levelIn.dimension().equals(Level.NETHER)) {
+				values = NETHER_RARITY;
+			} else if (levelIn.dimension().equals(Level.END)) {
+				values = END_RARITY;
+			} else {
+				values = hasFixedTime ? DEFAULT_FIXED_RARITY : OVERWORLD_RARITY;
+			}
+			final int sessionTypeLength = hasFixedTime ? 1 : 2;
+			final int difficultyLength = InvasionDifficulty.values().length - 1;
+			this.invasionSessionTypeRarity = new ForgeConfigSpec.IntValue[sessionTypeLength];
+			this.invasionDifficultyRarity = new ForgeConfigSpec.IntValue[difficultyLength];
+			this.cancelableInvasions = new ForgeConfigSpec.BooleanValue[sessionTypeLength];
+			this.cancelInvasionRarity = new ForgeConfigSpec.IntValue[sessionTypeLength];
+			this.maxInvasions = new ForgeConfigSpec.IntValue[sessionTypeLength];
+			this.tierIncreaseDelay = new ForgeConfigSpec.IntValue[sessionTypeLength];
+			for (int st = 0; st < sessionTypeLength; st++) {
+				final InvasionSessionType sessionType = hasFixedTime ? InvasionSessionType.FIXED : InvasionSessionType.values()[st];
+				this.invasionSessionTypeRarity[st] = this.builder
+						.translation(CONFIG + sessionType + "_invasion_rarity")
+						.worldRestart()
+						.comment("How often should " + sessionType.getDefaultName() + " Invasions occur.")
+						.defineInRange(sessionType + "InvasionRarity", values[0][st], 1, Integer.MAX_VALUE);
+				this.cancelableInvasions[st] = this.builder
+						.translation(CONFIG + "cancelable_" + sessionType + "_invasions")
+						.worldRestart()
+						.comment("Determines if " + sessionType + " invasions can be canceled.")
+						.define("cancelable" + sessionType.getDefaultName() + "Invasions", true);
+				this.cancelInvasionRarity[st] = this.builder
+						.translation(CONFIG + sessionType + "_cancel_invasion_rarity")
+						.worldRestart()
+						.comment("How often should " + sessionType + " invasions be canceled.", "NOTE: An invasion is canceled once in every 'value' fixed invasions.", "NOTE: If an invasion is set to be cancel on the same cycle as a hyper/nightmare invasion, it will not be cancled.")
+						.defineInRange(sessionType + "CancelInvasionRarity", values[0][st] * 4, 1, Integer.MAX_VALUE);
+				this.maxInvasions[st] = this.builder
+						.translation(CONFIG + "max_" + sessionType + "_invasions")
+						.worldRestart()
+						.comment("Max " + sessionType.getDefaultName() + " Invasions that can occur at once.")
+						.defineInRange("max" + sessionType.getDefaultName() + "Invasions", 3, 1, Integer.MAX_VALUE);
+				this.tierIncreaseDelay[st] = this.builder
+						.translation(CONFIG + sessionType + "_tier_increase_delay")
+						.worldRestart()
+						.comment("How many days should pass when the " + sessionType.getDefaultName() + " Invasion Tier increases.")
+						.defineInRange(sessionType + "TierIncreaseDelay", values[2][st], 1, Integer.MAX_VALUE);
+			}
+			for (int d = 0; d < difficultyLength; d++) {
+				final InvasionDifficulty difficulty = InvasionDifficulty.values()[d + 1];
+				this.invasionDifficultyRarity[d] = this.builder
+						.translation(CONFIG + difficulty + "_invasion_rarity")
+						.worldRestart()
+						.comment("How often should " + difficulty.getDefaultName() + " Invasions occur.")
+						.defineInRange(difficulty + "InvasionRarity", values[1][d], 1, Integer.MAX_VALUE);
+			}
+		}
+	}
+
+	public static final void initConfig(final boolean isClientIn) {
 		final Path configPath = FMLPaths.CONFIGDIR.get();
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		try {
 			Files.createDirectory(psConfigPath);
-		} catch (final FileAlreadyExistsException exceptionIn) {
+		} catch (final FileAlreadyExistsException exception) {
 			LOGGER.info("Config directory for " + PureSufferingMod.MODID + " already exists!");
-		} catch (final IOException exceptionIn) {
-			LOGGER.error("Failed to create " + PureSufferingMod.MODID + " config directory!", exceptionIn);
+		} catch (final IOException exception) {
+			LOGGER.error("Failed to create " + PureSufferingMod.MODID + " config directory!", exception);
 		}
-		loadConfig(CommonConfig.COMMON_BUILDER.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-common.toml"));
-		loadConfig(ClientConfig.CLIENT_BUILDER.build(), configPath.resolve(PureSufferingMod.MODID + "/" + PureSufferingMod.MODID + "-client.toml"));
+		loadConfig(COMMON.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-common.toml"));
+		if (isClientIn) loadConfig(CLIENT.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml"));
 	}
-	
-    private static final void loadConfig(final ForgeConfigSpec specIn, final Path pathIn) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(pathIn)
-                .sync()
-                .autosave()
-                .preserveInsertionOrder()
-                .writingMode(WritingMode.REPLACE)
-                .build();
-        configData.load();
-        specIn.setConfig(configData);
-    }
+
+	public static final void initLevelConfig(final ServerLevel levelIn) {
+		final String levelFileName = levelIn.dimension().location().toDebugFileName();
+		final Path configPath = FMLPaths.CONFIGDIR.get();
+		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
+		final Path psLevelConfigPath = Paths.get(psConfigPath.toAbsolutePath().toString(), "dimensions");
+		try {
+			Files.createDirectory(psLevelConfigPath);
+		} catch (final FileAlreadyExistsException exception) {
+			if (LEVELS.isEmpty()) LOGGER.info("Config directory for puresuffering dimensions already exists!");
+		} catch (final IOException exception) {
+			LOGGER.error("Failed to create puresuffering dimensions config directory!", exception);
+		}
+		final LevelConfig config = new LevelConfig(levelIn);
+		LEVELS.put(levelIn, config);
+		loadConfig(config.builder.build(), psLevelConfigPath.resolve(levelFileName + "-level.toml"));
+	}
+
+	private static final void loadConfig(final ForgeConfigSpec specIn, final Path pathIn) {
+		final CommentedFileConfig configData = CommentedFileConfig.builder(pathIn)
+				.sync()
+				.autosave()
+				.preserveInsertionOrder()
+				.writingMode(WritingMode.REPLACE)
+				.build();
+		configData.load();
+		specIn.setConfig(configData);
+	}
 }

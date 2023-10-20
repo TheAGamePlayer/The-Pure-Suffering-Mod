@@ -1,4 +1,5 @@
 {
+  "DayNightCycleRequirement": "NEEDS_CYCLE",
   "Dimensions": [
     "minecraft:overworld"
   ],
@@ -7,63 +8,71 @@
   "Rarity": 7,
   "SeverityInfo": [
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.6,
-      "SkyRenderer": {
-        "BlueOffset": -0.1,
-        "FogRenderer": {
-          "BlueOffset": 0.0,
-          "GreenOffset": 0.0,
-          "RedOffset": 0.05
+      "SkyRenderInfo": {
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.05,
+            0.0,
+            0.0
+          ]
         },
-        "GreenOffset": -0.1,
+        "LightLevel": 0,
         "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
-        "RedOffset": 0.0,
+        "RGBOffset": [
+          0.0,
+          -0.1,
+          -0.1
+        ],
         "WeatherVisibility": 0.1
       },
       "TickDelay": 25
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.8,
-      "SkyRenderer": {
-        "BlueOffset": -0.2,
-        "FogRenderer": {
-          "BlueOffset": 0.0,
-          "GreenOffset": 0.0,
-          "RedOffset": 0.1
+      "SkyRenderInfo": {
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.1,
+            0.0,
+            0.0
+          ]
         },
-        "GreenOffset": -0.2,
+        "LightLevel": 0,
         "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
-        "RedOffset": 0.0,
+        "RGBOffset": [
+          0.0,
+          -0.2,
+          -0.2
+        ],
         "WeatherVisibility": 0.2
       },
       "TickDelay": 20
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 1.0,
-      "SkyRenderer": {
-        "BlueOffset": -0.3,
-        "FogRenderer": {
-          "BlueOffset": 0.0,
-          "GreenOffset": 0.0,
-          "RedOffset": 0.15
+      "SkyRenderInfo": {
+        "FogRenderInfo": {
+          "RGBOffset": [
+            0.15,
+            0.0,
+            0.0
+          ]
         },
-        "GreenOffset": -0.3,
+        "LightLevel": 0,
         "MoonTexture": "puresuffering:textures/environment/lunar_eclipse_moon.png",
-        "RedOffset": 0.0,
+        "RGBOffset": [
+          0.0,
+          -0.3,
+          -0.3
+        ],
         "WeatherVisibility": 0.3
       },
       "TickDelay": 15
     }
   ],
   "SpawningSystem": "BIOME_BOOSTED",
-  "Tier": 1,
+  "Tier": 2,
   "TimeChangeability": "ONLY_NIGHT",
-  "TimeModifier": "NONE",
-  "WeatherType": "DEFAULT"
+  "TimeModifier": "NONE"
 }

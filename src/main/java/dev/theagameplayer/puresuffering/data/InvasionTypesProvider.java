@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import dev.theagameplayer.puresuffering.data.packs.PSEndInvasionTypes;
+import dev.theagameplayer.puresuffering.data.packs.PSMultiDimInvasionTypes;
+import dev.theagameplayer.puresuffering.data.packs.PSNetherInvasionTypes;
+import dev.theagameplayer.puresuffering.data.packs.PSOverworldInvasionTypes;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
@@ -16,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionTypesProvider implements DataProvider {
 	private final PackOutput.PathProvider pathProvider;
-	private final List<Consumer<Consumer<InvasionType>>> tabs = List.of(new PSInvasionTypes());
+	private final List<Consumer<Consumer<InvasionType>>> tabs = List.of(new PSOverworldInvasionTypes(), new PSNetherInvasionTypes(), new PSEndInvasionTypes(), new PSMultiDimInvasionTypes());
 	private final CompletableFuture<HolderLookup.Provider> registries;
 
 	public InvasionTypesProvider(final PackOutput packOutputIn, final CompletableFuture<HolderLookup.Provider> lookupProviderIn) {

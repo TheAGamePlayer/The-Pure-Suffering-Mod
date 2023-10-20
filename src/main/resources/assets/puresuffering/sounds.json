@@ -34,5 +34,23 @@
 				"stream": true
 			}
 		]
+	},
+	"inform_invasion": {
+		"subtitle": "puresuffering.subtitle.inform_invasion",
+		"sounds": [
+			{
+				"name": "puresuffering:inform_invasion",
+				"stream": true
+			}
+		]
+	},
+	"invasion_ambience": {
+		"subtitle": "puresuffering.subtitle.invasion_ambience",
+		"sounds": [
+			{
+				"name": "puresuffering:invasion_ambience",
+				"stream": true
+			}
+		]
 	}
 }

@@ -2,33 +2,28 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
-import dev.theagameplayer.puresuffering.util.InvasionListType;
-import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
-import net.minecraft.client.Minecraft;
+import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
+import dev.theagameplayer.puresuffering.client.invasion.InvasionSkyRenderInfo;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class RemoveInvasionPacket {
-	private final InvasionSkyRenderer renderer;
-	private final InvasionListType listType;
+	private final InvasionSkyRenderInfo renderer;
 
-	public RemoveInvasionPacket(final InvasionSkyRenderer rendererIn, final InvasionListType listTypeIn) {
+	public RemoveInvasionPacket(final InvasionSkyRenderInfo rendererIn) {
 		this.renderer = rendererIn;
-		this.listType = listTypeIn;
 	}
 
 	public static final void encode(final RemoveInvasionPacket msgIn, final FriendlyByteBuf bufIn) {
 		msgIn.renderer.deconstruct().serializeToNetwork(bufIn);
 		bufIn.writeResourceLocation(msgIn.renderer.getId());
-		bufIn.writeEnum(msgIn.listType);
 	}
 
 	public static final RemoveInvasionPacket decode(final FriendlyByteBuf bufIn) {
-		final InvasionSkyRenderer renderer = InvasionSkyRenderer.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
-		return new RemoveInvasionPacket(renderer, bufIn.readEnum(InvasionListType.class));
+		final InvasionSkyRenderInfo renderer = InvasionSkyRenderInfo.Builder.fromNetwork(bufIn).build(bufIn.readResourceLocation());
+		return new RemoveInvasionPacket(renderer);
 	}
 
 	public static class Handler {
@@ -40,18 +35,7 @@ public final class RemoveInvasionPacket {
 		}
 
 		private static final void handlePacket(final RemoveInvasionPacket msgIn, final Supplier<Context> ctxIn) {
-			final Minecraft mc = Minecraft.getInstance();
-			switch (msgIn.listType) {
-			case DAY:
-				ClientInvasionWorldInfo.getDayClientInfo(mc.level).getRendererMap().remove(msgIn.renderer);
-				break;
-			case NIGHT:
-				ClientInvasionWorldInfo.getNightClientInfo(mc.level).getRendererMap().remove(msgIn.renderer);
-				break;
-			case FIXED:
-				ClientInvasionWorldInfo.getFixedClientInfo(mc.level).getRendererMap().remove(msgIn.renderer);
-				break;
-			}
+			ClientInvasionSession.remove(msgIn.renderer);
 		}
 	}
 }

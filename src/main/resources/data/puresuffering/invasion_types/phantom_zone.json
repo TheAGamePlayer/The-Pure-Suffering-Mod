@@ -5,15 +5,14 @@
   ],
   "InvasionPriority": "SECONDARY_ONLY",
   "InvasionTime": "NIGHT",
-  "Rarity": 5,
+  "Rarity": 7,
   "SeverityInfo": [
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.1,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:phantom",
+          "ForceDespawn": true,
           "MaxCount": 1,
           "MinCount": 1,
           "Weight": 1
@@ -22,12 +21,11 @@
       "TickDelay": 90
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.2,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:phantom",
+          "ForceDespawn": true,
           "MaxCount": 2,
           "MinCount": 1,
           "Weight": 1
@@ -36,12 +34,11 @@
       "TickDelay": 75
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.3,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:phantom",
+          "ForceDespawn": true,
           "MaxCount": 3,
           "MinCount": 1,
           "Weight": 1
@@ -50,12 +47,11 @@
       "TickDelay": 60
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.4,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:phantom",
+          "ForceDespawn": true,
           "MaxCount": 4,
           "MinCount": 1,
           "Weight": 1
@@ -64,12 +60,11 @@
       "TickDelay": 45
     },
     {
-      "ClusterSize": 1,
-      "ForceNoSleep": false,
       "MobCapPercentage": 0.5,
       "MobSpawnList": [
         {
           "EntityType": "minecraft:phantom",
+          "ForceDespawn": true,
           "MaxCount": 5,
           "MinCount": 2,
           "Weight": 1
@@ -78,9 +73,5 @@
       "TickDelay": 30
     }
   ],
-  "SpawningSystem": "DEFAULT",
-  "Tier": 2,
-  "TimeChangeability": "DEFAULT",
-  "TimeModifier": "NONE",
-  "WeatherType": "DEFAULT"
+  "Tier": 3
 }

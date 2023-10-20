@@ -4,8 +4,12 @@
 	"compatibilityLevel": "JAVA_17",
 	"refmap": "puresuffering.refmap.json",
 	"mixins": [
+		"GameRulesCategoryMixin",
 		"LevelMixin",
-		"LivingEntityMixin"
+		"MobMixin",
+		"SensorMixin",
+		"VillagerMixin",
+		"WitherBossMixin"
 	],
 	"client": [
 		"ClientLevelMixin",
@@ -13,7 +17,9 @@
 		"LevelRendererMixin",
 		"LightTextureMixin"
 	],
-	"server": [],
+	"server": [
+		"DedicatedServerPropertiesMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	},

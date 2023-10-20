@@ -2,8 +2,7 @@ package dev.theagameplayer.puresuffering.network.packet;
 
 import java.util.function.Supplier;
 
-import dev.theagameplayer.puresuffering.util.InvasionListType;
-import dev.theagameplayer.puresuffering.world.ClientInvasionWorldInfo;
+import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -12,20 +11,17 @@ import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class UpdateXPMultPacket {
 	private final double xpMult;
-	private final InvasionListType listType;
 	
-	public UpdateXPMultPacket(final double xpMultIn, final InvasionListType listTypeIn) {
+	public UpdateXPMultPacket(final double xpMultIn) {
 		this.xpMult = xpMultIn;
-		this.listType = listTypeIn;
 	}
 	
 	public static final void encode(final UpdateXPMultPacket msgIn, final FriendlyByteBuf bufIn) {
 		bufIn.writeDouble(msgIn.xpMult);
-		bufIn.writeEnum(msgIn.listType);
 	}
 	
 	public static final UpdateXPMultPacket decode(final FriendlyByteBuf bufIn) {
-		return new UpdateXPMultPacket(bufIn.readDouble(), bufIn.readEnum(InvasionListType.class));
+		return new UpdateXPMultPacket(bufIn.readDouble());
 	}
 
 	public static class Handler {
@@ -38,17 +34,9 @@ public final class UpdateXPMultPacket {
 		
 		private static final void handlePacket(final UpdateXPMultPacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
-			switch (msgIn.listType) {
-			case DAY:
-				ClientInvasionWorldInfo.getDayClientInfo(mc.level).setXPMultiplier(msgIn.xpMult);
-				break;
-			case NIGHT:
-				ClientInvasionWorldInfo.getNightClientInfo(mc.level).setXPMultiplier(msgIn.xpMult);
-				break;
-			case FIXED:
-				ClientInvasionWorldInfo.getFixedClientInfo(mc.level).setXPMultiplier(msgIn.xpMult);
-				break;
-			}
+			final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
+			if (session == null) return;
+			session.setXPMultiplier(msgIn.xpMult);
 		}
 	}
 }
