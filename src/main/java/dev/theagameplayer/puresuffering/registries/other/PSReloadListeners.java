@@ -8,7 +8,7 @@ public final class PSReloadListeners {
 	private static InvasionTypeManager invasionTypeManager;
 
 	public static final void addReloadListeners(final AddReloadListenerEvent eventIn) {
-		invasionTypeManager = new InvasionTypeManager(eventIn.getRegistryAccess().registryOrThrow(Registries.DIMENSION_TYPE));
+		invasionTypeManager = new InvasionTypeManager(eventIn.getRegistryAccess().registryOrThrow(Registries.LEVEL_STEM));
 		eventIn.addListener(invasionTypeManager);
 	}
 

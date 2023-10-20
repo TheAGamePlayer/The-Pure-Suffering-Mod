@@ -22,9 +22,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class InvasionType {
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	private final ResourceLocation id;
 	private final boolean overridesExisting;
 	private final String defaultName;
@@ -188,8 +190,9 @@ public final class InvasionType {
 			this.requirement = requirementIn;
 		}
 		
-		public final boolean meetsRequirement(final DimensionType dimensionTypeIn) {
-			return this.requirement.test(dimensionTypeIn);
+		public final boolean meetsRequirement(final LevelStem levelStemIn, final String modDimIn) {
+			if (levelStemIn == null || !levelStemIn.type().isBound()) LOGGER.warn("Could not find dimension with id, likely typed it wrong in Config: " + modDimIn);
+			return this.requirement.test(levelStemIn.type().value());
 		}
 	}
 
@@ -251,7 +254,6 @@ public final class InvasionType {
 		}
 
 		public static final class Builder {
-			private static final Logger LOGGER = PureSufferingMod.LOGGER;
 			private InvasionSkyRenderInfo.Builder skyRenderInfo = null;
 			private List<InvasionSpawnerData> mobSpawnList;
 			private List<AdditionalEntitySpawnData> additionalEntitiesList;
@@ -589,7 +591,7 @@ public final class InvasionType {
 			return jsonObject;
 		}
 
-		public static final InvasionType.Builder fromJson(final Registry<DimensionType> dimensionTypesIn, final JsonObject jsonObjectIn) {
+		public static final InvasionType.Builder fromJson(final Registry<LevelStem> dimensionsIn, final JsonObject jsonObjectIn) {
 			final boolean overridesExisting = jsonObjectIn.has("OverridesExisting") && jsonObjectIn.get("OverridesExisting").getAsBoolean();
 			final String defaultName = jsonObjectIn.has("DefaultName") ? jsonObjectIn.get("DefaultName").getAsString() : null;
 			final int rarity = Math.max(jsonObjectIn.get("Rarity").getAsInt(), 1) - 1;
@@ -688,19 +690,19 @@ public final class InvasionType {
 						if (dimId.equals(Level.OVERWORLD.location()) && dayNightCycleRequirement != null) {
 							for (final String modDim : PSConfigValues.common.overworldLikeDimensions) {
 								final ResourceLocation modDimId = ResourceLocation.tryParse(modDim);
-								if (dayNightCycleRequirement.meetsRequirement(dimensionTypesIn.get(modDimId)))
+								if (dayNightCycleRequirement.meetsRequirement(dimensionsIn.get(modDimId), modDim))
 									dimensions.add(modDimId);
 							}
 						} else if (dimId.equals(Level.NETHER.location())) {
 							for (final String modDim : PSConfigValues.common.netherLikeDimensions) {
 								final ResourceLocation modDimId = ResourceLocation.tryParse(modDim);
-								if (dayNightCycleRequirement.meetsRequirement(dimensionTypesIn.get(modDimId)))
+								if (dayNightCycleRequirement.meetsRequirement(dimensionsIn.get(modDimId), modDim))
 									dimensions.add(modDimId);
 							}
 						} else if (dimId.equals(Level.END.location())) {
 							for (final String modDim : PSConfigValues.common.endLikeDimensions) {
 								final ResourceLocation modDimId = ResourceLocation.tryParse(modDim);
-								if (dayNightCycleRequirement.meetsRequirement(dimensionTypesIn.get(modDimId)))
+								if (dayNightCycleRequirement.meetsRequirement(dimensionsIn.get(modDimId), modDim))
 									dimensions.add(modDimId);
 							}
 						}
