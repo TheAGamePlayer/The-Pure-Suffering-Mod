@@ -1,4 +1,7 @@
 #Minecraft 1.20.x
+Version 1.6.0.1R:
+- Fixed non-mob related explosions causing the level to crash.
+
 Version 1.6.0.0R:
 - INVASION ANTI GRIEF IS NOW DISABLED BY DEFAULT!
 - Added invasion music that's able to be added by the player (Via .ogg files).
