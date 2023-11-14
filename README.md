@@ -6,7 +6,7 @@ Version 1.6.0.1R is now available!
 
 Curseforge: https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod
 
-Discord: https://discord.gg/MEysS6sRCn
+Discord: https://discord.gg/WAgx39BG
 
 1.20.1 Pure Suffering Mutant Monsters Datapack Github: https://github.com/TheAGamePlayer/PSMM-Datapack
 
