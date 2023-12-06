@@ -83,7 +83,7 @@ public final class InvasionManager {
 							final Predicate<InvasionType> potentialPrimary = it -> sessionType.isAcceptableTime(it, false) && potentials.test(it) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() || PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()));
 							final Predicate<InvasionType> potentialSecondary = it -> potentials.test(it) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY;
 							for (int inv = 0; inv < totalInvasions; inv++) {
-								final InvasionType invasionType = this.getInvasionType(new InvasionChart(inv == 0, inv == 0 ? it -> potentialPrimary.test(it) : it -> sessionType.isAcceptableTime(it, isTimeModified[0]) && potentialSecondary.test(it) && (!isTimeModified[0] || sessionType.canBeChanged(it))), random);
+								final InvasionType invasionType = this.getInvasionType(new InvasionChart(inv == 0, inv == 0 ? potentialPrimary : it -> sessionType.isAcceptableTime(it, isTimeModified[0]) && potentialSecondary.test(it) && (!isTimeModified[0] || sessionType.canBeChanged(it))), random);
 								if (invasionType == null || invasionType.getMaxSeverity() < 1) break;
 								if (inv == 0) this.sessions[index] = new InvasionSession(sessionType, difficulty);
 								final int severity = difficulty.isHyper() ? invasionType.getMaxSeverity() - 1 : random.nextInt(Mth.clamp(PSGameRules.TIERED_INVASIONS.get(levelIn) ? (int)(days/tierIncreaseDelay - invasionType.getTier()) + 1 : invasionType.getMaxSeverity(), 1, inv == 0 ? invasionType.getMaxSeverity() : this.getSecondarySeverityCap(invasionType, index)));

@@ -1,4 +1,8 @@
 #Minecraft 1.20.x
+Version 1.6.0.2R:
+- Fixed Villagers having raid victory behaviors during invasions.
+- Small optimization tweaks
+
 Version 1.6.0.1R:
 - Fixed non-mob related explosions causing the level to crash.
 

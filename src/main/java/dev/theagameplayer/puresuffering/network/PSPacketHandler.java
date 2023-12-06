@@ -17,12 +17,12 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PSPacketHandler {
-	private static final String PROTOCAL_VERSION = "1";
+	private static final String PROTOCOL_VERSION = "1";
 	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
 			PureSufferingMod.namespace("main_network_channel"), 
-			() -> PROTOCAL_VERSION, 
-			PROTOCAL_VERSION::equals, 
-			PROTOCAL_VERSION::equals);
+			() -> PROTOCOL_VERSION, 
+			PROTOCOL_VERSION::equals, 
+			PROTOCOL_VERSION::equals);
 	
 	public static final void registerPackets() { //Using message builder instead of register message due to log spam of "Unknown custom packet identifier: puresuffering:main_network_channel"
 		int id = 0;
