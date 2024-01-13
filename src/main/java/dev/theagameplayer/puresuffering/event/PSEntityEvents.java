@@ -22,8 +22,11 @@ public final class PSEntityEvents {
 		if (entity instanceof Mob mob) {
 			if (eventIn.loadedFromDisk()) {
 				final ServerLevel level = (ServerLevel)eventIn.getLevel();
-				final InvasionSession session =  InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
-				if (session != null) session.loadMob(mob);
+				final InvasionLevelData ilData = InvasionLevelData.get(level);
+				if (ilData != null) {
+					final InvasionSession session =  ilData.getInvasionManager().getActiveSession(level);
+					if (session != null) session.loadMob(mob);
+				}
 			} else if (mob instanceof PSInvasionMob invasionMob && invasionMob.psGetHyperCharge() > 0) {
 				PSInvasionMob.applyHyperEffects(mob);
 			}
