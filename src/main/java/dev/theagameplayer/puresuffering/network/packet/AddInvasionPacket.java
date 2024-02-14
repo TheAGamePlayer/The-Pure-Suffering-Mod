@@ -1,7 +1,5 @@
 package dev.theagameplayer.puresuffering.network.packet;
 
-import java.util.function.Supplier;
-
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.client.invasion.InvasionSkyRenderInfo;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
@@ -10,8 +8,8 @@ import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class AddInvasionPacket {
 	private final InvasionSessionType sessionType;
@@ -62,14 +60,14 @@ public final class AddInvasionPacket {
 	}
 
 	public static final class Handler {
-		public static final boolean handle(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
-			ctxIn.get().enqueueWork(() -> {
+		public static final boolean handle(final AddInvasionPacket msgIn, CustomPayloadEvent.Context ctxIn) {
+			ctxIn.enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 
-		private static final void handlePacket(final AddInvasionPacket msgIn, final Supplier<Context> ctxIn) {
+		private static final void handlePacket(final AddInvasionPacket msgIn, final CustomPayloadEvent.Context ctxIn) {
 			ClientInvasionSession.add(msgIn.sessionType, msgIn.difficulty, msgIn.renderer, msgIn.isPrimary, msgIn.severity, msgIn.mobCap, msgIn.maxSeverity, msgIn.rarity, msgIn.tier, msgIn.component);
 		}
 	}

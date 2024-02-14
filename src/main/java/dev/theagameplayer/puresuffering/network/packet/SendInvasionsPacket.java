@@ -1,7 +1,5 @@
 package dev.theagameplayer.puresuffering.network.packet;
 
-import java.util.function.Supplier;
-
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.registries.PSSoundEvents;
@@ -12,8 +10,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class SendInvasionsPacket {
 	private final boolean isNatural;
@@ -31,14 +29,14 @@ public final class SendInvasionsPacket {
 	}
 
 	public static final class Handler {
-		public static final boolean handle(final SendInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
-			ctxIn.get().enqueueWork(() -> {
+		public static final boolean handle(final SendInvasionsPacket msgIn, final CustomPayloadEvent.Context ctxIn) {
+			ctxIn.enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 
-		private static final void handlePacket(final SendInvasionsPacket msgIn, final Supplier<Context> ctxIn) {
+		private static final void handlePacket(final SendInvasionsPacket msgIn, final CustomPayloadEvent.Context ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			if (PSConfigValues.client.useInvasionSoundEffects && msgIn.isNatural)
 				mc.player.playSound(PSSoundEvents.INFORM_INVASION.get());

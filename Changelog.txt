@@ -1,4 +1,7 @@
 #Minecraft 1.20.x
+Version 1.6.1.0B:
+- Updated to 1.20.2
+
 Version 1.6.0.3R:
 - Fixed a bug where another mod crashing will cause invasion mobs to not load properly, thus redirecting the crash to Pure Suffering.
 
