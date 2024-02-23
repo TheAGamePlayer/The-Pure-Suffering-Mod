@@ -12,12 +12,17 @@ import dev.theagameplayer.puresuffering.network.packet.UpdateGameRulePacket;
 import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.SimpleChannel;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 public final class PSPacketHandler {
-	public static final SimpleChannel CHANNEL = ChannelBuilder.named(PureSufferingMod.namespace("main_network_channel")).simpleChannel();
+	private static final String PROTOCOL_VERSION = "1";
+	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
+			PureSufferingMod.namespace("main_network_channel"), 
+			() -> PROTOCOL_VERSION, 
+			PROTOCOL_VERSION::equals, 
+			PROTOCOL_VERSION::equals);
 	
 	public static final void registerPackets() { //Using message builder instead of register message due to log spam of "Unknown custom packet identifier: puresuffering:main_network_channel"
 		int id = 0;
@@ -34,14 +39,14 @@ public final class PSPacketHandler {
 	}
 	
 	public static final void sendToClient(final Object msgIn, final ServerPlayer playerIn) {
-		CHANNEL.send(msgIn, PacketDistributor.PLAYER.with(playerIn));
+		CHANNEL.send(PacketDistributor.PLAYER.with(() -> playerIn), msgIn);
 	}
 	
 	public static final void sendToClientsIn(final Object msgIn, final ServerLevel levelIn) {
-		CHANNEL.send(msgIn, PacketDistributor.DIMENSION.with(levelIn.dimension()));
+		CHANNEL.send(PacketDistributor.DIMENSION.with(() -> levelIn.dimension()), msgIn);
 	}
 	
 	public static final void sendToAllClients(final Object msgIn) {
-		CHANNEL.send(msgIn, PacketDistributor.ALL.noArg());
+		CHANNEL.send(PacketDistributor.ALL.noArg(), msgIn);
 	}
 }

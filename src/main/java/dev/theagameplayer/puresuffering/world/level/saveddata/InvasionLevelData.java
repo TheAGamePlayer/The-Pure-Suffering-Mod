@@ -15,51 +15,43 @@ public final class InvasionLevelData extends SavedData {
 	private final InvasionManager invasionManager;
 	private long invasionTime;
 	private int xpMult;
-
-	private InvasionLevelData(final ServerLevel levelIn) {
+	
+	public InvasionLevelData(final ServerLevel levelIn) {
 		this.invasionManager = new InvasionManager(levelIn.dimensionType().hasFixedTime());
 		this.setDirty();
 		INVASION_DATA.put(levelIn, this);
 	}
-
-	public static SavedData.Factory<InvasionLevelData> factory(final ServerLevel levelIn) {
-		return new SavedData.Factory<>(() -> {
-			return new InvasionLevelData(levelIn);
-		}, nbt -> {
-			return load(levelIn, nbt);
-		}, null); //TODO: Verify that worlds will not break due to this being set to null
-	}
-
+	
 	public static final String getFileId(final Holder<DimensionType> dimTypeIn) {
 		return dimTypeIn.is(BuiltinDimensionTypes.END) ? "invasions_end" : "invasions";
 	}
-
+	
 	public static final InvasionLevelData get(final ServerLevel levelIn) {
 		return INVASION_DATA.get(levelIn);
 	}
-
+	
 	public final InvasionManager getInvasionManager() {
 		return this.invasionManager;
 	}
-
+	
 	public final long getInvasionTime() {
 		return this.invasionTime;
 	}
-
+	
 	public final void setInvasionTime(final long invasionTimeIn) {
 		this.invasionTime = invasionTimeIn;
 		this.setDirty();
 	}
-
+	
 	public final int getXPMultiplier() {
 		return this.xpMult;
 	}
-
+	
 	public final void setXPMultiplier(final int xpMultIn) {
 		this.xpMult = xpMultIn;
 		this.setDirty();
 	}
-
+	
 	public static final InvasionLevelData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
 		final InvasionLevelData ilData = new InvasionLevelData(levelIn);
 		ilData.getInvasionManager().load(levelIn, nbtIn.getCompound("InvasionManager"));
@@ -67,7 +59,7 @@ public final class InvasionLevelData extends SavedData {
 		ilData.xpMult = nbtIn.getInt("XPMult");
 		return ilData;
 	}
-
+	
 	@Override
 	public CompoundTag save(final CompoundTag nbtIn) {
 		nbtIn.put("InvasionManager", this.invasionManager.save());

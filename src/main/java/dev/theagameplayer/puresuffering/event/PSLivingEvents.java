@@ -32,7 +32,7 @@ import net.minecraftforge.eventbus.api.Event.Result;
 
 public final class PSLivingEvents {
 	public static final void conversionPre(final LivingConversionEvent.Pre eventIn) {
-		if (eventIn.getOutcome().getCategory() != MobCategory.MONSTER || !eventIn.getEntity().getPersistentData().contains(Invasion.INVASION_MOB)) return;
+		if (eventIn.getOutcome() == null || eventIn.getOutcome().getCategory() != MobCategory.MONSTER || !eventIn.getEntity().getPersistentData().contains(Invasion.INVASION_MOB)) return;
 		if (eventIn.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
 			final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
 			if (session == null || !session.stopsConversions() || !session.hasMob(mob)) return;
@@ -42,7 +42,7 @@ public final class PSLivingEvents {
 	}
 
 	public static final void conversionPost(final LivingConversionEvent.Post eventIn) {
-		if (eventIn.getOutcome().getClassification(false) != MobCategory.MONSTER) return;
+		if (eventIn.getOutcome() == null || eventIn.getOutcome().getClassification(false) != MobCategory.MONSTER) return;
 		if (eventIn.getOutcome() instanceof Mob resultMob) {
 			final CompoundTag persistentData = eventIn.getEntity().getPersistentData();
 			final CompoundTag outcomeData = resultMob.getPersistentData();

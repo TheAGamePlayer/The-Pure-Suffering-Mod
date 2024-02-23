@@ -1,12 +1,14 @@
 package dev.theagameplayer.puresuffering.network.packet;
 
+import java.util.function.Supplier;
+
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class InvasionMobParticlesPacket {
 	private final InvasionDifficulty difficulty;
@@ -42,14 +44,14 @@ public final class InvasionMobParticlesPacket {
 	}
 
 	public static final class Handler {
-		public static final boolean handle(final InvasionMobParticlesPacket msgIn, final CustomPayloadEvent.Context ctxIn) {
-			ctxIn.enqueueWork(() -> {
+		public static final boolean handle(final InvasionMobParticlesPacket msgIn, final Supplier<Context> ctxIn) {
+			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 
-		private static final void handlePacket(final InvasionMobParticlesPacket msgIn, final CustomPayloadEvent.Context ctxIn) {
+		private static final void handlePacket(final InvasionMobParticlesPacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
 			for (int l = 0; l < msgIn.difficulty.getParticleCount(); ++l) {
 				final double x = msgIn.x + 0.5D + (mc.level.random.nextDouble() - 0.5D) * 2.0D;

@@ -1,12 +1,14 @@
 package dev.theagameplayer.puresuffering.network.packet;
 
+import java.util.function.Supplier;
+
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class UpdateGameRulePacket {
 	final PSGameRules.PSGameRule<?> gameRule;
@@ -44,15 +46,16 @@ public final class UpdateGameRulePacket {
 	}
 
 	public static final class Handler {
-		public static final boolean handle(final UpdateGameRulePacket msgIn, final CustomPayloadEvent.Context ctxIn) {
-			ctxIn.enqueueWork(() -> {
+		public static final boolean handle(final UpdateGameRulePacket msgIn, final Supplier<Context> ctxIn) {
+			ctxIn.get().enqueueWork(() -> {
 				DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> handlePacket(msgIn, ctxIn));
 			});
 			return true;
 		}
 
-		private static final void handlePacket(final UpdateGameRulePacket msgIn, final CustomPayloadEvent.Context ctxIn) {
+		private static final void handlePacket(final UpdateGameRulePacket msgIn, final Supplier<Context> ctxIn) {
 			final Minecraft mc = Minecraft.getInstance();
+			if (mc.level == null) return;
 			final GameRules.Value<?> value = msgIn.gameRule.getRule(mc.level.getGameRules());
 			if (value instanceof GameRules.BooleanValue booleanValue) {
 				booleanValue.set(msgIn.v1, null);

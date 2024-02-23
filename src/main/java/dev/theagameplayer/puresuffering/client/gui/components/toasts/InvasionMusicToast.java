@@ -11,14 +11,12 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.RecordItem;
 
 public final class InvasionMusicToast implements Toast {
-	private static final ResourceLocation BACKGROUND_SPRITE = new ResourceLocation("toast/system");
 	private static final MutableComponent MUSIC_TEXT = Component.translatable("puresuffering.toast.music");
 	private final ItemStack recordItem;
 	private final MutableComponent name;
@@ -40,7 +38,7 @@ public final class InvasionMusicToast implements Toast {
 	@Override
 	public final Visibility render(final GuiGraphics graphicsIn, final ToastComponent componentIn, final long ticksIn) {
 		final Minecraft mc = componentIn.getMinecraft();
-		graphicsIn.blit(BACKGROUND_SPRITE, 0, 0, 0, 0, this.width(), this.height());
+		graphicsIn.blit(TEXTURE, 0, 0, 0, 0, this.width(), this.height());
 		if (ticksIn < 1500L) {
 			final int i = Mth.floor(Mth.clamp((float)(1500L - ticksIn) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;
 			graphicsIn.drawString(mc.font, MUSIC_TEXT, 30, 11, this.color1 | i, false);
