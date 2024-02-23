@@ -15,11 +15,7 @@ public final class PSServerEvents {
 		server.getAllLevels().forEach(level -> {
 			PSConfig.initLevelConfig(level);
 			PSConfigValues.addLevelValues(level);
-			final InvasionManager invasionManager = level.getDataStorage().computeIfAbsent(data -> {
-				return InvasionLevelData.load(level, data);
-			}, () -> {
-				return new InvasionLevelData(level);
-			}, InvasionLevelData.getFileId(level.dimensionTypeRegistration())).getInvasionManager();
+			final InvasionManager invasionManager = level.getDataStorage().computeIfAbsent(InvasionLevelData.factory(level), InvasionLevelData.getFileId(level.dimensionTypeRegistration())).getInvasionManager();
 			server.addTickable(new Thread(() -> invasionManager.tick(server.isSpawningMonsters(), level), "[" + level.dimension().location() + "] Invasion Ticker"));
 		});
 	}

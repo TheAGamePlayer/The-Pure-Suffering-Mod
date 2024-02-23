@@ -44,7 +44,7 @@ public final class PSClientEvents {
 		entityTypes.forEach(et -> {
 			MobRenderer<Mob, EntityModel<Mob>> renderer = null;
 			try {
-				renderer = eventIn.getRenderer(et);
+				renderer = eventIn.getEntityRenderer(et);
 			} catch (final Exception eIn) {
 				LOGGER.warn("HyperChargeLayer failed to apply to " + ForgeRegistries.ENTITY_TYPES.getKey(et) + ", perhaps renderer is not instance of MobRenderer?");
 			}
@@ -65,7 +65,7 @@ public final class PSClientEvents {
 
 	public static final void debugText(final CustomizeGuiOverlayEvent.DebugText eventIn) {
 		final Minecraft mc = Minecraft.getInstance();
-		if (!mc.options.renderDebug) return;
+		if (!mc.options.hideGui) return;
 		final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 		eventIn.getLeft().add("");
 		eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Invasions: " + (session == null ? 0 : session.size()));

@@ -1,4 +1,10 @@
 #Minecraft 1.20.x
+Version 1.6.1.1B:
+- Issues solved in 1.6.0.4R, but for 1.20.2.
+
+Version 1.6.1.0B:
+- Updated to 1.20.2
+
 Version 1.6.0.4R:
 - Added a fallback to avoid crashing to mobs attempting to convert into a non-existing entity type.
 - Added a check for making sure the client loads before game rules are updated to the client.
