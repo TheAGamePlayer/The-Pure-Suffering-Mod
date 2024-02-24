@@ -10,9 +10,9 @@ import dev.theagameplayer.puresuffering.invasion.InvasionType.SeverityInfo;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.SpawningSystem;
 import dev.theagameplayer.puresuffering.invasion.data.AdditionalEntitySpawnData;
 import dev.theagameplayer.puresuffering.invasion.data.InvasionSpawnerData;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.InvasionMobParticlesPacket;
+import dev.theagameplayer.puresuffering.network.InvasionMobParticlesPacket;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import dev.theagameplayer.puresuffering.registries.other.PSReloadListeners;
 import dev.theagameplayer.puresuffering.util.list.SpawnPosChart;
 import dev.theagameplayer.puresuffering.world.entity.PSInvasionMob;
@@ -30,6 +30,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -39,9 +40,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.neoforged.neoforge.event.EventHooks;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public final class Invasion implements InvasionTypeHolder {
 	public static final int TRANSITION_TIME = 600;
@@ -75,6 +75,7 @@ public final class Invasion implements InvasionTypeHolder {
 		this.index = indexIn;
 	}
 
+	@Override
 	public final InvasionType getType() {
 		return this.invasionType;
 	}
@@ -146,10 +147,10 @@ public final class Invasion implements InvasionTypeHolder {
 				final ChunkPos chunkPos = this.getSpawnChunk(levelIn, player);
 				final BlockPos spawnPos = this.getSpawnPos(levelIn, chunkPos, player, mob.getType(), false, true);
 				if (mob != null && this.canSpawnMob(levelIn, mob.getType(), spawnPos, mob.getPersistentData().contains(ANTI_GRIEF) && mob.getPersistentData().getBoolean(ANTI_GRIEF))) {
-					PSPacketHandler.sendToClientsIn(new InvasionMobParticlesPacket(difficultyIn, mob.position(), false), levelIn);
+					PSPackets.sendToClientsIn(new InvasionMobParticlesPacket(difficultyIn, mob.position(), false), levelIn);
 					mob.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), mob.getYRot(), mob.getXRot());
 					if (!mob.isInWall()) {
-						PSPacketHandler.sendToClientsIn(new InvasionMobParticlesPacket(difficultyIn, mob.position(), true), levelIn);
+						PSPackets.sendToClientsIn(new InvasionMobParticlesPacket(difficultyIn, mob.position(), true), levelIn);
 						mob.getPersistentData().getIntArray(DESPAWN_LOGIC)[3] = 0; //Prevents mobs from speeding around the map needlessly.
 					}
 					info.relocate = false;
@@ -198,7 +199,7 @@ public final class Invasion implements InvasionTypeHolder {
 			//Spawn Mob Group (Same Mob)
 			final InvasionSpawnerData spawners = mobs.get(levelIn.random.nextInt(mobs.size()));
 			final int groupSize = levelIn.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-			this.nextSpawnData.getEntityToSpawn().putString("id", ForgeRegistries.ENTITY_TYPES.getKey(spawners.type).toString());
+			this.nextSpawnData.getEntityToSpawn().putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(spawners.type).toString());
 			final CompoundTag compoundNBT = this.nextSpawnData.getEntityToSpawn();
 			final Optional<EntityType<?>> optional = EntityType.by(compoundNBT);
 			if (!optional.isPresent()) {
@@ -219,7 +220,7 @@ public final class Invasion implements InvasionTypeHolder {
 					}
 					entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), levelIn.random.nextFloat() * 360.0F, 0.0F);
 					if (entity instanceof Mob mob) {
-						if (!ForgeEventFactory.checkSpawnPosition(mob, levelIn, MobSpawnType.EVENT)) continue;
+						if (!EventHooks.checkSpawnPosition(mob, levelIn, MobSpawnType.EVENT)) continue;
 						if (this.nextSpawnData.getEntityToSpawn().size() == 1 && this.nextSpawnData.getEntityToSpawn().contains("id", Tag.TAG_STRING))
 							this.spawnInvasionMob(levelIn, difficultyIn, mob, spawners.ignoreSpawnRules, spawners.forceDespawn || PSGameRules.MOBS_DIE_AT_END_OF_INVASIONS.get(levelIn));
 					}
@@ -247,7 +248,7 @@ public final class Invasion implements InvasionTypeHolder {
 	private final void spawnClusterEntity(final BlockPos posIn, final ServerLevel levelIn, final EntityType<?> entityTypeIn) {
 		if (!Level.isInSpawnableBounds(posIn)) return;
 		final CompoundTag compoundTag = new CompoundTag();
-		compoundTag.putString("id", ForgeRegistries.ENTITY_TYPES.getKey(entityTypeIn).toString());
+		compoundTag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(entityTypeIn).toString());
 		final Entity entity = EntityType.loadEntityRecursive(compoundTag, levelIn, e -> {
 			e.moveTo(posIn.getX(), posIn.getY(), posIn.getZ(), e.getYRot(), e.getXRot());
 			return e;
@@ -255,7 +256,7 @@ public final class Invasion implements InvasionTypeHolder {
 		if (entity == null) return;
 		entity.getPersistentData().putBoolean(ANTI_GRIEF, false);
 		if (entity instanceof Mob mob)
-			ForgeEventFactory.onFinalizeSpawn(mob, levelIn, levelIn.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.EVENT, null, null);
+			EventHooks.onFinalizeSpawn(mob, levelIn, levelIn.getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.EVENT, null, null);
 		levelIn.tryAddFreshEntityWithPassengers(entity);
 	}
 
@@ -268,9 +269,9 @@ public final class Invasion implements InvasionTypeHolder {
 		if (forceDespawnIn) persistentData.getIntArray(DESPAWN_LOGIC)[5] = 100 + levelIn.random.nextInt(101);
 		if (hyperCharged && mobIn instanceof PSInvasionMob invasionMob)
 			invasionMob.psSetHyperCharge(difficultyIn.getHyperCharge(levelIn, this.invasionType.getTier(), this.isNatural));
-		ForgeEventFactory.onFinalizeSpawn(mobIn, levelIn, levelIn.getCurrentDifficultyAt(mobIn.blockPosition()), MobSpawnType.EVENT, null, null);
+		EventHooks.onFinalizeSpawn(mobIn, levelIn, levelIn.getCurrentDifficultyAt(mobIn.blockPosition()), MobSpawnType.EVENT, null, null);
 		this.invasionMobs.add(new MobInfo(mobIn.getUUID(), false));
-		PSPacketHandler.sendToClientsIn(new InvasionMobParticlesPacket(difficultyIn, mobIn.position()), levelIn);
+		PSPackets.sendToClientsIn(new InvasionMobParticlesPacket(difficultyIn, mobIn.position()), levelIn);
 		mobIn.spawnAnim();
 	}
 
@@ -317,8 +318,8 @@ public final class Invasion implements InvasionTypeHolder {
 	private final ArrayList<InvasionSpawnerData> getMixedSpawnList(final ServerLevel levelIn) {
 		final Optional<Holder.Reference<LevelStem>> optional = levelIn.registryAccess().registryOrThrow(Registries.LEVEL_STEM).getRandom(levelIn.random);
 		if (!optional.isPresent() || optional.isEmpty()) return new ArrayList<>();
-		final ArrayList<Holder<Biome>> biomes = new ArrayList<>(optional.get().get().generator().getBiomeSource().possibleBiomes());
-		final ArrayList<InvasionSpawnerData> spawners = biomes.size() > 0 ? InvasionSpawnerData.convertSpawners(biomes.get(levelIn.random.nextInt(biomes.size())).get().getMobSettings().getMobs(MobCategory.MONSTER).unwrap()) : new ArrayList<>();
+		final ArrayList<Holder<Biome>> biomes = new ArrayList<>(optional.get().value().generator().getBiomeSource().possibleBiomes());
+		final ArrayList<InvasionSpawnerData> spawners = biomes.size() > 0 ? InvasionSpawnerData.convertSpawners(biomes.get(levelIn.random.nextInt(biomes.size())).value().getMobSettings().getMobs(MobCategory.MONSTER).unwrap()) : new ArrayList<>();
 		spawners.removeIf(spawner -> {
 			final ResourceLocation name = spawner.type.getDefaultLootTable();
 			return PSConfigValues.common.modBiomeBoostedBlacklist.contains(name.getNamespace()) || PSConfigValues.common.mobBiomeBoostedBlacklist.contains(name.toString());

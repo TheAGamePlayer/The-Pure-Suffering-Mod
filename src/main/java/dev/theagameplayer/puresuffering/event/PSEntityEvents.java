@@ -11,9 +11,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TraceableEntity;
 import net.minecraft.world.entity.monster.Vex;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityMobGriefingEvent;
-import net.minecraftforge.eventbus.api.Event.Result;
+import net.neoforged.bus.api.Event.Result;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityMobGriefingEvent;
 
 public final class PSEntityEvents {
 	public static final void joinLevel(final EntityJoinLevelEvent eventIn) {

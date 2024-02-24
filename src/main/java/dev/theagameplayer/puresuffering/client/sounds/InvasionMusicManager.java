@@ -28,7 +28,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
 
 public final class InvasionMusicManager {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;

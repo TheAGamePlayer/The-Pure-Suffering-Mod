@@ -27,7 +27,7 @@ public final class InvasionLevelData extends SavedData {
 			return new InvasionLevelData(levelIn);
 		}, nbt -> {
 			return load(levelIn, nbt);
-		}, null); //TODO: Verify that worlds will not break due to this being set to null
+		});
 	}
 
 	public static final String getFileId(final Holder<DimensionType> dimTypeIn) {

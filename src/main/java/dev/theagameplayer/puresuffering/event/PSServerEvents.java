@@ -5,8 +5,8 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 public final class PSServerEvents {
 	public static final void serverStarting(final ServerStartingEvent eventIn) {

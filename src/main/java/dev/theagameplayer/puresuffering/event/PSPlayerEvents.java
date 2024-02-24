@@ -4,19 +4,19 @@ import java.util.Optional;
 
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionSession;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.SendInvasionsPacket;
-import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
+import dev.theagameplayer.puresuffering.network.SendInvasionsPacket;
+import dev.theagameplayer.puresuffering.network.UpdateXPMultPacket;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerSleepInBedEvent;
 
 public final class PSPlayerEvents {
 	public static final void playerLoggedIn(final PlayerEvent.PlayerLoggedInEvent eventIn) {
@@ -45,10 +45,10 @@ public final class PSPlayerEvents {
 		final InvasionSession session = ilData.getInvasionManager().getActiveSession(playerIn.serverLevel());
 		if (session == null) return;
 		session.updateClient(playerIn);
-		PSPacketHandler.sendToClient(new UpdateXPMultPacket(Math.log1p(ilData.getXPMultiplier())/Math.E), playerIn);
+		PSPackets.sendToClient(new UpdateXPMultPacket(Math.log1p(ilData.getXPMultiplier())/Math.E), playerIn);
 		if (blessingDurationIn > 0)
 			playerIn.addEffect(new MobEffectInstance(PSMobEffects.BLESSING.get(), blessingDurationIn, 0));
-		if (informPlayerIn) PSPacketHandler.sendToClient(new SendInvasionsPacket(true), playerIn);
+		if (informPlayerIn) PSPackets.sendToClient(new SendInvasionsPacket(true), playerIn);
 	}
 
 	public static final void playerSleepInBed(final PlayerSleepInBedEvent eventIn) {

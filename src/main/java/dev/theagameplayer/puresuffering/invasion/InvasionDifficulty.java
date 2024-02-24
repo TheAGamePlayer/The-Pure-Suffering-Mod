@@ -1,5 +1,7 @@
 package dev.theagameplayer.puresuffering.invasion;
 
+import java.util.function.Supplier;
+
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.registries.PSSoundEvents;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
@@ -14,7 +16,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.RegistryObject;
 
 public enum InvasionDifficulty {
 	DEFAULT("Default", ChatFormatting.RED.getColor(), ChatFormatting.DARK_RED.getColor(), PSSoundEvents.DEFAULT_INVASION_START, ParticleTypes.SMOKE, ParticleTypes.FLAME, 20, 4) {
@@ -89,12 +90,12 @@ public enum InvasionDifficulty {
 	private final String name;
 	private final MutableComponent translation;
 	private final int color1, color2;
-	private final RegistryObject<SoundEvent> startSound;
+	private final Supplier<SoundEvent> startSound;
 	private final SimpleParticleType p1, p2;
 	private final int particleCount;
 	private final int ringDelay;
 
-	private InvasionDifficulty(final String nameIn, final int color1n, final int color2n, final RegistryObject<SoundEvent> startSoundIn, final SimpleParticleType p1n, final SimpleParticleType p2n, final int particleCountIn, final int ringDelayIn) {
+	private InvasionDifficulty(final String nameIn, final int color1n, final int color2n, final Supplier<SoundEvent> startSoundIn, final SimpleParticleType p1n, final SimpleParticleType p2n, final int particleCountIn, final int ringDelayIn) {
 		this.name = nameIn;
 		this.translation = Component.translatable("puresuffering.invasionDifficulty." + this.toString());
 		this.color1 = color1n;

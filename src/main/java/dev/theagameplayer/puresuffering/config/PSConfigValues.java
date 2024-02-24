@@ -5,7 +5,7 @@ import java.util.List;
 
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public abstract class PSConfigValues { //Exists so that the config file doesn't have to be read every time a value is needed.
 	public static CommonValues common;

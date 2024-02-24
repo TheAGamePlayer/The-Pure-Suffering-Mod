@@ -1,4 +1,8 @@
 #Minecraft 1.20.x
+Version 1.6.2.0R:
+- Updated to 1.20.4
+- Moved to NeoForge.
+
 Version 1.6.1.1B:
 - Issues solved in 1.6.0.4R, but for 1.20.2.
 

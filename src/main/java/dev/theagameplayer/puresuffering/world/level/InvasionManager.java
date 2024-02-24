@@ -13,10 +13,10 @@ import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
 import dev.theagameplayer.puresuffering.invasion.InvasionSession;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.InvasionPriority;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.InvasionStartPacket;
-import dev.theagameplayer.puresuffering.network.packet.SendInvasionAmbiencePacket;
+import dev.theagameplayer.puresuffering.network.InvasionStartPacket;
+import dev.theagameplayer.puresuffering.network.SendInvasionAmbiencePacket;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import dev.theagameplayer.puresuffering.util.list.InvasionChart;
 import dev.theagameplayer.puresuffering.util.list.QueuedInvasionList;
 import net.minecraft.nbt.CompoundTag;
@@ -110,7 +110,7 @@ public final class InvasionManager {
 		}
 		this.ambienceTime = this.intervals[this.inactiveSession][0] == 0 ? 2999L + levelIn.random.nextInt(6000) : -1;
 		if (isCanceled || this.sessions[index] != null)
-			PSPacketHandler.sendToClientsIn(new InvasionStartPacket(), levelIn);
+			PSPackets.sendToClientsIn(new InvasionStartPacket(), levelIn);
 	}
 
 	private final InvasionDifficulty calcInvasionDifficulty(final int indexIn, final long daysIn, final ServerLevel levelIn, final InvasionSessionType sessionTypeIn) {
@@ -175,7 +175,7 @@ public final class InvasionManager {
 	public final void tick(final boolean spawningMonstersIn, final ServerLevel levelIn) {
 		if (!spawningMonstersIn) return;
 		if (PSGameRules.ENABLE_INVASION_AMBIENCE.get(levelIn) && this.ambienceTime > -1 && levelIn.getDayTime() % 12000L > this.ambienceTime) {
-			PSPacketHandler.sendToClientsIn(new SendInvasionAmbiencePacket(), levelIn);
+			PSPackets.sendToClientsIn(new SendInvasionAmbiencePacket(), levelIn);
 			this.ambienceTime = -1;
 		}
 		if (this.sessions[this.activeSession] == null) return;

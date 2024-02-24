@@ -15,7 +15,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -23,13 +25,12 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.level.material.FogType;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.event.ViewportEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.event.ViewportEvent;
 
 public final class PSClientEvents {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
@@ -37,19 +38,17 @@ public final class PSClientEvents {
 	@SuppressWarnings("unchecked")
 	public static final void addLayers(final EntityRenderersEvent.AddLayers eventIn) { //TODO: Redo for mobs not using a mob renderer
 		final List<EntityType<? extends Mob>> entityTypes = List.copyOf(
-				ForgeRegistries.ENTITY_TYPES.getValues().stream()
-				.filter(et -> DefaultAttributes.hasSupplier(et) && et.getCategory() == MobCategory.MONSTER)
-				.map(et -> (EntityType<? extends Mob>)et)
+				BuiltInRegistries.ENTITY_TYPE.asLookup().listElements()
+				.filter(et -> DefaultAttributes.hasSupplier(et.value()) && et.value().getCategory() == MobCategory.MONSTER)
+				.map(et -> (EntityType<? extends Mob>)et.value())
 				.collect(Collectors.toList()));
 		entityTypes.forEach(et -> {
-			MobRenderer<Mob, EntityModel<Mob>> renderer = null;
-			try {
-				renderer = eventIn.getEntityRenderer(et);
-			} catch (final Exception eIn) {
-				LOGGER.warn("HyperChargeLayer failed to apply to " + ForgeRegistries.ENTITY_TYPES.getKey(et) + ", perhaps renderer is not instance of MobRenderer?");
+			final EntityRenderer<?> renderer = eventIn.getRenderer(et);
+			if (renderer instanceof MobRenderer mobRenderer) {
+				mobRenderer.addLayer(new HyperChargeLayer<Mob, EntityModel<Mob>>(mobRenderer));
+				return;
 			}
-			if (renderer != null)
-				renderer.addLayer(new HyperChargeLayer<Mob, EntityModel<Mob>>(renderer));
+			LOGGER.warn("HyperChargeLayer failed to apply to " + BuiltInRegistries.ENTITY_TYPE.getKey(et) + ", perhaps renderer is not instance of MobRenderer?");
 		});
 	}
 
@@ -65,7 +64,6 @@ public final class PSClientEvents {
 
 	public static final void debugText(final CustomizeGuiOverlayEvent.DebugText eventIn) {
 		final Minecraft mc = Minecraft.getInstance();
-		if (!mc.options.hideGui) return;
 		final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 		eventIn.getLeft().add("");
 		eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Invasions: " + (session == null ? 0 : session.size()));

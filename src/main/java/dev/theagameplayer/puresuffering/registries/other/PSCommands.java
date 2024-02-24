@@ -9,7 +9,7 @@ import dev.theagameplayer.puresuffering.server.commands.QueryInvasionsCommand;
 import dev.theagameplayer.puresuffering.server.commands.RemoveInvasionsCommand;
 import dev.theagameplayer.puresuffering.server.commands.SyncCommand;
 import net.minecraft.commands.Commands;
-import net.minecraftforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 public final class PSCommands {
 	public static final void registerCommands(final RegisterCommandsEvent eventIn) {

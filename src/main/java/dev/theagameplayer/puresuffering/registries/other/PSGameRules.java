@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.UpdateGameRulePacket;
+import dev.theagameplayer.puresuffering.network.UpdateGameRulePacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameRules;
@@ -101,9 +100,9 @@ public final class PSGameRules {
 
 		private BooleanRule(final String nameIn, final boolean updatesClientIn, final boolean valueIn) {
 			super(nameIn, updatesClientIn ? GameRules.BooleanValue.create(valueIn, (server, value) -> {
-				PSPacketHandler.sendToAllClients(new UpdateGameRulePacket(fromString(nameIn), value.get()));
+				PSPackets.sendToAllClients(new UpdateGameRulePacket(fromString(nameIn), value.get()));
 			}) : GameRules.BooleanValue.create(valueIn), (server, gameRule) -> gameRule.getRule(server.getGameRules()).set(valueIn, server), (player, gameRule) -> {
-				PSPacketHandler.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
+				PSPackets.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
 			}, updatesClientIn);
 			this.defaultValue = valueIn;
 		}
@@ -118,9 +117,9 @@ public final class PSGameRules {
 
 		private IntegerRule(final String nameIn, final boolean updatesClientIn, final int valueIn) {
 			super(nameIn, updatesClientIn ? GameRules.IntegerValue.create(valueIn, (server, value) -> {
-				PSPacketHandler.sendToAllClients(new UpdateGameRulePacket(fromString(nameIn), value.get()));
+				PSPackets.sendToAllClients(new UpdateGameRulePacket(fromString(nameIn), value.get()));
 			}) : GameRules.IntegerValue.create(valueIn), (server, gameRule) -> gameRule.getRule(server.getGameRules()).set(valueIn, server), (player, gameRule) -> {
-				PSPacketHandler.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
+				PSPackets.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
 			}, updatesClientIn);
 			this.defaultValue = valueIn;
 		}

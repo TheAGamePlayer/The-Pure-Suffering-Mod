@@ -11,9 +11,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.client.event.sound.PlaySoundEvent;
-import net.minecraftforge.client.event.sound.PlaySoundSourceEvent;
-import net.minecraftforge.client.event.sound.PlayStreamingSourceEvent;
+import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
+import net.neoforged.neoforge.client.event.sound.PlaySoundSourceEvent;
+import net.neoforged.neoforge.client.event.sound.PlayStreamingSourceEvent;
 
 public final class PSClientSoundEvents {
 	public static final void playSound(final PlaySoundEvent eventIn) {
@@ -38,8 +38,8 @@ public final class PSClientSoundEvents {
 
 	public static final void playStreamingSource(final PlayStreamingSourceEvent eventIn) {
 		final String name = eventIn.getName();
-		final boolean flag1 = PSSoundEvents.INFORM_INVASION.getId().getPath().equals(name) || PSSoundEvents.INVASION_AMBIENCE.getId().getPath().equals(name);
-		final boolean flag2 = PSSoundEvents.CANCEL_INVASION.getId().getPath().equals(name) || InvasionDifficulty.DEFAULT.getStartSound().getLocation().getPath().equals(name) || InvasionDifficulty.HYPER.getStartSound().getLocation().getPath().equals(name) || InvasionDifficulty.NIGHTMARE.getStartSound().getLocation().getPath().equals(name);
+		final boolean flag1 = PSSoundEvents.INFORM_INVASION.get().getLocation().getPath().equals(name) || PSSoundEvents.INVASION_AMBIENCE.get().getLocation().getPath().equals(name);
+		final boolean flag2 = PSSoundEvents.CANCEL_INVASION.get().getLocation().getPath().equals(name) || InvasionDifficulty.DEFAULT.getStartSound().getLocation().getPath().equals(name) || InvasionDifficulty.HYPER.getStartSound().getLocation().getPath().equals(name) || InvasionDifficulty.NIGHTMARE.getStartSound().getLocation().getPath().equals(name);
 		if (flag1 || flag2) InvasionSoundHandler.playSound(eventIn.getChannel().source, flag1 ? 6.0F : 15.0F);
 		if (!eventIn.getSound().getLocation().getNamespace().equals(PureSufferingMod.MUSICID)) return;
 		if (eventIn.getSound() instanceof PSMusicSoundInstance psSound && InvasionMusicManager.isMusic(psSound)) InvasionMusicManager.setChannel(eventIn.getChannel());

@@ -16,7 +16,6 @@ import dev.theagameplayer.puresuffering.event.PSLevelEvents;
 import dev.theagameplayer.puresuffering.event.PSLivingEvents;
 import dev.theagameplayer.puresuffering.event.PSPlayerEvents;
 import dev.theagameplayer.puresuffering.event.PSServerEvents;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
 import dev.theagameplayer.puresuffering.registries.PSActivities;
 import dev.theagameplayer.puresuffering.registries.PSCommandArgumentTypes;
 import dev.theagameplayer.puresuffering.registries.PSMobEffects;
@@ -24,37 +23,36 @@ import dev.theagameplayer.puresuffering.registries.PSSoundEvents;
 import dev.theagameplayer.puresuffering.registries.other.PSCommands;
 import dev.theagameplayer.puresuffering.registries.other.PSEntityPlacements;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import dev.theagameplayer.puresuffering.registries.other.PSReloadListeners;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 //TheAGamePlayer was here :>
-@Mod(value = PureSufferingMod.MODID)
+@Mod(PureSufferingMod.MODID)
 public final class PureSufferingMod {
 	public static final String MODID = "puresuffering";
 	public static final String MUSICID = MODID + "music";
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-	public PureSufferingMod() {
-		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-		this.registerAll(modEventBus);
-		this.createRegistries(modEventBus);
+	public PureSufferingMod(final IEventBus modEventBusIn) {
+		this.registerAll(modEventBusIn);
+		this.createRegistries(modEventBusIn);
 		this.createConfig();
-		modEventBus.addListener(this::commonSetup);
-		modEventBus.addListener(this::clientSetup);
-		modEventBus.addListener(this::gatherData);
+		modEventBusIn.addListener(this::commonSetup);
+		modEventBusIn.addListener(this::clientSetup);
+		modEventBusIn.addListener(this::gatherData);
 		if (FMLEnvironment.dist.isClient())
-			attachClientEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
-		attachCommonEventListeners(modEventBus, MinecraftForge.EVENT_BUS);
+			attachClientEventListeners(modEventBusIn, NeoForge.EVENT_BUS);
+		attachCommonEventListeners(modEventBusIn, NeoForge.EVENT_BUS);
 	}
 	
 	public static final ResourceLocation namespace(final String nameIn) {
@@ -71,10 +69,10 @@ public final class PureSufferingMod {
 	}
 	
 	private final void registerAll(final IEventBus busIn) {
-		PSActivities.ACTIVITIES.register(busIn);
-		PSCommandArgumentTypes.COMMAND_ARGUMENT_TYPES.register(busIn);
-		PSMobEffects.MOB_EFFECTS.register(busIn);
-		PSSoundEvents.SOUND_EVENTS.register(busIn);
+		PSActivities.ACTIVITY.register(busIn);
+		PSCommandArgumentTypes.COMMAND_ARGUMENT_TYPE.register(busIn);
+		PSMobEffects.MOB_EFFECT.register(busIn);
+		PSSoundEvents.SOUND_EVENT.register(busIn);
 		LOGGER.info("Registered all event buses.");
 	}
 	
@@ -95,6 +93,7 @@ public final class PureSufferingMod {
 
 	public static final void attachCommonEventListeners(final IEventBus modBusIn, final IEventBus forgeBusIn) {
 		//Registries
+		modBusIn.addListener(PSPackets::registerPackets);
 		modBusIn.addListener(PSEntityPlacements::registerSpawnPlacements);
 		forgeBusIn.addListener(PSCommands::registerCommands);
 		forgeBusIn.addListener(PSReloadListeners::addReloadListeners);
@@ -123,7 +122,6 @@ public final class PureSufferingMod {
 	}
 	
 	private final void commonSetup(final FMLCommonSetupEvent eventIn) {
-		PSPacketHandler.registerPackets();
 		PSGameRules.registerGameRules();
 		LOGGER.info("Finished common setup.");
 	}

@@ -7,7 +7,7 @@ import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.event.TickEvent;
+import net.neoforged.neoforge.event.TickEvent;
 
 public final class PSBaseEvents {
 	public static final void levelTick(final TickEvent.LevelTickEvent eventIn) {

@@ -2,8 +2,8 @@ package dev.theagameplayer.puresuffering.server.commands;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.SendInvasionsPacket;
+import dev.theagameplayer.puresuffering.network.SendInvasionsPacket;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -12,7 +12,7 @@ public final class QueryInvasionsCommand {
 		return Commands.literal("query").requires(css -> {
 			return css.hasPermission(0) && css.isPlayer();
 		}).executes(ctx -> {
-			PSPacketHandler.sendToClient(new SendInvasionsPacket(false), ctx.getSource().getPlayer());
+			PSPackets.sendToClient(new SendInvasionsPacket(false), ctx.getSource().getPlayer());
 			return 0;
 		});
 	}

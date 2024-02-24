@@ -5,10 +5,10 @@ import java.util.List;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionSession;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.UpdateXPMultPacket;
+import dev.theagameplayer.puresuffering.network.UpdateXPMultPacket;
 import dev.theagameplayer.puresuffering.registries.other.PSEntityPredicates;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import dev.theagameplayer.puresuffering.world.entity.PSInvasionMob;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.core.BlockPos;
@@ -24,11 +24,11 @@ import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingConversionEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.MobSpawnEvent;
-import net.minecraftforge.eventbus.api.Event.Result;
+import net.neoforged.bus.api.Event.Result;
+import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
+import net.neoforged.neoforge.event.entity.living.MobSpawnEvent;
 
 public final class PSLivingEvents {
 	public static final void conversionPre(final LivingConversionEvent.Pre eventIn) {
@@ -134,7 +134,7 @@ public final class PSLivingEvents {
 				ilData.setXPMultiplier(ilData.getXPMultiplier() + 1);
 				final double log = Math.log1p(ilData.getXPMultiplier())/Math.E;
 				eventIn.setDroppedExperience((int)(eventIn.getOriginalExperience() * log) + eventIn.getOriginalExperience()/3 * invasionMob.psGetHyperCharge());
-				PSPacketHandler.sendToClientsIn(new UpdateXPMultPacket(log), level);
+				PSPackets.sendToClientsIn(new UpdateXPMultPacket(log), level);
 			}
 		}
 	}

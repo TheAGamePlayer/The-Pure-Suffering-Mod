@@ -18,9 +18,9 @@ import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
 public final class PSConfig {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
@@ -32,24 +32,24 @@ public final class PSConfig {
 	public static final class CommonConfig {
 		private static final String NOTE_HN_PERFORMANCE = "NOTE: May affect performance at higher numbers!";
 		private static final String NOTE_REDUCE_FOR_PERFORMANCE = "NOTE: Reduce for increased performance!";
-		private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+		private final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 		//GameRules - Boolean
-		public final ForgeConfigSpec.BooleanValue overrideGameRules;
-		public final ForgeConfigSpec.BooleanValue enableHyperInvasions;
-		public final ForgeConfigSpec.BooleanValue enableNightmareInvasions;
-		public final ForgeConfigSpec.BooleanValue invasionAntiGrief;
-		public final ForgeConfigSpec.BooleanValue consistentInvasions;
-		public final ForgeConfigSpec.BooleanValue tieredInvasions;
-		public final ForgeConfigSpec.BooleanValue hyperAggression;
-		public final ForgeConfigSpec.BooleanValue hyperCharge;
-		public final ForgeConfigSpec.BooleanValue forceInvasionSleeplessness;
-		public final ForgeConfigSpec.BooleanValue useXPMultiplier;
-		public final ForgeConfigSpec.BooleanValue mobsDieAtEndOfInvasions;
-		public final ForgeConfigSpec.BooleanValue weakenedInvasionVexes;
-		public final ForgeConfigSpec.BooleanValue enableInvasionAmbience;
+		public final ModConfigSpec.BooleanValue overrideGameRules;
+		public final ModConfigSpec.BooleanValue enableHyperInvasions;
+		public final ModConfigSpec.BooleanValue enableNightmareInvasions;
+		public final ModConfigSpec.BooleanValue invasionAntiGrief;
+		public final ModConfigSpec.BooleanValue consistentInvasions;
+		public final ModConfigSpec.BooleanValue tieredInvasions;
+		public final ModConfigSpec.BooleanValue hyperAggression;
+		public final ModConfigSpec.BooleanValue hyperCharge;
+		public final ModConfigSpec.BooleanValue forceInvasionSleeplessness;
+		public final ModConfigSpec.BooleanValue useXPMultiplier;
+		public final ModConfigSpec.BooleanValue mobsDieAtEndOfInvasions;
+		public final ModConfigSpec.BooleanValue weakenedInvasionVexes;
+		public final ModConfigSpec.BooleanValue enableInvasionAmbience;
 		//GameRules - Integer
-		public final ForgeConfigSpec.IntValue primaryInvasionMobCap;
-		public final ForgeConfigSpec.IntValue secondaryInvasionMobCap;
+		public final ModConfigSpec.IntValue primaryInvasionMobCap;
+		public final ModConfigSpec.IntValue secondaryInvasionMobCap;
 		//Invasions
 		public final ConfigValue<List<? extends String>> invasionBlacklist;
 		public final ConfigValue<List<? extends String>> primaryWhitelist;
@@ -60,10 +60,10 @@ public final class PSConfig {
 		public final ConfigValue<List<? extends String>> hyperChargeBlacklist;
 		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
 		public final ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
-		public final ForgeConfigSpec.DoubleValue naturalSpawnChance;
-		public final ForgeConfigSpec.DoubleValue hyperChargeChance;
-		public final ForgeConfigSpec.IntValue blessingEffectRespawnDuration;
-		public final ForgeConfigSpec.IntValue blessingEffectDimensionChangeDuration;
+		public final ModConfigSpec.DoubleValue naturalSpawnChance;
+		public final ModConfigSpec.DoubleValue hyperChargeChance;
+		public final ModConfigSpec.IntValue blessingEffectRespawnDuration;
+		public final ModConfigSpec.IntValue blessingEffectDimensionChangeDuration;
 
 		private CommonConfig() {
 			this.builder.push("GameRules");
@@ -238,19 +238,19 @@ public final class PSConfig {
 	public static final class ClientConfig {
 		private static final String NOTE_INCOMPATIBLE_SHADERS = "NOTE: Set false with incompatible shaders!";
 		private static final String NOTE_DISABLE_SKY_EFFECTS = "NOTE: Set to 'enableSkyEffects' to false to disable.";
-		private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+		private final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
-		public final ForgeConfigSpec.BooleanValue useSkyBoxRenderer;
-		public final ForgeConfigSpec.BooleanValue canInvasionsChangeBrightness;
-		public final ForgeConfigSpec.BooleanValue enableInvasionStartEffects;
-		public final ForgeConfigSpec.BooleanValue enableSkyFlickering;
-		public final ForgeConfigSpec.BooleanValue enableSkyEffects;
-		public final ForgeConfigSpec.BooleanValue useFastEffects;
-		public final ForgeConfigSpec.IntValue minVortexParticleLifespan;
-		public final ForgeConfigSpec.IntValue maxVortexParticleLifespan;
-		public final ForgeConfigSpec.IntValue vortexParticleDelay;
+		public final ModConfigSpec.BooleanValue useSkyBoxRenderer;
+		public final ModConfigSpec.BooleanValue canInvasionsChangeBrightness;
+		public final ModConfigSpec.BooleanValue enableInvasionStartEffects;
+		public final ModConfigSpec.BooleanValue enableSkyFlickering;
+		public final ModConfigSpec.BooleanValue enableSkyEffects;
+		public final ModConfigSpec.BooleanValue useFastEffects;
+		public final ModConfigSpec.IntValue minVortexParticleLifespan;
+		public final ModConfigSpec.IntValue maxVortexParticleLifespan;
+		public final ModConfigSpec.IntValue vortexParticleDelay;
 
-		public final ForgeConfigSpec.BooleanValue useInvasionSoundEffects;
+		public final ModConfigSpec.BooleanValue useInvasionSoundEffects;
 
 		private ClientConfig() {
 			this.builder.push("Rendering");
@@ -305,14 +305,14 @@ public final class PSConfig {
 		private static final int[][] OVERWORLD_RARITY = new int[][] {{21, 3}, {12, 5}, {50, 30}};
 		private static final int[][] NETHER_RARITY = new int[][] {{8}, {12, 5}, {40}};
 		private static final int[][] END_RARITY = new int[][] {{8}, {10, 4}, {40}};
-		private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+		private final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
-		public final ForgeConfigSpec.IntValue[] invasionSessionTypeRarity;
-		public final ForgeConfigSpec.IntValue[] invasionDifficultyRarity;
-		public final ForgeConfigSpec.BooleanValue[] cancelableInvasions;
-		public final ForgeConfigSpec.IntValue[] cancelInvasionRarity;
-		public final ForgeConfigSpec.IntValue[] maxInvasions;
-		public final ForgeConfigSpec.IntValue[] tierIncreaseDelay;
+		public final ModConfigSpec.IntValue[] invasionSessionTypeRarity;
+		public final ModConfigSpec.IntValue[] invasionDifficultyRarity;
+		public final ModConfigSpec.BooleanValue[] cancelableInvasions;
+		public final ModConfigSpec.IntValue[] cancelInvasionRarity;
+		public final ModConfigSpec.IntValue[] maxInvasions;
+		public final ModConfigSpec.IntValue[] tierIncreaseDelay;
 		
 		private LevelConfig(final ServerLevel levelIn) {
 			final boolean hasFixedTime = levelIn.dimensionType().hasFixedTime();
@@ -326,12 +326,12 @@ public final class PSConfig {
 			}
 			final int sessionTypeLength = hasFixedTime ? 1 : 2;
 			final int difficultyLength = InvasionDifficulty.values().length - 1;
-			this.invasionSessionTypeRarity = new ForgeConfigSpec.IntValue[sessionTypeLength];
-			this.invasionDifficultyRarity = new ForgeConfigSpec.IntValue[difficultyLength];
-			this.cancelableInvasions = new ForgeConfigSpec.BooleanValue[sessionTypeLength];
-			this.cancelInvasionRarity = new ForgeConfigSpec.IntValue[sessionTypeLength];
-			this.maxInvasions = new ForgeConfigSpec.IntValue[sessionTypeLength];
-			this.tierIncreaseDelay = new ForgeConfigSpec.IntValue[sessionTypeLength];
+			this.invasionSessionTypeRarity = new ModConfigSpec.IntValue[sessionTypeLength];
+			this.invasionDifficultyRarity = new ModConfigSpec.IntValue[difficultyLength];
+			this.cancelableInvasions = new ModConfigSpec.BooleanValue[sessionTypeLength];
+			this.cancelInvasionRarity = new ModConfigSpec.IntValue[sessionTypeLength];
+			this.maxInvasions = new ModConfigSpec.IntValue[sessionTypeLength];
+			this.tierIncreaseDelay = new ModConfigSpec.IntValue[sessionTypeLength];
 			for (int st = 0; st < sessionTypeLength; st++) {
 				final InvasionSessionType sessionType = hasFixedTime ? InvasionSessionType.FIXED : InvasionSessionType.values()[st];
 				this.invasionSessionTypeRarity[st] = this.builder
@@ -402,7 +402,7 @@ public final class PSConfig {
 		loadConfig(config.builder.build(), psLevelConfigPath.resolve(levelFileName + "-level.toml"));
 	}
 
-	private static final void loadConfig(final ForgeConfigSpec specIn, final Path pathIn) {
+	private static final void loadConfig(final ModConfigSpec specIn, final Path pathIn) {
 		final CommentedFileConfig configData = CommentedFileConfig.builder(pathIn)
 				.sync()
 				.autosave()

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import dev.theagameplayer.puresuffering.invasion.InvasionType.WeatherType;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.AddInvasionPacket;
-import dev.theagameplayer.puresuffering.network.packet.ClearInvasionsPacket;
-import dev.theagameplayer.puresuffering.network.packet.RemoveInvasionPacket;
+import dev.theagameplayer.puresuffering.network.AddInvasionPacket;
+import dev.theagameplayer.puresuffering.network.ClearInvasionsPacket;
+import dev.theagameplayer.puresuffering.network.RemoveInvasionPacket;
+import dev.theagameplayer.puresuffering.registries.other.PSPackets;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -166,7 +166,7 @@ public final class InvasionSession implements Iterable<Invasion> {
 	public final void add(final ServerLevel levelIn, final Invasion invasionIn) {
 		this.invasions.add(invasionIn);
 		this.update();
-		PSPacketHandler.sendToClientsIn(new AddInvasionPacket(this.sessionType, this.difficulty, invasionIn), levelIn);
+		PSPackets.sendToClientsIn(new AddInvasionPacket(this.sessionType, this.difficulty, invasionIn), levelIn);
 	}
 
 	public final void remove(final ServerLevel levelIn, final Invasion invasionIn) {
@@ -176,19 +176,19 @@ public final class InvasionSession implements Iterable<Invasion> {
 		}
 		this.invasions.remove(invasionIn);
 		this.update();
-		PSPacketHandler.sendToClientsIn(new RemoveInvasionPacket(invasionIn.getSeverityInfo().getSkyRenderInfo()), levelIn);
+		PSPackets.sendToClientsIn(new RemoveInvasionPacket(invasionIn.getSeverityInfo().getSkyRenderInfo()), levelIn);
 	}
 
 	public final void clear(final ServerLevel levelIn) {
 		this.invasions.clear();
-		PSPacketHandler.sendToClientsIn(new ClearInvasionsPacket(), levelIn);
+		PSPackets.sendToClientsIn(new ClearInvasionsPacket(), levelIn);
 	}
 
 	public final void updateClient(final ServerPlayer playerIn) {
-		PSPacketHandler.sendToClient(new ClearInvasionsPacket(), playerIn);
+		PSPackets.sendToClient(new ClearInvasionsPacket(), playerIn);
 		for (int index = 0; index < this.invasions.size(); index++) {
 			final Invasion invasion = this.invasions.get(index);
-			PSPacketHandler.sendToClient(new AddInvasionPacket(this.sessionType, this.difficulty, invasion), playerIn);
+			PSPackets.sendToClient(new AddInvasionPacket(this.sessionType, this.difficulty, invasion), playerIn);
 		}
 	}
 

@@ -4,7 +4,7 @@ import dev.theagameplayer.puresuffering.PureSufferingMod;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraftforge.common.ForgeMod;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 public interface PSInvasionMob { //Add "PS" to avoid compatibility problems
 	static final String HYPER_CHARGE = PureSufferingMod.MODID.toUpperCase() + "HyperCharge";
@@ -23,7 +23,7 @@ public interface PSInvasionMob { //Add "PS" to avoid compatibility problems
 		hyperAttribute(mobIn, Attributes.ATTACK_KNOCKBACK, 0.1D);
 		hyperAttribute(mobIn, Attributes.ARMOR, 0.5D);
 		hyperAttribute(mobIn, Attributes.SPAWN_REINFORCEMENTS_CHANCE, 0.25D);
-		hyperAttribute(mobIn, ForgeMod.SWIM_SPEED.get(), 0.16D);
+		hyperAttribute(mobIn, NeoForgeMod.SWIM_SPEED.value(), 0.16D);
 		mobIn.setHealth(mobIn.getMaxHealth());
     }
     

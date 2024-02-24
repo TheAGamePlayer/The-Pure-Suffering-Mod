@@ -19,11 +19,11 @@ import dev.theagameplayer.puresuffering.invasion.data.InvasionSpawnerData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public final class InvasionType {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
@@ -332,7 +332,7 @@ public final class InvasionType {
 					final JsonArray jsonArray = new JsonArray();
 					for (final InvasionSpawnerData spawnInfo : this.mobSpawnList) {
 						final JsonObject jsonObject1 = new JsonObject();
-						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITY_TYPES.getKey(spawnInfo.type).toString());
+						jsonObject1.addProperty("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(spawnInfo.type).toString());
 						jsonObject1.addProperty("Weight", spawnInfo.getWeight().asInt());
 						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
 						jsonObject1.addProperty("MaxCount", spawnInfo.maxCount);
@@ -348,7 +348,7 @@ public final class InvasionType {
 					final JsonArray jsonArray = new JsonArray();
 					for (final AdditionalEntitySpawnData spawnInfo : this.additionalEntitiesList) {
 						final JsonObject jsonObject1 = new JsonObject();
-						jsonObject1.addProperty("EntityType", ForgeRegistries.ENTITY_TYPES.getKey(spawnInfo.getEntityType()).toString());
+						jsonObject1.addProperty("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(spawnInfo.getEntityType()).toString());
 						jsonObject1.addProperty("MinCount", spawnInfo.getMinCount());
 						jsonObject1.addProperty("MaxCount", spawnInfo.getMaxCount());
 						jsonObject1.addProperty("Chance", spawnInfo.getChance());
@@ -389,7 +389,7 @@ public final class InvasionType {
 						for (final JsonElement e : a) {
 							if (e.isJsonObject()) {
 								final JsonObject o = e.getAsJsonObject();
-								final EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(o.get("EntityType").getAsString()));
+								final EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(o.get("EntityType").getAsString()));
 								final int weight = o.get("Weight").getAsInt();
 								final int minCount = o.get("MinCount").getAsInt();
 								final int maxCount = o.get("MaxCount").getAsInt();
@@ -413,7 +413,7 @@ public final class InvasionType {
 						for (final JsonElement e : a) {
 							if (e.isJsonObject()) {
 								final JsonObject o = e.getAsJsonObject();
-								final EntityType<?> type = ForgeRegistries.ENTITY_TYPES.getValue(ResourceLocation.tryParse(o.get("EntityType").getAsString()));
+								final EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(o.get("EntityType").getAsString()));
 								final int minCount = o.get("MinCount").getAsInt();
 								final int maxCount = o.get("MaxCount").getAsInt();
 								final int chance = o.get("Chance").getAsInt();

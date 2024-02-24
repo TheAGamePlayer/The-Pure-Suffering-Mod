@@ -3,7 +3,7 @@ package dev.theagameplayer.puresuffering.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.world.level.GameRules.Category;
-import net.minecraftforge.common.IExtensibleEnum;
+import net.neoforged.neoforge.common.IExtensibleEnum;
 
 @Mixin(Category.class)
 public final class GameRulesCategoryMixin implements IExtensibleEnum {
