@@ -1,4 +1,7 @@
 #Minecraft 1.20.x
+Version 1.6.2.1R:
+- Fixed music toast not rendering correctly.
+
 Version 1.6.2.0R:
 - Updated to 1.20.4
 - Moved to NeoForge.
