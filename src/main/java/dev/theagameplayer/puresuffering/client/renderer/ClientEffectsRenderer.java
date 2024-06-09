@@ -32,17 +32,17 @@ public final class ClientEffectsRenderer {
 	private final boolean canSeeSky;
 	private final int[] delays = new int[2];
 
-	public ClientEffectsRenderer(final InvasionDifficulty difficultyIn) {
+	public ClientEffectsRenderer(final InvasionDifficulty pDifficulty) {
 		final Minecraft mc = Minecraft.getInstance();
 		final DimensionType dimType = mc.level.dimensionType();
-		this.difficulty = difficultyIn;
+		this.difficulty = pDifficulty;
 		this.canSeeSky = !dimType.hasCeiling();
 	}
 
-	public final void tick(final RandomSource randomIn, final long dayTimeIn, final int startTimeIn) {
-		if (startTimeIn < 40 && PSConfigValues.client.enableInvasionStartEffects) {
+	public final void tick(final RandomSource pRandom, final long pDayTime, final int pStartTime) {
+		if (pStartTime < 40 && PSConfigValues.client.enableInvasionStartEffects) {
 			if (this.delays[0] < 1) {
-				if (this.canSeeSky) this.soundRings.add(new SoundRing(this.difficulty, startTimeIn));
+				if (this.canSeeSky) this.soundRings.add(new SoundRing(this.difficulty, pStartTime));
 				this.delays[0] = this.difficulty.getRingDelay();
 			} else {
 				this.delays[0]--;
@@ -50,40 +50,40 @@ public final class ClientEffectsRenderer {
 		}
 		if (this.difficulty.isHyper()) {
 			if (this.delays[1] < 1) {
-				this.vortexParticles.add(new VortexParticle(randomIn, this.difficulty));
+				this.vortexParticles.add(new VortexParticle(pRandom, this.difficulty));
 				this.delays[1] = PSConfigValues.client.vortexParticleDelay;
 			} else {
 				this.delays[1]--;
 			}
 		}
 		this.soundRings.removeIf(ring -> ring.tick());
-		this.vortexParticles.removeIf(particle -> particle.tick(dayTimeIn));
+		this.vortexParticles.removeIf(particle -> particle.tick(pDayTime));
 	}
 
-	public final void render(final PoseStack poseStackIn, final float partialTicksIn) { //Uses partial ticks, do computing work on client level tick
+	public final void render(final PoseStack pPoseStack, final float pPartialTicks) { //Uses partial ticks, do computing work on client level tick
 		final Minecraft mc = Minecraft.getInstance();
-		final float weatherVisibility = mc.level.getRainLevel(partialTicksIn) * 0.15F;
+		final float weatherVisibility = mc.level.getRainLevel(pPartialTicks) * 0.15F;
 		final long dayTime = mc.level.getDayTime() % 12000L;
 		final BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
 		RenderSystem.depthMask(Minecraft.useShaderTransparency());
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		this.soundRings.forEach(ring -> ring.render(bufferBuilder, poseStackIn, partialTicksIn));
+		this.soundRings.forEach(ring -> ring.render(bufferBuilder, pPoseStack, pPartialTicks));
 		if (this.difficulty.isHyper())
-			this.vortexParticles.forEach(particle -> particle.render(bufferBuilder, poseStackIn, partialTicksIn, weatherVisibility, dayTime));
+			this.vortexParticles.forEach(particle -> particle.render(bufferBuilder, pPoseStack, pPartialTicks, weatherVisibility, dayTime));
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableBlend();
 		RenderSystem.depthMask(true);
 	}
 
-	private static final float getAlpha(final float alphaOffsetIn, final long dayTimeIn) {
-		float alpha = alphaOffsetIn;
-		if (dayTimeIn < Invasion.TRANSITION_TIME) {
-			alpha = (alphaOffsetIn/Invasion.TRANSITION_TIME) * (dayTimeIn + 1); //0-1
-		} else if (dayTimeIn > 11999L - Invasion.TRANSITION_TIME) {
-			alpha = (alphaOffsetIn/Invasion.TRANSITION_TIME) * (12000L - dayTimeIn); //1-0
+	private static final float getAlpha(final float pAlphaOffset, final long pDayTime) {
+		float alpha = pAlphaOffset;
+		if (pDayTime < Invasion.TRANSITION_TIME) {
+			alpha = (pAlphaOffset/Invasion.TRANSITION_TIME) * (pDayTime + 1); //0-1
+		} else if (pDayTime > 11999L - Invasion.TRANSITION_TIME) {
+			alpha = (pAlphaOffset/Invasion.TRANSITION_TIME) * (12000L - pDayTime); //1-0
 		}
 		return alpha;
 	}
@@ -95,8 +95,8 @@ public final class ClientEffectsRenderer {
 		private final float[] length = new float[4];
 		private int ticksAlive;
 
-		private SoundRing(final InvasionDifficulty difficultyIn, final int startTimeIn) {
-			final PSRGB color = difficultyIn.getInterColor(40, 40 - startTimeIn);
+		private SoundRing(final InvasionDifficulty pDifficulty, final int pStartTime) {
+			final PSRGB color = pDifficulty.getInterColor(40, 40 - pStartTime);
 			this.rgb[0] = color.red();
 			this.rgb[1] = color.green();
 			this.rgb[2] = color.blue();
@@ -114,25 +114,25 @@ public final class ClientEffectsRenderer {
 			return this.ticksAlive < 1;
 		}
 
-		private final void render(final BufferBuilder bufferBuilderIn, final PoseStack poseStackIn, final float partialTicksIn) {
-			final float dist1 = this.dist[1] + (this.dist[0] - this.dist[1]) * partialTicksIn;
+		private final void render(final BufferBuilder pBufferBuilder, final PoseStack pPoseStack, final float pPartialTicks) {
+			final float dist1 = this.dist[1] + (this.dist[0] - this.dist[1]) * pPartialTicks;
 			final float dist2 = -dist1/3;
-			final float sizeAlpha = this.sizeAlpha[1] + (this.sizeAlpha[0] - this.sizeAlpha[1]) * partialTicksIn;
-			final float length = this.length[1] + (this.length[0] - this.length[1]) * partialTicksIn;
+			final float sizeAlpha = this.sizeAlpha[1] + (this.sizeAlpha[0] - this.sizeAlpha[1]) * pPartialTicks;
+			final float length = this.length[1] + (this.length[0] - this.length[1]) * pPartialTicks;
 			RenderSystem.setShaderColor(this.rgb[0], this.rgb[1], this.rgb[2], sizeAlpha);
 			RenderSystem.setShaderTexture(0, TEXTURE);
 			for (final Direction dir : Direction.Plane.HORIZONTAL) {
-				poseStackIn.pushPose();
-				poseStackIn.mulPose(Axis.YP.rotationDegrees(dir.toYRot()));
-				poseStackIn.translate(dist1, dist2, sizeAlpha);
-				final Matrix4f matrix4f = poseStackIn.last().pose();
-				bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-				bufferBuilderIn.vertex(matrix4f, -sizeAlpha, 100.0F, -sizeAlpha * length).endVertex();
-				bufferBuilderIn.vertex(matrix4f, sizeAlpha, 100.0F, -sizeAlpha * length).endVertex();
-				bufferBuilderIn.vertex(matrix4f, sizeAlpha, 100.0F, sizeAlpha * length).endVertex();
-				bufferBuilderIn.vertex(matrix4f, -sizeAlpha, 100.0F, sizeAlpha * length).endVertex();
-				BufferUploader.drawWithShader(bufferBuilderIn.end());
-				poseStackIn.popPose();
+				pPoseStack.pushPose();
+				pPoseStack.mulPose(Axis.YP.rotationDegrees(dir.toYRot()));
+				pPoseStack.translate(dist1, dist2, sizeAlpha);
+				final Matrix4f matrix4f = pPoseStack.last().pose();
+				pBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+				pBufferBuilder.vertex(matrix4f, -sizeAlpha, 100.0F, -sizeAlpha * length).endVertex();
+				pBufferBuilder.vertex(matrix4f, sizeAlpha, 100.0F, -sizeAlpha * length).endVertex();
+				pBufferBuilder.vertex(matrix4f, sizeAlpha, 100.0F, sizeAlpha * length).endVertex();
+				pBufferBuilder.vertex(matrix4f, -sizeAlpha, 100.0F, sizeAlpha * length).endVertex();
+				BufferUploader.drawWithShader(pBufferBuilder.end());
+				pPoseStack.popPose();
 			}
 		}
 	}
@@ -148,28 +148,28 @@ public final class ClientEffectsRenderer {
 		private float size, a, alpha;
 		private float ticksAlive;
 
-		private VortexParticle(final RandomSource randomIn, final InvasionDifficulty difficultyIn) { 
-			this.speed = randomIn.nextInt(PSConfigValues.client.maxVortexParticleLifespan - PSConfigValues.client.minVortexParticleLifespan + 1) + PSConfigValues.client.minVortexParticleLifespan;
-			this.degreesStart = randomIn.nextInt(360);
-			this.degreesFinish = randomIn.nextInt(360) + 180;
-			this.maxSize = randomIn.nextFloat() + 0.75F;
-			this.maxAlpha = randomIn.nextFloat() * 0.5F + 0.5F;
-			final PSRGB color = difficultyIn.getRandomColor(randomIn);
+		private VortexParticle(final RandomSource pRandom, final InvasionDifficulty pDifficulty) { 
+			this.speed = pRandom.nextInt(PSConfigValues.client.maxVortexParticleLifespan - PSConfigValues.client.minVortexParticleLifespan + 1) + PSConfigValues.client.minVortexParticleLifespan;
+			this.degreesStart = pRandom.nextInt(360);
+			this.degreesFinish = pRandom.nextInt(360) + 180;
+			this.maxSize = pRandom.nextFloat() + 0.75F;
+			this.maxAlpha = pRandom.nextFloat() * 0.5F + 0.5F;
+			final PSRGB color = pDifficulty.getRandomColor(pRandom);
 			this.rgb[0] = color.red();
 			this.rgb[1] = color.green();
 			this.rgb[2] = color.blue();
-			this.axis[0] = difficultyIn.isNightmare() ? Axis.YN : Axis.YP;
-			this.axis[1] = randomIn.nextBoolean() ? Axis.XP : Axis.XN;
-			this.axis[2] = randomIn.nextBoolean() ? Axis.ZP : Axis.ZN;
-			this.rot = new float[PSConfigValues.client.useFastEffects ? 2 : randomIn.nextInt(3) + 3][3];
+			this.axis[0] = pDifficulty.isNightmare() ? Axis.YN : Axis.YP;
+			this.axis[1] = pRandom.nextBoolean() ? Axis.XP : Axis.XN;
+			this.axis[2] = pRandom.nextBoolean() ? Axis.ZP : Axis.ZN;
+			this.rot = new float[PSConfigValues.client.useFastEffects ? 2 : pRandom.nextInt(3) + 3][3];
 			this.scaleFactor = 1.0F/(this.rot.length - 1);
 			this.ticksAlive = this.speed;
 		}
 
-		private final boolean tick(final long dayTimeIn) {
+		private final boolean tick(final long pDayTime) {
 			final float percentAlive = this.ticksAlive/this.speed;
-			this.a = this.vortexValue(this.a, this.maxAlpha, dayTimeIn);
-			this.alpha = getAlpha(this.a, dayTimeIn);
+			this.a = this.vortexValue(this.a, this.maxAlpha, pDayTime);
+			this.alpha = getAlpha(this.a, pDayTime);
 			for (int i = this.rot.length - 1; i > 0; i--) {
 				this.rot[i][0] = this.rot[i - 1][0];
 				this.rot[i][1] = this.rot[i - 1][1];
@@ -178,41 +178,41 @@ public final class ClientEffectsRenderer {
 			this.rot[0][0] = this.degreesStart + percentAlive * this.degreesFinish;
 			this.rot[0][1] = percentAlive > 0.5F ? percentAlive * 180.0F : 180.0F - percentAlive * 180.0F;
 			this.rot[0][2] = percentAlive > 0.5F ? 180.0F + percentAlive * 180.0F : 180.0F + percentAlive * 180.0F;
-			this.size = this.vortexValue(this.size, this.maxSize, dayTimeIn);
+			this.size = this.vortexValue(this.size, this.maxSize, pDayTime);
 			this.ticksAlive--;
 			return this.ticksAlive < 1;
 		}
 
-		private final float vortexValue(final float currentIn, final float maxIn, final long dayTimeIn) {
-			final float result = this.ticksAlive > this.speed/2 ? maxIn/this.speed * (this.speed - this.ticksAlive) : maxIn/this.speed * this.ticksAlive;
-			if (dayTimeIn < Invasion.HALF_TRANSITION) {
-				return result + currentIn/Invasion.HALF_TRANSITION; //0-1
-			} else if (dayTimeIn > 11999L - Invasion.HALF_TRANSITION) {
-				return result - currentIn/Invasion.HALF_TRANSITION; //1-0
+		private final float vortexValue(final float pCurrent, final float pMax, final long pDayTime) {
+			final float result = this.ticksAlive > this.speed/2 ? pMax/this.speed * (this.speed - this.ticksAlive) : pMax/this.speed * this.ticksAlive;
+			if (pDayTime < Invasion.HALF_TRANSITION) {
+				return result + pCurrent/Invasion.HALF_TRANSITION; //0-1
+			} else if (pDayTime > 11999L - Invasion.HALF_TRANSITION) {
+				return result - pCurrent/Invasion.HALF_TRANSITION; //1-0
 			}
 			return result;
 		}
 
-		private final void render(final BufferBuilder bufferBuilderIn, final PoseStack poseStackIn, final float partialTicksIn, final float weatherVisibilityIn, final long dayTimeIn) {
-			final float alpha = this.alpha - ClientTransitionHandler.getWeatherVisibility(weatherVisibilityIn, dayTimeIn);
+		private final void render(final BufferBuilder pBufferBuilder, final PoseStack pPoseStack, final float pPartialTicks, final float pWeatherVisibility, final long pDayTime) {
+			final float alpha = this.alpha - ClientTransitionHandler.getWeatherVisibility(pWeatherVisibility, pDayTime);
 			final int length = Minecraft.useFancyGraphics() ? this.rot.length : 2;
 			RenderSystem.setShaderTexture(0, TEXTURE);
 			for (int i = 1; i < length; i++) {
 				final float s = this.scaleFactor * (this.rot.length - i);
 				final float size = this.size * s;
 				RenderSystem.setShaderColor(this.rgb[0] * s, this.rgb[1] * s, this.rgb[2] * s, alpha * s);
-				poseStackIn.pushPose();
-				poseStackIn.mulPose(this.axis[0].rotationDegrees(this.rot[i][0] + (this.rot[i - 1][0] - this.rot[i][0]) * partialTicksIn));
-				poseStackIn.mulPose(this.axis[1].rotationDegrees(this.rot[i][1] + (this.rot[i - 1][1] - this.rot[i][1]) * partialTicksIn));
-				poseStackIn.mulPose(this.axis[2].rotationDegrees(this.rot[i][2] + (this.rot[i - 1][2] - this.rot[i][2]) * partialTicksIn));
-				final Matrix4f matrix4f = poseStackIn.last().pose();
-				bufferBuilderIn.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-				bufferBuilderIn.vertex(matrix4f, -size, 100.0F, -size).endVertex();
-				bufferBuilderIn.vertex(matrix4f, size, 100.0F, -size).endVertex();
-				bufferBuilderIn.vertex(matrix4f, size, 100.0F, size).endVertex();
-				bufferBuilderIn.vertex(matrix4f, -size, 100.0F, size).endVertex();
-				BufferUploader.drawWithShader(bufferBuilderIn.end());
-				poseStackIn.popPose();
+				pPoseStack.pushPose();
+				pPoseStack.mulPose(this.axis[0].rotationDegrees(this.rot[i][0] + (this.rot[i - 1][0] - this.rot[i][0]) * pPartialTicks));
+				pPoseStack.mulPose(this.axis[1].rotationDegrees(this.rot[i][1] + (this.rot[i - 1][1] - this.rot[i][1]) * pPartialTicks));
+				pPoseStack.mulPose(this.axis[2].rotationDegrees(this.rot[i][2] + (this.rot[i - 1][2] - this.rot[i][2]) * pPartialTicks));
+				final Matrix4f matrix4f = pPoseStack.last().pose();
+				pBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+				pBufferBuilder.vertex(matrix4f, -size, 100.0F, -size).endVertex();
+				pBufferBuilder.vertex(matrix4f, size, 100.0F, -size).endVertex();
+				pBufferBuilder.vertex(matrix4f, size, 100.0F, size).endVertex();
+				pBufferBuilder.vertex(matrix4f, -size, 100.0F, size).endVertex();
+				BufferUploader.drawWithShader(pBufferBuilder.end());
+				pPoseStack.popPose();
 			}
 		}
 	}

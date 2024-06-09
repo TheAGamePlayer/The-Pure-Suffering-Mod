@@ -4,48 +4,49 @@ import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class InvasionMobParticlesPacket implements CustomPacketPayload {
-	public static final ResourceLocation ID = PureSufferingMod.namespace("invasion_mob_particles");
+	public static final CustomPacketPayload.Type<InvasionMobParticlesPacket> TYPE = new CustomPacketPayload.Type<>(PureSufferingMod.namespace("invasion_mob_particles"));
+	public static final StreamCodec<FriendlyByteBuf, InvasionMobParticlesPacket> STREAM_CODEC = CustomPacketPayload.codec(InvasionMobParticlesPacket::write, InvasionMobParticlesPacket::read);
 	private final InvasionDifficulty difficulty;
 	private final double x, y, z;
 	private final RelocationStatus status;
 
-	public InvasionMobParticlesPacket(final InvasionDifficulty difficultyIn, final Vec3 posIn) {
-		this(difficultyIn, posIn, RelocationStatus.NONE);
+	public InvasionMobParticlesPacket(final InvasionDifficulty pDifficulty, final Vec3 pPos) {
+		this(pDifficulty, pPos, RelocationStatus.NONE);
 	}
 
-	public InvasionMobParticlesPacket(final InvasionDifficulty difficultyIn, final Vec3 posIn, final boolean relocateIn) {
-		this(difficultyIn, posIn, relocateIn ? RelocationStatus.TO : RelocationStatus.FROM);
+	public InvasionMobParticlesPacket(final InvasionDifficulty pDifficulty, final Vec3 pPos, final boolean pRelocate) {
+		this(pDifficulty, pPos, pRelocate ? RelocationStatus.TO : RelocationStatus.FROM);
 	}
 
-	private InvasionMobParticlesPacket(final InvasionDifficulty difficultyIn, final Vec3 posIn, final RelocationStatus statusIn) {
-		this.difficulty = difficultyIn;
-		this.x = posIn.x;
-		this.y = posIn.y;
-		this.z = posIn.z;
-		this.status = statusIn;
+	private InvasionMobParticlesPacket(final InvasionDifficulty pDifficulty, final Vec3 pPos, final RelocationStatus pStatus) {
+		this.difficulty = pDifficulty;
+		this.x = pPos.x;
+		this.y = pPos.y;
+		this.z = pPos.z;
+		this.status = pStatus;
 	}
 
-	@Override
-	public final void write(final FriendlyByteBuf bufIn) {
-		bufIn.writeEnum(this.difficulty);
-		bufIn.writeDouble(this.x);
-		bufIn.writeDouble(this.y);
-		bufIn.writeDouble(this.z);
-		bufIn.writeEnum(this.status);
+	public final void write(final FriendlyByteBuf pBuf) {
+		pBuf.writeEnum(this.difficulty);
+		pBuf.writeDouble(this.x);
+		pBuf.writeDouble(this.y);
+		pBuf.writeDouble(this.z);
+		pBuf.writeEnum(this.status);
 	}
 
-	public static final InvasionMobParticlesPacket read(final FriendlyByteBuf bufIn) {
-		return new InvasionMobParticlesPacket(bufIn.readEnum(InvasionDifficulty.class), new Vec3(bufIn.readDouble(), bufIn.readDouble(), bufIn.readDouble()), bufIn.readEnum(RelocationStatus.class));
+	public static final InvasionMobParticlesPacket read(final FriendlyByteBuf pBuf) {
+		return new InvasionMobParticlesPacket(pBuf.readEnum(InvasionDifficulty.class), new Vec3(pBuf.readDouble(), pBuf.readDouble(), pBuf.readDouble()), pBuf.readEnum(RelocationStatus.class));
 	}
 
-	public static final void handle(final InvasionMobParticlesPacket msgIn, final PlayPayloadContext ctxIn) {
-		ctxIn.workHandler().execute(() -> {
+	public static final void handle(final InvasionMobParticlesPacket msgIn, final IPayloadContext pCtx) {
+		if (pCtx.flow().isServerbound()) return;
+		pCtx.enqueueWork(() -> {
 			final Minecraft mc = Minecraft.getInstance();
 			for (int l = 0; l < msgIn.difficulty.getParticleCount(); ++l) {
 				final double x = msgIn.x + 0.5D + (mc.level.random.nextDouble() - 0.5D) * 2.0D;
@@ -60,8 +61,8 @@ public final class InvasionMobParticlesPacket implements CustomPacketPayload {
 	}
 
 	@Override
-	public final ResourceLocation id() {
-		return ID;
+	public final Type<? extends CustomPacketPayload> type() {
+		return TYPE;
 	}
 
 	private static enum RelocationStatus {

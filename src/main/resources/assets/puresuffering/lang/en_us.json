@@ -61,6 +61,8 @@
 	"gamerule.puresuffering:weakenedInvasionVexes.description": "Determines vexes in invasions have a limited lifespan.",
 	"gamerule.puresuffering:enableInvasionAmbience": "Enable Invasion Ambience",
 	"gamerule.puresuffering:enableInvasionAmbience.description": "Determines if invasion ambience sounds should occur.",
+	"gamerule.puresuffering.notifyPlayersAboutInvasions": "Notify Players About Invasions",
+	"gamerule.puresuffering.notifyPlayersAboutInvasions.description": "Determines if players be notified when invasions start.",
 	
 	"gamerule.puresuffering:primaryInvasionMobCap": "Primary Invasion Mob Cap",
 	"gamerule.puresuffering:primaryInvasionMobCap.description": "The max amount of mobs that can spawn from Primary Invasions at once.",
@@ -134,6 +136,7 @@
 	"puresuffering.config.mobs_die_at_end_of_invasions": "Mobs Die at End of Invasions",
 	"puresuffering.config.weakened_invasion_vexes": "Weakened Invasion Vexes",
 	"puresuffering.config.enable_invasion_ambience": "Enable Invasion Ambience",
+	"puresuffering.config.notify_players_about_invasions": "Notify Players About Invasions",
 	
 	"puresuffering.config.primary_invasion_mob_cap": "Primary Invasion Mob Cap",
 	"puresuffering.config.secondary_invasion_mob_cap": "Secondary Invasion Mob Cap",

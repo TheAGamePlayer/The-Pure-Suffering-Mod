@@ -14,10 +14,10 @@ import net.minecraft.world.entity.LivingEntity;
 @Mixin(LightTexture.class)
 public final class LightTextureMixin {
 	@Inject(at = @At("RETURN"), method = "calculateDarknessScale(Lnet/minecraft/world/entity/LivingEntity;FF)F", cancellable = true)
-	private final void calculateDarknessScale(final LivingEntity playerIn, final float darknessIn, final float partialTicksIn, final CallbackInfoReturnable<Float> callbackIn) {
+	private final void calculateDarknessScale(final LivingEntity pPlayer, final float pDarkness, final float pPartialTicks, final CallbackInfoReturnable<Float> pCallback) {
 		if (PSConfigValues.client.canInvasionsChangeBrightness) {
 			final Minecraft mc = Minecraft.getInstance();
-			callbackIn.setReturnValue(ClientInvasionHandler.handleDarknessScale(callbackIn.getReturnValueF(), mc.level));
+			pCallback.setReturnValue(ClientInvasionHandler.handleDarknessScale(pCallback.getReturnValueF(), mc.level));
 		}
 	}
 }

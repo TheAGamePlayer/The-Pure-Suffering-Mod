@@ -1,4 +1,18 @@
 #Minecraft 1.20.x
+Version 1.6.3.0B:
+- Updated to 1.20.6
+- Reduced TPS spikes on lower end CPUs.
+- Fixed hyper charged slimes & magma cubes not spliting into smaller hyper charged slimes.
+- Fixed split slimes & magma cubes not counting towards the invasion xp multiplier.
+- Fixed immense lag spikes caused by mob spawning in worlds with increased world height.
+- Fixed invasion mobs not properly saving to the invasion when the game is reloaded.
+- Fixed invasion mobs being able to spawn around spectators.
+- Fixed rare bug where invasion music would reset itself after the first few ticks if the client desynced with the server.
+- Optimized invasion mob code to not do repeated checks on the same tick.
+- Added a new path finding based spawning method (Mobs now only spawn if they can path find towards the player (Not completely obstructed).
+- Data packs can now add custom tags to mobs spawned by invasions (Uses persistent data only).
+- Mob relocation now also relies on path finding (The old method still runs as a fallback).
+
 Version 1.6.2.1R:
 - Fixed music toast not rendering correctly.
 

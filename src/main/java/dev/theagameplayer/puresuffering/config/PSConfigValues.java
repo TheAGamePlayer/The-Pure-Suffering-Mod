@@ -25,8 +25,8 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		if (FMLEnvironment.dist.isClient()) client = new ClientValues();
 	}
 
-	public static final void addLevelValues(final ServerLevel levelIn) {
-		LEVELS.put(levelIn, new LevelValues(levelIn));
+	public static final void addLevelValues(final ServerLevel pLevel) {
+		LEVELS.put(pLevel, new LevelValues(pLevel));
 	}
 
 	public static final class CommonValues {
@@ -44,6 +44,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final boolean mobsDieAtEndOfInvasions;
 		public final boolean weakenedInvasionVexes;
 		public final boolean enableInvasionAmbience;
+		public final boolean notifyPlayersAboutInvasions;
 		//GameRules - Integer
 		public final int primaryInvasionMobCap;
 		public final int secondaryInvasionMobCap;
@@ -77,6 +78,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 			this.mobsDieAtEndOfInvasions = PSConfig.COMMON.mobsDieAtEndOfInvasions.get();
 			this.weakenedInvasionVexes = PSConfig.COMMON.weakenedInvasionVexes.get();
 			this.enableInvasionAmbience = PSConfig.COMMON.enableInvasionAmbience.get();
+			this.notifyPlayersAboutInvasions = PSConfig.COMMON.notifyPlayersAboutInvasions.get();
 			//GameRules - Integer
 			this.primaryInvasionMobCap = PSConfig.COMMON.primaryInvasionMobCap.get();
 			this.secondaryInvasionMobCap = PSConfig.COMMON.secondaryInvasionMobCap.get();
@@ -135,9 +137,9 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final int[] maxInvasions;
 		public final int[] tierIncreaseDelay;
 
-		private LevelValues(final ServerLevel levelIn) {
-			final PSConfig.LevelConfig config = PSConfig.LEVELS.get(levelIn);
-			final int sessionTypeLength = levelIn.dimensionType().hasFixedTime() ? 1 : 2;
+		private LevelValues(final ServerLevel pLevel) {
+			final PSConfig.LevelConfig config = PSConfig.LEVELS.get(pLevel);
+			final int sessionTypeLength = pLevel.dimensionType().hasFixedTime() ? 1 : 2;
 			final int difficultyLength = InvasionDifficulty.values().length - 1;
 			this.invasionSessionTypeRarity = new int[sessionTypeLength];
 			this.invasionDifficultyRarity = new int[difficultyLength];

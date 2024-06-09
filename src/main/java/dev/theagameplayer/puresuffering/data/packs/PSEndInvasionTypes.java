@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 
 public final class PSEndInvasionTypes implements Consumer<Consumer<InvasionType>> {
 	@Override
-	public final void accept(final Consumer<InvasionType> consumerIn) {
+	public final void accept(final Consumer<InvasionType> pConsumer) {
 		InvasionType.Builder.invasionType().withRarity(2).withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_MIXED).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderInfo(
 						InvasionSkyRenderInfo.Builder.skyRenderInfo().withFog(InvasionFogRenderInfo.Builder.fogRenderer().withRGB(0.15F, 0.15F, 0.15F))
@@ -52,7 +52,7 @@ public final class PSEndInvasionTypes implements Consumer<Consumer<InvasionType>
 				.withTickDelay(20)
 				.setMobCapMultiplier(1.0F))
 		.dimensions(Level.END.location())
-		.save(consumerIn, "end_game");
+		.save(pConsumer, "end_game");
 		InvasionType.Builder.invasionType().withRarity(6).withInvasionTime(InvasionTime.NIGHT).withInvasionPriority(InvasionPriority.SECONDARY_ONLY).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.2F).withTickDelay(30).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 1, 3), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 1, 1)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.4F).withTickDelay(24).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 2, 4), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 1, 2)),
@@ -60,6 +60,6 @@ public final class PSEndInvasionTypes implements Consumer<Consumer<InvasionType>
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.8F).withTickDelay(12).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 3, 6), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 2, 5)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(6).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 3, 8), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 2, 6)))
 		.dimensions(Level.END.location())
-		.save(consumerIn, "end_pest");
+		.save(pConsumer, "end_pest");
 	}
 }

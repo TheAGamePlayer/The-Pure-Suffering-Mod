@@ -10,43 +10,44 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class SendInvasionsPacket implements CustomPacketPayload {
-	public static final ResourceLocation ID = PureSufferingMod.namespace("send_invasions");
+	public static final CustomPacketPayload.Type<SendInvasionsPacket> TYPE = new CustomPacketPayload.Type<>(PureSufferingMod.namespace("send_invasions"));
+	public static final StreamCodec<FriendlyByteBuf, SendInvasionsPacket> STREAM_CODEC = CustomPacketPayload.codec(SendInvasionsPacket::write, SendInvasionsPacket::read);
 	private final boolean isNatural;
 
-	public SendInvasionsPacket(final boolean isNaturalIn) {
-		this.isNatural = isNaturalIn;
+	public SendInvasionsPacket(final boolean pIsNatural) {
+		this.isNatural = pIsNatural;
 	}
 
-	@Override
-	public final void write(final FriendlyByteBuf bufIn) {
-		bufIn.writeBoolean(this.isNatural);
+	public final void write(final FriendlyByteBuf pBuf) {
+		pBuf.writeBoolean(this.isNatural);
 	}
 
-	public static final SendInvasionsPacket read(final FriendlyByteBuf bufIn) {
-		return new SendInvasionsPacket(bufIn.readBoolean());
+	public static final SendInvasionsPacket read(final FriendlyByteBuf pBuf) {
+		return new SendInvasionsPacket(pBuf.readBoolean());
 	}
 
-	public static final void handle(final SendInvasionsPacket packetIn, final PlayPayloadContext ctxIn) {
-		ctxIn.workHandler().execute(() -> {
+	public static final void handle(final SendInvasionsPacket pPacket, final IPayloadContext pCtx) {
+		if (pCtx.flow().isServerbound()) return;
+		pCtx.enqueueWork(() -> {
 			final Minecraft mc = Minecraft.getInstance();
-			if (PSConfigValues.client.useInvasionSoundEffects && packetIn.isNatural)
+			if (PSConfigValues.client.useInvasionSoundEffects && pPacket.isNatural)
 				mc.player.playSound(PSSoundEvents.INFORM_INVASION.get());
 			final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 			if (session != null) {
-				mc.getChatListener().handleSystemMessage(InvasionText.create(packetIn.isNatural ? "invasion.puresuffering.inform" : "commands.puresuffering.query.invasions", packetIn.isNatural ? ChatFormatting.GRAY : ChatFormatting.GOLD, session).withStyle(session.getStyle()), false);
-			} else if (!packetIn.isNatural) {
+				mc.getChatListener().handleSystemMessage(InvasionText.create(pPacket.isNatural ? "invasion.puresuffering.inform" : "commands.puresuffering.query.invasions", pPacket.isNatural ? ChatFormatting.GRAY : ChatFormatting.GOLD, session).withStyle(session.getStyle()), false);
+			} else if (!pPacket.isNatural) {
 				mc.getChatListener().handleSystemMessage(Component.translatable("commands.puresuffering.query.none").withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)), false);
 			}
 		});
 	}
 
 	@Override
-	public final ResourceLocation id() {
-		return ID;
+	public final Type<? extends CustomPacketPayload> type() {
+		return TYPE;
 	}
 }

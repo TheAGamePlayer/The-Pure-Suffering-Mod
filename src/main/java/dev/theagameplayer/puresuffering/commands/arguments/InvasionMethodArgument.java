@@ -27,16 +27,16 @@ public final class InvasionMethodArgument implements ArgumentType<InvasionMethod
 	}
 
 	@Override
-	public InvasionMethod parse(final StringReader readerIn) throws CommandSyntaxException {
-		final String name = readerIn.readUnquotedString();
+	public InvasionMethod parse(final StringReader pReader) throws CommandSyntaxException {
+		final String name = pReader.readUnquotedString();
 		final InvasionMethod method = InvasionMethod.valueOf(name.toUpperCase());
-		if (method == null) throw ERROR_INVALID.createWithContext(readerIn, name);
+		if (method == null) throw ERROR_INVALID.createWithContext(pReader, name);
 		return method;
 	}
 
 	@Override
-	public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> ctxIn, final SuggestionsBuilder suggestionsBuilderIn) {
-		return SharedSuggestionProvider.suggest(Stream.of(InvasionMethod.values()).map(InvasionMethod::toString), suggestionsBuilderIn);
+	public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> pCtx, final SuggestionsBuilder pSuggestionsBuilder) {
+		return SharedSuggestionProvider.suggest(Stream.of(InvasionMethod.values()).map(InvasionMethod::toString), pSuggestionsBuilder);
 	}
 
 	@Override

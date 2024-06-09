@@ -8,12 +8,12 @@ public final class AdditionalEntitySpawnData {
 	private final int chance;
 	private final boolean isSurfaceSpawn;
 
-	public AdditionalEntitySpawnData(final EntityType<?> entityTypeIn, final int minCountIn, final int maxCountIn, final int chanceIn, final boolean isSurfaceSpawnIn) {
-		this.type = entityTypeIn;
-		this.minCount = minCountIn;
-		this.maxCount = maxCountIn;
-		this.chance = chanceIn;
-		this.isSurfaceSpawn = isSurfaceSpawnIn;
+	public AdditionalEntitySpawnData(final EntityType<?> pEntityType, final int pMinCount, final int pMaxCount, final int pChance, final boolean pIsSurfaceSpawn) {
+		this.type = pEntityType;
+		this.minCount = pMinCount;
+		this.maxCount = pMaxCount;
+		this.chance = pChance;
+		this.isSurfaceSpawn = pIsSurfaceSpawn;
 	}
 
 	public final EntityType<?> getEntityType() {

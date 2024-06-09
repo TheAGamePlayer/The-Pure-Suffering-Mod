@@ -10,7 +10,7 @@ displayName="${mod_name}" #mandatory
 updateJSONURL="https://raw.githubusercontent.com/TheAGamePlayer/The-Pure-Suffering-Mod/main/update.json" #optional
 displayURL="https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod" #optional
 logoFile="puresuffering.png" #optional
-credits="Thanks to the NeoForged Team for making this possible!" #optional
+credits="Thanks to the NeoForge Team for making this possible!" #optional
 authors="${mod_authors}" #optional
 #displayTest="MATCH_VERSION" # MATCH_VERSION is the default if nothing is specified (#optional)
 #(multi line!) (#mandatory)

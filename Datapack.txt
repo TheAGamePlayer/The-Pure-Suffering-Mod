@@ -132,6 +132,26 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - If true, this entity will use default mob spawning rules instead of it's specialized rules.
         ForceDespawn: (Optional - Boolean)
         - If true. this entity will be forced to despawn at the end of an invasion.
+        Tags: { (Optional - NBTList)
+            - This applies to the mob's persistent data not vanilla entity data.
+            Id: (Integer)
+            - Type number depending on type of tag
+            - BOOLEAN = 0
+            - BYTE = 1
+            - SHORT = 2
+            - INT = 3
+            - LONG = 4
+            - FLOAT = 5
+            - DOUBLE = 6
+            - STRING = 7
+            - BYTE_ARRAY = 8
+            - INT_ARRAY = 9
+            - LONG_ARRAY = 10
+            Name: (String)
+            - Name of the tag
+            Value: (Depends on Id)
+            - Type value associated with the tag's type/id number
+        }
     }
     AdditionalEntitiesList: (List of Entities to spawn that aren't mobs) {
         EntityType: (ResourceLocation-String)

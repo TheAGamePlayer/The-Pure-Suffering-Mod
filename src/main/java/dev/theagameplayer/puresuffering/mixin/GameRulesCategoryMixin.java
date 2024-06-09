@@ -11,7 +11,7 @@ public final class GameRulesCategoryMixin implements IExtensibleEnum {
 		create("PURE_SUFFERING", "gamerule.category.puresuffering");
 	}
 	
-	private static final Category create(final String nameIn, final String descriptionIdIn) {
+	private static final Category create(final String pName, final String pDescriptionId) {
 		throw new IllegalStateException("Enum not extended");
 	}
 }

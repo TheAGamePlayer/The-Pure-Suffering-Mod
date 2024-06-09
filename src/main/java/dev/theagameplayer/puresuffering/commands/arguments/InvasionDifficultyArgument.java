@@ -27,16 +27,16 @@ public final class InvasionDifficultyArgument implements ArgumentType<InvasionDi
 	}
 
 	@Override
-	public final InvasionDifficulty parse(final StringReader readerIn) throws CommandSyntaxException {
-		final String name = readerIn.readUnquotedString();
+	public final InvasionDifficulty parse(final StringReader pReader) throws CommandSyntaxException {
+		final String name = pReader.readUnquotedString();
 		final InvasionDifficulty difficulty = InvasionDifficulty.valueOf(name.toUpperCase());
-		if (difficulty == null) throw ERROR_INVALID.createWithContext(readerIn, name);
+		if (difficulty == null) throw ERROR_INVALID.createWithContext(pReader, name);
 		return difficulty;
 	}
 
 	@Override
-	public final <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> ctxIn, final SuggestionsBuilder suggestionsBuilderIn) {
-		return SharedSuggestionProvider.suggest(Stream.of(InvasionDifficulty.values()).map(InvasionDifficulty::toString), suggestionsBuilderIn);
+	public final <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> pCtx, final SuggestionsBuilder pSuggestionsBuilder) {
+		return SharedSuggestionProvider.suggest(Stream.of(InvasionDifficulty.values()).map(InvasionDifficulty::toString), pSuggestionsBuilder);
 	}
 
 	@Override

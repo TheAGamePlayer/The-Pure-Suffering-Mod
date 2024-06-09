@@ -8,35 +8,43 @@ import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.registries.PSSoundEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public final class InvasionStartPacket implements CustomPacketPayload {
-	public static final ResourceLocation ID = PureSufferingMod.namespace("invasion_start");
+	public static final CustomPacketPayload.Type<InvasionStartPacket> TYPE = new CustomPacketPayload.Type<>(PureSufferingMod.namespace("invasion_start"));
+	public static final StreamCodec<FriendlyByteBuf, InvasionStartPacket> STREAM_CODEC = CustomPacketPayload.codec(InvasionStartPacket::write, InvasionStartPacket::read);
+	private final boolean notifyPlayers;
 
-	@Override
-	public final void write(final FriendlyByteBuf bufIn) {}
-
-	public static final InvasionStartPacket read(final FriendlyByteBuf bufIn) {
-		return new InvasionStartPacket();
+	public InvasionStartPacket(final boolean pNotifyPlayers) {
+		this.notifyPlayers = pNotifyPlayers;
+	}
+	
+	public final void write(final FriendlyByteBuf pBuf) {
+		pBuf.writeBoolean(this.notifyPlayers);
 	}
 
-	public static final void handle(final InvasionStartPacket packetIn, final PlayPayloadContext ctxIn) {
-		ctxIn.workHandler().execute(() -> {
+	public static final InvasionStartPacket read(final FriendlyByteBuf pBuf) {
+		return new InvasionStartPacket(pBuf.readBoolean());
+	}
+
+	public static final void handle(final InvasionStartPacket pPacket, final IPayloadContext pCtx) {
+		if (pCtx.flow().isServerbound()) return;
+		pCtx.enqueueWork(() -> {
 			final Minecraft mc = Minecraft.getInstance();
 			final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 			final InvasionDifficulty difficulty = session == null ? null : session.getDifficulty();
 			if (PSConfigValues.client.useInvasionSoundEffects)
 				mc.player.playSound(difficulty == null ? PSSoundEvents.CANCEL_INVASION.get() : difficulty.getStartSound());
-			InvasionStartTimer.timer = new InvasionStartTimer(difficulty, session);
+			InvasionStartTimer.timer = new InvasionStartTimer(difficulty, session, pPacket.notifyPlayers);
 			if (session == null || !PSConfigValues.client.enableInvasionStartEffects) return;
 			session.setStartTimer();
 		});
 	}
 
 	@Override
-	public final ResourceLocation id() {
-		return ID;
+	public final Type<? extends CustomPacketPayload> type() {
+		return TYPE;
 	}
 }

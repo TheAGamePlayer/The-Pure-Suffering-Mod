@@ -19,8 +19,8 @@ public final class SensorMixin {
 
 	//A temporary fix to an annoying problem with Piglins being unable to have hyper aggression applied.
 	@Inject(at = @At("HEAD"), method = "isEntityAttackableIgnoringLineOfSight(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/entity/LivingEntity;)Z", cancellable = true)
-	private static final void isEntityAttackableIgnoringLineOfSight(final LivingEntity entityIn, final LivingEntity targetIn, final CallbackInfoReturnable<Boolean> callbackIn) {
-		if (entityIn.getPersistentData().contains(Invasion.INVASION_MOB) && entityIn instanceof AbstractPiglin)
-			callbackIn.setReturnValue(entityIn.getBrain().isMemoryValue(MemoryModuleType.ATTACK_TARGET, targetIn) ? INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT.test(entityIn, targetIn) : INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_LINE_OF_SIGHT.test(entityIn, targetIn));
+	private static final void isEntityAttackableIgnoringLineOfSight(final LivingEntity pEntity, final LivingEntity pTarget, final CallbackInfoReturnable<Boolean> pCallback) {
+		if (pEntity.getPersistentData().contains(Invasion.INVASION_MOB) && pEntity instanceof AbstractPiglin)
+			pCallback.setReturnValue(pEntity.getBrain().isMemoryValue(MemoryModuleType.ATTACK_TARGET, pTarget) ? INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_INVISIBILITY_AND_LINE_OF_SIGHT.test(pEntity, pTarget) : INVASION_ATTACK_TARGET_CONDITIONS_IGNORE_LINE_OF_SIGHT.test(pEntity, pTarget));
 	}
 }

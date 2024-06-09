@@ -15,9 +15,9 @@ import net.minecraft.world.Difficulty;
 @Mixin(DedicatedServerProperties.class)
 public final class DedicatedServerPropertiesMixin {
 	@Inject(at = @At("RETURN"), method = "Lnet/minecraft/server/dedicated/DedicatedServerProperties;fromFile(Ljava/nio/file/Path;)Lnet/minecraft/server/dedicated/DedicatedServerProperties;", cancellable = true)
-	private static final void fromFile(final Path pathIn, final CallbackInfoReturnable<DedicatedServerProperties> callbackIn) {
-		final Properties properties = DedicatedServerProperties.loadFromFile(pathIn);
-		if (!Files.exists(pathIn)) properties.setProperty("difficulty", Difficulty.HARD.getKey());
-		callbackIn.setReturnValue(new DedicatedServerProperties(properties));
+	private static final void fromFile(final Path pPath, final CallbackInfoReturnable<DedicatedServerProperties> pCallback) {
+		final Properties properties = DedicatedServerProperties.loadFromFile(pPath);
+		if (!Files.exists(pPath)) properties.setProperty("difficulty", Difficulty.HARD.getKey());
+		pCallback.setReturnValue(new DedicatedServerProperties(properties));
 	}
 }

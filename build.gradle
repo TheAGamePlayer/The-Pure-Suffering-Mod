@@ -4,7 +4,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.80'
+    id 'net.neoforged.gradle.userdev' version '7.0.142'
 }
 //Mod Info
 version = minecraft_version + "-" + mod_version
@@ -16,7 +16,7 @@ base {
     archivesName = mod_name
 }
 //Java Info
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 //Setup Runs
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -43,6 +43,10 @@ runs {
     }
 }
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+//Config
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
 //Mod Dependencies
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
@@ -67,14 +71,20 @@ jar {
 //META_INF Files
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
-            minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
-            neo_version         : neo_version, neo_version_range: neo_version_range,
+            minecraft_version: minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version: neo_version,
+            neo_version_range: neo_version_range,
             loader_version_range: loader_version_range,
-            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
-            mod_authors         : mod_authors, mod_description: mod_description
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_license: mod_license,
+            mod_version: mod_version,
+            mod_authors: mod_authors,
+            mod_description: mod_description
     ]
     inputs.properties replaceProperties
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    filesMatching(['META-INF/neoforge.mods.toml']) {
         expand replaceProperties + [project: project]
     }
 }
@@ -94,4 +104,11 @@ publishing {
 //Java Compile
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+//InteliJ
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
 }

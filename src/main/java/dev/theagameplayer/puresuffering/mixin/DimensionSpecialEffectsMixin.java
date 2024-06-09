@@ -13,10 +13,10 @@ import net.minecraft.client.renderer.DimensionSpecialEffects;
 @Mixin(DimensionSpecialEffects.class)
 public final class DimensionSpecialEffectsMixin {
 	@Inject(at = @At("RETURN"), method = "forceBrightLightmap()Z", cancellable = true)
-	private final void forceBrightLightmap(final CallbackInfoReturnable<Boolean> callbackIn) {
+	private final void forceBrightLightmap(final CallbackInfoReturnable<Boolean> pCallback) {
 		if (PSConfigValues.client.canInvasionsChangeBrightness) {
 			final Minecraft mc = Minecraft.getInstance();
-			callbackIn.setReturnValue(ClientInvasionHandler.handleBrightLightmap(callbackIn.getReturnValueZ(), mc.level));
+			pCallback.setReturnValue(ClientInvasionHandler.handleBrightLightmap(pCallback.getReturnValueZ(), mc.level));
 		}
 	}
 }

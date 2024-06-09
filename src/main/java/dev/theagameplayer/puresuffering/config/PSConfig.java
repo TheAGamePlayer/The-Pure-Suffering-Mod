@@ -47,6 +47,7 @@ public final class PSConfig {
 		public final ModConfigSpec.BooleanValue mobsDieAtEndOfInvasions;
 		public final ModConfigSpec.BooleanValue weakenedInvasionVexes;
 		public final ModConfigSpec.BooleanValue enableInvasionAmbience;
+		public final ModConfigSpec.BooleanValue notifyPlayersAboutInvasions;
 		//GameRules - Integer
 		public final ModConfigSpec.IntValue primaryInvasionMobCap;
 		public final ModConfigSpec.IntValue secondaryInvasionMobCap;
@@ -131,8 +132,13 @@ public final class PSConfig {
 			this.enableInvasionAmbience = this.builder
 					.translation(CONFIG + "enable_invasion_ambience")
 					.worldRestart()
-					.comment("Should invasion ambient sounds be broadcasted before invasions?")
+					.comment("Determines if invasion ambience sounds should occur.")
 					.define("enableInvasionAmbience", true);
+			this.notifyPlayersAboutInvasions = this.builder
+					.translation(CONFIG + "notify_players_about_invasions")
+					.worldRestart()
+					.comment("Determines if players be notified when invasions start.")
+					.define("notifyPlayersAboutInvasions", true);
 			this.builder.pop();
 			this.builder.push("Integer");
 			this.primaryInvasionMobCap = this.builder
@@ -314,12 +320,12 @@ public final class PSConfig {
 		public final ModConfigSpec.IntValue[] maxInvasions;
 		public final ModConfigSpec.IntValue[] tierIncreaseDelay;
 		
-		private LevelConfig(final ServerLevel levelIn) {
-			final boolean hasFixedTime = levelIn.dimensionType().hasFixedTime();
+		private LevelConfig(final ServerLevel pLevel) {
+			final boolean hasFixedTime = pLevel.dimensionType().hasFixedTime();
 			int[][] values = new int[0][0];
-			if (levelIn.dimension().equals(Level.NETHER)) {
+			if (pLevel.dimension().equals(Level.NETHER)) {
 				values = NETHER_RARITY;
-			} else if (levelIn.dimension().equals(Level.END)) {
+			} else if (pLevel.dimension().equals(Level.END)) {
 				values = END_RARITY;
 			} else {
 				values = hasFixedTime ? DEFAULT_FIXED_RARITY : OVERWORLD_RARITY;
@@ -371,7 +377,7 @@ public final class PSConfig {
 		}
 	}
 
-	public static final void initConfig(final boolean isClientIn) {
+	public static final void initConfig(final boolean pIsClient) {
 		final Path configPath = FMLPaths.CONFIGDIR.get();
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		try {
@@ -382,11 +388,11 @@ public final class PSConfig {
 			LOGGER.error("Failed to create " + PureSufferingMod.MODID + " config directory!", exception);
 		}
 		loadConfig(COMMON.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-common.toml"));
-		if (isClientIn) loadConfig(CLIENT.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml"));
+		if (pIsClient) loadConfig(CLIENT.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml"));
 	}
 
-	public static final void initLevelConfig(final ServerLevel levelIn) {
-		final String levelFileName = levelIn.dimension().location().toDebugFileName();
+	public static final void initLevelConfig(final ServerLevel pLevel) {
+		final String levelFileName = pLevel.dimension().location().toDebugFileName();
 		final Path configPath = FMLPaths.CONFIGDIR.get();
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		final Path psLevelConfigPath = Paths.get(psConfigPath.toAbsolutePath().toString(), "dimensions");
@@ -397,19 +403,19 @@ public final class PSConfig {
 		} catch (final IOException exception) {
 			LOGGER.error("Failed to create puresuffering dimensions config directory!", exception);
 		}
-		final LevelConfig config = new LevelConfig(levelIn);
-		LEVELS.put(levelIn, config);
+		final LevelConfig config = new LevelConfig(pLevel);
+		LEVELS.put(pLevel, config);
 		loadConfig(config.builder.build(), psLevelConfigPath.resolve(levelFileName + "-level.toml"));
 	}
 
-	private static final void loadConfig(final ModConfigSpec specIn, final Path pathIn) {
-		final CommentedFileConfig configData = CommentedFileConfig.builder(pathIn)
+	private static final void loadConfig(final ModConfigSpec pSpec, final Path pPath) {
+		final CommentedFileConfig configData = CommentedFileConfig.builder(pPath)
 				.sync()
 				.autosave()
 				.preserveInsertionOrder()
 				.writingMode(WritingMode.REPLACE)
 				.build();
 		configData.load();
-		specIn.setConfig(configData);
+		pSpec.setConfig(configData);
 	}
 }

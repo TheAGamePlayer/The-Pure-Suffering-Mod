@@ -16,80 +16,80 @@ import net.minecraft.util.Mth;
 public enum InvasionSessionType {
 	DAY("Day", (it, modified) -> modified ? it != InvasionTime.DAY : it != InvasionTime.NIGHT, tm -> tm == TimeModifier.DAY_TO_NIGHT, tc -> tc != TimeChangeability.ONLY_NIGHT) {
 		@Override
-		public final int getMaxPossibleInvasions(final ServerLevel levelIn) {
-			return Mth.clamp((int)(levelIn.getDayTime()/(24000L * this.getTierIncreaseDelay(levelIn))) + 1, 0, PSConfigValues.LEVELS.get(levelIn).maxInvasions[0]);
+		public final int getMaxPossibleInvasions(final ServerLevel pLevel) {
+			return Mth.clamp((int)(pLevel.getDayTime()/(24000L * this.getTierIncreaseDelay(pLevel))) + 1, 0, PSConfigValues.LEVELS.get(pLevel).maxInvasions[0]);
 		}
 
 		@Override
-		public final int getRarity(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).invasionSessionTypeRarity[0];
+		public final int getRarity(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).invasionSessionTypeRarity[0];
 		}
 
 		@Override
-		public final int getTierIncreaseDelay(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).tierIncreaseDelay[0];
+		public final int getTierIncreaseDelay(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).tierIncreaseDelay[0];
 		}
 
 		@Override
-		public final boolean canBeCanceled(final ServerLevel levelIn) {
-			return PSGameRules.CANCELABLE_INVASIONS.get(levelIn) && PSConfigValues.LEVELS.get(levelIn).cancelableInvasions[0];
+		public final boolean canBeCanceled(final ServerLevel pLevel) {
+			return PSGameRules.CANCELABLE_INVASIONS.get(pLevel) && PSConfigValues.LEVELS.get(pLevel).cancelableInvasions[0];
 		}
 
 		@Override
-		public final int getCancelRarity(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).cancelInvasionRarity[0];
+		public final int getCancelRarity(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).cancelInvasionRarity[0];
 		}
 	},
 	NIGHT("Night", (it, modified) -> modified ? it != InvasionTime.NIGHT : it != InvasionTime.DAY, tm -> tm == TimeModifier.NIGHT_TO_DAY, tc -> tc != TimeChangeability.ONLY_DAY) {
 		@Override
-		public final int getMaxPossibleInvasions(final ServerLevel levelIn) {
-			return Mth.clamp((int)(levelIn.getDayTime()/(24000L * this.getTierIncreaseDelay(levelIn))) + 1, 0, PSConfigValues.LEVELS.get(levelIn).maxInvasions[1]);
+		public final int getMaxPossibleInvasions(final ServerLevel pLevel) {
+			return Mth.clamp((int)(pLevel.getDayTime()/(24000L * this.getTierIncreaseDelay(pLevel))) + 1, 0, PSConfigValues.LEVELS.get(pLevel).maxInvasions[1]);
 		}
 
 		@Override
-		public final int getRarity(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).invasionSessionTypeRarity[1];
+		public final int getRarity(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).invasionSessionTypeRarity[1];
 		}
 
 		@Override
-		public final int getTierIncreaseDelay(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).tierIncreaseDelay[1];
+		public final int getTierIncreaseDelay(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).tierIncreaseDelay[1];
 		}
 
 		@Override
-		public final boolean canBeCanceled(final ServerLevel levelIn) {
-			return PSGameRules.CANCELABLE_INVASIONS.get(levelIn) && PSConfigValues.LEVELS.get(levelIn).cancelableInvasions[1];
+		public final boolean canBeCanceled(final ServerLevel pLevel) {
+			return PSGameRules.CANCELABLE_INVASIONS.get(pLevel) && PSConfigValues.LEVELS.get(pLevel).cancelableInvasions[1];
 		}
 
 		@Override
-		public final int getCancelRarity(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).cancelInvasionRarity[1];
+		public final int getCancelRarity(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).cancelInvasionRarity[1];
 		}
 	},
 	FIXED("Fixed", (it, modified) -> true, tm -> false, tc -> true) {
 		@Override
-		public final int getMaxPossibleInvasions(final ServerLevel levelIn) {
-			return Mth.clamp((int)(levelIn.getDayTime()/(24000L * this.getTierIncreaseDelay(levelIn))) + 1, 0, PSConfigValues.LEVELS.get(levelIn).maxInvasions[0]);
+		public final int getMaxPossibleInvasions(final ServerLevel pLevel) {
+			return Mth.clamp((int)(pLevel.getDayTime()/(24000L * this.getTierIncreaseDelay(pLevel))) + 1, 0, PSConfigValues.LEVELS.get(pLevel).maxInvasions[0]);
 		}
 
 		@Override
-		public final int getRarity(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).invasionSessionTypeRarity[0];
+		public final int getRarity(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).invasionSessionTypeRarity[0];
 		}
 
 		@Override
-		public final int getTierIncreaseDelay(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).tierIncreaseDelay[0];
+		public final int getTierIncreaseDelay(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).tierIncreaseDelay[0];
 		}
 
 		@Override
-		public final boolean canBeCanceled(final ServerLevel levelIn) {
-			return PSGameRules.CANCELABLE_INVASIONS.get(levelIn) && PSConfigValues.LEVELS.get(levelIn).cancelableInvasions[0];
+		public final boolean canBeCanceled(final ServerLevel pLevel) {
+			return PSGameRules.CANCELABLE_INVASIONS.get(pLevel) && PSConfigValues.LEVELS.get(pLevel).cancelableInvasions[0];
 		}
 
 		@Override
-		public final int getCancelRarity(final ServerLevel levelIn) {
-			return PSConfigValues.LEVELS.get(levelIn).cancelInvasionRarity[0];
+		public final int getCancelRarity(final ServerLevel pLevel) {
+			return PSConfigValues.LEVELS.get(pLevel).cancelInvasionRarity[0];
 		}
 	};
 	
@@ -99,12 +99,12 @@ public enum InvasionSessionType {
 	private final Predicate<TimeModifier> canModifyTime;
 	private final Predicate<TimeChangeability> canBeChanged;
 	
-	private InvasionSessionType(final String nameIn, final BiPredicate<InvasionTime, Boolean> isAcceptableTimeIn, final Predicate<TimeModifier> canModifyTimeIn, final Predicate<TimeChangeability> canBeChangedIn) {
-		this.name = nameIn;
+	private InvasionSessionType(final String pName, final BiPredicate<InvasionTime, Boolean> pIsAcceptableTime, final Predicate<TimeModifier> pCanModifyTime, final Predicate<TimeChangeability> pCanBeChanged) {
+		this.name = pName;
 		this.translation = Component.translatable("puresuffering.invasionSessionType." + this.toString());
-		this.isAcceptableTime = isAcceptableTimeIn;
-		this.canModifyTime = canModifyTimeIn;
-		this.canBeChanged = canBeChangedIn;
+		this.isAcceptableTime = pIsAcceptableTime;
+		this.canModifyTime = pCanModifyTime;
+		this.canBeChanged = pCanBeChanged;
 	}
 	
 	@Override
@@ -120,33 +120,33 @@ public enum InvasionSessionType {
 		return this.translation.getString(256);
 	}
 	
-	public final boolean isAcceptableTime(final InvasionType invasionTypeIn, final boolean isTimeModifiedIn) {
-		return this.isAcceptableTime.test(invasionTypeIn.getInvasionTime(), isTimeModifiedIn);
+	public final boolean isAcceptableTime(final InvasionType pInvasionType, final boolean pIsTimeModified) {
+		return this.isAcceptableTime.test(pInvasionType.getInvasionTime(), pIsTimeModified);
 	}
 	
-	public final boolean canModifyTime(final InvasionType invasionTypeIn) {
-		return this.canModifyTime.test(invasionTypeIn.getTimeModifier());
+	public final boolean canModifyTime(final InvasionType pInvasionType) {
+		return this.canModifyTime.test(pInvasionType.getTimeModifier());
 	}
 	
-	public final boolean canBeChanged(final InvasionType invasionTypeIn) {
-		return this.canBeChanged.test(invasionTypeIn.getTimeChangeability());
+	public final boolean canBeChanged(final InvasionType pInvasionType) {
+		return this.canBeChanged.test(pInvasionType.getTimeChangeability());
 	}
 	
-	public abstract int getMaxPossibleInvasions(final ServerLevel levelIn);
+	public abstract int getMaxPossibleInvasions(final ServerLevel pLevel);
 	
-	public abstract int getRarity(final ServerLevel levelIn);
+	public abstract int getRarity(final ServerLevel pLevel);
 	
-	public abstract int getTierIncreaseDelay(final ServerLevel levelIn);
+	public abstract int getTierIncreaseDelay(final ServerLevel pLevel);
 	
-	public abstract boolean canBeCanceled(final ServerLevel levelIn);
+	public abstract boolean canBeCanceled(final ServerLevel pLevel);
 	
-	public abstract int getCancelRarity(final ServerLevel levelIn);
+	public abstract int getCancelRarity(final ServerLevel pLevel);
 	
-	public static final InvasionSessionType getActive(final ServerLevel levelIn) {
-		return levelIn.dimensionType().hasFixedTime() ? FIXED : (levelIn.getDayTime() % 24000L < 12000L ? DAY : NIGHT);
+	public static final InvasionSessionType getActive(final ServerLevel pLevel) {
+		return pLevel.dimensionType().hasFixedTime() ? FIXED : (pLevel.getDayTime() % 24000L < 12000L ? DAY : NIGHT);
 	}
 	
-	public static final InvasionSessionType getInactive(final ServerLevel levelIn) {
-		return levelIn.dimensionType().hasFixedTime() ? FIXED : (levelIn.getDayTime() % 24000L < 12000L ? NIGHT : DAY);
+	public static final InvasionSessionType getInactive(final ServerLevel pLevel) {
+		return pLevel.dimensionType().hasFixedTime() ? FIXED : (pLevel.getDayTime() % 24000L < 12000L ? NIGHT : DAY);
 	}
 }

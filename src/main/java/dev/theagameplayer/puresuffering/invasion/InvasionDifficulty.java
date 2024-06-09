@@ -20,70 +20,70 @@ import net.minecraft.world.level.Level;
 public enum InvasionDifficulty {
 	DEFAULT("Default", ChatFormatting.RED.getColor(), ChatFormatting.DARK_RED.getColor(), PSSoundEvents.DEFAULT_INVASION_START, ParticleTypes.SMOKE, ParticleTypes.FLAME, 20, 4) {
 		@Override
-		public final int getHyperCharge(final ServerLevel levelIn, final int tierIn, final boolean isNaturalIn) {
-			if (PSGameRules.TIERED_INVASIONS.get(levelIn) && isNaturalIn) {
-				final int maxCharge = (int)levelIn.getDayTime()/(24000 * InvasionSessionType.getActive(levelIn).getTierIncreaseDelay(levelIn)) - tierIn;
+		public final int getHyperCharge(final ServerLevel pLevel, final int pTier, final boolean pIsNatural) {
+			if (PSGameRules.TIERED_INVASIONS.get(pLevel) && pIsNatural) {
+				final int maxCharge = (int)pLevel.getDayTime()/(24000 * InvasionSessionType.getActive(pLevel).getTierIncreaseDelay(pLevel)) - pTier;
 				if (maxCharge < 1) return 0;
-				return levelIn.random.nextInt(levelIn.random.nextInt(Math.min(maxCharge, 3)) + 1) + 1;
+				return pLevel.random.nextInt(pLevel.random.nextInt(Math.min(maxCharge, 3)) + 1) + 1;
 			}
-			return levelIn.random.nextInt(levelIn.random.nextInt(3) + 1) + 1;
+			return pLevel.random.nextInt(pLevel.random.nextInt(3) + 1) + 1;
 		}
 
 		@Override
-		public final boolean isAllowed(final Level levelIn) {
-			return levelIn.getDifficulty() != Difficulty.PEACEFUL && PSGameRules.ENABLE_INVASIONS.get(levelIn);
+		public final boolean isAllowed(final Level pLevel) {
+			return pLevel.getDifficulty() != Difficulty.PEACEFUL && PSGameRules.ENABLE_INVASIONS.get(pLevel);
 		}
 
 		@Override
-		public final int getRarity(final ServerLevel levelIn, final int invasionRarityIn) {
-			return invasionRarityIn;
+		public final int getRarity(final ServerLevel pLevel, final int pInvasionRarity) {
+			return pInvasionRarity;
 		}
 
 		@Override
-		public final int getInvasionCount(final RandomSource randomIn, final int maxInvasionsIn) {
-			return randomIn.nextInt(maxInvasionsIn) + 1;
+		public final int getInvasionCount(final RandomSource pRandom, final int pMaxInvasions) {
+			return pRandom.nextInt(pMaxInvasions) + 1;
 		}
 	},
 	HYPER("Hyper", ChatFormatting.RED.getColor(), ChatFormatting.DARK_RED.getColor(), PSSoundEvents.HYPER_INVASION_START, ParticleTypes.SOUL, ParticleTypes.FLAME, 25, 2) {
 		@Override
-		public final int getHyperCharge(final ServerLevel levelIn, final int tierIn, final boolean isNaturalIn) {
-			return Math.max(levelIn.random.nextInt(3), levelIn.random.nextInt(3)) + 1;
+		public final int getHyperCharge(final ServerLevel pLevel, final int pTier, final boolean pIsNatural) {
+			return Math.max(pLevel.random.nextInt(3), pLevel.random.nextInt(3)) + 1;
 		}
 
 		@Override
-		public final boolean isAllowed(final Level levelIn) {
-			return DEFAULT.isAllowed(levelIn) && levelIn.getDifficulty() != Difficulty.EASY && PSGameRules.HYPER_CHARGE.get(levelIn) && PSGameRules.ENABLE_HYPER_INVASIONS.get(levelIn);
+		public final boolean isAllowed(final Level pLevel) {
+			return DEFAULT.isAllowed(pLevel) && pLevel.getDifficulty() != Difficulty.EASY && PSGameRules.HYPER_CHARGE.get(pLevel) && PSGameRules.ENABLE_HYPER_INVASIONS.get(pLevel);
 		}
 
 		@Override
-		public final int getRarity(final ServerLevel levelIn, final int invasionRarityIn) {
-			return PSConfigValues.LEVELS.get(levelIn).invasionDifficultyRarity[0];
+		public final int getRarity(final ServerLevel pLevel, final int pInvasionRarity) {
+			return PSConfigValues.LEVELS.get(pLevel).invasionDifficultyRarity[0];
 		}
 
 		@Override
-		public final int getInvasionCount(final RandomSource randomIn, final int maxInvasionsIn) {
-			return Math.max(randomIn.nextInt(maxInvasionsIn), randomIn.nextInt(maxInvasionsIn)) + 1;
+		public final int getInvasionCount(final RandomSource pRandom, final int pMaxInvasions) {
+			return Math.max(pRandom.nextInt(pMaxInvasions), pRandom.nextInt(pMaxInvasions)) + 1;
 		}
 	},
 	NIGHTMARE("Nightmare", (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/2, (ChatFormatting.DARK_PURPLE.getColor() + ChatFormatting.DARK_RED.getColor())/3, PSSoundEvents.NIGHTMARE_INVASION_START, ParticleTypes.SCULK_SOUL, ParticleTypes.SOUL_FIRE_FLAME, 30, 1) {
 		@Override
-		public final int getHyperCharge(final ServerLevel levelIn, final int tierIn, final boolean isNaturalIn) {
+		public final int getHyperCharge(final ServerLevel pLevel, final int pTier, final boolean pIsNatural) {
 			return 4;
 		}
 
 		@Override
-		public final boolean isAllowed(final Level levelIn) {
-			return HYPER.isAllowed(levelIn) && PSGameRules.ENABLE_NIGHTMARE_INVASIONS.get(levelIn);
+		public final boolean isAllowed(final Level pLevel) {
+			return HYPER.isAllowed(pLevel) && PSGameRules.ENABLE_NIGHTMARE_INVASIONS.get(pLevel);
 		}
 
 		@Override
-		public final int getRarity(final ServerLevel levelIn, final int invasionRarityIn) {
-			return PSConfigValues.LEVELS.get(levelIn).invasionDifficultyRarity[1];
+		public final int getRarity(final ServerLevel pLevel, final int pInvasionRarity) {
+			return PSConfigValues.LEVELS.get(pLevel).invasionDifficultyRarity[1];
 		}
 
 		@Override
-		public final int getInvasionCount(final RandomSource randomIn, final int maxInvasionsIn) {
-			return Math.max(HYPER.getInvasionCount(randomIn, maxInvasionsIn), randomIn.nextInt(maxInvasionsIn));
+		public final int getInvasionCount(final RandomSource pRandom, final int pMaxInvasions) {
+			return Math.max(HYPER.getInvasionCount(pRandom, pMaxInvasions), pRandom.nextInt(pMaxInvasions));
 		}
 	};
 
@@ -95,16 +95,16 @@ public enum InvasionDifficulty {
 	private final int particleCount;
 	private final int ringDelay;
 
-	private InvasionDifficulty(final String nameIn, final int color1n, final int color2n, final Supplier<SoundEvent> startSoundIn, final SimpleParticleType p1n, final SimpleParticleType p2n, final int particleCountIn, final int ringDelayIn) {
-		this.name = nameIn;
+	private InvasionDifficulty(final String pName, final int pColor1, final int pColor2, final Supplier<SoundEvent> pStartSound, final SimpleParticleType pP1, final SimpleParticleType pP2, final int pParticleCount, final int pRingDelay) {
+		this.name = pName;
 		this.translation = Component.translatable("puresuffering.invasionDifficulty." + this.toString());
-		this.color1 = color1n;
-		this.color2 = color2n;
-		this.startSound = startSoundIn;
-		this.p1 = p1n;
-		this.p2 = p2n;
-		this.particleCount = particleCountIn;
-		this.ringDelay = ringDelayIn;
+		this.color1 = pColor1;
+		this.color2 = pColor2;
+		this.startSound = pStartSound;
+		this.p1 = pP1;
+		this.p2 = pP2;
+		this.particleCount = pParticleCount;
+		this.ringDelay = pRingDelay;
 	}
 
 	@Override
@@ -120,24 +120,24 @@ public enum InvasionDifficulty {
 		return this.translation.getString(256);
 	}
 	
-	public final int getColor(final boolean isFirstIn) {
-		return isFirstIn ? this.color1 : this.color2;
+	public final int getColor(final boolean pIsFirst) {
+		return pIsFirst ? this.color1 : this.color2;
 	}
 	
-	public final PSRGB getInterColor(final int divIn, final int multIn) {
-		return new PSRGB(this.color1, this.color2, divIn, multIn);
+	public final PSRGB getInterColor(final int pDiv, final int pMult) {
+		return new PSRGB(this.color1, this.color2, pDiv, pMult);
 	}
 	
-	public final PSRGB getRandomColor(final RandomSource randomIn) {
-		return new PSRGB(randomIn, this.color1, this.color2);
+	public final PSRGB getRandomColor(final RandomSource pRandom) {
+		return new PSRGB(pRandom, this.color1, this.color2);
 	}
 
 	public final SoundEvent getStartSound() {
 		return this.startSound.get();
 	}
 
-	public final SimpleParticleType getSpawnParticleType(final boolean isFirstIn) {
-		return isFirstIn ? this.p1 : this.p2;
+	public final SimpleParticleType getSpawnParticleType(final boolean pIsFirst) {
+		return pIsFirst ? this.p1 : this.p2;
 	}
 
 	public final int getParticleCount() {
@@ -156,11 +156,11 @@ public enum InvasionDifficulty {
 		return this.ordinal() > HYPER.ordinal();
 	}
 	
-	public abstract int getHyperCharge(final ServerLevel levelIn, final int tierIn, final boolean isNaturalIn);
+	public abstract int getHyperCharge(final ServerLevel pLevel, final int pTier, final boolean pIsNatural);
 	
-	public abstract boolean isAllowed(final Level levelIn);
+	public abstract boolean isAllowed(final Level pLevel);
 	
-	public abstract int getRarity(final ServerLevel levelIn, final int invasionRarityIn);
+	public abstract int getRarity(final ServerLevel pLevel, final int pInvasionRarity);
 	
-	public abstract int getInvasionCount(final RandomSource randomIn, final int maxInvasionsIn);
+	public abstract int getInvasionCount(final RandomSource pRandom, final int pMaxInvasions);
 }

@@ -7,9 +7,9 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 public final class PSReloadListeners {
 	private static InvasionTypeManager invasionTypeManager;
 
-	public static final void addReloadListeners(final AddReloadListenerEvent eventIn) {
-		invasionTypeManager = new InvasionTypeManager(eventIn.getRegistryAccess().registryOrThrow(Registries.LEVEL_STEM));
-		eventIn.addListener(invasionTypeManager);
+	public static final void addReloadListeners(final AddReloadListenerEvent pEvent) {
+		invasionTypeManager = new InvasionTypeManager(pEvent.getRegistryAccess().registryOrThrow(Registries.LEVEL_STEM));
+		pEvent.addListener(invasionTypeManager);
 	}
 
 	public static final InvasionTypeManager getInvasionTypeManager() {

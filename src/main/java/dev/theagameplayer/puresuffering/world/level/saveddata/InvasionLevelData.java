@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
@@ -16,26 +17,26 @@ public final class InvasionLevelData extends SavedData {
 	private long invasionTime;
 	private int xpMult;
 
-	private InvasionLevelData(final ServerLevel levelIn) {
-		this.invasionManager = new InvasionManager(levelIn.dimensionType().hasFixedTime());
+	private InvasionLevelData(final ServerLevel pLevel) {
+		this.invasionManager = new InvasionManager(pLevel.dimensionType().hasFixedTime());
 		this.setDirty();
-		INVASION_DATA.put(levelIn, this);
+		INVASION_DATA.put(pLevel, this);
 	}
 
-	public static SavedData.Factory<InvasionLevelData> factory(final ServerLevel levelIn) {
+	public static final SavedData.Factory<InvasionLevelData> factory(final ServerLevel pLevel) {
 		return new SavedData.Factory<>(() -> {
-			return new InvasionLevelData(levelIn);
-		}, nbt -> {
-			return load(levelIn, nbt);
+			return new InvasionLevelData(pLevel);
+		}, (nbt, provider) -> {
+			return load(pLevel, nbt);
 		});
 	}
 
-	public static final String getFileId(final Holder<DimensionType> dimTypeIn) {
-		return dimTypeIn.is(BuiltinDimensionTypes.END) ? "invasions_end" : "invasions";
+	public static final String getFileId(final Holder<DimensionType> pDimType) {
+		return pDimType.is(BuiltinDimensionTypes.END) ? "invasions_end" : "invasions";
 	}
 
-	public static final InvasionLevelData get(final ServerLevel levelIn) {
-		return INVASION_DATA.get(levelIn);
+	public static final InvasionLevelData get(final ServerLevel pLevel) {
+		return INVASION_DATA.get(pLevel);
 	}
 
 	public final InvasionManager getInvasionManager() {
@@ -46,8 +47,8 @@ public final class InvasionLevelData extends SavedData {
 		return this.invasionTime;
 	}
 
-	public final void setInvasionTime(final long invasionTimeIn) {
-		this.invasionTime = invasionTimeIn;
+	public final void setInvasionTime(final long pInvasionTime) {
+		this.invasionTime = pInvasionTime;
 		this.setDirty();
 	}
 
@@ -55,24 +56,24 @@ public final class InvasionLevelData extends SavedData {
 		return this.xpMult;
 	}
 
-	public final void setXPMultiplier(final int xpMultIn) {
-		this.xpMult = xpMultIn;
+	public final void setXPMultiplier(final int pXPMult) {
+		this.xpMult = pXPMult;
 		this.setDirty();
 	}
 
-	public static final InvasionLevelData load(final ServerLevel levelIn, final CompoundTag nbtIn) {
-		final InvasionLevelData ilData = new InvasionLevelData(levelIn);
-		ilData.getInvasionManager().load(levelIn, nbtIn.getCompound("InvasionManager"));
-		ilData.invasionTime = nbtIn.getLong("InvasionTime");
-		ilData.xpMult = nbtIn.getInt("XPMult");
+	public static final InvasionLevelData load(final ServerLevel pLevel, final CompoundTag pNbt) {
+		final InvasionLevelData ilData = new InvasionLevelData(pLevel);
+		ilData.getInvasionManager().load(pLevel, pNbt.getCompound("InvasionManager"));
+		ilData.invasionTime = pNbt.getLong("InvasionTime");
+		ilData.xpMult = pNbt.getInt("XPMult");
 		return ilData;
 	}
 
 	@Override
-	public CompoundTag save(final CompoundTag nbtIn) {
-		nbtIn.put("InvasionManager", this.invasionManager.save());
-		nbtIn.putLong("InvasionTime", this.invasionTime);
-		nbtIn.putInt("XPMult", this.xpMult);
-		return nbtIn;
+	public CompoundTag save(final CompoundTag pNbt, final HolderLookup.Provider pProvider) {
+		pNbt.put("InvasionManager", this.invasionManager.save());
+		pNbt.putLong("InvasionTime", this.invasionTime);
+		pNbt.putInt("XPMult", this.xpMult);
+		return pNbt;
 	}
 }

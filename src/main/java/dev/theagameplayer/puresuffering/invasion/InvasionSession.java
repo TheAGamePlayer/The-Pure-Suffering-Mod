@@ -2,6 +2,7 @@ package dev.theagameplayer.puresuffering.invasion;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import dev.theagameplayer.puresuffering.invasion.InvasionType.WeatherType;
 import dev.theagameplayer.puresuffering.network.AddInvasionPacket;
@@ -25,10 +26,10 @@ public final class InvasionSession implements Iterable<Invasion> {
 	private int weatherChangeDelay, lightLevel;
 	private boolean stopsConversions, forceNoSleep;
 
-	public InvasionSession(final InvasionSessionType sessionTypeIn, final InvasionDifficulty difficultyIn) {
-		this.sessionType = sessionTypeIn;
-		this.difficulty = difficultyIn;
-		this.style = Style.EMPTY.withBold(difficultyIn.isHyper()).withItalic(difficultyIn.isNightmare());
+	public InvasionSession(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty) {
+		this.sessionType = pSessionType;
+		this.difficulty = pDifficulty;
+		this.style = Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare());
 	}
 
 	public final Invasion getPrimary() {
@@ -47,32 +48,44 @@ public final class InvasionSession implements Iterable<Invasion> {
 		return this.style;
 	}
 	
-	public final boolean replaceMob(final Mob oldMobIn, final Mob mobIn) {
+	public final boolean replaceMob(final Mob pOldMob, final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
-			if (invasion.hasMob(oldMobIn)) {
-				invasion.replaceMob(oldMobIn, mobIn);
+			final int index = invasion.hasMob(pOldMob);
+			if (index > 0) {
+				invasion.replaceMob(pMob, index);
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public final boolean splitMob(final Mob pParent, final List<Mob> pChildren) {
+		for (final Invasion invasion : this.invasions) {
+			if (invasion.hasSameInvasion(pParent)) {
+				invasion.splitMob(pChildren);
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public final void relocateMob(final Mob mobIn) {
+	public final void relocateMob(final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
-			if (invasion.hasMob(mobIn)) invasion.relocateMob(mobIn);
+			final int index = invasion.hasMob(pMob);
+			if (index > -1) invasion.relocateMob(index);
 		}
 	}
 	
-	public final boolean hasMob(final Mob mobIn) {
+	public final boolean hasMob(final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
-			if (invasion.hasMob(mobIn)) return true;
+			if (invasion.hasMob(pMob) > -1) return true;
 		}
 		return false;
 	}
 	
-	public final void loadMob(final Mob mobIn) {
+	public final void loadMob(final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
-			if (invasion.loadMob(mobIn)) return;
+			if (invasion.loadMob(pMob)) return;
 		}
 	}
 
@@ -95,30 +108,30 @@ public final class InvasionSession implements Iterable<Invasion> {
 		this.lightLevel = this.difficulty.isNightmare() ? 15 : (lc > 0 ? lightLevel/lc : -1);
 	}
 
-	public final boolean stopOrTick(final ServerLevel levelIn) {
+	public final boolean stopOrTick(final ServerLevel pLevel) {
 		if (this.invasions.isEmpty()) return true;
 		switch (this.weatherType) {
 		case DEFAULT: break;
 		case CLEAR: {
-			if (levelIn.isRaining() || levelIn.isThundering())
-				levelIn.setWeatherParameters(12000 - (int)(levelIn.dayTime() % 12000L), 0, false, false);
+			if (pLevel.isRaining() || pLevel.isThundering())
+				pLevel.setWeatherParameters(12000 - (int)(pLevel.dayTime() % 12000L), 0, false, false);
 			break;
 		}
 		case RAIN: {
-			if (!levelIn.isRaining())
-				levelIn.setWeatherParameters(0, 12000 - (int)(levelIn.dayTime() % 12000L), true, false);
+			if (!pLevel.isRaining())
+				pLevel.setWeatherParameters(0, 12000 - (int)(pLevel.dayTime() % 12000L), true, false);
 			break;
 		}
 		case THUNDER: {
-			if (!levelIn.isThundering())
-				levelIn.setWeatherParameters(0, 12000 - (int)(levelIn.dayTime() % 12000L), true, true);
+			if (!pLevel.isThundering())
+				pLevel.setWeatherParameters(0, 12000 - (int)(pLevel.dayTime() % 12000L), true, true);
 			break;
 		}
 		case UNSTABLE: {
 			if (this.weatherChangeDelay < 0) {
-				final int type = levelIn.random.nextInt(5);
-				final int time = Math.min(150 + levelIn.random.nextInt(Invasion.HALF_TRANSITION + 1), 12000 - (int)(levelIn.dayTime() % 12000L));
-				levelIn.setWeatherParameters(type < 2 ? time : 0, type < 2 ? 0 : time, type == 2, type > 2);
+				final int type = pLevel.random.nextInt(5);
+				final int time = Math.min(150 + pLevel.random.nextInt(Invasion.HALF_TRANSITION + 1), 12000 - (int)(pLevel.dayTime() % 12000L));
+				pLevel.setWeatherParameters(type < 2 ? time : 0, type < 2 ? 0 : time, type == 2, type > 2);
 				this.weatherChangeDelay = time;
 			} else {
 				this.weatherChangeDelay--;
@@ -126,7 +139,7 @@ public final class InvasionSession implements Iterable<Invasion> {
 			break;
 		}
 		}
-		this.invasions.get((int)(levelIn.getDayTime() % this.invasions.size())).tick(levelIn, this.difficulty, this.invasions.size());
+		this.invasions.get((int)(pLevel.getDayTime() % this.invasions.size())).tick(pLevel, this.difficulty, this.invasions.size());
 		return false;
 	}
 
@@ -138,16 +151,16 @@ public final class InvasionSession implements Iterable<Invasion> {
 		return this.forceNoSleep;
 	}
 
-	public final int getLightLevelOrDefault(final int lightLevelIn) {
-		return this.lightLevel > 0 ? this.lightLevel : lightLevelIn;
+	public final int getLightLevelOrDefault(final int pLightLevel) {
+		return this.lightLevel > 0 ? this.lightLevel : pLightLevel;
 	}
 
-	public static final InvasionSession load(final ServerLevel levelIn, final CompoundTag nbtIn) {
-		final InvasionSession session = new InvasionSession(InvasionSessionType.getActive(levelIn), InvasionDifficulty.values()[nbtIn.getInt("Difficulty")]);
-		final ListTag invasionsNBT = nbtIn.getList(session.sessionType.getDefaultName() + "Invasions", Tag.TAG_COMPOUND);
+	public static final InvasionSession load(final ServerLevel pLevel, final CompoundTag pNbt) {
+		final InvasionSession session = new InvasionSession(InvasionSessionType.getActive(pLevel), InvasionDifficulty.values()[pNbt.getInt("Difficulty")]);
+		final ListTag invasionsNBT = pNbt.getList(session.sessionType.getDefaultName() + "Invasions", Tag.TAG_COMPOUND);
 		for (final Tag inbt : invasionsNBT) {
 			if (inbt instanceof CompoundTag nbt)
-				session.add(levelIn, Invasion.load(levelIn, nbt));
+				session.add(pLevel, Invasion.load(pLevel, nbt));
 		}
 		return session;
 	}
@@ -163,25 +176,25 @@ public final class InvasionSession implements Iterable<Invasion> {
 	}
 
 	//Sync to Client
-	public final void add(final ServerLevel levelIn, final Invasion invasionIn) {
-		this.invasions.add(invasionIn);
+	public final void add(final ServerLevel pLevel, final Invasion pInvasion) {
+		this.invasions.add(pInvasion);
 		this.update();
-		PSPackets.sendToClientsIn(new AddInvasionPacket(this.sessionType, this.difficulty, invasionIn), levelIn);
+		PSPackets.sendToClientsIn(new AddInvasionPacket(this.sessionType, this.difficulty, pInvasion), pLevel);
 	}
 
-	public final void remove(final ServerLevel levelIn, final Invasion invasionIn) {
-		if (invasionIn.isPrimary()) {
-			this.clear(levelIn);
+	public final void remove(final ServerLevel pLevel, final Invasion pInvasion) {
+		if (pInvasion.isPrimary()) {
+			this.clear(pLevel);
 			return;
 		}
-		this.invasions.remove(invasionIn);
+		this.invasions.remove(pInvasion);
 		this.update();
-		PSPackets.sendToClientsIn(new RemoveInvasionPacket(invasionIn.getSeverityInfo().getSkyRenderInfo()), levelIn);
+		PSPackets.sendToClientsIn(new RemoveInvasionPacket(pInvasion.getSeverityInfo().getSkyRenderInfo()), pLevel);
 	}
 
-	public final void clear(final ServerLevel levelIn) {
+	public final void clear(final ServerLevel pLevel) {
 		this.invasions.clear();
-		PSPackets.sendToClientsIn(new ClearInvasionsPacket(), levelIn);
+		PSPackets.sendToClientsIn(new ClearInvasionsPacket(), pLevel);
 	}
 
 	public final void updateClient(final ServerPlayer playerIn) {

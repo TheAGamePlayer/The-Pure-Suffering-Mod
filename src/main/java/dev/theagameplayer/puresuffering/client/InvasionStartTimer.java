@@ -15,28 +15,30 @@ public final class InvasionStartTimer {
 	public static InvasionStartTimer timer;
 	private final ArrayList<DelayInfo> delays = new ArrayList<>();
 
-	public InvasionStartTimer(final InvasionDifficulty difficultyIn, final ClientInvasionSession sessionIn) {
+	public InvasionStartTimer(final InvasionDifficulty pDifficulty, final ClientInvasionSession pSession, final boolean pNotifyPlayers) {
 		this.delays.add(new DelayInfo(session -> { //2.5 seconds
-			if (difficultyIn == null) {
+			if (!pNotifyPlayers) return;
+			if (pDifficulty == null) {
 				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("invasion.puresuffering.start.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), false);
 			} else if (session != null) {
-				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("invasion.puresuffering.start." + difficultyIn).withStyle(Style.EMPTY.withBold(difficultyIn.isHyper()).withItalic(difficultyIn.isNightmare()).withColor(difficultyIn.getColor(true))), false);
+				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("invasion.puresuffering.start." + pDifficulty).withStyle(Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare()).withColor(pDifficulty.getColor(true))), false);
 			}
 		}, 50));
 		this.delays.add(new DelayInfo(session -> { //3.25 seconds
-			if (difficultyIn != null && session != null)
-				Minecraft.getInstance().getChatListener().handleSystemMessage(InvasionText.create("", difficultyIn.getColor(false), sessionIn).withStyle(sessionIn.getStyle()), false);
+			if (!pNotifyPlayers) return;
+			if (pDifficulty != null && session != null)
+				Minecraft.getInstance().getChatListener().handleSystemMessage(InvasionText.create("", pDifficulty.getColor(false), pSession).withStyle(pSession.getStyle()), false);
 		}, 65));
 	}
 
-	public static final void tick(final ClientInvasionSession sessionIn) {
+	public static final void tick(final ClientInvasionSession pSession) {
 		if (timer == null) return;
 		timer.delays.removeIf(delayInfo -> {
 			if (delayInfo.delay > 0) {
 				delayInfo.delay--;
 				return false;
 			} else {
-				delayInfo.info.accept(sessionIn);
+				delayInfo.info.accept(pSession);
 				return true;
 			}
 		});
@@ -47,9 +49,9 @@ public final class InvasionStartTimer {
 		private final Consumer<ClientInvasionSession> info;
 		private int delay;
 		
-		private DelayInfo(final Consumer<ClientInvasionSession> infoIn, final int delayIn) {
-			this.info = infoIn;
-			this.delay = delayIn;
+		private DelayInfo(final Consumer<ClientInvasionSession> pInfo, final int pDelay) {
+			this.info = pInfo;
+			this.delay = pDelay;
 		}
 	}
 }

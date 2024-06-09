@@ -14,32 +14,32 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class PSPackets {
-	public static final void registerPackets(final RegisterPayloadHandlerEvent eventIn) {
-		final IPayloadRegistrar registrar = eventIn.registrar(PureSufferingMod.MODID);
-		registrar.play(AddInvasionPacket.ID, AddInvasionPacket::read, handler -> handler.client(AddInvasionPacket::handle));
-		registrar.play(ClearInvasionsPacket.ID, ClearInvasionsPacket::read, handler -> handler.client(ClearInvasionsPacket::handle));
-		registrar.play(InvasionMobParticlesPacket.ID, InvasionMobParticlesPacket::read, handler -> handler.client(InvasionMobParticlesPacket::handle));
-		registrar.play(SendInvasionsPacket.ID, SendInvasionsPacket::read, handler -> handler.client(SendInvasionsPacket::handle));
-		registrar.play(InvasionStartPacket.ID, InvasionStartPacket::read, handler -> handler.client(InvasionStartPacket::handle));
-		registrar.play(RemoveInvasionPacket.ID, RemoveInvasionPacket::read, handler -> handler.client(RemoveInvasionPacket::handle));
-		registrar.play(SendInvasionAmbiencePacket.ID, SendInvasionAmbiencePacket::read, handler -> handler.client(SendInvasionAmbiencePacket::handle));
-		registrar.play(UpdateGameRulePacket.ID, UpdateGameRulePacket::read, handler -> handler.client(UpdateGameRulePacket::handle));
-		registrar.play(UpdateXPMultPacket.ID, UpdateXPMultPacket::read, handler -> handler.client(UpdateXPMultPacket::handle));
+	public static final void registerPackets(final RegisterPayloadHandlersEvent pEvent) {
+		final PayloadRegistrar registrar = pEvent.registrar(PureSufferingMod.MODID).versioned("1.0.0").optional();
+		registrar.playToClient(AddInvasionPacket.TYPE, AddInvasionPacket.STREAM_CODEC, AddInvasionPacket::handle);
+		registrar.playToClient(ClearInvasionsPacket.TYPE, ClearInvasionsPacket.STREAM_CODEC, ClearInvasionsPacket::handle);
+		registrar.playToClient(InvasionMobParticlesPacket.TYPE, InvasionMobParticlesPacket.STREAM_CODEC, InvasionMobParticlesPacket::handle);
+		registrar.playToClient(SendInvasionsPacket.TYPE, SendInvasionsPacket.STREAM_CODEC, SendInvasionsPacket::handle);
+		registrar.playToClient(InvasionStartPacket.TYPE, InvasionStartPacket.STREAM_CODEC, InvasionStartPacket::handle);
+		registrar.playToClient(RemoveInvasionPacket.TYPE, RemoveInvasionPacket.STREAM_CODEC, RemoveInvasionPacket::handle);
+		registrar.playToClient(SendInvasionAmbiencePacket.TYPE, SendInvasionAmbiencePacket.STREAM_CODEC, SendInvasionAmbiencePacket::handle);
+		registrar.playToClient(UpdateGameRulePacket.TYPE, UpdateGameRulePacket.STREAM_CODEC, UpdateGameRulePacket::handle);
+		registrar.playToClient(UpdateXPMultPacket.TYPE, UpdateXPMultPacket.STREAM_CODEC, UpdateXPMultPacket::handle);
 	}
 	
-	public static final void sendToClient(final CustomPacketPayload packetIn, final ServerPlayer playerIn) {
-		PacketDistributor.PLAYER.with(playerIn).send(packetIn);
+	public static final void sendToClient(final CustomPacketPayload pPacket, final ServerPlayer pPlayer) {
+		PacketDistributor.sendToPlayer(pPlayer, pPacket);
 	}
 	
-	public static final void sendToClientsIn(final CustomPacketPayload packetIn, final ServerLevel levelIn) {
-		PacketDistributor.DIMENSION.with(levelIn.dimension()).send(packetIn);
+	public static final void sendToClientsIn(final CustomPacketPayload pPacket, final ServerLevel levelIn) {
+		PacketDistributor.sendToPlayersInDimension(levelIn, pPacket);
 	}
 	
-	public static final void sendToAllClients(final CustomPacketPayload packetIn) {
-		PacketDistributor.ALL.with(null).send(packetIn);
+	public static final void sendToAllClients(final CustomPacketPayload pPacket) {
+		PacketDistributor.sendToAllPlayers(pPacket);
 	}
 }
