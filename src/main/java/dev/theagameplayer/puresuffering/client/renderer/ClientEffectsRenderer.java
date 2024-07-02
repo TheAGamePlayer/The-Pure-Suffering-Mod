@@ -25,7 +25,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.dimension.DimensionType;
 
 public final class ClientEffectsRenderer {
-	private static final ResourceLocation TEXTURE = new ResourceLocation("neoforge", "textures/white.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("neoforge", "textures/white.png");
 	private final ArrayList<SoundRing> soundRings = new ArrayList<>();
 	private final ArrayList<VortexParticle> vortexParticles = new ArrayList<>();
 	private final InvasionDifficulty difficulty;
@@ -64,14 +64,13 @@ public final class ClientEffectsRenderer {
 		final Minecraft mc = Minecraft.getInstance();
 		final float weatherVisibility = mc.level.getRainLevel(pPartialTicks) * 0.15F;
 		final long dayTime = mc.level.getDayTime() % 12000L;
-		final BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
 		RenderSystem.depthMask(Minecraft.useShaderTransparency());
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		this.soundRings.forEach(ring -> ring.render(bufferBuilder, pPoseStack, pPartialTicks));
+		this.soundRings.forEach(ring -> ring.render(pPoseStack, pPartialTicks));
 		if (this.difficulty.isHyper())
-			this.vortexParticles.forEach(particle -> particle.render(bufferBuilder, pPoseStack, pPartialTicks, weatherVisibility, dayTime));
+			this.vortexParticles.forEach(particle -> particle.render(pPoseStack, pPartialTicks, weatherVisibility, dayTime));
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.defaultBlendFunc();
 		RenderSystem.disableBlend();
@@ -114,7 +113,7 @@ public final class ClientEffectsRenderer {
 			return this.ticksAlive < 1;
 		}
 
-		private final void render(final BufferBuilder pBufferBuilder, final PoseStack pPoseStack, final float pPartialTicks) {
+		private final void render(final PoseStack pPoseStack, final float pPartialTicks) {
 			final float dist1 = this.dist[1] + (this.dist[0] - this.dist[1]) * pPartialTicks;
 			final float dist2 = -dist1/3;
 			final float sizeAlpha = this.sizeAlpha[1] + (this.sizeAlpha[0] - this.sizeAlpha[1]) * pPartialTicks;
@@ -126,12 +125,12 @@ public final class ClientEffectsRenderer {
 				pPoseStack.mulPose(Axis.YP.rotationDegrees(dir.toYRot()));
 				pPoseStack.translate(dist1, dist2, sizeAlpha);
 				final Matrix4f matrix4f = pPoseStack.last().pose();
-				pBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-				pBufferBuilder.vertex(matrix4f, -sizeAlpha, 100.0F, -sizeAlpha * length).endVertex();
-				pBufferBuilder.vertex(matrix4f, sizeAlpha, 100.0F, -sizeAlpha * length).endVertex();
-				pBufferBuilder.vertex(matrix4f, sizeAlpha, 100.0F, sizeAlpha * length).endVertex();
-				pBufferBuilder.vertex(matrix4f, -sizeAlpha, 100.0F, sizeAlpha * length).endVertex();
-				BufferUploader.drawWithShader(pBufferBuilder.end());
+				final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+				bufferBuilder.addVertex(matrix4f, -sizeAlpha, 100.0F, -sizeAlpha * length);
+				bufferBuilder.addVertex(matrix4f, sizeAlpha, 100.0F, -sizeAlpha * length);
+				bufferBuilder.addVertex(matrix4f, sizeAlpha, 100.0F, sizeAlpha * length);
+				bufferBuilder.addVertex(matrix4f, -sizeAlpha, 100.0F, sizeAlpha * length);
+				BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 				pPoseStack.popPose();
 			}
 		}
@@ -193,7 +192,7 @@ public final class ClientEffectsRenderer {
 			return result;
 		}
 
-		private final void render(final BufferBuilder pBufferBuilder, final PoseStack pPoseStack, final float pPartialTicks, final float pWeatherVisibility, final long pDayTime) {
+		private final void render(final PoseStack pPoseStack, final float pPartialTicks, final float pWeatherVisibility, final long pDayTime) {
 			final float alpha = this.alpha - ClientTransitionHandler.getWeatherVisibility(pWeatherVisibility, pDayTime);
 			final int length = Minecraft.useFancyGraphics() ? this.rot.length : 2;
 			RenderSystem.setShaderTexture(0, TEXTURE);
@@ -206,12 +205,12 @@ public final class ClientEffectsRenderer {
 				pPoseStack.mulPose(this.axis[1].rotationDegrees(this.rot[i][1] + (this.rot[i - 1][1] - this.rot[i][1]) * pPartialTicks));
 				pPoseStack.mulPose(this.axis[2].rotationDegrees(this.rot[i][2] + (this.rot[i - 1][2] - this.rot[i][2]) * pPartialTicks));
 				final Matrix4f matrix4f = pPoseStack.last().pose();
-				pBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-				pBufferBuilder.vertex(matrix4f, -size, 100.0F, -size).endVertex();
-				pBufferBuilder.vertex(matrix4f, size, 100.0F, -size).endVertex();
-				pBufferBuilder.vertex(matrix4f, size, 100.0F, size).endVertex();
-				pBufferBuilder.vertex(matrix4f, -size, 100.0F, size).endVertex();
-				BufferUploader.drawWithShader(pBufferBuilder.end());
+				final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
+				bufferBuilder.addVertex(matrix4f, -size, 100.0F, -size);
+				bufferBuilder.addVertex(matrix4f, size, 100.0F, -size);
+				bufferBuilder.addVertex(matrix4f, size, 100.0F, size);
+				bufferBuilder.addVertex(matrix4f, -size, 100.0F, size);
+				BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 				pPoseStack.popPose();
 			}
 		}

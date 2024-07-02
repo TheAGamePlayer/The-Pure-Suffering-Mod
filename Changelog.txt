@@ -1,3 +1,9 @@
+#Minecraft 1.21.x
+Version 1.6.4.0B:
+- Updated to 1.21
+- The update broke the custom gamerule tab, so they have been moved to MISC.
+- Fixed an error in the en_us lang file.
+
 #Minecraft 1.20.x
 Version 1.6.3.0B:
 - Updated to 1.20.6

@@ -61,8 +61,8 @@
 	"gamerule.puresuffering:weakenedInvasionVexes.description": "Determines vexes in invasions have a limited lifespan.",
 	"gamerule.puresuffering:enableInvasionAmbience": "Enable Invasion Ambience",
 	"gamerule.puresuffering:enableInvasionAmbience.description": "Determines if invasion ambience sounds should occur.",
-	"gamerule.puresuffering.notifyPlayersAboutInvasions": "Notify Players About Invasions",
-	"gamerule.puresuffering.notifyPlayersAboutInvasions.description": "Determines if players be notified when invasions start.",
+	"gamerule.puresuffering:notifyPlayersAboutInvasions": "Notify Players About Invasions",
+	"gamerule.puresuffering:notifyPlayersAboutInvasions.description": "Determines if players be notified when invasions start.",
 	
 	"gamerule.puresuffering:primaryInvasionMobCap": "Primary Invasion Mob Cap",
 	"gamerule.puresuffering:primaryInvasionMobCap.description": "The max amount of mobs that can spawn from Primary Invasions at once.",

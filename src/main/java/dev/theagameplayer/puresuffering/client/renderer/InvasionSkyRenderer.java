@@ -3,7 +3,6 @@ package dev.theagameplayer.puresuffering.client.renderer;
 import java.util.ArrayList;
 import org.joml.Matrix4f;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -24,6 +23,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 
@@ -35,9 +35,9 @@ import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.Vec3;
 
 public final class InvasionSkyRenderer {
-	private static final ResourceLocation DEFAULT_SUN = new ResourceLocation("textures/environment/sun.png");
-	private static final ResourceLocation DEFAULT_MOON = new ResourceLocation("textures/environment/moon_phases.png");
-	private static final ResourceLocation DEFAULT_END_SKY = new ResourceLocation("textures/environment/end_sky.png");
+	private static final ResourceLocation DEFAULT_SUN = ResourceLocation.withDefaultNamespace("textures/environment/sun.png");
+	private static final ResourceLocation DEFAULT_MOON = ResourceLocation.withDefaultNamespace("textures/environment/moon_phases.png");
+	private static final ResourceLocation DEFAULT_END_SKY = ResourceLocation.withDefaultNamespace("textures/environment/end_sky.png");
 	private final SkyType skyType;
 	private final InvasionDifficulty difficulty;
 	private final boolean noTick;
@@ -120,7 +120,7 @@ public final class InvasionSkyRenderer {
 		this.weatherVisibility = Mth.clamp(ClientTransitionHandler.getWeatherVisibility(this.weatherVisibilityOffset, pDayTime), 0.0F, 1.0F);
 	}
 	
-	public final boolean hasRenderedInvasionSky(final Matrix4f pProjectionMatrix, final Matrix4f pFrustrumMatrix, final float pPartialTick, final Camera pCamera, final boolean pIsFoggy, final Runnable pSkyFogSetup) {
+	public final boolean hasRenderedInvasionSky(final Matrix4f pFrustrumMatrix, final Matrix4f pProjectionMatrix, final float pPartialTick, final Camera pCamera, final boolean pIsFoggy, final Runnable pSkyFogSetup) {
 		pSkyFogSetup.run();
 		if (pIsFoggy) return false;
 		final Minecraft mc = Minecraft.getInstance();
@@ -130,12 +130,12 @@ public final class InvasionSkyRenderer {
 		final PoseStack poseStack = new PoseStack();
 		switch (this.skyType) {
 		case NORMAL: {
-			poseStack.mulPose(pProjectionMatrix);
-			this.renderInvasionSky(level.getDayTime() % 12000L, poseStack, pFrustrumMatrix, pPartialTick, pSkyFogSetup);
+			poseStack.mulPose(pFrustrumMatrix);
+			this.renderInvasionSky(level.getDayTime() % 12000L, poseStack, pProjectionMatrix, pPartialTick, pSkyFogSetup);
 			return true;
 		}
 		case END: {
-			poseStack.mulPose(pProjectionMatrix);
+			poseStack.mulPose(pFrustrumMatrix);
 			this.renderEndInvasionSkybox(level.getDayTime() % 12000L, poseStack, pPartialTick);
 			return true;
 		}
@@ -143,18 +143,17 @@ public final class InvasionSkyRenderer {
 		}
 	}
 
-	private final void renderInvasionSky(final long pDayTime, final PoseStack pPoseStack, final Matrix4f pFrustrumMatrix, final float pPartialTick, final Runnable pSkyFogSetup) {
+	private final void renderInvasionSky(final long pDayTime, final PoseStack pPoseStack, final Matrix4f pProjectionMatrix, final float pPartialTick, final Runnable pSkyFogSetup) {
 		final Minecraft mc = Minecraft.getInstance();
 		final ClientLevel level = mc.level;
 		final float timeOfDay = level.getTimeOfDay(pPartialTick);
-		final BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
 		FogRenderer.levelFogColor();
 		RenderSystem.depthMask(false);
 		final Vec3 color = level.getSkyColor(mc.gameRenderer.getMainCamera().getPosition(), pPartialTick);
 		RenderSystem.setShaderColor(this.rgb[1][0] + (float)color.x, this.rgb[1][1] + (float)color.y, this.rgb[1][2] + (float)color.z, 1.0F);
 		final ShaderInstance shaderInstance = RenderSystem.getShader();
 		mc.levelRenderer.skyBuffer.bind();
-		mc.levelRenderer.skyBuffer.drawWithShader(pPoseStack.last().pose(), pFrustrumMatrix, shaderInstance);
+		mc.levelRenderer.skyBuffer.drawWithShader(pPoseStack.last().pose(), pProjectionMatrix, shaderInstance);
 		VertexBuffer.unbind();
 		RenderSystem.enableBlend();
 		final float[] aRGB = level.effects().getSunriseColor(timeOfDay, pPartialTick);
@@ -167,15 +166,15 @@ public final class InvasionSkyRenderer {
 			pPoseStack.mulPose(Axis.ZP.rotationDegrees(angle));
 			pPoseStack.mulPose(Axis.ZP.rotationDegrees(90.0F));
 			final Matrix4f matrix4f = pPoseStack.last().pose();
-			bufferBuilder.begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
-			bufferBuilder.vertex(matrix4f, 0.0F, 100.0F, 0.0F).color(aRGB[0], aRGB[1], aRGB[2], aRGB[3]).endVertex();
+			final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
+			bufferBuilder.addVertex(matrix4f, 0.0F, 100.0F, 0.0F).setColor(aRGB[0], aRGB[1], aRGB[2], aRGB[3]);
 			for(int j = 0; j < 17; ++j) {
 				final float a = (float)j * ((float)Math.PI * 2F) / 16.0F;
 				final float x = Mth.sin(a);
 				final float yz = Mth.cos(a);
-				bufferBuilder.vertex(matrix4f, x * 120.0F, yz * 120.0F, -yz * 40.0F * aRGB[3]).color(aRGB[0], aRGB[1], aRGB[2], 0.0F).endVertex();
+				bufferBuilder.addVertex(matrix4f, x * 120.0F, yz * 120.0F, -yz * 40.0F * aRGB[3]).setColor(aRGB[0], aRGB[1], aRGB[2], 0.0F);
 			}
-			BufferUploader.drawWithShader(bufferBuilder.end());
+			BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 			pPoseStack.popPose();
 		}
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -186,14 +185,14 @@ public final class InvasionSkyRenderer {
 		pPoseStack.mulPose(Axis.YN.rotationDegrees(90.0F));
 		pPoseStack.mulPose(Axis.XP.rotationDegrees(timeOfDay * 360.0F));
 		final Matrix4f matrix4f2 = pPoseStack.last().pose();
-		this.renderSun(bufferBuilder, matrix4f2, 30.0F, pDayTime);
-		this.renderMoon(bufferBuilder, matrix4f2, 20.0F, pDayTime);
+		this.renderSun(matrix4f2, 30.0F, pDayTime);
+		this.renderMoon(matrix4f2, 20.0F, pDayTime);
 		final float f10 = level.getStarBrightness(pPartialTick) * alpha;
 		if (f10 > 0.0F) {
 			RenderSystem.setShaderColor(f10, f10, f10, f10);
 			FogRenderer.setupNoFog();
 			mc.levelRenderer.starBuffer.bind();
-			mc.levelRenderer.starBuffer.drawWithShader(pPoseStack.last().pose(), pFrustrumMatrix, GameRenderer.getPositionShader());
+			mc.levelRenderer.starBuffer.drawWithShader(pPoseStack.last().pose(), pProjectionMatrix, GameRenderer.getPositionShader());
 			VertexBuffer.unbind();
 			pSkyFogSetup.run();
 		}
@@ -207,7 +206,7 @@ public final class InvasionSkyRenderer {
 			pPoseStack.pushPose();
 			pPoseStack.translate(0.0D, 12.0D, 0.0D);
 			mc.levelRenderer.darkBuffer.bind();
-			mc.levelRenderer.darkBuffer.drawWithShader(pPoseStack.last().pose(), pFrustrumMatrix, shaderInstance);
+			mc.levelRenderer.darkBuffer.drawWithShader(pPoseStack.last().pose(), pProjectionMatrix, shaderInstance);
 			VertexBuffer.unbind();
 			pPoseStack.popPose();
 		}
@@ -215,18 +214,18 @@ public final class InvasionSkyRenderer {
 		RenderSystem.depthMask(true);
 	}
 
-	private final void renderSun(final BufferBuilder pBufferBuilder, final Matrix4f pMatrix4f, final float pSize, final long pDayTime) {
+	private final void renderSun(final Matrix4f pMatrix4f, final float pSize, final long pDayTime) {
 		final boolean flag = pDayTime < Invasion.HALF_TRANSITION || pDayTime > 11999L - Invasion.HALF_TRANSITION;
 		RenderSystem.setShaderTexture(0, (this.sun == null || flag) ? DEFAULT_SUN : this.sun);
-		pBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		pBufferBuilder.vertex(pMatrix4f, -pSize, 100.0F, -pSize).uv(0.0F, 0.0F).endVertex();
-		pBufferBuilder.vertex(pMatrix4f, pSize, 100.0F, -pSize).uv(1.0F, 0.0F).endVertex();
-		pBufferBuilder.vertex(pMatrix4f, pSize, 100.0F, pSize).uv(1.0F, 1.0F).endVertex();
-		pBufferBuilder.vertex(pMatrix4f, -pSize, 100.0F, pSize).uv(0.0F, 1.0F).endVertex();
-		BufferUploader.drawWithShader(pBufferBuilder.end());
+		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilder.addVertex(pMatrix4f, -pSize, 100.0F, -pSize).setUv(0.0F, 0.0F);
+		bufferBuilder.addVertex(pMatrix4f, pSize, 100.0F, -pSize).setUv(1.0F, 0.0F);
+		bufferBuilder.addVertex(pMatrix4f, pSize, 100.0F, pSize).setUv(1.0F, 1.0F);
+		bufferBuilder.addVertex(pMatrix4f, -pSize, 100.0F, pSize).setUv(0.0F, 1.0F);
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 	}
 
-	private final void renderMoon(final BufferBuilder pBufferBuilder, final Matrix4f pMatrix4f, final float pSize, final long pDayTime) {
+	private final void renderMoon(final Matrix4f pMatrix4f, final float pSize, final long pDayTime) {
 		final Minecraft mc = Minecraft.getInstance();
 		final ClientLevel level = mc.level;
 		final boolean flag = pDayTime < Invasion.HALF_TRANSITION || pDayTime > 11999L - Invasion.HALF_TRANSITION;
@@ -238,12 +237,12 @@ public final class InvasionSkyRenderer {
 		final float f15 = (float)(i1 + 0) / 2.0F;
 		final float f16 = (float)(l + 1) / 4.0F;
 		final float f17 = (float)(i1 + 1) / 2.0F;
-		pBufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-		pBufferBuilder.vertex(pMatrix4f, -pSize, -100.0F, pSize).uv(f16, f17).endVertex();
-		pBufferBuilder.vertex(pMatrix4f, pSize, -100.0F, pSize).uv(f14, f17).endVertex();
-		pBufferBuilder.vertex(pMatrix4f, pSize, -100.0F, -pSize).uv(f14, f15).endVertex();
-		pBufferBuilder.vertex(pMatrix4f, -pSize, -100.0F, -pSize).uv(f16, f15).endVertex();
-		BufferUploader.drawWithShader(pBufferBuilder.end());
+		final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilder.addVertex(pMatrix4f, -pSize, -100.0F, pSize).setUv(f16, f17);
+		bufferBuilder.addVertex(pMatrix4f, pSize, -100.0F, pSize).setUv(f14, f17);
+		bufferBuilder.addVertex(pMatrix4f, pSize, -100.0F, -pSize).setUv(f14, f15);
+		bufferBuilder.addVertex(pMatrix4f, -pSize, -100.0F, -pSize).setUv(f16, f15);
+		BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 	}
 
 	private final void renderEndInvasionSkybox(final long pDayTime, final PoseStack pPoseStack, final float pPartialTick) {
@@ -251,9 +250,8 @@ public final class InvasionSkyRenderer {
 		RenderSystem.depthMask(false);
 		RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 		RenderSystem.setShaderTexture(0, this.sky == null ? DEFAULT_END_SKY : this.sky);
-		final Tesselator tessellator = Tesselator.getInstance();
-		final BufferBuilder bufferBuilder = tessellator.getBuilder();
-		for(int i = 0; i < 6; ++i) {
+		final Tesselator tesselator = Tesselator.getInstance();
+		for (int i = 0; i < 6; ++i) {
 			pPoseStack.pushPose();
 			if (this.difficulty.isNightmare()) {
 				pPoseStack.mulPose(Axis.XP.rotationDegrees(pDayTime));
@@ -272,12 +270,12 @@ public final class InvasionSkyRenderer {
 				pPoseStack.mulPose(Axis.ZP.rotationDegrees(-90.0F));
 			}
 			final Matrix4f matrix4f = pPoseStack.last().pose();
-			bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, -100.0F).uv(0.0F, 0.0F).color(40, 40, 40, 255).endVertex();
-			bufferBuilder.vertex(matrix4f, -100.0F, -100.0F, 100.0F).uv(0.0F, 16.0F).color(40, 40, 40, 255).endVertex();
-			bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, 100.0F).uv(16.0F, 16.0F).color(40, 40, 40, 255).endVertex();
-			bufferBuilder.vertex(matrix4f, 100.0F, -100.0F, -100.0F).uv(16.0F, 0.0F).color(40, 40, 40, 255).endVertex();
-			tessellator.end();
+			final BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+			bufferBuilder.addVertex(matrix4f, -100.0F, -100.0F, -100.0F).setUv(0.0F, 0.0F).setColor(40, 40, 40, 255);
+			bufferBuilder.addVertex(matrix4f, -100.0F, -100.0F, 100.0F).setUv(0.0F, 16.0F).setColor(40, 40, 40, 255);
+			bufferBuilder.addVertex(matrix4f, 100.0F, -100.0F, 100.0F).setUv(16.0F, 16.0F).setColor(40, 40, 40, 255);
+			bufferBuilder.addVertex(matrix4f, 100.0F, -100.0F, -100.0F).setUv(16.0F, 0.0F).setColor(40, 40, 40, 255);
+			BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
 			pPoseStack.popPose();
 		}
 		RenderSystem.depthMask(true);

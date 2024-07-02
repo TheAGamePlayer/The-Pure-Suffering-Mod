@@ -61,8 +61,8 @@ public final class InvasionMusicManager {
 			}
 			final ArrayList<PSMusicInfo> hyperList = new ArrayList<>();
 			for (final File file : new File(hyperPath.toString()).listFiles()) {
-				final ResourceLocation location = new ResourceLocation(PureSufferingMod.MUSICID, difficulty.toString() + "/" + file.getName().toLowerCase().replaceAll("\\s+", "_").replaceAll(".ogg", ""));
-				final Sound sound = new Sound(location.toString(), ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Sound.Type.FILE, true, false, 16);
+				final ResourceLocation location = ResourceLocation.fromNamespaceAndPath(PureSufferingMod.MUSICID, difficulty.toString() + "/" + file.getName().toLowerCase().replaceAll("\\s+", "_").replaceAll(".ogg", ""));
+				final Sound sound = new Sound(location, ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Sound.Type.FILE, true, false, 16);
 				final WeighedSoundEvents soundEvent = new WeighedSoundEvents(location, "puresuffering.subtitle.music");
 				if (!validateSoundOgg(sound, file.getName())) continue;
 				soundEvent.addSound(sound);

@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 
@@ -36,7 +37,7 @@ public final class HyperChargeLayer<M extends Mob, EM extends EntityModel<M>> ex
 			this.getParentModel().copyPropertiesTo(entityModel);
 			final VertexConsumer vertexConsumer = pBuffer.getBuffer(RenderType.energySwirl(hyperCharge < 4 ? HYPER_CHARGE_LOCATION1 : HYPER_CHARGE_LOCATION2, Mth.sin(tick * 0.007854F * hyperCharge), tick * (0.01F * hyperCharge) % 1.0F));
 			entityModel.setupAnim(pMob, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
-			entityModel.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, argb, argb, argb, argb);
+			entityModel.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, ARGB32.colorFromFloat(argb, argb, argb, argb));
 		}
 	}
 }

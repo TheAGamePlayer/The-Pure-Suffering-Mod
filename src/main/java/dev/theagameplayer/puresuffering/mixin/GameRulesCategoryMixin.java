@@ -1,17 +1,12 @@
 package dev.theagameplayer.puresuffering.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-
+import org.spongepowered.asm.mixin.Unique;
 import net.minecraft.world.level.GameRules.Category;
-import net.neoforged.neoforge.common.IExtensibleEnum;
 
 @Mixin(Category.class)
-public final class GameRulesCategoryMixin implements IExtensibleEnum {
+@Unique
+public final class GameRulesCategoryMixin {
 	static {
-		create("PURE_SUFFERING", "gamerule.category.puresuffering");
-	}
-	
-	private static final Category create(final String pName, final String pDescriptionId) {
-		throw new IllegalStateException("Enum not extended");
 	}
 }

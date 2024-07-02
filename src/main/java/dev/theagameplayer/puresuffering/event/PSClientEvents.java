@@ -76,7 +76,7 @@ public final class PSClientEvents {
 		final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 		if (session == null) return;
 		pEvent.getPoseStack().mulPose(pEvent.getModelViewMatrix());
-		session.getClientEffectsRenderer().render(pEvent.getPoseStack(), pEvent.getPartialTick());
+		session.getClientEffectsRenderer().render(pEvent.getPoseStack(), pEvent.getPartialTick().getGameTimeDeltaPartialTick(false));
 	}
 
 	public static final void screenInitPre(final ScreenEvent.Init.Pre pEvent) {

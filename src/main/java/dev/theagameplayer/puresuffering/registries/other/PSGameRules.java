@@ -33,7 +33,7 @@ public final class PSGameRules {
 	public static final IntegerRule SECONDARY_INVASION_MOB_CAP = new IntegerRule("secondaryInvasionMobCap", false, PSConfigValues.common.secondaryInvasionMobCap);
 
 	public static final void registerGameRules() {
-		final GameRules.Category category = GameRules.Category.valueOf("PURE_SUFFERING");
+		final GameRules.Category category = GameRules.Category.MISC; //GameRules.Category.valueOf("PURE_SUFFERING");
 		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.register(category);
 	}
 

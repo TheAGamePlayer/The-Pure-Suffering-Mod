@@ -14,11 +14,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.JukeboxSong;
 
 public final class InvasionMusicToast implements Toast {
-	private static final ResourceLocation BACKGROUND_SPRITE = new ResourceLocation("toast/advancement");
+	private static final ResourceLocation BACKGROUND_SPRITE = ResourceLocation.withDefaultNamespace("toast/advancement");
 	private static final MutableComponent MUSIC_TEXT = Component.translatable("puresuffering.toast.music");
 	private final ItemStack recordItem;
 	private final MutableComponent name;
@@ -26,10 +27,10 @@ public final class InvasionMusicToast implements Toast {
 
 	public InvasionMusicToast(final String pName, final InvasionDifficulty pDifficulty) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ArrayList<RecordItem> records = new ArrayList<>();
+		final ArrayList<Item> records = new ArrayList<>();
 		mc.level.registryAccess().registryOrThrow(Registries.ITEM).forEach(item -> {
-			if (item instanceof RecordItem recordItem)
-				records.add(recordItem);
+			if (JukeboxSong.fromStack(mc.level.registryAccess(), item.getDefaultInstance()).isPresent())
+				records.add(item);
 		});
 		this.recordItem = new ItemStack(records.get(mc.level.random.nextInt(records.size())));
 		this.name = Component.literal(pName);
