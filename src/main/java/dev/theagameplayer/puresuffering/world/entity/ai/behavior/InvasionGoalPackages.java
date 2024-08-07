@@ -19,7 +19,8 @@ public final class InvasionGoalPackages {
 	public static ImmutableList<Pair<Integer, ? extends BehaviorControl<? super Villager>>> villagerPackage(final float speedIn) {
 		return ImmutableList.of(
 				Pair.of(2, BehaviorBuilder.sequence(BehaviorBuilder.triggerIf(InvasionGoalPackages::isInvasion), LocateHidingPlace.create(24, speedIn * 1.4F, 1))),
-				getMinimalLookBehavior());
+				getMinimalLookBehavior(),
+				Pair.of(99, ResetInvasionStatus.create()));
 	}
 
 	private static Pair<Integer, BehaviorControl<LivingEntity>> getMinimalLookBehavior() { //From VillagerGoalPackages
