@@ -1,4 +1,7 @@
 #Minecraft 1.20.x
+Version 1.6.3.1B:
+- Fixed a bug with villager ai breaking after an invasion.
+
 Version 1.6.3.0B:
 - Updated to 1.20.6
 - Reduced TPS spikes on lower end CPUs.
@@ -13,6 +16,9 @@ Version 1.6.3.0B:
 - Data packs can now add custom tags to mobs spawned by invasions (Uses persistent data only).
 - Mob relocation now also relies on path finding (The old method still runs as a fallback).
 
+Version 1.6.2.2R:
+- Fixed a bug with villager ai breaking after an invasion.
+
 Version 1.6.2.1R:
 - Fixed music toast not rendering correctly.
 
@@ -20,11 +26,17 @@ Version 1.6.2.0R:
 - Updated to 1.20.4
 - Moved to NeoForge.
 
+Version 1.6.1.2B:
+- Fixed a bug with villager ai breaking after an invasion.
+
 Version 1.6.1.1B:
 - Issues solved in 1.6.0.4R, but for 1.20.2.
 
 Version 1.6.1.0B:
 - Updated to 1.20.2
+
+Version 1.6.0.5R:
+- Fixed a bug with villager ai breaking after an invasion.
 
 Version 1.6.0.4R:
 - Added a fallback to avoid crashing to mobs attempting to convert into a non-existing entity type.
