@@ -29,6 +29,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -42,11 +43,12 @@ public final class PureSufferingMod {
 	public static final String MODID = "puresuffering";
 	public static final String MUSICID = MODID + "music";
 	public static final Logger LOGGER = LogManager.getLogger(MODID);
+	public static ModContainer MC;
 
-	public PureSufferingMod(final IEventBus pModEventBus) {
+	public PureSufferingMod(final ModContainer pModContainer, final IEventBus pModEventBus) {
 		this.registerAll(pModEventBus);
 		this.createRegistries(pModEventBus);
-		this.createConfig();
+		this.createConfig(pModContainer);
 		pModEventBus.addListener(this::commonSetup);
 		pModEventBus.addListener(this::clientSetup);
 		pModEventBus.addListener(this::gatherData);
@@ -59,8 +61,9 @@ public final class PureSufferingMod {
 		return ResourceLocation.fromNamespaceAndPath(MODID, pName);
 	}
 	
-	private final void createConfig() {
-		PSConfig.initConfig(FMLEnvironment.dist.isClient());
+	private final void createConfig(final ModContainer pModContainer) {
+		MC = pModContainer;
+		PSConfig.initConfig(pModContainer, FMLEnvironment.dist.isClient());
 		LOGGER.info("Created mod config.");
 	}
 	

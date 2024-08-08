@@ -1,4 +1,4 @@
-// 1.20.4	2024-03-05T14:56:40.765161935	Invasion Types
+// 1.21	2024-07-10T14:03:12.327115924	Invasion Types
 80bf895efba3a45d7a7911fb41a3c4f84bcd4623 data/puresuffering/invasion_types/arachnophobia.json
 6ffb749f69ce4875cbc8c49dc8cb868308c36513 data/puresuffering/invasion_types/end_game.json
 1d18b9dd88bb1acd84690466e7360783cc983475 data/puresuffering/invasion_types/end_pest.json
@@ -13,8 +13,8 @@ c988c6ac37ac9fdc8f8fdda5f863551a4efaa114 data/puresuffering/invasion_types/lunar
 bc5e1b799f479328a893cef2354101b03f3b0604 data/puresuffering/invasion_types/porkinator.json
 1ca52a701744144adbe9040c504555fe31ac38d1 data/puresuffering/invasion_types/slime_time.json
 e6b4d4c5ad60c27f96cbfebd5afec81c944efff7 data/puresuffering/invasion_types/solar_eclipse.json
-c1164ecba042e35c8ae5637121dae2fc1cb84755 data/puresuffering/invasion_types/super_storm.json
-aceb16d3ef985117bc021b9c50fdc34500c238db data/puresuffering/invasion_types/undead.json
+d7da055b3ed33b7bee60b3aed64997c79046089e data/puresuffering/invasion_types/super_storm.json
+1adbab2ce0b8b7e88ed05b6255764002f5516fd6 data/puresuffering/invasion_types/undead.json
 4b99e9a10205432ada4269040d9f051c0740c896 data/puresuffering/invasion_types/warden.json
 04c3ca8759f4a09b9922dca0b8c38ea0dc2565e5 data/puresuffering/invasion_types/wither.json
 0d1937fde51335920ac2838572b80018d44530d3 data/puresuffering/invasion_types/worlds_end.json

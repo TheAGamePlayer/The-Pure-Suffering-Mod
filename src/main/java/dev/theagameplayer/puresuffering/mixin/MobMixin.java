@@ -16,17 +16,17 @@ import net.minecraft.world.entity.Mob;
 public final class MobMixin implements PSInvasionMob {
 	private static final EntityDataAccessor<Integer> PS_HYPER_CHARGE = SynchedEntityData.defineId(Mob.class, EntityDataSerializers.INT);
 
-	@Inject(at = @At("RETURN"), method = "defineSynchedData(Lnet/minecraft/network/syncher/SynchedEntityData$Builder;)V")
+	@Inject(at = @At("RETURN"), method = "Lnet/minecraft/world/entity/Mob;defineSynchedData(Lnet/minecraft/network/syncher/SynchedEntityData$Builder;)V")
 	private final void defineSynchedData(final SynchedEntityData.Builder pBuilder, final CallbackInfo pCallback) {
 		pBuilder.define(PS_HYPER_CHARGE, 0);
 	}
 
-	@Inject(at = @At("HEAD"), method = "addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at = @At("HEAD"), method = "Lnet/minecraft/world/entity/Mob;addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V")
 	private final void addAdditionalSaveData(final CompoundTag pCompound, final CallbackInfo pCallback) {
 		pCompound.putInt(HYPER_CHARGE, this.psGetHyperCharge());
 	}
 
-	@Inject(at = @At("HEAD"), method = "readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V")
+	@Inject(at = @At("HEAD"), method = "Lnet/minecraft/world/entity/Mob;readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V")
 	private final void readAdditionalSaveData(final CompoundTag pCompound, final CallbackInfo pCallback) {
 		this.psSetHyperCharge(pCompound.getInt(HYPER_CHARGE));
 	}

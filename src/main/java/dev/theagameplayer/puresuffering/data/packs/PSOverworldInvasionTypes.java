@@ -88,7 +88,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 						.withSkyBrightness(0.2F)
 						.withLightLevel(0)
 						.withRGB(-0.1F, -0.1F, -0.1F))
-				.mobSpawnList(new InvasionSpawnerData(EntityType.DROWNED, 10, 1, 3))
+				.mobSpawnList(new InvasionSpawnerData(EntityType.DROWNED, 10, 1, 3), new InvasionSpawnerData(EntityType.BREEZE, 4, 1, 2))
 				.additionalEntitiesList(new AdditionalEntitySpawnData(EntityType.LIGHTNING_BOLT, 0, 1, 156, true))
 				.withTickDelay(20)
 				.withClusterSize(6)
@@ -99,7 +99,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 						.withSkyBrightness(0.1F)
 						.withLightLevel(0)
 						.withRGB(-0.2F, -0.2F, -0.2F))
-				.mobSpawnList(new InvasionSpawnerData(EntityType.DROWNED, 10, 1, 4))
+				.mobSpawnList(new InvasionSpawnerData(EntityType.DROWNED, 10, 1, 4), new InvasionSpawnerData(EntityType.BREEZE, 4, 1, 3))
 				.additionalEntitiesList(new AdditionalEntitySpawnData(EntityType.LIGHTNING_BOLT, 0, 2, 104, true))
 				.withTickDelay(16)
 				.withClusterSize(8)
@@ -110,7 +110,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 						.withSkyBrightness(0.0F)
 						.withLightLevel(0)
 						.withRGB(-0.3F, -0.3F, -0.3F))
-				.mobSpawnList(new InvasionSpawnerData(EntityType.DROWNED, 10, 2, 5))
+				.mobSpawnList(new InvasionSpawnerData(EntityType.DROWNED, 10, 2, 5), new InvasionSpawnerData(EntityType.BREEZE, 4, 2, 4))
 				.additionalEntitiesList(new AdditionalEntitySpawnData(EntityType.LIGHTNING_BOLT, 0, 3, 52, true))
 				.withTickDelay(12)
 				.withClusterSize(10)
@@ -282,9 +282,9 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 		InvasionType.Builder.invasionType().withRarity(1).withInvasionTime(InvasionTime.NIGHT).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.6F).withTickDelay(24).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 1, 2), new InvasionSpawnerData(EntityType.HUSK, 2, 1, 1), new InvasionSpawnerData(EntityType.SKELETON, 4, 1, 2), new InvasionSpawnerData(EntityType.STRAY, 1, 1, 1)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.7F).withTickDelay(20).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 1, 3), new InvasionSpawnerData(EntityType.HUSK, 2, 1, 2), new InvasionSpawnerData(EntityType.SKELETON, 4, 1, 3), new InvasionSpawnerData(EntityType.STRAY, 1, 1, 2)),
-				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.8F).withTickDelay(16).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 2, 4), new InvasionSpawnerData(EntityType.HUSK, 2, 1, 3), new InvasionSpawnerData(EntityType.SKELETON, 4, 2, 4), new InvasionSpawnerData(EntityType.STRAY, 1, 1, 3)),
-				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.9F).withTickDelay(12).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 2, 5), new InvasionSpawnerData(EntityType.HUSK, 2, 2, 3), new InvasionSpawnerData(EntityType.SKELETON, 4, 2, 5), new InvasionSpawnerData(EntityType.STRAY, 1, 2, 3)),
-				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(8).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 3, 7), new InvasionSpawnerData(EntityType.HUSK, 2, 2, 4), new InvasionSpawnerData(EntityType.SKELETON, 4, 3, 6), new InvasionSpawnerData(EntityType.STRAY, 1, 2, 4)))
+				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.8F).withTickDelay(16).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 2, 4), new InvasionSpawnerData(EntityType.HUSK, 2, 1, 3), new InvasionSpawnerData(EntityType.SKELETON, 4, 2, 4), new InvasionSpawnerData(EntityType.STRAY, 1, 1, 3), new InvasionSpawnerData(EntityType.BOGGED, 1, 1, 1)),
+				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.9F).withTickDelay(12).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 2, 5), new InvasionSpawnerData(EntityType.HUSK, 2, 2, 3), new InvasionSpawnerData(EntityType.SKELETON, 4, 2, 5), new InvasionSpawnerData(EntityType.STRAY, 1, 2, 3), new InvasionSpawnerData(EntityType.BOGGED, 1, 1, 2)),
+				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(8).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 3, 7), new InvasionSpawnerData(EntityType.HUSK, 2, 2, 4), new InvasionSpawnerData(EntityType.SKELETON, 4, 3, 6), new InvasionSpawnerData(EntityType.STRAY, 1, 2, 4), new InvasionSpawnerData(EntityType.BOGGED, 1, 1, 3)))
 		.dimensions(Level.OVERWORLD.location())
 		.save(pConsumer, "undead");
 		InvasionType.Builder.invasionType().withInvasionTime(InvasionTime.NIGHT).severityInfo(

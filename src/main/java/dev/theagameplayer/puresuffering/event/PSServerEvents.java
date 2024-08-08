@@ -2,7 +2,6 @@ package dev.theagameplayer.puresuffering.event;
 
 import java.util.ArrayList;
 
-import dev.theagameplayer.puresuffering.config.PSConfig;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
@@ -23,7 +22,6 @@ public final class PSServerEvents {
 		invasionTicker = new Thread[levels.size()];
 		for (int l = 0; l < levels.size(); l++) {
 			final ServerLevel level = server.getLevel(levels.get(l));
-			PSConfig.initLevelConfig(level);
 			PSConfigValues.addLevelValues(level);
 			final InvasionManager invasionManager = level.getDataStorage().computeIfAbsent(InvasionLevelData.factory(level), InvasionLevelData.getFileId(level.dimensionTypeRegistration())).getInvasionManager();
 			invasionTicker[l] = new Thread(() -> invasionManager.tick(server.isSpawningMonsters(), level), "[" + level.dimension().location() + "] Invasion Ticker");

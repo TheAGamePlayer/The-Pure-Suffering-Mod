@@ -91,6 +91,12 @@
           "MaxCount": 3,
           "MinCount": 1,
           "Weight": 1
+        },
+        {
+          "EntityType": "minecraft:bogged",
+          "MaxCount": 1,
+          "MinCount": 1,
+          "Weight": 1
         }
       ],
       "TickDelay": 16
@@ -121,6 +127,12 @@
           "MaxCount": 3,
           "MinCount": 2,
           "Weight": 1
+        },
+        {
+          "EntityType": "minecraft:bogged",
+          "MaxCount": 2,
+          "MinCount": 1,
+          "Weight": 1
         }
       ],
       "TickDelay": 12
@@ -150,6 +162,12 @@
           "EntityType": "minecraft:stray",
           "MaxCount": 4,
           "MinCount": 2,
+          "Weight": 1
+        },
+        {
+          "EntityType": "minecraft:bogged",
+          "MaxCount": 3,
+          "MinCount": 1,
           "Weight": 1
         }
       ],

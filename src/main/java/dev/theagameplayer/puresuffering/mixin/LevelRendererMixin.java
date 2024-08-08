@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 
 @Mixin(LevelRenderer.class)
 public final class LevelRendererMixin {
-	@Inject(at = @At("HEAD"), method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "Lnet/minecraft/client/renderer/LevelRenderer;renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V", cancellable = true)
 	private final void renderSky(final Matrix4f pProjectionMatrix, final Matrix4f pFrustrumMatrix, final float pPartialTick, final Camera pCamera, final boolean pIsFoggy, final Runnable pSkyFogSetup, final CallbackInfo pCallback) {
 		if (!PSConfigValues.client.useSkyBoxRenderer) return;
 		final Minecraft mc = Minecraft.getInstance();

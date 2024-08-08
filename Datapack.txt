@@ -128,7 +128,7 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - Least amount of mobs that can spawn in a group.
         MaxCount: (Integer)
         - Most amount of mobs that can spawn in a group.
-        IgnoreSpawnerRules: (Optional - Boolean)
+        IgnoreSpawnRules: (Optional - Boolean)
         - If true, this entity will use default mob spawning rules instead of it's specialized rules.
         ForceDespawn: (Optional - Boolean)
         - If true. this entity will be forced to despawn at the end of an invasion.

@@ -7,17 +7,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.logging.log4j.Logger;
-
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.dimension.LevelStem;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
@@ -27,7 +29,7 @@ public final class PSConfig {
 	private static final String CONFIG = PureSufferingMod.MODID + ".config.";
 	protected static final CommonConfig COMMON = new CommonConfig();
 	protected static final ClientConfig CLIENT = new ClientConfig();
-	protected static final HashMap<ServerLevel, LevelConfig> LEVELS = new HashMap<>();
+	protected static final HashMap<ResourceKey<Level>, LevelConfig> LEVELS = new HashMap<>();
 
 	public static final class CommonConfig {
 		private static final String NOTE_HN_PERFORMANCE = "NOTE: May affect performance at higher numbers!";
@@ -158,63 +160,63 @@ public final class PSConfig {
 					.translation(CONFIG + "invasion_blacklist")
 					.worldRestart()
 					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (swap '' with quotation marks)")
-					.defineList("invasionBlacklist", List.of(), string -> {
+					.defineList("invasionBlacklist", List.of(), null, string -> {
 						return string != "";
 					});
 			this.primaryWhitelist = this.builder
 					.translation(CONFIG + "primary_whitelist")
 					.worldRestart()
 					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("primaryWhitelist", List.of(), string -> {
+					.defineList("primaryWhitelist", List.of(), null, string -> {
 						return string != "";
 					});
 			this.overworldLikeDimensions = this.builder
 					.translation(CONFIG + "overworld_like_dimensions")
 					.worldRestart()
 					.comment("List of Dimensions that should use Overworld Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("overworldLikeDimensions", List.of(), string -> {
+					.defineList("overworldLikeDimensions", List.of(), null, string -> {
 						return string != "";
 					});
 			this.netherLikeDimensions = this.builder
 					.translation(CONFIG + "nether_like_dimensions")
 					.worldRestart()
 					.comment("List of Dimensions that should use Nether Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("netherLikeDimensions", List.of(), string -> {
+					.defineList("netherLikeDimensions", List.of(), null, string -> {
 						return string != "";
 					});
 			this.endLikeDimensions = this.builder
 					.translation(CONFIG + "end_like_dimensions")
 					.worldRestart()
 					.comment("List of Dimensions that should use End Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("endLikeDimensions", List.of(), string -> {
+					.defineList("endLikeDimensions", List.of(), null, string -> {
 						return string != "";
 					});
 			this.hyperAggressionBlacklist = this.builder
 					.translation(CONFIG + "hyper_aggression_blacklist")
 					.worldRestart()
 					.comment("List of mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
-					.defineList("hyperAggressionBlacklist", List.of("minecraft:vex"), string -> {
+					.defineList("hyperAggressionBlacklist", List.of("minecraft:vex"), null, string -> {
 						return string != "";
 					});
 			this.hyperChargeBlacklist = this.builder
 					.translation(CONFIG + "hyper_charge_blacklist")
 					.worldRestart()
 					.comment("List of mobs that can't be hyper charged. (If setting is turned on)")
-					.defineList("hyperChargeBlacklist", List.of("minecraft:vex"), string -> {
+					.defineList("hyperChargeBlacklist", List.of("minecraft:vex"), null, string -> {
 						return string != "";
 					});
 			this.modBiomeBoostedBlacklist = this.builder
 					.translation(CONFIG + "mod_biome_boosted_blacklist")
 					.worldRestart()
 					.comment("List of mods that won't be allowed to have their mobs spawn in Biome Boosted Invasions.", "Ex: 'twilightforest', 'mutantbeasts'")
-					.defineList("modBiomeBoostedBlacklist", List.of(), string -> {
+					.defineList("modBiomeBoostedBlacklist", List.of(), null, string -> {
 						return string != "";
 					});
 			this.mobBiomeBoostedBlacklist = this.builder
 					.translation(CONFIG + "mob_biome_boosted_blacklist")
 					.worldRestart()
 					.comment("List of mobs that won't be allowed to spawn in Biome Boosted Invasions.", "Ex: 'minecraft:enderman', 'mutantbeasts:mutant_creeper'")
-					.defineList("mobBiomeBoostedBlacklist", List.of(), string -> {
+					.defineList("mobBiomeBoostedBlacklist", List.of(), null, string -> {
 						return string != "";
 					});
 			this.naturalSpawnChance = this.builder
@@ -320,12 +322,12 @@ public final class PSConfig {
 		public final ModConfigSpec.IntValue[] maxInvasions;
 		public final ModConfigSpec.IntValue[] tierIncreaseDelay;
 		
-		private LevelConfig(final ServerLevel pLevel) {
-			final boolean hasFixedTime = pLevel.dimensionType().hasFixedTime();
+		private LevelConfig(final ResourceKey<Level> pDimension, final LevelStem pLevelStem) {
+			final boolean hasFixedTime = pLevelStem.type().value().hasFixedTime();
 			int[][] values = new int[0][0];
-			if (pLevel.dimension().equals(Level.NETHER)) {
+			if (pDimension.equals(Level.NETHER)) {
 				values = NETHER_RARITY;
-			} else if (pLevel.dimension().equals(Level.END)) {
+			} else if (pDimension.equals(Level.END)) {
 				values = END_RARITY;
 			} else {
 				values = hasFixedTime ? DEFAULT_FIXED_RARITY : OVERWORLD_RARITY;
@@ -377,7 +379,7 @@ public final class PSConfig {
 		}
 	}
 
-	public static final void initConfig(final boolean pIsClient) {
+	public static final void initConfig(final ModContainer pModContainer, final boolean pIsClient) {
 		final Path configPath = FMLPaths.CONFIGDIR.get();
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		try {
@@ -387,12 +389,15 @@ public final class PSConfig {
 		} catch (final IOException exception) {
 			LOGGER.error("Failed to create " + PureSufferingMod.MODID + " config directory!", exception);
 		}
-		loadConfig(COMMON.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-common.toml"));
-		if (pIsClient) loadConfig(CLIENT.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml"));
+		pModContainer.registerConfig(ModConfig.Type.COMMON, COMMON.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-common.toml").toString());
+		if (pIsClient) pModContainer.registerConfig(ModConfig.Type.CLIENT, CLIENT.builder.build(), psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml").toString());
 	}
 
-	public static final void initLevelConfig(final ServerLevel pLevel) {
-		final String levelFileName = pLevel.dimension().location().toDebugFileName();
+	public static final void initLevelConfig(final Entry<ResourceKey<LevelStem>, LevelStem> pLevelStem) {
+		if (PureSufferingMod.MC == null) return;
+		final ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, pLevelStem.getKey().location());
+		if (LEVELS.containsKey(dimension)) return;
+		final String levelFileName = dimension.location().toDebugFileName();
 		final Path configPath = FMLPaths.CONFIGDIR.get();
 		final Path psConfigPath = Paths.get(configPath.toAbsolutePath().toString(), PureSufferingMod.MODID);
 		final Path psLevelConfigPath = Paths.get(psConfigPath.toAbsolutePath().toString(), "dimensions");
@@ -403,19 +408,8 @@ public final class PSConfig {
 		} catch (final IOException exception) {
 			LOGGER.error("Failed to create puresuffering dimensions config directory!", exception);
 		}
-		final LevelConfig config = new LevelConfig(pLevel);
-		LEVELS.put(pLevel, config);
-		loadConfig(config.builder.build(), psLevelConfigPath.resolve(levelFileName + "-level.toml"));
-	}
-
-	private static final void loadConfig(final ModConfigSpec pSpec, final Path pPath) {
-		final CommentedFileConfig configData = CommentedFileConfig.builder(pPath)
-				.sync()
-				.autosave()
-				.preserveInsertionOrder()
-				.writingMode(WritingMode.REPLACE)
-				.build();
-		configData.load();
-		pSpec.setConfig(configData);
+		final LevelConfig config = new LevelConfig(dimension, pLevelStem.getValue());
+		LEVELS.put(dimension, config);
+		PureSufferingMod.MC.registerConfig(ModConfig.Type.SERVER, config.builder.build(), psLevelConfigPath.resolve(levelFileName + "-level.toml").toString());
 	}
 }

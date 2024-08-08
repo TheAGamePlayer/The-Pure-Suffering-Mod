@@ -1,7 +1,6 @@
 package dev.theagameplayer.puresuffering.event;
 
 import java.util.List;
-
 import dev.theagameplayer.puresuffering.client.InvasionStartTimer;
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.client.sounds.InvasionMusicManager;
@@ -50,7 +49,7 @@ public final class PSTickEvents {
 		}
 	}
 	
-	public static final void entityTickPost(final EntityTickEvent.Post pEvent) {
+	public static final void entityTickPost(final EntityTickEvent.Pre pEvent) {
 		if (pEvent.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
 			final CompoundTag persistentData = mob.getPersistentData();
 			final boolean flag1 = PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(mob.getType().getDescriptionId());

@@ -138,7 +138,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final int[] tierIncreaseDelay;
 
 		private LevelValues(final ServerLevel pLevel) {
-			final PSConfig.LevelConfig config = PSConfig.LEVELS.get(pLevel);
+			final PSConfig.LevelConfig config = PSConfig.LEVELS.get(pLevel.dimension());
 			final int sessionTypeLength = pLevel.dimensionType().hasFixedTime() ? 1 : 2;
 			final int difficultyLength = InvasionDifficulty.values().length - 1;
 			this.invasionSessionTypeRarity = new int[sessionTypeLength];

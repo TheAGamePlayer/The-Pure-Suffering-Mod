@@ -24,6 +24,12 @@
           "MaxCount": 3,
           "MinCount": 1,
           "Weight": 10
+        },
+        {
+          "EntityType": "minecraft:breeze",
+          "MaxCount": 2,
+          "MinCount": 1,
+          "Weight": 4
         }
       ],
       "SkyRenderInfo": {
@@ -62,6 +68,12 @@
           "MaxCount": 4,
           "MinCount": 1,
           "Weight": 10
+        },
+        {
+          "EntityType": "minecraft:breeze",
+          "MaxCount": 3,
+          "MinCount": 1,
+          "Weight": 4
         }
       ],
       "SkyRenderInfo": {
@@ -100,6 +112,12 @@
           "MaxCount": 5,
           "MinCount": 2,
           "Weight": 10
+        },
+        {
+          "EntityType": "minecraft:breeze",
+          "MaxCount": 4,
+          "MinCount": 2,
+          "Weight": 4
         }
       ],
       "SkyRenderInfo": {

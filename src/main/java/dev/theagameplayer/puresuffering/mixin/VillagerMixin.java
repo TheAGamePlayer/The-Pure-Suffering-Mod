@@ -15,7 +15,7 @@ import net.minecraft.world.entity.schedule.Activity;
 @Mixin(Villager.class)
 public final class VillagerMixin {
 	@Inject(at = @At("RETURN"), method = "Lnet/minecraft/world/entity/npc/Villager;registerBrainGoals(Lnet/minecraft/world/entity/ai/Brain;)V")
-	private final void registerBrainGoals(final Brain<Villager> pBrain, final CallbackInfo pCallback) { //TODO: Use make brain event when neo-forge updates recommended version.
+	private final void registerBrainGoals(final Brain<Villager> pBrain, final CallbackInfo pCallback) {
 		pBrain.addActivity(PSActivities.INVASION.value(), InvasionGoalPackages.villagerPackage(0.5F));
 		pBrain.availableBehaviorsByPriority.get(0).get(Activity.CORE).add(SetInvasionStatus.create());
 	}
