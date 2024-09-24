@@ -1,4 +1,10 @@
 #Minecraft 1.21.x
+Version 1.6.5.2B:
+- Changed the way invasions are ticked to rely less on multi-threading.
+- Added in-game config menu support!
+- Fixed some broken translations in en_us.
+- Many micro optimizations
+
 Version 1.6.5.1B:
 - Update to 1.21.1
 

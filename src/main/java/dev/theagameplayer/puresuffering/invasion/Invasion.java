@@ -56,7 +56,7 @@ public final class Invasion implements InvasionTypeHolder {
 	public static final String INVASION_MOB = PureSufferingMod.MODID.toUpperCase() + "InvasionMob";
 	public static final String ANTI_GRIEF = PureSufferingMod.MODID.toUpperCase() + "AntiGrief";
 	public static final String DESPAWN_LOGIC = PureSufferingMod.MODID.toUpperCase() + "DespawnLogic";
-	private final ArrayList<MobInfo> invasionMobs = new ArrayList<>();
+	private final ArrayList<MobInfo> invasionMobs;
 	private final InvasionType invasionType;
 	private final boolean isPrimary;
 	private final int severity, mobCap;
@@ -72,6 +72,7 @@ public final class Invasion implements InvasionTypeHolder {
 		final SeverityInfo info = pInvasionType.getSeverityInfo().get(pSeverity);
 		final int pMobCap = Math.max(0, pIsPrimary ? PSGameRules.PRIMARY_INVASION_MOB_CAP.get(pLevel) : PSGameRules.SECONDARY_INVASION_MOB_CAP.get(pLevel));
 		final int mobCap = info.getFixedMobCap() > 0 ? Mth.clamp(info.getFixedMobCap(), 0, pMobCap) : pMobCap;
+		this.invasionMobs = new ArrayList<>(mobCap + 1);
 		this.invasionType = pInvasionType;
 		this.isPrimary = pIsPrimary;
 		this.severity = pSeverity;
@@ -120,7 +121,7 @@ public final class Invasion implements InvasionTypeHolder {
 
 	public final int hasMob(final Mob pMob) {
 		final UUID uuid = pMob.getUUID();
-		for (int i = 0; i < this.invasionMobs.size(); i++) {
+		for (int i = 0; i < this.invasionMobs.size(); ++i) {
 			final MobInfo info = this.invasionMobs.get(i);
 			if (uuid.equals(info.uuid)) return i;
 		}
@@ -177,7 +178,7 @@ public final class Invasion implements InvasionTypeHolder {
 			if (t < 1) return;
 			final ServerPlayer player = playerList.get(pLevel.random.nextInt(players));
 			final ChunkPos chunkPos = this.getSpawnChunk(pLevel, player);
-			for (int c = 0; c < t; c++)
+			for (int c = 0; c < t; ++c)
 				this.spawnClusterEntity(this.getEntitySpawnPos(pLevel, chunkPos, player, spawnInfo.getEntityType(), spawnInfo.isSurfaceSpawn()), pLevel, spawnInfo.getEntityType());
 		}
 	}
@@ -201,7 +202,7 @@ public final class Invasion implements InvasionTypeHolder {
 		//Spawn Mob Cluster (Different Mobs)
 		boolean flag1 = false;
 		final int clusterSize = pLevel.random.nextInt(this.getSeverityInfo().getClusterSize()) + 1;
-		for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; cluster++) {
+		for (int cluster = 0; cluster < clusterSize && this.invasionMobs.size() < this.mobCap; ++cluster) {
 			//Spawn Mob Group (Same Mob)
 			final InvasionSpawnerData spawners = mobs.get(pLevel.random.nextInt(mobs.size()));
 			final int groupSize = pLevel.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
@@ -307,7 +308,7 @@ public final class Invasion implements InvasionTypeHolder {
 		final ArrayList<InvasionSpawnerData> newList = new ArrayList<>();
 		if (!originalList.isEmpty()) {
 			for (final InvasionSpawnerData spawners : originalList) {
-				for (int w = 0; w < spawners.getWeight().asInt(); w++)
+				for (int w = 0, tw = spawners.getWeight().asInt(); w < tw; ++w)
 					newList.add(spawners);
 			}
 		}
@@ -376,7 +377,7 @@ public final class Invasion implements InvasionTypeHolder {
 		final int x = pChunkPos.getMinBlockX() + pLevel.random.nextInt(16);
 		final int z = pChunkPos.getMinBlockZ() + pLevel.random.nextInt(16);
 		final ArrayList<Integer> posList = new ArrayList<>();
-		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 96; y <= yMax; y++) {
+		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 97; y < yMax; ++y) {
 			final BlockPos pos = new BlockPos(x, y, z);
 			if (pEntityType == null ? !pLevel.getBlockState(pos).isAir() && pLevel.getBlockState(pos.above()).isAir() : SpawnPlacements.getPlacementType(pEntityType).isSpawnPositionOk(pLevel, pos, pEntityType)) {
 				if (pCompoundTag == null) posList.add(pos.getY());
@@ -399,7 +400,7 @@ public final class Invasion implements InvasionTypeHolder {
 		final int x = pChunkPos.getMinBlockX() + pLevel.random.nextInt(16);
 		final int z = pChunkPos.getMinBlockZ() + pLevel.random.nextInt(16);
 		final ArrayList<Integer> posList = new ArrayList<>();
-		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 96; y <= yMax; y++) {
+		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 97; y < yMax; ++y) {
 			final BlockPos pos = new BlockPos(x, y, z);
 			if (pEntity == null ? !pLevel.getBlockState(pos).isAir() && pLevel.getBlockState(pos.above()).isAir() : SpawnPlacements.getPlacementType(pEntity.getType()).isSpawnPositionOk(pLevel, pos, pEntity.getType())) {
 				if (pEntity instanceof Mob mob) {
@@ -417,7 +418,7 @@ public final class Invasion implements InvasionTypeHolder {
 		final int z = pChunkPos.getMinBlockZ() + pLevel.random.nextInt(16);
 		if (pIsSurface) return new BlockPos(x, pLevel.getHeight(Heightmap.Types.WORLD_SURFACE, x, z), z);
 		final ArrayList<Integer> posList = new ArrayList<>();
-		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 96; y <= yMax; y++) {
+		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 97; y < yMax; ++y) {
 			final BlockPos pos = new BlockPos(x, y, z);
 			if (pEntityType == null ? !pLevel.getBlockState(pos).isAir() && pLevel.getBlockState(pos.above()).isAir() : SpawnPlacements.getPlacementType(pEntityType).isSpawnPositionOk(pLevel, pos, pEntityType))
 				posList.add(pos.getY());

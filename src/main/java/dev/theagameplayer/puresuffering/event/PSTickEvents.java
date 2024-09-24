@@ -46,6 +46,8 @@ public final class PSTickEvents {
 				ilData.setInvasionTime(dayTime - dayTime % 12000L);
 				ilData.setXPMultiplier(0);
 			}
+			if (!level.getServer().isSpawningMonsters()) return;
+			invasionManager.tick(level);
 		}
 	}
 	
@@ -63,7 +65,7 @@ public final class PSTickEvents {
 					despawnLogic[2] = pos.getZ();
 					despawnLogic[3] = 0;
 				} else if (getNearestPlayer(level, mob.position()) != null) {
-					despawnLogic[3]++;
+					++despawnLogic[3];
 				}
 			}
 			if (persistentData.contains(Invasion.INVASION_MOB) && flag1 && flag2) {

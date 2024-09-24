@@ -14,7 +14,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 
 	static {
 		common = new CommonValues();
-		if (FMLEnvironment.dist.isClient())  client = new ClientValues();
+		if (FMLEnvironment.dist.isClient()) client = new ClientValues();
 	}
 
 	public static final void resyncCommon() {

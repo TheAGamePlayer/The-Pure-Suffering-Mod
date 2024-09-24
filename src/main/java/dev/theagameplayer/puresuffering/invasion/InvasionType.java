@@ -67,7 +67,7 @@ public final class InvasionType {
 	}
 
 	public final InvasionType.Builder deconstruct() {
-		final ArrayList<SeverityInfo.Builder> severityInfo = new ArrayList<>();
+		final ArrayList<SeverityInfo.Builder> severityInfo = new ArrayList<>(this.severityInfo.size());
 		for (SeverityInfo info : this.severityInfo)
 			severityInfo.add(info.deconstruct());
 		return new InvasionType.Builder(this.overridesExisting, this.defaultName, this.rarity, this.tier, this.stopConversions, this.invasionTime, this.invasionPriority, this.spawningSystem, this.timeModifier, this.timeChangeability, this.weatherType, this.dayNightCycleRequirement, severityInfo, this.dimensions);
@@ -404,7 +404,7 @@ public final class InvasionType {
 								final boolean forceDespawn = o.has("ForceDespawn") && o.get("ForceDespawn").getAsBoolean();
 								final MobTagData[] tags = new MobTagData[o.has("Tags") ? o.get("Tags").getAsJsonArray().size() : 0];
 								if (o.has("Tags")) {
-									for (int t = 0; t < tags.length; t++) {
+									for (int t = 0; t < tags.length; ++t) {
 										final JsonElement e1 = o.get("Tags").getAsJsonArray().get(t);
 										if (!e1.isJsonObject()) continue;
 										tags[t] = MobTagData.addTagData(e1.getAsJsonObject());
@@ -591,16 +591,14 @@ public final class InvasionType {
 				jsonObject.addProperty("DayNightCycleRequirement", this.dayNightCycleRequirement.toString());
 			if (this.severityInfo != null) {
 				final JsonArray jsonArray = new JsonArray();
-				for (final SeverityInfo.Builder builder : this.severityInfo) {
+				for (final SeverityInfo.Builder builder : this.severityInfo)
 					jsonArray.add(builder.serializeToJson());
-				}
 				jsonObject.add("SeverityInfo", jsonArray);
 			}
 			if (this.dimensions != null) {
 				final JsonArray jsonArray = new JsonArray();
-				for (final ResourceLocation id : this.dimensions) {
+				for (final ResourceLocation id : this.dimensions)
 					jsonArray.add(id.toString());
-				}
 				jsonObject.add("Dimensions", jsonArray);
 			}
 			return jsonObject;
@@ -681,7 +679,7 @@ public final class InvasionType {
 			if (severityInfoElement != null) {
 				if (severityInfoElement.isJsonArray()) {
 					final JsonArray a = severityInfoElement.getAsJsonArray();
-					for (int info = 0; info < a.size(); info++) {
+					for (int info = 0; info < a.size(); ++info) {
 						final JsonElement e = a.get(info);
 						if (e.isJsonObject()) {
 							severityInfo.add(SeverityInfo.Builder.fromJson(e.getAsJsonObject()));
@@ -699,7 +697,7 @@ public final class InvasionType {
 			if (dimensionsElement != null) {
 				if (dimensionsElement.isJsonArray()) {
 					final JsonArray a = dimensionsElement.getAsJsonArray();
-					for (int dim = 0; dim < a.size(); dim++) {
+					for (int dim = 0; dim < a.size(); ++dim) {
 						final ResourceLocation dimId = ResourceLocation.tryParse(a.get(dim).getAsString());
 						dimensions.add(dimId);
 						if (dimId.equals(Level.OVERWORLD.location()) && dayNightCycleRequirement != null) {

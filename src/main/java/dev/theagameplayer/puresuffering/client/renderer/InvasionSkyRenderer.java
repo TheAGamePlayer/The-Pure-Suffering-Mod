@@ -60,9 +60,9 @@ public final class InvasionSkyRenderer {
 		switch (this.skyType) {
 		case NONE: return;
 		case NORMAL: {
-			final ArrayList<InvasionSkyRenderInfo> skyColorList = new ArrayList<>(); //Invasions that change the sky colors
-			final ArrayList<InvasionSkyRenderInfo> sunMoonAlphaList = new ArrayList<>(); //Invasions that changes the sun & moon alpha.
-			final ArrayList<InvasionSkyRenderInfo> weatherVisibilityList = new ArrayList<>(); //Invasions that are visible in weather
+			final ArrayList<InvasionSkyRenderInfo> skyColorList = new ArrayList<>(pInvasions.size()); //Invasions that change the sky colors
+			final ArrayList<InvasionSkyRenderInfo> sunMoonAlphaList = new ArrayList<>(pInvasions.size()); //Invasions that changes the sun & moon alpha.
+			final ArrayList<InvasionSkyRenderInfo> weatherVisibilityList = new ArrayList<>(pInvasions.size()); //Invasions that are visible in weather
 			this.sun = pPrimaryInfo.getSunTexture();
 			this.moon = pPrimaryInfo.getMoonTexture();
 			this.noSunOrMoon = false;
@@ -168,8 +168,8 @@ public final class InvasionSkyRenderer {
 			final Matrix4f matrix4f = pPoseStack.last().pose();
 			final BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.TRIANGLE_FAN, DefaultVertexFormat.POSITION_COLOR);
 			bufferBuilder.addVertex(matrix4f, 0.0F, 100.0F, 0.0F).setColor(aRGB[0], aRGB[1], aRGB[2], aRGB[3]);
-			for(int j = 0; j < 17; ++j) {
-				final float a = (float)j * ((float)Math.PI * 2F) / 16.0F;
+			for (int j = 0; j < 17; ++j) {
+				final float a = (float)j * (Mth.PI * 2F) / 16.0F;
 				final float x = Mth.sin(a);
 				final float yz = Mth.cos(a);
 				bufferBuilder.addVertex(matrix4f, x * 120.0F, yz * 120.0F, -yz * 40.0F * aRGB[3]).setColor(aRGB[0], aRGB[1], aRGB[2], 0.0F);

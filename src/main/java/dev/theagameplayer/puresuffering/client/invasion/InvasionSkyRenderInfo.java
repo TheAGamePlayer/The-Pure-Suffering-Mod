@@ -223,8 +223,8 @@ public final class InvasionSkyRenderInfo {
 		public final InvasionSkyRenderInfo.Builder withFlickerRGB(final float pRed, final float pGreen, final float pBlue, final int pMinDelay, final int pMaxDelay) {
 			final int l = this.fRGB.length;
 			final float[][] fRGB = new float[l + 1][5];
-			for (int i1 = 0; i1 < l; i1++) {
-				for (int i2 = 0; i2 < 5; i2++)
+			for (int i1 = 0; i1 < l; ++i1) {
+				for (int i2 = 0; i2 < 5; ++i2)
 					fRGB[i1][i2] = this.fRGB[i1][i2];
 			}
 			this.fRGB = fRGB;
@@ -297,7 +297,7 @@ public final class InvasionSkyRenderInfo {
 			}
 			if (this.changes[3]) {
 				final JsonArray a1 = new JsonArray();
-				for (int i = 0; i < this.fRGB.length; i++) {
+				for (int i = 0; i < this.fRGB.length; ++i) {
 					final JsonArray a2 = new JsonArray();
 					a2.add(this.fRGB[i][0]);
 					a2.add(this.fRGB[i][1]);
@@ -361,7 +361,7 @@ public final class InvasionSkyRenderInfo {
 			if (fRGBElement != null && fRGBElement.isJsonArray() && !fRGBElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a1 = fRGBElement.getAsJsonArray();
 				fRGB = new float[a1.size()][5];
-				for (int i = 0; i < a1.size(); i++) {
+				for (int i = 0; i < a1.size(); ++i) {
 					final JsonElement e = a1.get(i);
 					if (e.isJsonArray() && !e.getAsJsonArray().isEmpty()) {
 						final JsonArray a2 = e.getAsJsonArray();
@@ -417,7 +417,7 @@ public final class InvasionSkyRenderInfo {
 			pBuf.writeFloat(this.fBrightness[2]);
 			pBuf.writeFloat(this.fBrightness[3]);
 			pBuf.writeInt(this.fRGB.length);
-			for (int i = 0; i < this.fRGB.length; i++) {
+			for (int i = 0; i < this.fRGB.length; ++i) {
 				pBuf.writeFloat(this.fRGB[i][0]);
 				pBuf.writeFloat(this.fRGB[i][1]);
 				pBuf.writeFloat(this.fRGB[i][2]);

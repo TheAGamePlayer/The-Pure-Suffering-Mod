@@ -45,7 +45,7 @@ public final class ClientEffectsRenderer {
 				if (this.canSeeSky) this.soundRings.add(new SoundRing(this.difficulty, pStartTime));
 				this.delays[0] = this.difficulty.getRingDelay();
 			} else {
-				this.delays[0]--;
+				--this.delays[0];
 			}
 		}
 		if (this.difficulty.isHyper()) {
@@ -53,7 +53,7 @@ public final class ClientEffectsRenderer {
 				this.vortexParticles.add(new VortexParticle(pRandom, this.difficulty));
 				this.delays[1] = PSConfigValues.client.vortexParticleDelay;
 			} else {
-				this.delays[1]--;
+				--this.delays[1];
 			}
 		}
 		this.soundRings.removeIf(ring -> ring.tick());
@@ -109,7 +109,7 @@ public final class ClientEffectsRenderer {
 			this.sizeAlpha[0] = (float)this.ticksAlive/Invasion.HALF_TRANSITION;
 			this.length[1] = this.length[0];
 			this.length[0] = this.dist[0]/this.sizeAlpha[0];
-			this.ticksAlive--;
+			--this.ticksAlive;
 			return this.ticksAlive < 1;
 		}
 
@@ -169,7 +169,7 @@ public final class ClientEffectsRenderer {
 			final float percentAlive = this.ticksAlive/this.speed;
 			this.a = this.vortexValue(this.a, this.maxAlpha, pDayTime);
 			this.alpha = getAlpha(this.a, pDayTime);
-			for (int i = this.rot.length - 1; i > 0; i--) {
+			for (int i = this.rot.length - 1; i > 0; --i) {
 				this.rot[i][0] = this.rot[i - 1][0];
 				this.rot[i][1] = this.rot[i - 1][1];
 				this.rot[i][2] = this.rot[i - 1][2];
@@ -178,7 +178,7 @@ public final class ClientEffectsRenderer {
 			this.rot[0][1] = percentAlive > 0.5F ? percentAlive * 180.0F : 180.0F - percentAlive * 180.0F;
 			this.rot[0][2] = percentAlive > 0.5F ? 180.0F + percentAlive * 180.0F : 180.0F + percentAlive * 180.0F;
 			this.size = this.vortexValue(this.size, this.maxSize, pDayTime);
-			this.ticksAlive--;
+			--this.ticksAlive;
 			return this.ticksAlive < 1;
 		}
 
@@ -196,7 +196,7 @@ public final class ClientEffectsRenderer {
 			final float alpha = this.alpha - ClientTransitionHandler.getWeatherVisibility(pWeatherVisibility, pDayTime);
 			final int length = Minecraft.useFancyGraphics() ? this.rot.length : 2;
 			RenderSystem.setShaderTexture(0, TEXTURE);
-			for (int i = 1; i < length; i++) {
+			for (int i = 1; i < length; ++i) {
 				final float s = this.scaleFactor * (this.rot.length - i);
 				final float size = this.size * s;
 				RenderSystem.setShaderColor(this.rgb[0] * s, this.rgb[1] * s, this.rgb[2] * s, alpha * s);

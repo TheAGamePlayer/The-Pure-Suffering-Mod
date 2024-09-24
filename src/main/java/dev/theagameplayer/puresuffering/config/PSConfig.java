@@ -69,20 +69,20 @@ public final class PSConfig {
 		public final ModConfigSpec.IntValue blessingEffectDimensionChangeDuration;
 
 		private CommonConfig() {
-			this.builder.push("GameRules");
+			this.builder.push("game_rules");
 			this.overrideGameRules = this.builder
 					.translation(CONFIG + "override_game_rules")
 					.worldRestart()
 					.comment("This will make these config options override their game rule values.", "NOTE: Can be used to help modpack creators enforce certain settings.")
 					.define("overrideGameRules", false);
-			this.builder.push("Boolean");
+			this.builder.push("game_rules_boolean");
 			this.enableHyperInvasions = this.builder
-					.translation(CONFIG + "hyper_invasions")
+					.translation(CONFIG + "enable_hyper_invasions")
 					.worldRestart()
 					.comment("Should hyper invasions be able to occur?")
 					.define("enableHyperInvasions", true);
 			this.enableNightmareInvasions = this.builder
-					.translation(CONFIG + "nightmare_invasions")
+					.translation(CONFIG + "enable_nightmare_invasions")
 					.worldRestart()
 					.comment("Should nightmare invasions be able to occur?", "NOTE: Hyper invasions must be enabled.")
 					.define("enableNightmareInvasions", true);
@@ -142,7 +142,7 @@ public final class PSConfig {
 					.comment("Determines if players be notified when invasions start.")
 					.define("notifyPlayersAboutInvasions", true);
 			this.builder.pop();
-			this.builder.push("Integer");
+			this.builder.push("game_rules_integer");
 			this.primaryInvasionMobCap = this.builder
 					.translation(CONFIG + "primary_invasion_mob_cap")
 					.worldRestart()
@@ -155,7 +155,7 @@ public final class PSConfig {
 					.defineInRange("secondaryInvasionMobCap", 25, 0, Integer.MAX_VALUE);
 			this.builder.pop();
 			this.builder.pop();
-			this.builder.push("Invasions");
+			this.builder.push("invasions");
 			this.invasionBlacklist = this.builder
 					.translation(CONFIG + "invasion_blacklist")
 					.worldRestart()
@@ -261,7 +261,7 @@ public final class PSConfig {
 		public final ModConfigSpec.BooleanValue useInvasionSoundEffects;
 
 		private ClientConfig() {
-			this.builder.push("Rendering");
+			this.builder.push("rendering");
 			this.useSkyBoxRenderer = this.builder
 					.translation(CONFIG + "use_sky_box_renderer")
 					.comment("Can render Invasions with a custom sky box renderer?", NOTE_INCOMPATIBLE_SHADERS)
@@ -299,7 +299,7 @@ public final class PSConfig {
 					.comment("Delay value for spawning vortex particles.", "NOTE: Increasing the delay will result in less particles, increasing performance.", "NOTE: total particle = particles * 1/(value + 1)")
 					.defineInRange("vortexParticleDelay", 1, 0, Integer.MAX_VALUE);
 			this.builder.pop();
-			this.builder.push("Sound");
+			this.builder.push("sound");
 			this.useInvasionSoundEffects = this.builder
 					.translation(CONFIG + "use_invasion_sound_effects")
 					.comment("Should the sound effects signaling invasion be used?")

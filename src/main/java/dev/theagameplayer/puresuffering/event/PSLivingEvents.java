@@ -100,7 +100,7 @@ public final class PSLivingEvents {
 				pEvent.setResult(Result.ALLOW);
 				return;
 			} else {
-				despawnLogic[4]++;
+				++despawnLogic[4];
 			}
 		}
 	}

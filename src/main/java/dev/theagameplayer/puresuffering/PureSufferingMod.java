@@ -34,6 +34,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
@@ -64,6 +66,7 @@ public final class PureSufferingMod {
 	private final void createConfig(final ModContainer pModContainer) {
 		MC = pModContainer;
 		PSConfig.initConfig(pModContainer, FMLEnvironment.dist.isClient());
+		pModContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 		LOGGER.info("Created mod config.");
 	}
 	

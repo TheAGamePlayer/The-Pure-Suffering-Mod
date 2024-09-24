@@ -123,6 +123,13 @@
 	"puresuffering.subtitle.music": "Invasion Music",
 	"puresuffering.subtitle.invasion_ambience": "Invasion Ambience",
 	
+	"puresuffering.configuration.game_rules": "Game Rules",
+	"puresuffering.configuration.game_rules_boolean": "Boolean",
+	"puresuffering.configuration.game_rules_integer": "Integer",
+	"puresuffering.configuration.invasions": "Invasions",
+	"puresuffering.configuration.rendering": "Rendering",
+	"puresuffering.configuration.sound": "Sound",
+	
 	"puresuffering.config.override_game_rules": "Override Game Rules",
 	"puresuffering.config.enable_hyper_invasions": "Enable Hyper Invasions",
 	"puresuffering.config.enable_nightmare_invasions": "Enable Nightmare Invasions",

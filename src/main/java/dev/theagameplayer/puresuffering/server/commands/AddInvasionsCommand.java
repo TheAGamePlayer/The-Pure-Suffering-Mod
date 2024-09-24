@@ -167,12 +167,12 @@ public final class AddInvasionsCommand {
 		if (isPrimary) { //Primary
 			int total = 0;
 			final int[] ranges = new int[InvasionDifficulty.values().length];
-			for (int i = 0; i < ranges.length; i++) {
+			for (int i = 0; i < ranges.length; ++i) {
 				total += InvasionDifficulty.values().length - i;
 				ranges[i] = total;
 			}
 			final int value = random.nextInt(total) + 1;
-			for (int i = ranges.length - 1; i > -1; i--) {
+			for (int i = ranges.length - 1; i > -1; --i) {
 				final int range = ranges[i];
 				if (value >= range) {
 					difficulty[0] = InvasionDifficulty.values()[i];

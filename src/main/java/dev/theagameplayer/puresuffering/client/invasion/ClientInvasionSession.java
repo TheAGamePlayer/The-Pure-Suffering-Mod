@@ -77,7 +77,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		this.fogRGB = new float[2][3];
 		this.brightness = new float[2];
 		if (this.difficulty.isNightmare()) {
-			for (int i = 0; i < 3; i++) this.fogRGB[0][i] = -1.0F;
+			for (int i = 0; i < 3; ++i) this.fogRGB[0][i] = -1.0F;
 			this.brightness[0] = 1.0F;
 			this.lightLevel = 15;
 		} else {
@@ -85,7 +85,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 			if (!fogColorRenders.isEmpty()) {
 				for (final InvasionSkyRenderInfo render : fogColorRenders) {
 					final InvasionFogRenderInfo fogRender = render.getFogRenderInfo();
-					for (int i = 0; i < 3; i++) 
+					for (int i = 0; i < 3; ++i) 
 						this.fogRGB[0][i] += fogRender.getRGBOffset(i) / fogColorRenders.size();
 				}
 			}
@@ -121,7 +121,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 			this.brightness[1] = invasion.flickerBrightness(this.brightness[1]);
 		this.brightness[1] = ClientTransitionHandler.getBrightness(this.brightness[1], pDayTime);
 		this.darkness = ClientTransitionHandler.getLightTextureDarkness(pDayTime);
-		if (this.startTime < 40) this.startTime++;
+		if (this.startTime < 40) ++this.startTime;
 	}
 
 	public final float[] getFogRGB() {

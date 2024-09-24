@@ -40,7 +40,7 @@ public final class InvasionManager {
 		this.queuedInvasions = new QueuedInvasionList[this.sessionTypes.size()];
 		this.intervals = new int[this.sessionTypes.size()][InvasionDifficulty.values().length];
 		this.cancelIntervals = new int[this.sessionTypes.size()];
-		for (int i = 0; i < this.sessionTypes.size(); i++) {
+		for (int i = 0; i < this.sessionTypes.size(); ++i) {
 			for (final InvasionDifficulty difficulty : InvasionDifficulty.values())
 				this.intervals[i][difficulty.ordinal()] = -1;
 			this.cancelIntervals[i] = -1;
@@ -67,7 +67,7 @@ public final class InvasionManager {
 				if (difficulty != null) {
 					LOGGER.info("Setting " + difficulty.getDefaultName() + " " + sessionType.getDefaultName() + " Invasions: [");
 					if (this.cancelIntervals[index] > 0) {
-						this.cancelIntervals[index]--;
+						--this.cancelIntervals[index];
 					} else {
 						final int cancelRarity = sessionType.getCancelRarity(pLevel);
 						if (this.calcInvasionCanceled(index, days, maxPossibleInvasions, pLevel, sessionType, difficulty))
@@ -82,7 +82,7 @@ public final class InvasionManager {
 							final Predicate<InvasionType> potentials = it -> it.getDimensions().contains(pLevel.dimension().location()) && (!PSGameRules.TIERED_INVASIONS.get(pLevel) || days >= it.getTier() * tierIncreaseDelay);
 							final Predicate<InvasionType> potentialPrimary = it -> sessionType.isAcceptableTime(it, false) && potentials.test(it) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY && (PSConfigValues.common.primaryWhitelist.isEmpty() || PSConfigValues.common.primaryWhitelist.contains(it.getId().toString()));
 							final Predicate<InvasionType> potentialSecondary = it -> potentials.test(it) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY;
-							for (int inv = 0; inv < totalInvasions; inv++) {
+							for (int inv = 0; inv < totalInvasions; ++inv) {
 								final InvasionType invasionType = this.getInvasionType(new InvasionChart(inv == 0, inv == 0 ? potentialPrimary : it -> sessionType.isAcceptableTime(it, isTimeModified[0]) && potentialSecondary.test(it) && (!isTimeModified[0] || sessionType.canBeChanged(it))), random);
 								if (invasionType == null || invasionType.getMaxSeverity() < 1) break;
 								if (inv == 0) this.sessions[index] = new InvasionSession(sessionType, difficulty);
@@ -100,7 +100,7 @@ public final class InvasionManager {
 		} else {
 			this.sessions[index] = new InvasionSession(sessionType, this.queuedInvasions[index].getDifficulty());
 			LOGGER.info("Setting Queued " + this.sessions[index].getDifficulty().getDefaultName() + " " + sessionType.getDefaultName() + " Invasions: [");
-			for (int q = 0; q < this.queuedInvasions[index].size(); q++) {
+			for (int q = 0; q < this.queuedInvasions[index].size(); ++q) {
 				final Invasion invasion = this.queuedInvasions[index].get(q).build(pLevel, q);
 				this.sessions[index].add(pLevel, invasion);
 				LOGGER.info("Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
@@ -119,7 +119,7 @@ public final class InvasionManager {
 			if (!difficulty.isAllowed(pLevel)) break;
 			final int i = difficulty.ordinal();
 			if (this.intervals[pIndex][i] > 0) {
-				this.intervals[pIndex][i]--;
+				--this.intervals[pIndex][i];
 				break;
 			} else {
 				final int rarity = difficulty.getRarity(pLevel, pSessionType.getRarity(pLevel));
@@ -145,7 +145,7 @@ public final class InvasionManager {
 	private final int getSecondarySeverityCap(final InvasionType pInvasionType, int pIndex) {
 		final Invasion primary = this.sessions[pIndex].getPrimary();
 		final float primaryPercent = (float)(primary.getSeverity() + 1)/primary.getType().getMaxSeverity();
-		for (int s = pInvasionType.getMaxSeverity(); s > 0; s--) {
+		for (int s = pInvasionType.getMaxSeverity(); s > 0; --s) {
 			if ((float)s/pInvasionType.getMaxSeverity() <= primaryPercent)
 				return s;
 		}
@@ -172,8 +172,7 @@ public final class InvasionManager {
 		return this.queuedInvasions[this.sessionTypes.indexOf(pSessionType)];
 	}
 
-	public final void tick(final boolean pSpawningMonsters, final ServerLevel pLevel) {
-		if (!pSpawningMonsters) return;
+	public final void tick(final ServerLevel pLevel) {
 		if (PSGameRules.ENABLE_INVASION_AMBIENCE.get(pLevel) && this.ambienceTime > -1 && pLevel.getDayTime() % 12000L > this.ambienceTime) {
 			PSPackets.sendToClientsIn(new SendInvasionAmbiencePacket(), pLevel);
 			this.ambienceTime = -1;
@@ -186,7 +185,7 @@ public final class InvasionManager {
 	public final void load(final ServerLevel pLevel, final CompoundTag pNbt) {
 		final CompoundTag[] sessionsNBT = new CompoundTag[this.sessionTypes.size()];
 		final CompoundTag[] queuedInvasionsNBT = new CompoundTag[this.sessionTypes.size()];
-		for (int i = 0; i < this.sessionTypes.size(); i++) {
+		for (int i = 0; i < this.sessionTypes.size(); ++i) {
 			final InvasionSessionType sessionType = this.sessionTypes.get(i);
 			sessionsNBT[i] = pNbt.getCompound(sessionType.getDefaultName() + "InvasionSessions");
 			queuedInvasionsNBT[i] = pNbt.getCompound("Queued" + sessionType.getDefaultName() + "Invasions");
@@ -207,7 +206,7 @@ public final class InvasionManager {
 		final CompoundTag nbt = new CompoundTag();
 		final CompoundTag[] sessionsNBT = new CompoundTag[this.sessionTypes.size()];
 		final CompoundTag[] queuedInvasionsNBT = new CompoundTag[this.sessionTypes.size()];
-		for (int i = 0; i < this.sessionTypes.size(); i++) {
+		for (int i = 0; i < this.sessionTypes.size(); ++i) {
 			final InvasionSessionType sessionType = this.sessionTypes.get(i);
 			sessionsNBT[i] = this.sessions[i] == null ? new CompoundTag() : this.sessions[i].save();
 			nbt.put(sessionType.getDefaultName() + "InvasionSessions", sessionsNBT[i]);
