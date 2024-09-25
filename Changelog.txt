@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.5.3B:
+- Fixed dedicated servers crashing.
+
 Version 1.6.5.2B:
 - Changed the way invasions are ticked to rely less on multi-threading.
 - Added in-game config menu support!

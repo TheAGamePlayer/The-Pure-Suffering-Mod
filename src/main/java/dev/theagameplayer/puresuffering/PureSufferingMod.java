@@ -65,8 +65,9 @@ public final class PureSufferingMod {
 	
 	private final void createConfig(final ModContainer pModContainer) {
 		MC = pModContainer;
-		PSConfig.initConfig(pModContainer, FMLEnvironment.dist.isClient());
-		pModContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+		final boolean flag = FMLEnvironment.dist.isClient();
+		PSConfig.initConfig(pModContainer, flag);
+		if (flag) pModContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 		LOGGER.info("Created mod config.");
 	}
 	
