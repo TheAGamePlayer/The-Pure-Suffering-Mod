@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.5.5B:
+- Attempt 2 at fixing the AE2 crash.
+
 Version 1.6.5.4B:
 - Fixed a bug with the in-game config not updating for client config options without a world reload.
 - Fixed a compatability bug with AE2 crashing for creating a dimension without a physical space (May resolve crashes with other mods as well).

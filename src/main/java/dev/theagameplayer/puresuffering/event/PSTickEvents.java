@@ -12,6 +12,8 @@ import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,6 +23,7 @@ import net.minecraft.world.entity.monster.Zoglin;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.warden.Warden;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
@@ -38,6 +41,8 @@ public final class PSTickEvents {
 			session.tick(level, level.getDayTime() % 12000L);
 		} else { //Assigning Invasions
 			final ServerLevel level = (ServerLevel)pEvent.getLevel();
+			final Registry<LevelStem> registry = level.getServer().registries().compositeAccess().registryOrThrow(Registries.LEVEL_STEM);
+			if (registry.getOptional(level.dimension().location()).isEmpty()) return;
 			final InvasionLevelData ilData = InvasionLevelData.get(level);
 			final InvasionManager invasionManager = ilData.getInvasionManager();
 			final long dayTime = level.getDayTime();
