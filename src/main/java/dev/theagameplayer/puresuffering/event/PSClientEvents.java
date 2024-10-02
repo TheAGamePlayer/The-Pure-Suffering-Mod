@@ -53,12 +53,10 @@ public final class PSClientEvents {
 	}
 
 	public static final void loggedIn(final ClientPlayerNetworkEvent.LoggingIn pEvent) {
-		PSConfigValues.resyncClient();
 		InvasionMusicManager.reloadMusic();
 	}
 
 	public static final void loggedOut(final ClientPlayerNetworkEvent.LoggingOut pEvent) {
-		PSConfigValues.resyncClient();
 		ClientInvasionSession.clear();
 	}
 

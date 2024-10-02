@@ -50,7 +50,7 @@ public final class PureSufferingMod {
 	public PureSufferingMod(final ModContainer pModContainer, final IEventBus pModEventBus) {
 		this.registerAll(pModEventBus);
 		this.createRegistries(pModEventBus);
-		this.createConfig(pModContainer);
+		this.createConfig(pModContainer, pModEventBus);
 		pModEventBus.addListener(this::commonSetup);
 		pModEventBus.addListener(this::clientSetup);
 		pModEventBus.addListener(this::gatherData);
@@ -63,11 +63,13 @@ public final class PureSufferingMod {
 		return ResourceLocation.fromNamespaceAndPath(MODID, pName);
 	}
 	
-	private final void createConfig(final ModContainer pModContainer) {
+	private final void createConfig(final ModContainer pModContainer, final IEventBus pModEventBus) {
 		MC = pModContainer;
 		final boolean flag = FMLEnvironment.dist.isClient();
 		PSConfig.initConfig(pModContainer, flag);
 		if (flag) pModContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+		pModEventBus.addListener(PSConfig::loading);
+		pModEventBus.addListener(PSConfig::reloading);
 		LOGGER.info("Created mod config.");
 	}
 	
@@ -123,7 +125,6 @@ public final class PureSufferingMod {
 		pForgeBus.addListener(PSLevelEvents::explosionStart);
 		//Server
 		pForgeBus.addListener(PSServerEvents::serverStarting);
-		pForgeBus.addListener(PSServerEvents::serverStopping);
 		//Tick
 		pForgeBus.addListener(PSTickEvents::levelTickPost);
 		pForgeBus.addListener(PSTickEvents::entityTickPost);
