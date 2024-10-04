@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.5.6B:
+- Fixed crash by creating a new dimension mid-game (Now requires reload for invasions to work in the dimension).
+
 Version 1.6.5.5B:
 - Attempt 2 at fixing the AE2 crash.
 
