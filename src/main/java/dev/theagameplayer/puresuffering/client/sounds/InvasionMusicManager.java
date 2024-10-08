@@ -7,8 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import org.apache.logging.log4j.Logger;
+import org.codehaus.plexus.util.FastMap;
 
 import com.mojang.blaze3d.audio.Channel;
 
@@ -32,14 +32,12 @@ import net.neoforged.fml.loading.FMLPaths;
 
 public final class InvasionMusicManager {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
-	private static final HashMap<InvasionDifficulty, ArrayList<PSMusicInfo>> PS_MUSIC = new HashMap<>();
+	private static final FastMap<InvasionDifficulty, ArrayList<PSMusicInfo>> PS_MUSIC = new FastMap<>();
 	private static PSMusicSoundInstance music;
 	private static Channel channel;
 	private static int mIndex = -1;
 
-	public static final void addMusic(final boolean pLog) {
-		final Minecraft mc = Minecraft.getInstance();
-		final SoundManager soundManager = mc.getSoundManager();
+	public static final void addMusic(final SoundManager pSoundManager, final boolean pLog) {
 		final Path gamePath = FMLPaths.GAMEDIR.get();
 		final Path musicPath = Paths.get(gamePath.toAbsolutePath().toString(), PureSufferingMod.MUSICID);
 		try {
@@ -59,18 +57,19 @@ public final class InvasionMusicManager {
 				LOGGER.error("Failed to create " + PureSufferingMod.MUSICID + "-" + difficulty.toString()  + " music directory!", exceptionIn);
 				continue;
 			}
-			final ArrayList<PSMusicInfo> hyperList = new ArrayList<>();
-			for (final File file : new File(hyperPath.toString()).listFiles()) {
+			final File[] files = hyperPath.toFile().listFiles();
+			final ArrayList<PSMusicInfo> hyperList = new ArrayList<>(files.length);
+			for (final File file : files) {
 				final ResourceLocation location = ResourceLocation.fromNamespaceAndPath(PureSufferingMod.MUSICID, difficulty.toString() + "/" + file.getName().toLowerCase().replaceAll("\\s+", "_").replaceAll(".ogg", ""));
 				final Sound sound = new Sound(location, ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Sound.Type.FILE, true, false, 16);
 				final WeighedSoundEvents soundEvent = new WeighedSoundEvents(location, "puresuffering.subtitle.music");
 				if (!validateSoundOgg(sound, file.getName())) continue;
 				soundEvent.addSound(sound);
 				hyperList.add(new PSMusicInfo(location, file.toPath(), file.getName().replaceAll(".ogg", "")));
-				soundManager.registry.put(location, soundEvent);
+				pSoundManager.registry.put(location, soundEvent);
 			}
-			if (!hyperList.isEmpty())
-				PS_MUSIC.put(difficulty, hyperList);
+			if (hyperList.isEmpty()) continue;
+			PS_MUSIC.put(difficulty, hyperList);
 		}
 	}
 
@@ -86,7 +85,7 @@ public final class InvasionMusicManager {
 
 	public static final void reloadMusic() {
 		LOGGER.info("Reloading Invasion Music!");
-		addMusic(false);
+		addMusic(Minecraft.getInstance().getSoundManager(), false);
 	}
 
 	public static final Path getMusic(final ResourceLocation pLoc) {
@@ -113,7 +112,7 @@ public final class InvasionMusicManager {
 			}
 			if (music != null && soundManager.isActive(music)) {
 				if (channel == null) return;
-				channel.setVolume(Math.min((float)(12000L - pDayTime)/Invasion.HALF_TRANSITION, 1.0F));
+				channel.setVolume(Math.min((float)(12000L - pDayTime)/Invasion.HALF_TRANSITION, mc.options.getSoundSourceVolume(SoundSource.MUSIC)));
 			} else if (pDayTime > Invasion.HALF_TRANSITION && pDayTime < 12000L - Invasion.HALF_TRANSITION) {
 				final ArrayList<PSMusicInfo> hyperList = PS_MUSIC.get(pDifficulty);
 				if (mIndex == -1) mIndex = pRandom.nextInt(hyperList.size());
@@ -128,7 +127,7 @@ public final class InvasionMusicManager {
 			tickInactive();
 		}
 	}
-	
+
 	public static final void tickInactive() {
 		if (!playingMusic()) return;
 		final Minecraft mc = Minecraft.getInstance();
@@ -140,11 +139,11 @@ public final class InvasionMusicManager {
 	public static final boolean playingMusic() {
 		return music != null && Minecraft.getInstance().getSoundManager().isActive(music);
 	}
-	
+
 	public static final boolean isMusic(final PSMusicSoundInstance pSound) {
 		return pSound.equals(music);
 	}
-	
+
 	public static final void setChannel(final Channel pChannel) {
 		channel = pChannel;
 	}

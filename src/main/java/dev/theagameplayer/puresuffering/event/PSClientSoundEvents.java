@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundSource;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundSourceEvent;
 import net.neoforged.neoforge.client.event.sound.PlayStreamingSourceEvent;
+import net.neoforged.neoforge.client.event.sound.SoundEngineLoadEvent;
 
 public final class PSClientSoundEvents {
 	public static final void playSound(final PlaySoundEvent pEvent) {
@@ -23,8 +24,7 @@ public final class PSClientSoundEvents {
 			pEvent.setSound(null);
 			return;
 		}
-		if (sound instanceof PSMusicSoundInstance) return;
-		if (!sound.getLocation().getNamespace().equals(PureSufferingMod.MUSICID)) return; //Needed for playSound command
+		if (sound instanceof PSMusicSoundInstance || !sound.getLocation().getNamespace().equals(PureSufferingMod.MUSICID)) return; //Needed for playSound command
 		final Minecraft mc = Minecraft.getInstance();
 		pEvent.setSound(new PSMusicSoundInstance(SoundEvent.createVariableRangeEvent(sound.getLocation()), sound.getSource(), sound.getVolume(), sound.getPitch(), mc.level.getRandom(), sound.getX(), sound.getY(), sound.getZ()));
 	}
@@ -43,5 +43,9 @@ public final class PSClientSoundEvents {
 		if (flag1 || flag2) InvasionSoundHandler.playSound(pEvent.getChannel().source, flag1 ? 6.0F : 15.0F);
 		if (!pEvent.getSound().getLocation().getNamespace().equals(PureSufferingMod.MUSICID)) return;
 		if (pEvent.getSound() instanceof PSMusicSoundInstance psSound && InvasionMusicManager.isMusic(psSound)) InvasionMusicManager.setChannel(pEvent.getChannel());
+	}
+	
+	public static final void soundEngineLoad(final SoundEngineLoadEvent pEvent) {
+		InvasionMusicManager.addMusic(pEvent.getEngine().soundManager, true);
 	}
 }

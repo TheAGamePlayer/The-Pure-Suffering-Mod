@@ -5,7 +5,6 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import dev.theagameplayer.puresuffering.client.sounds.InvasionMusicManager;
 import dev.theagameplayer.puresuffering.config.PSConfig;
 import dev.theagameplayer.puresuffering.data.InvasionTypesProvider;
 import dev.theagameplayer.puresuffering.event.PSClientEvents;
@@ -31,7 +30,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
@@ -52,7 +50,6 @@ public final class PureSufferingMod {
 		this.createRegistries(pModEventBus);
 		this.createConfig(pModContainer, pModEventBus);
 		pModEventBus.addListener(this::commonSetup);
-		pModEventBus.addListener(this::clientSetup);
 		pModEventBus.addListener(this::gatherData);
 		if (FMLEnvironment.dist.isClient())
 			attachClientEventListeners(pModEventBus, NeoForge.EVENT_BUS);
@@ -98,6 +95,7 @@ public final class PureSufferingMod {
 		pForgeBus.addListener(PSClientSoundEvents::playSound);
 		pForgeBus.addListener(PSClientSoundEvents::playSoundSource);
 		pForgeBus.addListener(PSClientSoundEvents::playStreamingSource);
+		pModBus.addListener(PSClientSoundEvents::soundEngineLoad);
 	}
 
 	public static final void attachCommonEventListeners(final IEventBus pModBus, final IEventBus pForgeBus) {
@@ -133,11 +131,6 @@ public final class PureSufferingMod {
 	private final void commonSetup(final FMLCommonSetupEvent pEvent) {
 		PSGameRules.registerGameRules();
 		LOGGER.info("Finished common setup.");
-	}
-	
-	private final void clientSetup(final FMLClientSetupEvent pEvent) {
-		InvasionMusicManager.addMusic(true);
-		LOGGER.info("Finished client setup.");
 	}
 	
 	private final void gatherData(final GatherDataEvent pEvent) {

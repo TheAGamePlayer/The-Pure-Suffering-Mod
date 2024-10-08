@@ -1,6 +1,5 @@
 package dev.theagameplayer.puresuffering.client.gui.components.toasts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
@@ -27,18 +26,15 @@ public final class InvasionMusicToast implements Toast {
 
 	public InvasionMusicToast(final String pName, final InvasionDifficulty pDifficulty) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ArrayList<Item> records = new ArrayList<>();
-		mc.level.registryAccess().registryOrThrow(Registries.ITEM).forEach(item -> {
-			if (JukeboxSong.fromStack(mc.level.registryAccess(), item.getDefaultInstance()).isPresent())
-				records.add(item);
-		});
-		this.recordItem = new ItemStack(records.get(mc.level.random.nextInt(records.size())));
+		final Item[] records = mc.level.registryAccess().registryOrThrow(Registries.ITEM).stream().filter(item -> {
+			return JukeboxSong.fromStack(mc.level.registryAccess(), item.getDefaultInstance()).isPresent();
+		}).toArray(Item[]::new);
+		this.recordItem = new ItemStack(records[mc.level.random.nextInt(records.length)]);
 		this.name = Component.literal(pName);
 		this.color1 = pDifficulty.getColor(true);
 		this.color2 = pDifficulty.getColor(false);
 	}
 
-	@Override
 	public final Visibility render(final GuiGraphics pGraphics, final ToastComponent pComponent, final long pTicks) {
 		final Minecraft mc = pComponent.getMinecraft();
 		pGraphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
