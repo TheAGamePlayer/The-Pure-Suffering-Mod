@@ -52,6 +52,7 @@ public final class PSConfig {
 		public final ModConfigSpec.BooleanValue enableInvasionAmbience;
 		public final ModConfigSpec.BooleanValue notifyPlayersAboutInvasions;
 		//GameRules - Integer
+		public final ModConfigSpec.IntValue invasionStartDelay;
 		public final ModConfigSpec.IntValue primaryInvasionMobCap;
 		public final ModConfigSpec.IntValue secondaryInvasionMobCap;
 		//Invasions
@@ -145,6 +146,11 @@ public final class PSConfig {
 					.define("notifyPlayersAboutInvasions", true);
 			builder.pop();
 			builder.push("game_rules_integer");
+			this.invasionStartDelay = builder
+					.translation(CONFIG + "invasion_start_delay")
+					.worldRestart()
+					.comment("The amount of days until an invasion can start.")
+					.defineInRange("invasionStartDelay", 1, 0, Integer.MAX_VALUE);
 			this.primaryInvasionMobCap = builder
 					.translation(CONFIG + "primary_invasion_mob_cap")
 					.worldRestart()
@@ -225,7 +231,7 @@ public final class PSConfig {
 					.translation(CONFIG + "natural_spawn_chance")
 					.worldRestart()
 					.comment("The chance of a naturally spawning mob has of spawning during an invasion.", NOTE_HN_PERFORMANCE)
-					.defineInRange("naturalSpawnChance", 0.0005D, 0.0D, 1.0D);
+					.defineInRange("naturalSpawnChance", 0.0025D, 0.0D, 1.0D);
 			this.hyperChargeChance = builder
 					.translation(CONFIG + "hyper_charge_chance")
 					.worldRestart()

@@ -1,6 +1,7 @@
 package dev.theagameplayer.puresuffering.event;
 
 import java.util.List;
+
 import dev.theagameplayer.puresuffering.client.InvasionStartTimer;
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.client.sounds.InvasionMusicManager;
@@ -55,8 +56,6 @@ public final class PSTickEvents {
 	public static final void entityTickPost(final EntityTickEvent.Pre pEvent) {
 		if (pEvent.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
 			final CompoundTag persistentData = mob.getPersistentData();
-			final boolean flag1 = PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(mob.getType().getDescriptionId());
-			final boolean flag2 = mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive();
 			if (persistentData.contains(Invasion.DESPAWN_LOGIC)) {
 				final int[] despawnLogic = persistentData.getIntArray(Invasion.DESPAWN_LOGIC);
 				final BlockPos pos = mob.blockPosition();
@@ -65,11 +64,11 @@ public final class PSTickEvents {
 					despawnLogic[1] = pos.getY();
 					despawnLogic[2] = pos.getZ();
 					despawnLogic[3] = 0;
-				} else if (getNearestPlayer(level, mob.position()) != null) {
+				} else if (!level.getPlayers(PSEntityPredicates.HYPER_AGGRESSION).isEmpty()) {
 					++despawnLogic[3];
 				}
 			}
-			if (persistentData.contains(Invasion.INVASION_MOB) && flag1 && flag2) {
+			if (persistentData.contains(Invasion.INVASION_MOB) && PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(mob.getType().getDescriptionId()) && (mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive())) {
 				final ServerPlayer player = getNearestPlayer(level, mob.position());
 				if (player == null) {
 					mob.setTarget(null);

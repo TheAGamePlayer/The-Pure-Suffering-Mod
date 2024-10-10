@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.Weight;
 import net.minecraft.util.random.WeightedEntry;
 import net.minecraft.world.entity.EntityType;
@@ -19,39 +20,39 @@ public final class InvasionSpawnerData extends WeightedEntry.IntrusiveBase { //F
 	public final int maxCount;
 	public final boolean ignoreSpawnRules;
 	public final boolean forceDespawn;
-	public final MobTagData[] tags;
+	public final ResourceLocation[] acceptableBiomes;
+	public final MobTagData[] nbtTags, persistentTags;
 
 	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount) {
-		this(pType, Weight.of(pWeight), pMinCount, pMaxCount, false, false, new MobTagData[]{});
+		this(pType, pWeight, pMinCount, pMaxCount, false, false, new ResourceLocation[0], new MobTagData[0], new MobTagData[0]);
 	}
 	
 	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn) {
-		this(pType, Weight.of(pWeight), pMinCount, pMaxCount, pIgnoreSpawnRules, pForceDespawn, new MobTagData[]{});
+		this(pType, pWeight, pMinCount, pMaxCount, pIgnoreSpawnRules, pForceDespawn, new ResourceLocation[0], new MobTagData[0], new MobTagData[0]);
 	}
 
-	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final MobTagData[] pTags) {
-		this(pType, Weight.of(pWeight), pMinCount, pMaxCount, pIgnoreSpawnRules, pForceDespawn, pTags);
-	}
-
-	public InvasionSpawnerData(final EntityType<?> pType, final Weight pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final MobTagData[] pTags) {
-		super(pWeight);
-		this.type = pType.getCategory() == MobCategory.MISC ? EntityType.PIG : pType;
+	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final ResourceLocation[] pAcceptableBiomes, final MobTagData[] pNBTTags, final MobTagData[] pPersistentTags) {
+		super(Weight.of(pWeight));
+		if (pType == null || pType.getCategory() == MobCategory.MISC) throw new NullPointerException("Spawning an entity type of null or of a 'Misc' category will result in undefined behavior.");
+		this.type = pType;
 		this.minCount = pMinCount;
 		this.maxCount = pMaxCount;
 		this.ignoreSpawnRules = pIgnoreSpawnRules;
 		this.forceDespawn = pForceDespawn;
-		this.tags = pTags;
+		this.acceptableBiomes = pAcceptableBiomes;
+		this.nbtTags = pNBTTags;
+		this.persistentTags = pPersistentTags;
 	}
 
 	@Override
 	public String toString() {
-		return EntityType.getKey(this.type) + "*(" + this.minCount + "-" + this.maxCount + "):" + this.getWeight() + ", " + this.ignoreSpawnRules + ", " + this.forceDespawn + ", " + this.tags;
+		return EntityType.getKey(this.type) + "*(" + this.minCount + "-" + this.maxCount + "):" + this.getWeight() + ", " + this.ignoreSpawnRules + ", " + this.forceDespawn + ", " + this.acceptableBiomes + ", " + this.nbtTags + ", " + this.persistentTags;
 	}
 
 	public static final ArrayList<InvasionSpawnerData> convertSpawners(final List<MobSpawnSettings.SpawnerData> pList) {
-		final ArrayList<InvasionSpawnerData> spawners = new ArrayList<>();
+		final ArrayList<InvasionSpawnerData> spawners = new ArrayList<>(pList.size());
 		for (final MobSpawnSettings.SpawnerData spawner : pList)
-			spawners.add(new InvasionSpawnerData(spawner.type, spawner.getWeight(), spawner.minCount, spawner.maxCount, false, false, new MobTagData[]{}));
+			spawners.add(new InvasionSpawnerData(spawner.type, spawner.getWeight().asInt(), spawner.minCount, spawner.maxCount, false, false, new ResourceLocation[0], new MobTagData[0], new MobTagData[0]));
 		return spawners;
 	}
 
@@ -151,40 +152,40 @@ public final class InvasionSpawnerData extends WeightedEntry.IntrusiveBase { //F
 			}
 		}
 
-		public final void addTagToMob(final CompoundTag pPersistentData) {
+		public final void addTagToMob(final CompoundTag pData) {
 			switch(this.tagType) {
 			case TAG_BOOLEAN:
-				pPersistentData.putBoolean(this.name, (boolean)this.value);
+				pData.putBoolean(this.name, (boolean)this.value);
 				break;
 			case TAG_BYTE:
-				pPersistentData.putByte(this.name, (byte)this.value);
+				pData.putByte(this.name, (byte)this.value);
 				break;
 			case TAG_SHORT:
-				pPersistentData.putShort(this.name, (short)this.value);
+				pData.putShort(this.name, (short)this.value);
 				break;
 			case TAG_INT:
-				pPersistentData.putInt(this.name, (int)this.value);
+				pData.putInt(this.name, (int)this.value);
 				break;
 			case TAG_LONG:
-				pPersistentData.putLong(this.name, (long)this.value);
+				pData.putLong(this.name, (long)this.value);
 				break;
 			case TAG_FLOAT:
-				pPersistentData.putFloat(this.name, (float)this.value);
+				pData.putFloat(this.name, (float)this.value);
 				break;
 			case TAG_DOUBLE:
-				pPersistentData.putDouble(this.name, (double)this.value);
+				pData.putDouble(this.name, (double)this.value);
 				break;
 			case TAG_STRING:
-				pPersistentData.putString(this.name, (String)this.value);
+				pData.putString(this.name, (String)this.value);
 				break;
 			case TAG_BYTE_ARRAY:
-				pPersistentData.putByteArray(this.name, (byte[])this.value);
+				pData.putByteArray(this.name, (byte[])this.value);
 				break;
 			case TAG_INT_ARRAY:
-				pPersistentData.putIntArray(this.name, (int[])this.value);
+				pData.putIntArray(this.name, (int[])this.value);
 				break;
 			case TAG_LONG_ARRAY:
-				pPersistentData.putLongArray(this.name, (long[])this.value);
+				pData.putLongArray(this.name, (long[])this.value);
 				break;
 			default:
 				break;

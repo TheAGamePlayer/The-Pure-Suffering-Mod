@@ -1,6 +1,7 @@
 package dev.theagameplayer.puresuffering.world.entity;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
+import dev.theagameplayer.puresuffering.invasion.data.InvasionSpawnerData.MobTagData;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -10,9 +11,11 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 public interface PSInvasionMob { //Add "PS" to avoid compatibility problems
 	static final String HYPER_CHARGE = PureSufferingMod.MODID.toUpperCase() + "HyperCharge";
 	
-    int psGetHyperCharge();
+    abstract int psGetHyperCharge();
     
-    void psSetHyperCharge(final int pHyperCharge);
+    abstract void psSetHyperCharge(final int pHyperCharge);
+    
+    abstract void applyNBTTags(final MobTagData[] pNBTTags);
     
     public static void applyHyperEffects(final Mob pMob) {
 		hyperAttribute(pMob, Attributes.MAX_HEALTH, 0.375D);
@@ -29,8 +32,7 @@ public interface PSInvasionMob { //Add "PS" to avoid compatibility problems
     }
     
 	private static void hyperAttribute(final Mob pMob, final Holder<Attribute> pAttribute, final double pMult) {
-		if (pMob.getAttributes().hasAttribute(pAttribute) && pMob instanceof PSInvasionMob invasionMob) {
+		if (pMob.getAttributes().hasAttribute(pAttribute) && pMob instanceof PSInvasionMob invasionMob)
 			pMob.getAttribute(pAttribute).setBaseValue(pMob.getAttributeBaseValue(pAttribute) * (1.0D + pMult * invasionMob.psGetHyperCharge()));
-		}
 	}
 }

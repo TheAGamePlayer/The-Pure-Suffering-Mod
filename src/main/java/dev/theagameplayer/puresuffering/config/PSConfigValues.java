@@ -42,6 +42,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final boolean enableInvasionAmbience = PSConfig.COMMON.enableInvasionAmbience.get();
 		public final boolean notifyPlayersAboutInvasions = PSConfig.COMMON.notifyPlayersAboutInvasions.get();
 		//GameRules - Integer
+		public final int invasionStartDelay = PSConfig.COMMON.invasionStartDelay.get();
 		public final int primaryInvasionMobCap = PSConfig.COMMON.primaryInvasionMobCap.get();
 		public final int secondaryInvasionMobCap = PSConfig.COMMON.secondaryInvasionMobCap.get();
 		//Invasions

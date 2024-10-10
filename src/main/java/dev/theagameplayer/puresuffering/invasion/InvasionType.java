@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.invasion.InvasionSkyRenderInfo;
@@ -19,10 +20,13 @@ import dev.theagameplayer.puresuffering.invasion.data.InvasionSpawnerData;
 import dev.theagameplayer.puresuffering.invasion.data.InvasionSpawnerData.MobTagData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 
@@ -76,7 +80,7 @@ public final class InvasionType {
 	public final ResourceLocation getId() {
 		return this.id;
 	}
-	
+
 	public final boolean overridesExisting() {
 		return this.overridesExisting;
 	}
@@ -184,13 +188,13 @@ public final class InvasionType {
 		NONE(dimType -> true),
 		NEEDS_CYCLE(dimType -> !dimType.hasFixedTime()),
 		NO_CYCLE(dimType -> dimType.hasFixedTime());
-		
+
 		private final Predicate<DimensionType> requirement;
 
 		private DayNightCycleRequirement(final Predicate<DimensionType> requirementIn) {
 			this.requirement = requirementIn;
 		}
-		
+
 		public final boolean meetsRequirement(final LevelStem levelStemIn, final String modDimIn) {
 			if (levelStemIn == null || !levelStemIn.type().isBound()) LOGGER.warn("Could not find dimension with id, likely typed it wrong in Config: " + modDimIn);
 			return this.requirement.test(levelStemIn.type().value());
@@ -199,16 +203,19 @@ public final class InvasionType {
 
 	public static final class SeverityInfo {
 		private final InvasionSkyRenderInfo skyRenderInfo;
-		private final List<InvasionSpawnerData> mobSpawnList;
-		private final List<AdditionalEntitySpawnData> additionalEntitiesList;
+		private final String[] startCommands, endCommands;
+		private final InvasionSpawnerData[] mobSpawnList;
+		private final AdditionalEntitySpawnData[] additionalEntitiesList;
 		private final float mobCapPercentage;
 		private final int fixedMobCap;
 		private final boolean forceNoSleep;
 		private final int tickDelay;
 		private final int clusterSize;
 
-		private SeverityInfo(final InvasionSkyRenderInfo pSkyRenderInfo, final List<InvasionSpawnerData> pMobSpawnList, final List<AdditionalEntitySpawnData> pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize) {
+		private SeverityInfo(final InvasionSkyRenderInfo pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize) {
 			this.skyRenderInfo = pSkyRenderInfo;
+			this.startCommands = pStartCommands;
+			this.endCommands = pEndCommands;
 			this.mobSpawnList = pMobSpawnList;
 			this.additionalEntitiesList = pAdditionalEntitiesList;
 			this.mobCapPercentage = pMobCapPercentage;
@@ -219,25 +226,33 @@ public final class InvasionType {
 		}
 
 		public final SeverityInfo.Builder deconstruct() {
-			return new SeverityInfo.Builder(this.skyRenderInfo == null ? null : this.skyRenderInfo.deconstruct(), this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize);
+			return new SeverityInfo.Builder(this.skyRenderInfo == null ? null : this.skyRenderInfo.deconstruct(), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize);
 		}
 
 		public final InvasionSkyRenderInfo getSkyRenderInfo() {
 			return this.skyRenderInfo;
 		}
+		
+		public final String[] getStartCommands() {
+			return this.startCommands;
+		}
+		
+		public final String[] getEndCommands() {
+			return this.endCommands;
+		}
 
-		public final List<InvasionSpawnerData> getMobSpawnList() {
+		public final InvasionSpawnerData[] getMobSpawnList() {
 			return this.mobSpawnList;
 		}
 
-		public final List<AdditionalEntitySpawnData> getAdditionalEntities() {
+		public final AdditionalEntitySpawnData[] getAdditionalEntities() {
 			return this.additionalEntitiesList;
 		}
 
 		public final float getMobCapPercentage() {
 			return this.mobCapPercentage;
 		}
-		
+
 		public final int getFixedMobCap() {
 			return this.fixedMobCap;
 		}
@@ -256,16 +271,19 @@ public final class InvasionType {
 
 		public static final class Builder {
 			private InvasionSkyRenderInfo.Builder skyRenderInfo = null;
-			private List<InvasionSpawnerData> mobSpawnList;
-			private List<AdditionalEntitySpawnData> additionalEntitiesList;
+			private String[] startCommands, endCommands;
+			private InvasionSpawnerData[] mobSpawnList;
+			private AdditionalEntitySpawnData[] additionalEntitiesList;
 			private float mobCapPercentage = 1.0F;
 			private int fixedMobCap = 0;
 			private boolean forceNoSleep = false;
 			private int tickDelay = -1;
 			private int clusterSize = 1;
 
-			private Builder(final InvasionSkyRenderInfo.Builder pSkyRenderInfo, final List<InvasionSpawnerData> pMobSpawnList, final List<AdditionalEntitySpawnData> pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize) {
+			private Builder(final InvasionSkyRenderInfo.Builder pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize) {
 				this.skyRenderInfo = pSkyRenderInfo;
+				this.startCommands = pStartCommands;
+				this.endCommands = pEndCommands;
 				this.mobSpawnList = pMobSpawnList;
 				this.additionalEntitiesList = pAdditionalEntitiesList;
 				this.mobCapPercentage = pMobCapPercentage;
@@ -286,13 +304,23 @@ public final class InvasionType {
 				return this;
 			}
 
+			public final SeverityInfo.Builder startCommands(final String... pStartCommands) {
+				this.startCommands = pStartCommands;
+				return this;
+			}
+
+			public final SeverityInfo.Builder endCommands(final String... pEndCommands) {
+				this.endCommands = pEndCommands;
+				return this;
+			}
+
 			public final SeverityInfo.Builder mobSpawnList(final InvasionSpawnerData... pMobSpawnList) {
-				this.mobSpawnList = List.of(pMobSpawnList);
+				this.mobSpawnList = pMobSpawnList;
 				return this;
 			}
 
 			public final SeverityInfo.Builder additionalEntitiesList(final AdditionalEntitySpawnData... pAdditionalEntitiesList) {
-				this.additionalEntitiesList = List.of(pAdditionalEntitiesList);
+				this.additionalEntitiesList = pAdditionalEntitiesList;
 				return this;
 			}
 
@@ -300,7 +328,7 @@ public final class InvasionType {
 				this.mobCapPercentage = pMobCapPercentage;
 				return this;
 			}
-			
+
 			public final SeverityInfo.Builder setFixedMobCap(final int pFixedMobCap) {
 				this.fixedMobCap = pFixedMobCap;
 				return this;
@@ -322,46 +350,70 @@ public final class InvasionType {
 			}
 
 			public final SeverityInfo build(final ResourceLocation pId) {
-				return new SeverityInfo(this.skyRenderInfo == null ? InvasionSkyRenderInfo.Builder.skyRenderInfo().build(pId) : this.skyRenderInfo.build(pId), this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize);
+				return new SeverityInfo(this.skyRenderInfo == null ? InvasionSkyRenderInfo.Builder.skyRenderInfo().build(pId) : this.skyRenderInfo.build(pId), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize);
 			}
 
 			public final JsonObject serializeToJson() {
 				final JsonObject jsonObject = new JsonObject();
 				if (this.skyRenderInfo != null)
 					jsonObject.add("SkyRenderInfo", this.skyRenderInfo.serializeToJson());
+				if (this.startCommands != null) {
+					final JsonArray jsonArray1 = new JsonArray();
+					for (final String cmd : this.startCommands)
+						jsonArray1.add(cmd);
+					jsonObject.add("StartCommands", jsonArray1);
+				}
+				if (this.endCommands != null) {
+					final JsonArray jsonArray2 = new JsonArray();
+					for (final String cmd : this.endCommands)
+						jsonArray2.add(cmd);
+					jsonObject.add("EndCommands", jsonArray2);
+				}
 				if (this.mobSpawnList != null) {
 					final JsonArray jsonArray = new JsonArray();
 					for (final InvasionSpawnerData spawnInfo : this.mobSpawnList) {
-						final JsonObject jsonObject1 = new JsonObject();
-						jsonObject1.addProperty("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(spawnInfo.type).toString());
-						jsonObject1.addProperty("Weight", spawnInfo.getWeight().asInt());
-						jsonObject1.addProperty("MinCount", spawnInfo.minCount);
-						jsonObject1.addProperty("MaxCount", spawnInfo.maxCount);
+						final JsonObject jsonObject3 = new JsonObject();
+						jsonObject3.addProperty("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(spawnInfo.type).toString());
+						jsonObject3.addProperty("Weight", spawnInfo.getWeight().asInt());
+						jsonObject3.addProperty("MinCount", spawnInfo.minCount);
+						jsonObject3.addProperty("MaxCount", spawnInfo.maxCount);
 						if (spawnInfo.ignoreSpawnRules)
-							jsonObject1.addProperty("IgnoreSpawnRules", spawnInfo.ignoreSpawnRules);
+							jsonObject3.addProperty("IgnoreSpawnRules", spawnInfo.ignoreSpawnRules);
 						if (spawnInfo.forceDespawn)
-							jsonObject1.addProperty("ForceDespawn", spawnInfo.forceDespawn);
-						if (spawnInfo.tags.length > 0) {
-							final JsonArray jsonArray1 = new JsonArray();
-							for (final MobTagData tag : spawnInfo.tags)
-								jsonArray1.add(tag.addTagToJson());
-							jsonObject1.add("Tags", jsonArray1);
+							jsonObject3.addProperty("ForceDespawn", spawnInfo.forceDespawn);
+						if (spawnInfo.acceptableBiomes.length > 0) {
+							final JsonArray jsonArray3 = new JsonArray();
+							for (final ResourceLocation id : spawnInfo.acceptableBiomes)
+								jsonArray3.add(id.toString());
+							jsonObject3.add("AcceptableBiomes", jsonArray3);
 						}
-						jsonArray.add(jsonObject1);
+						if (spawnInfo.nbtTags.length > 0) {
+							final JsonArray jsonArray4 = new JsonArray();
+							for (final MobTagData tag : spawnInfo.nbtTags)
+								jsonArray4.add(tag.addTagToJson());
+							jsonObject3.add("NBTTags", jsonArray4);
+						}
+						if (spawnInfo.persistentTags.length > 0) {
+							final JsonArray jsonArray5 = new JsonArray();
+							for (final MobTagData tag : spawnInfo.persistentTags)
+								jsonArray5.add(tag.addTagToJson());
+							jsonObject3.add("PersistentTags", jsonArray5);
+						}
+						jsonArray.add(jsonObject3);
 					}
 					jsonObject.add("MobSpawnList", jsonArray);
 				}
 				if (this.additionalEntitiesList != null) {
 					final JsonArray jsonArray = new JsonArray();
 					for (final AdditionalEntitySpawnData spawnInfo : this.additionalEntitiesList) {
-						final JsonObject jsonObject1 = new JsonObject();
-						jsonObject1.addProperty("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(spawnInfo.getEntityType()).toString());
-						jsonObject1.addProperty("MinCount", spawnInfo.getMinCount());
-						jsonObject1.addProperty("MaxCount", spawnInfo.getMaxCount());
-						jsonObject1.addProperty("Chance", spawnInfo.getChance());
+						final JsonObject jsonObject4 = new JsonObject();
+						jsonObject4.addProperty("EntityType", BuiltInRegistries.ENTITY_TYPE.getKey(spawnInfo.getEntityType()).toString());
+						jsonObject4.addProperty("MinCount", spawnInfo.getMinCount());
+						jsonObject4.addProperty("MaxCount", spawnInfo.getMaxCount());
+						jsonObject4.addProperty("Chance", spawnInfo.getChance());
 						if (spawnInfo.isSurfaceSpawn())
-							jsonObject1.addProperty("IsSurfaceSpawn", true);
-						jsonArray.add(jsonObject1);
+							jsonObject4.addProperty("IsSurfaceSpawn", true);
+						jsonArray.add(jsonObject4);
 					}
 					jsonObject.add("AdditionalEntitiesList", jsonArray);
 				}
@@ -377,7 +429,7 @@ public final class InvasionType {
 				return jsonObject;
 			}
 
-			public static final InvasionType.SeverityInfo.Builder fromJson(final JsonObject pJsonObject) {
+			public static final InvasionType.SeverityInfo.Builder fromJson(final Registry<Biome> pBiomes, final JsonObject pJsonObject) {
 				boolean errored = false;
 				InvasionSkyRenderInfo.Builder skyRenderInfo = null;
 				final JsonElement jsonElement = pJsonObject.getAsJsonObject("SkyRenderInfo");
@@ -388,29 +440,68 @@ public final class InvasionType {
 						errored = true;
 					}
 				}
-				final ArrayList<InvasionSpawnerData> mobSpawnList = new ArrayList<>();
+				final String[] startCommands = new String[pJsonObject.has("StartCommands") ? pJsonObject.get("StartCommands").getAsJsonArray().size() : 0];
+				if (pJsonObject.has("StartCommands")) {
+					for (int c = 0; c < startCommands.length; ++c) {
+						final JsonElement e4 = pJsonObject.get("StartCommands").getAsJsonArray().get(c);
+						startCommands[c] = e4.getAsString();
+					}
+				}
+				final String[] endCommands = new String[pJsonObject.has("EndCommands") ? pJsonObject.get("EndCommands").getAsJsonArray().size() : 0];
+				if (pJsonObject.has("EndCommands")) {
+					for (int c = 0; c < endCommands.length; ++c) {
+						final JsonElement e5 = pJsonObject.get("EndCommands").getAsJsonArray().get(c);
+						endCommands[c] = e5.getAsString();
+					}
+				}
+				final InvasionSpawnerData[] mobSpawnList = new InvasionSpawnerData[pJsonObject.has("MobSpawnList") ? pJsonObject.get("MobSpawnList").getAsJsonArray().size() : 0];
 				final JsonElement mobSpawnListElement = pJsonObject.getAsJsonArray("MobSpawnList");
 				if (mobSpawnListElement != null) {
 					if (mobSpawnListElement.isJsonArray()) {
-						final JsonArray a = mobSpawnListElement.getAsJsonArray();
-						for (final JsonElement e : a) {
-							if (e.isJsonObject()) {
-								final JsonObject o = e.getAsJsonObject();
-								final EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(o.get("EntityType").getAsString()));
-								final int weight = o.get("Weight").getAsInt();
-								final int minCount = o.get("MinCount").getAsInt();
-								final int maxCount = o.get("MaxCount").getAsInt();
-								final boolean ignoreSpawnRules = o.has("IgnoreSpawnRules") && o.get("IgnoreSpawnRules").getAsBoolean();
-								final boolean forceDespawn = o.has("ForceDespawn") && o.get("ForceDespawn").getAsBoolean();
-								final MobTagData[] tags = new MobTagData[o.has("Tags") ? o.get("Tags").getAsJsonArray().size() : 0];
-								if (o.has("Tags")) {
-									for (int t = 0; t < tags.length; ++t) {
-										final JsonElement e1 = o.get("Tags").getAsJsonArray().get(t);
-										if (!e1.isJsonObject()) continue;
-										tags[t] = MobTagData.addTagData(e1.getAsJsonObject());
+						final JsonArray jArray = mobSpawnListElement.getAsJsonArray();
+						for (int e = 0; e < jArray.size(); ++e) {
+							final JsonElement jElement = jArray.get(e);
+							if (jElement.isJsonObject()) {
+								final JsonObject jObject = jElement.getAsJsonObject();
+								final EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(jObject.get("EntityType").getAsString()));
+								final int weight = jObject.get("Weight").getAsInt();
+								final int minCount = jObject.get("MinCount").getAsInt();
+								final int maxCount = jObject.get("MaxCount").getAsInt();
+								final boolean ignoreSpawnRules = jObject.has("IgnoreSpawnRules") && jObject.get("IgnoreSpawnRules").getAsBoolean();
+								final boolean forceDespawn = jObject.has("ForceDespawn") && jObject.get("ForceDespawn").getAsBoolean();
+								final ArrayList<ResourceLocation> acceptableBiomes = new ArrayList<>(jObject.has("AcceptableBiomes") ? jObject.get("AcceptableBiomes").getAsJsonArray().size() : 0);
+								final MobTagData[] nbtTags = new MobTagData[jObject.has("NBTTags") ? jObject.get("NBTTags").getAsJsonArray().size() : 0];
+								final MobTagData[] persistentTags = new MobTagData[jObject.has("PersistentTags") ? jObject.get("PersistentTags").getAsJsonArray().size() : 0];
+								if (jObject.has("AcceptableBiomes")) {
+									for (int b = 0, size = jObject.get("AcceptableBiomes").getAsJsonArray().size(); b < size; ++b) {
+										final JsonElement e1 = jObject.get("AcceptableBiomes").getAsJsonArray().get(b);
+										final String eString = e1.getAsString();
+										final boolean isTag = eString.startsWith("#");
+										final ResourceLocation id = ResourceLocation.tryParse(isTag ? eString : eString.substring(1));
+										if (id == null) throw new JsonSyntaxException("Invalid biome id: " + eString);
+										if (isTag) {
+											final TagKey<Biome> tag = TagKey.create(Registries.BIOME, id);
+											pBiomes.getTagOrEmpty(tag).forEach(biome -> acceptableBiomes.add(biome.getKey().location()));
+										} else {
+											acceptableBiomes.add(id);
+										}
 									}
 								}
-								mobSpawnList.add(new InvasionSpawnerData(type, weight, minCount, maxCount, ignoreSpawnRules, forceDespawn, tags));
+								if (jObject.has("NBTTags")) {
+									for (int t = 0; t < nbtTags.length; ++t) {
+										final JsonElement e2 = jObject.get("NBTTags").getAsJsonArray().get(t);
+										if (!e2.isJsonObject()) continue;
+										nbtTags[t] = MobTagData.addTagData(e2.getAsJsonObject());
+									}
+								}
+								if (jObject.has("PersistentTags")) {
+									for (int t = 0; t < persistentTags.length; ++t) {
+										final JsonElement e3 = jObject.get("PersistentTags").getAsJsonArray().get(t);
+										if (!e3.isJsonObject()) continue;
+										persistentTags[t] = MobTagData.addTagData(e3.getAsJsonObject());
+									}
+								}
+								mobSpawnList[e] = new InvasionSpawnerData(type, weight, minCount, maxCount, ignoreSpawnRules, forceDespawn, acceptableBiomes.toArray(ResourceLocation[]::new), nbtTags, persistentTags);
 							} else {
 								errored = true;
 								break;
@@ -420,20 +511,21 @@ public final class InvasionType {
 						errored = true;
 					}
 				}
-				final ArrayList<AdditionalEntitySpawnData> additionalEntitiesList = new ArrayList<>();
+				final AdditionalEntitySpawnData[] additionalEntitiesList = new AdditionalEntitySpawnData[pJsonObject.has("AdditionalEntitiesList") ? pJsonObject.get("AdditionalEntitiesList").getAsJsonArray().size() : 0];
 				final JsonElement additionalEntitiesListElement = pJsonObject.getAsJsonArray("AdditionalEntitiesList");
 				if (additionalEntitiesListElement != null) {
 					if (additionalEntitiesListElement.isJsonArray()) {
-						final JsonArray a = additionalEntitiesListElement.getAsJsonArray();
-						for (final JsonElement e : a) {
-							if (e.isJsonObject()) {
-								final JsonObject o = e.getAsJsonObject();
-								final EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(o.get("EntityType").getAsString()));
-								final int minCount = o.get("MinCount").getAsInt();
-								final int maxCount = o.get("MaxCount").getAsInt();
-								final int chance = o.get("Chance").getAsInt();
-								final boolean isSurfaceSpawn = o.has("IsSurfaceSpawn") && o.get("IsSurfaceSpawn").getAsBoolean();
-								additionalEntitiesList.add(new AdditionalEntitySpawnData(type, minCount, maxCount, chance, isSurfaceSpawn));
+						final JsonArray jArray = additionalEntitiesListElement.getAsJsonArray();
+						for (int e = 0; e < jArray.size(); ++e) {
+							final JsonElement jElement = jArray.get(e);
+							if (jElement.isJsonObject()) {
+								final JsonObject jObject = jElement.getAsJsonObject();
+								final EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(jObject.get("EntityType").getAsString()));
+								final int minCount = jObject.get("MinCount").getAsInt();
+								final int maxCount = jObject.get("MaxCount").getAsInt();
+								final int chance = jObject.get("Chance").getAsInt();
+								final boolean isSurfaceSpawn = jObject.has("IsSurfaceSpawn") && jObject.get("IsSurfaceSpawn").getAsBoolean();
+								additionalEntitiesList[e] = new AdditionalEntitySpawnData(type, minCount, maxCount, chance, isSurfaceSpawn);
 							} else {
 								errored = true;
 								break;
@@ -450,7 +542,7 @@ public final class InvasionType {
 				final int clusterSize = pJsonObject.has("MobClusterSize") ? pJsonObject.get("MobClusterSize").getAsInt() : 1;
 				if (errored || tickDelay < 0 || clusterSize < 1)
 					LOGGER.error("JsonElement is incorrectly setup: " + pJsonObject.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
-				return new SeverityInfo.Builder(skyRenderInfo, mobSpawnList, additionalEntitiesList, mobCapPercentage, fixedMobCap, forceNoSleep, tickDelay, clusterSize);
+				return new SeverityInfo.Builder(skyRenderInfo, startCommands, endCommands, mobSpawnList, additionalEntitiesList, mobCapPercentage, fixedMobCap, forceNoSleep, tickDelay, clusterSize);
 			}
 		}
 	}
@@ -604,7 +696,7 @@ public final class InvasionType {
 			return jsonObject;
 		}
 
-		public static final InvasionType.Builder fromJson(final Registry<LevelStem> pDimensions, final JsonObject pJsonObject) {
+		public static final InvasionType.Builder fromJson(final Registry<LevelStem> pDimensions, final Registry<Biome> pBiomes, final JsonObject pJsonObject) {
 			final boolean overridesExisting = pJsonObject.has("OverridesExisting") && pJsonObject.get("OverridesExisting").getAsBoolean();
 			final String defaultName = pJsonObject.has("DefaultName") ? pJsonObject.get("DefaultName").getAsString() : null;
 			final int rarity = Math.max(pJsonObject.get("Rarity").getAsInt(), 1) - 1;
@@ -682,7 +774,7 @@ public final class InvasionType {
 					for (int info = 0; info < a.size(); ++info) {
 						final JsonElement e = a.get(info);
 						if (e.isJsonObject()) {
-							severityInfo.add(SeverityInfo.Builder.fromJson(e.getAsJsonObject()));
+							severityInfo.add(SeverityInfo.Builder.fromJson(pBiomes, e.getAsJsonObject()));
 						} else {
 							errored = true;
 							break;

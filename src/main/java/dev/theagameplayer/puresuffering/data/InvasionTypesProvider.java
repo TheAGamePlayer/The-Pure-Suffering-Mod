@@ -41,12 +41,8 @@ public final class InvasionTypesProvider implements DataProvider {
 					list.add(DataProvider.saveStable(pCache, invasionType.deconstruct().serializeToJson(), path1));
 				}
 			};
-			for (final Consumer<Consumer<InvasionType>> consumer1 : this.tabs) {
-				consumer1.accept(consumer);
-			}
-			return CompletableFuture.allOf(list.toArray((p_253393_) -> {
-				return new CompletableFuture[p_253393_];
-			}));
+			for (final Consumer<Consumer<InvasionType>> consumer1 : this.tabs) consumer1.accept(consumer);
+			return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
 		});
 	}
 

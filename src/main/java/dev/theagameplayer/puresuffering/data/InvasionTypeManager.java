@@ -21,6 +21,7 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -32,10 +33,12 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	private static final Gson GSON = (new GsonBuilder()).create();
 	private final HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
 	private final Registry<LevelStem> dimensions;
+	private final Registry<Biome> biomes;
 
-	public InvasionTypeManager(final Registry<LevelStem> pDimension) {
+	public InvasionTypeManager(final Registry<LevelStem> pDimension, final Registry<Biome> pBiomes) {
 		super(GSON, "invasion_types");
 		this.dimensions = pDimension;
+		this.biomes = pBiomes;
 	}
 
 	@Override
@@ -44,7 +47,7 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 		for (final Map.Entry<ResourceLocation, JsonElement> entry : pObjects.entrySet()) {
 			try {
 				final JsonObject jsonObject = GsonHelper.convertToJsonObject(entry.getValue(), "invasion_type");
-				final InvasionType invasionType = InvasionType.Builder.fromJson(this.dimensions, jsonObject).build(entry.getKey());
+				final InvasionType invasionType = InvasionType.Builder.fromJson(this.dimensions, this.biomes, jsonObject).build(entry.getKey());
 				if (invasionType == null) {
 					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met.", entry.getKey());
 					return;

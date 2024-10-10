@@ -64,6 +64,8 @@
 	"gamerule.puresuffering:notifyPlayersAboutInvasions": "Notify Players About Invasions",
 	"gamerule.puresuffering:notifyPlayersAboutInvasions.description": "Determines if players be notified when invasions start.",
 	
+	"gamerule.puresuffering:invasionStartDelay": "Invasion Start Delay",
+	"gamerule.puresuffering:invasionStartDelay.description": "The amount of days before an invasion can start.",
 	"gamerule.puresuffering:primaryInvasionMobCap": "Primary Invasion Mob Cap",
 	"gamerule.puresuffering:primaryInvasionMobCap.description": "The max amount of mobs that can spawn from Primary Invasions at once.",
 	"gamerule.puresuffering:secondaryInvasionMobCap": "Secondary Invasion Mob Cap",
@@ -145,6 +147,7 @@
 	"puresuffering.config.enable_invasion_ambience": "Enable Invasion Ambience",
 	"puresuffering.config.notify_players_about_invasions": "Notify Players About Invasions",
 	
+	"puresuffering.config.invasion_start_delay": "Invasion Start Delay",
 	"puresuffering.config.primary_invasion_mob_cap": "Primary Invasion Mob Cap",
 	"puresuffering.config.secondary_invasion_mob_cap": "Secondary Invasion Mob Cap",
 	

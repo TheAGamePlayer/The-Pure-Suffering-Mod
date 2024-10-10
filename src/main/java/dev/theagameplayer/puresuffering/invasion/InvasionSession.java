@@ -9,16 +9,24 @@ import dev.theagameplayer.puresuffering.network.AddInvasionPacket;
 import dev.theagameplayer.puresuffering.network.ClearInvasionsPacket;
 import dev.theagameplayer.puresuffering.network.RemoveInvasionPacket;
 import dev.theagameplayer.puresuffering.registries.other.PSPackets;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
-public final class InvasionSession implements Iterable<Invasion> {
+public final class InvasionSession implements Iterable<Invasion>, CommandSource {
 	private final ArrayList<Invasion> invasions = new ArrayList<>();
+	private final CommandSourceStack commandSource;
+	private final MinecraftServer server;
 	private final InvasionSessionType sessionType;
 	private final InvasionDifficulty difficulty;
 	private final Style style;
@@ -26,7 +34,9 @@ public final class InvasionSession implements Iterable<Invasion> {
 	private int weatherChangeDelay, lightLevel;
 	private boolean stopsConversions, forceNoSleep;
 
-	public InvasionSession(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty) {
+	public InvasionSession(final ServerLevel pLevel, final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty) {
+		this.commandSource = new CommandSourceStack(this, Vec3.atLowerCornerOf(pLevel.getSharedSpawnPos()), Vec2.ZERO, pLevel, 4, "InvasionSession", Component.literal("InvasionSession"), pLevel.getServer(), null);
+		this.server = pLevel.getServer();
 		this.sessionType = pSessionType;
 		this.difficulty = pDifficulty;
 		this.style = Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare());
@@ -47,7 +57,7 @@ public final class InvasionSession implements Iterable<Invasion> {
 	public final Style getStyle() {
 		return this.style;
 	}
-	
+
 	public final boolean replaceMob(final Mob pOldMob, final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
 			final int index = invasion.hasMob(pOldMob);
@@ -58,7 +68,7 @@ public final class InvasionSession implements Iterable<Invasion> {
 		}
 		return false;
 	}
-	
+
 	public final boolean splitMob(final Mob pParent, final List<Mob> pChildren) {
 		for (final Invasion invasion : this.invasions) {
 			if (invasion.hasSameInvasion(pParent)) {
@@ -75,14 +85,14 @@ public final class InvasionSession implements Iterable<Invasion> {
 			if (index > -1) invasion.relocateMob(index);
 		}
 	}
-	
+
 	public final boolean hasMob(final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
 			if (invasion.hasMob(pMob) > -1) return true;
 		}
 		return false;
 	}
-	
+
 	public final void loadMob(final Mob pMob) {
 		for (final Invasion invasion : this.invasions) {
 			if (invasion.loadMob(pMob)) return;
@@ -156,11 +166,11 @@ public final class InvasionSession implements Iterable<Invasion> {
 	}
 
 	public static final InvasionSession load(final ServerLevel pLevel, final CompoundTag pNbt) {
-		final InvasionSession session = new InvasionSession(InvasionSessionType.getActive(pLevel), InvasionDifficulty.values()[pNbt.getInt("Difficulty")]);
+		final InvasionSession session = new InvasionSession(pLevel, InvasionSessionType.getActive(pLevel), InvasionDifficulty.values()[pNbt.getInt("Difficulty")]);
 		final ListTag invasionsNBT = pNbt.getList(session.sessionType.getDefaultName() + "Invasions", Tag.TAG_COMPOUND);
 		for (final Tag inbt : invasionsNBT) {
 			if (inbt instanceof CompoundTag nbt)
-				session.add(pLevel, Invasion.load(pLevel, nbt));
+				session.add(pLevel, Invasion.load(pLevel, nbt), true);
 		}
 		return session;
 	}
@@ -176,8 +186,12 @@ public final class InvasionSession implements Iterable<Invasion> {
 	}
 
 	//Sync to Client
-	public final void add(final ServerLevel pLevel, final Invasion pInvasion) {
+	public final void add(final ServerLevel pLevel, final Invasion pInvasion, final boolean pIsLoaded) {
 		this.invasions.add(pInvasion);
+		if (!pIsLoaded) {
+			for (final String cmd : pInvasion.getSeverityInfo().getStartCommands())
+				this.server.getCommands().performPrefixedCommand(this.commandSource, cmd);
+		}
 		this.update();
 		PSPackets.sendToClientsIn(new AddInvasionPacket(this.sessionType, this.difficulty, pInvasion), pLevel);
 	}
@@ -187,12 +201,18 @@ public final class InvasionSession implements Iterable<Invasion> {
 			this.clear(pLevel);
 			return;
 		}
+		for (final String cmd : pInvasion.getSeverityInfo().getEndCommands())
+			this.server.getCommands().performPrefixedCommand(this.commandSource, cmd);
 		this.invasions.remove(pInvasion);
 		this.update();
 		PSPackets.sendToClientsIn(new RemoveInvasionPacket(pInvasion.getSeverityInfo().getSkyRenderInfo()), pLevel);
 	}
 
 	public final void clear(final ServerLevel pLevel) {
+		for (final Invasion invasion : this.invasions) {
+			for (final String cmd : invasion.getSeverityInfo().getEndCommands())
+				this.server.getCommands().performPrefixedCommand(this.commandSource, cmd);
+		}
 		this.invasions.clear();
 		PSPackets.sendToClientsIn(new ClearInvasionsPacket(), pLevel);
 	}
@@ -213,5 +233,25 @@ public final class InvasionSession implements Iterable<Invasion> {
 	@Override
 	public final Iterator<Invasion> iterator() {
 		return this.invasions.iterator();
+	}
+
+	@Override
+	public void sendSystemMessage(final Component pComponent) {
+		this.server.sendSystemMessage(pComponent);
+	}
+
+	@Override
+	public boolean acceptsSuccess() {
+		return this.server.acceptsSuccess();
+	}
+
+	@Override
+	public boolean acceptsFailure() {
+		return this.server.acceptsFailure();
+	}
+
+	@Override
+	public boolean shouldInformAdmins() {
+		return this.server.shouldInformAdmins();
 	}
 }

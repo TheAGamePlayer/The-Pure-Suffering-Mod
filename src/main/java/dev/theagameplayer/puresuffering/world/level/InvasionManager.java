@@ -75,7 +75,7 @@ public final class InvasionManager {
 						this.cancelIntervals[index] = cancelRarity > 0 ? random.nextInt(cancelRarity) + cancelRarity - (int)(days % cancelRarity) : 0;
 					}
 					if (!isCanceled) {
-						final int totalInvasions = this.calcInvasionCount(difficulty, random, days, maxPossibleInvasions);
+						final int totalInvasions = this.calcInvasionCount(pLevel, difficulty, random, days, maxPossibleInvasions);
 						if (totalInvasions > 0) {
 							final int tierIncreaseDelay = sessionType.getTierIncreaseDelay(pLevel);
 							boolean[] isTimeModified = new boolean[1]; //A sneaky work around >.>
@@ -85,10 +85,10 @@ public final class InvasionManager {
 							for (int inv = 0; inv < totalInvasions; ++inv) {
 								final InvasionType invasionType = this.getInvasionType(new InvasionChart(inv == 0, inv == 0 ? potentialPrimary : it -> sessionType.isAcceptableTime(it, isTimeModified[0]) && potentialSecondary.test(it) && (!isTimeModified[0] || sessionType.canBeChanged(it))), random);
 								if (invasionType == null || invasionType.getMaxSeverity() < 1) break;
-								if (inv == 0) this.sessions[index] = new InvasionSession(sessionType, difficulty);
+								if (inv == 0) this.sessions[index] = new InvasionSession(pLevel, sessionType, difficulty);
 								final int severity = difficulty.isHyper() ? invasionType.getMaxSeverity() - 1 : random.nextInt(Mth.clamp(PSGameRules.TIERED_INVASIONS.get(pLevel) ? (int)(days/tierIncreaseDelay - invasionType.getTier()) + 1 : invasionType.getMaxSeverity(), 1, inv == 0 ? invasionType.getMaxSeverity() : this.getSecondarySeverityCap(invasionType, index)));
 								final Invasion invasion = new Invasion(pLevel, invasionType, severity, inv == 0, true, pLevel.getDayTime(), inv);
-								this.sessions[index].add(pLevel, invasion);
+								this.sessions[index].add(pLevel, invasion, false);
 								LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
 								isTimeModified[0] |= sessionType.canModifyTime(invasionType);
 							}
@@ -98,11 +98,11 @@ public final class InvasionManager {
 				}
 			}
 		} else {
-			this.sessions[index] = new InvasionSession(sessionType, this.queuedInvasions[index].getDifficulty());
+			this.sessions[index] = new InvasionSession(pLevel, sessionType, this.queuedInvasions[index].getDifficulty());
 			LOGGER.info("Setting Queued " + this.sessions[index].getDifficulty().getDefaultName() + " " + sessionType.getDefaultName() + " Invasions: [");
 			for (int q = 0; q < this.queuedInvasions[index].size(); ++q) {
 				final Invasion invasion = this.queuedInvasions[index].get(q).build(pLevel, q);
-				this.sessions[index].add(pLevel, invasion);
+				this.sessions[index].add(pLevel, invasion, false);
 				LOGGER.info("Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}
 			this.queuedInvasions[index] = null;
@@ -134,8 +134,8 @@ public final class InvasionManager {
 		return this.cancelIntervals[pIndex] > -1 && (!PSGameRules.TIERED_INVASIONS.get(pLevel) || pDays > pSessionType.getTierIncreaseDelay(pLevel) * 2) && pMaxPossibleInvasions > 1 && pSessionType.canBeCanceled(pLevel) && !pDifficulty.isHyper();
 	}
 
-	private final int calcInvasionCount(final InvasionDifficulty pDifficulty, final RandomSource pRandom, final long pDays, final int pMaxInvasions) {
-		return pDays > 0 && pMaxInvasions > 0 ? pDifficulty.getInvasionCount(pRandom, pMaxInvasions) : 0;
+	private final int calcInvasionCount(final ServerLevel pLevel, final InvasionDifficulty pDifficulty, final RandomSource pRandom, final long pDays, final int pMaxInvasions) {
+		return pDays > PSGameRules.INVASION_START_DELAY.get(pLevel) - 1 && pMaxInvasions > 0 ? pDifficulty.getInvasionCount(pRandom, pMaxInvasions) : 0;
 	}
 
 	private final InvasionType getInvasionType(final InvasionChart pInvasionChart, final RandomSource pRandom) {

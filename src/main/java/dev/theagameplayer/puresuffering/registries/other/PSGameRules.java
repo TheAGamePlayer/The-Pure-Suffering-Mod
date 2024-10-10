@@ -29,6 +29,7 @@ public final class PSGameRules {
 	public static final BooleanRule ENABLE_INVASION_AMBIENCE = new BooleanRule("enableInvasionAmbience", false, PSConfigValues.common.enableInvasionAmbience);
 	public static final BooleanRule NOTIFY_PLAYERS_ABOUT_INVASIONS = new BooleanRule("notifyPlayersAboutInvasions", false, PSConfigValues.common.notifyPlayersAboutInvasions);
 
+	public static final IntegerRule INVASION_START_DELAY = new IntegerRule("invasionStartDelay", false, PSConfigValues.common.invasionStartDelay);
 	public static final IntegerRule PRIMARY_INVASION_MOB_CAP = new IntegerRule("primaryInvasionMobCap", false, PSConfigValues.common.primaryInvasionMobCap);
 	public static final IntegerRule SECONDARY_INVASION_MOB_CAP = new IntegerRule("secondaryInvasionMobCap", false, PSConfigValues.common.secondaryInvasionMobCap);
 

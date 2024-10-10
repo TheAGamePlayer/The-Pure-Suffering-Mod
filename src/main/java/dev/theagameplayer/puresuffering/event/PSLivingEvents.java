@@ -25,12 +25,12 @@ public final class PSLivingEvents {
 		final Mob mob = pEvent.getEntity();
 		if (pEvent.getSpawnType() != MobSpawnType.NATURAL || mob.getClassification(false) != MobCategory.MONSTER) return;
 		final ServerLevel level = (ServerLevel)pEvent.getLevel();
-		if (PSConfigValues.common.naturalSpawnChance < level.random.nextDouble()) return;
+		if (PSConfigValues.common.naturalSpawnChance > level.random.nextDouble()) return;
 		final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);
 		if (session == null) return;
 		pEvent.setSpawnCancelled(true);
 	}
-	
+
 	public static final void conversionPre(final LivingConversionEvent.Pre pEvent) {
 		if (pEvent.getOutcome() == null || pEvent.getOutcome().getCategory() != MobCategory.MONSTER || !pEvent.getEntity().getPersistentData().contains(Invasion.INVASION_MOB)) return;
 		if (pEvent.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
@@ -104,7 +104,7 @@ public final class PSLivingEvents {
 			}
 		}
 	}
-	
+
 	public static final void mobSplit(final MobSplitEvent pEvent) {
 		final Mob parent = pEvent.getParent();
 		final CompoundTag persistentData = parent.getPersistentData();
