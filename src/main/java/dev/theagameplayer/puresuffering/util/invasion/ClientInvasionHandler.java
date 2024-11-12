@@ -3,6 +3,7 @@ package dev.theagameplayer.puresuffering.util.invasion;
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
 public final class ClientInvasionHandler {
 	public static final float handleSkyDarken(final float pResult, final ClientLevel pLevel) { //Render Tick
@@ -19,8 +20,8 @@ public final class ClientInvasionHandler {
 		return false;
 	}
 	
-	public static final int handleSkyBrightness(final int pResult, final ClientLevel pLevel) { //Render Tick
-		final ClientInvasionSession session = ClientInvasionSession.get(pLevel);
+	public static final int handleSkyBrightness(final int pResult, final Level pLevel) { //Render Tick
+		final ClientInvasionSession session = ClientInvasionSession.get((ClientLevel)pLevel);
 		if (session == null) return pResult;
 		return session.getLightLevelOrDefault(pResult);
 	}

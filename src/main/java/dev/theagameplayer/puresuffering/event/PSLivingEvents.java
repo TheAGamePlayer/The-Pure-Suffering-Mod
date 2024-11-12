@@ -13,8 +13,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.MobDespawnEvent;
 import net.neoforged.neoforge.event.entity.living.MobDespawnEvent.Result;
@@ -65,17 +67,40 @@ public final class PSLivingEvents {
 		}
 	}
 
+	public static final void death(final LivingDeathEvent pEvent) {
+		if (pEvent.getEntity() instanceof Mob mob && pEvent.getSource().getEntity() instanceof Player) {
+			if (!mob.getPersistentData().contains(Invasion.INVASION_MOB)) return;
+			final ServerLevel level = (ServerLevel)mob.level();
+			final InvasionLevelData ilData = InvasionLevelData.get(level);
+			final InvasionSession session = ilData.getInvasionManager().getActiveSession(level);
+			if (session == null || !session.hasMob(mob)) return;
+			if (session.getMobKillLimit() > 0) {
+				++session.mobsKilledByPlayer;
+				if (session.mobsKilledByPlayer >= session.getMobKillLimit()) {
+					session.clear(level);
+					return;
+				}
+			}
+			final Invasion invasion = session.getInvasion(mob);
+			if (invasion.getSeverityInfo().getMobKillLimit() > 0) {
+				++invasion.mobsKilledByPlayer;
+				if (invasion.mobsKilledByPlayer >= invasion.getSeverityInfo().getMobKillLimit()) session.remove(level, invasion);
+			}
+		}
+	}
+
 	public static final void experienceDrop(final LivingExperienceDropEvent pEvent) {
 		if (pEvent.getEntity() instanceof Mob mob && mob instanceof PSInvasionMob invasionMob) {
+			if (!mob.getPersistentData().contains(Invasion.INVASION_MOB)) return;
 			final ServerLevel level = (ServerLevel)mob.level();
 			final InvasionLevelData ilData = InvasionLevelData.get(level);
 			final InvasionSession session = ilData.getInvasionManager().getActiveSession(level);
 			if (session == null || !session.hasMob(mob)) {
-				pEvent.setDroppedExperience(pEvent.getOriginalExperience() + pEvent.getOriginalExperience()/3 * invasionMob.psGetHyperCharge());
+				pEvent.setDroppedExperience(pEvent.getOriginalExperience() + (pEvent.getOriginalExperience()/3) * invasionMob.psGetHyperCharge());
 			} else if (PSGameRules.USE_XP_MULTIPLIER.get(level) && pEvent.getAttackingPlayer() != null) {
 				ilData.setXPMultiplier(ilData.getXPMultiplier() + 1);
 				final double log = Math.log1p(ilData.getXPMultiplier())/Math.E;
-				pEvent.setDroppedExperience((int)(pEvent.getOriginalExperience() * log) + pEvent.getOriginalExperience()/3 * invasionMob.psGetHyperCharge());
+				pEvent.setDroppedExperience((int)(pEvent.getOriginalExperience() * log) + (pEvent.getOriginalExperience()/3) * invasionMob.psGetHyperCharge());
 				PSPackets.sendToClientsIn(new UpdateXPMultPacket(log), level);
 			}
 		}

@@ -35,22 +35,22 @@ public final class InvasionMusicToast implements Toast {
 		this.color2 = pDifficulty.getColor(false);
 	}
 
-	public final Visibility render(final GuiGraphics pGraphics, final ToastComponent pComponent, final long pTicks) {
-		final Minecraft mc = pComponent.getMinecraft();
-		pGraphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
-		if (pTicks < 1500L) {
-			final int i = Mth.floor(Mth.clamp((float)(1500L - pTicks) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;
-			pGraphics.drawString(mc.font, MUSIC_TEXT, 30, 11, this.color1 | i, false);
+	public final Visibility render(final GuiGraphics pGuiGraphics, final ToastComponent pToastComponent, final long pTimeSinceLastVisible) {
+		final Minecraft mc = pToastComponent.getMinecraft();
+		pGuiGraphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
+		if (pTimeSinceLastVisible < 1500L) {
+			final int i = Mth.floor(Mth.clamp((float)(1500L - pTimeSinceLastVisible) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;
+			pGuiGraphics.drawString(mc.font, MUSIC_TEXT, 30, 11, this.color1 | i, false);
 		} else {
 			final List<FormattedCharSequence> list = mc.font.split(this.name, 125);
-			final int i = Mth.floor(Mth.clamp((float)(pTicks - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | 67108864;
+			final int i = Mth.floor(Mth.clamp((float)(pTimeSinceLastVisible - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | 67108864;
             int l = this.height()/2 - list.size() * 9/2;
             for (final FormattedCharSequence formattedCharSequence : list) {
-            	pGraphics.drawString(mc.font, formattedCharSequence, 30, l, this.color2 | i, false);
+            	pGuiGraphics.drawString(mc.font, formattedCharSequence, 30, l, this.color2 | i, false);
             	l += 9;
             }
 		}
-		pGraphics.renderFakeItem(this.recordItem, 8, 8);
-		return (double)pTicks >= 5000.0D * pComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+		pGuiGraphics.renderFakeItem(this.recordItem, 8, 8);
+		return (double)pTimeSinceLastVisible >= 5000.0D * pToastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
 	}
 }

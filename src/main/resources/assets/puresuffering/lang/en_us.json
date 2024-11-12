@@ -70,6 +70,8 @@
 	"gamerule.puresuffering:primaryInvasionMobCap.description": "The max amount of mobs that can spawn from Primary Invasions at once.",
 	"gamerule.puresuffering:secondaryInvasionMobCap": "Secondary Invasion Mob Cap",
 	"gamerule.puresuffering:secondaryInvasionMobCap.description": "The max amount of mobs that can spawn from Secondary Invasions at once.",
+	"gamerule.puresuffering:mobKillLimit": "Mob Kill Limit",
+	"gamerule.puresuffering:mobKillLimit.description": "The mob kill limit for the invasion that would cause it to end after the player kills so many mobs from that invasion.",
 
 	"puresuffering.invasionDifficulty.default": "Default",
 	"puresuffering.invasionDifficulty.hyper": "Hyper",
@@ -129,6 +131,7 @@
 	"puresuffering.configuration.game_rules_boolean": "Boolean",
 	"puresuffering.configuration.game_rules_integer": "Integer",
 	"puresuffering.configuration.invasions": "Invasions",
+	"puresuffering.configuration.text": "Text",
 	"puresuffering.configuration.rendering": "Rendering",
 	"puresuffering.configuration.sound": "Sound",
 	
@@ -150,6 +153,7 @@
 	"puresuffering.config.invasion_start_delay": "Invasion Start Delay",
 	"puresuffering.config.primary_invasion_mob_cap": "Primary Invasion Mob Cap",
 	"puresuffering.config.secondary_invasion_mob_cap": "Secondary Invasion Mob Cap",
+	"puresuffering.config.mob_kill_limit": "Mob Kill Limit",
 	
 	"puresuffering.config.invasion_blacklist": "Invasion Blacklist",
 	"puresuffering.config.primary_whitelist": "Primary Whitelist",
@@ -164,6 +168,11 @@
 	"puresuffering.config.hyper_charge_chance": "Hyper Charge Chance",
 	"puresuffering.config.blessing_effect_respawn_duration": "Blessing Effect Respawn Duration",
 	"puresuffering.config.blessing_effect_dimension_change_duration": "Blessing Effect Dimension Change Duration",
+	
+	"puresuffering.config.default_invasion_start_message": "Default Invasion Start Message",
+	"puresuffering.config.hyper_invasion_start_message": "Hyper Invasion Start Message",
+	"puresuffering.config.nightmare_invasion_start_message": "Nightmare Invasion Start Message",
+	"puresuffering.config.cancel_invasion_start_message": "Cancel Invasion Start Message",
 	
 	"puresuffering.config.use_sky_box_renderer": "Use Sky Box Renderer",
 	"puresuffering.config.can_invasions_change_brightness": "Can Invasions Change Brightness",

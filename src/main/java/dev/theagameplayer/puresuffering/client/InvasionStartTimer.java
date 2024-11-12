@@ -8,7 +8,6 @@ import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.util.invasion.InvasionText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 
 public final class InvasionStartTimer {
@@ -19,9 +18,9 @@ public final class InvasionStartTimer {
 		this.delays.add(new DelayInfo(session -> { //2.5 seconds
 			if (!pNotifyPlayers) return;
 			if (pDifficulty == null) {
-				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("invasion.puresuffering.start.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), false);
+				Minecraft.getInstance().getChatListener().handleSystemMessage(pSession.getStartMessage("invasion.puresuffering.start.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), false);
 			} else if (session != null) {
-				Minecraft.getInstance().getChatListener().handleSystemMessage(Component.translatable("invasion.puresuffering.start." + pDifficulty).withStyle(Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare()).withColor(pDifficulty.getColor(true))), false);
+				Minecraft.getInstance().getChatListener().handleSystemMessage(pSession.getStartMessage("invasion.puresuffering.start." + pDifficulty).withStyle(Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare()).withColor(pDifficulty.getColor(true))), false);
 			}
 		}, 50));
 		this.delays.add(new DelayInfo(session -> { //3.25 seconds

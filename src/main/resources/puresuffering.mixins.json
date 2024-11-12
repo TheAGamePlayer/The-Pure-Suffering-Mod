@@ -4,7 +4,6 @@
 	"compatibilityLevel": "JAVA_21",
 	"refmap": "puresuffering.refmap.json",
 	"mixins": [
-		"GameRulesCategoryMixin",
 		"LevelMixin",
 		"MinecraftServerMixin",
 		"MobMixin",

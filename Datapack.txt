@@ -216,6 +216,9 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
     ClusterSize: (Optional - Integer 1+)
     - The amount of mobs spawn in a cluster per chunk picked by the invasion.
     - Defaults to 1.
+    MobKillLimit: (Optional - Integer 0+)
+    - The amount of mobs a player needs to kill before the invasion is ended.
+    - By setting it to 0 it will default to turning the feature off.
 }
 Dimensions: (List of Strings)
 - The Ids of every dimension this invasion can occur in.

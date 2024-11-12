@@ -1,10 +1,11 @@
 package dev.theagameplayer.puresuffering.client.invasion;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
+
+import org.codehaus.plexus.util.FastMap;
 
 import dev.theagameplayer.puresuffering.client.ClientTransitionHandler;
 import dev.theagameplayer.puresuffering.client.renderer.InvasionSkyRenderer;
@@ -16,15 +17,17 @@ import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
 public final class ClientInvasionSession implements Iterable<ClientInvasion> {
-	private static final HashMap<ResourceLocation, ClientInvasionSession> CLIENT_SESSIONS = new HashMap<>();
+	private static final FastMap<ResourceLocation, ClientInvasionSession> CLIENT_SESSIONS = new FastMap<>();
 	private final ArrayList<ClientInvasion> invasions = new ArrayList<>();
 	private final InvasionSessionType sessionType;
 	private final InvasionDifficulty difficulty;
+	private final String customStartMessage;
 	private final Style style;
 	private final InvasionSkyRenderer invasionSkyRenderer;
 	private final ClientEffectsRenderer clientEffectsRenderer;
@@ -36,9 +39,10 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 	private int startTime = 40; //Day Time doesn't always sync, so this is necessary
 	private double xpMult;
 
-	public ClientInvasionSession(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty) {
+	public ClientInvasionSession(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty, final String pCustomStartMessage) {
 		this.sessionType = pSessionType;
 		this.difficulty = pDifficulty;
+		this.customStartMessage = pCustomStartMessage;
 		this.style = Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare());
 		this.invasionSkyRenderer = new InvasionSkyRenderer(pDifficulty);
 		this.clientEffectsRenderer = new ClientEffectsRenderer(pDifficulty);
@@ -54,6 +58,10 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 	
 	public final InvasionDifficulty getDifficulty() {
 		return this.difficulty;
+	}
+	
+	public final MutableComponent getStartMessage(final String pDefaultMessage) {
+		return this.customStartMessage.isBlank() ? Component.translatable(pDefaultMessage) : Component.literal(this.customStartMessage);
 	}
 	
 	public final Style getStyle() {
@@ -164,7 +172,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		return pLevel == null ? null : CLIENT_SESSIONS.get(pLevel.dimension().location());
 	}
 
-	public static final void add(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty, final InvasionSkyRenderInfo pRenderer, final boolean pIsPrimary, final int pSeverity, final int pMobCap, final int pMaxSeverity, final int pRarity, final int pTier, final Component pComponent) {
+	public static final void add(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty, final InvasionSkyRenderInfo pRenderer, final boolean pIsPrimary, final int pSeverity, final int pMobCap, final int pMaxSeverity, final int pRarity, final int pTier, final Component pComponent, final String pCustomStartMessage) {
 		final Minecraft mc = Minecraft.getInstance();
 		final ResourceLocation dimId = mc.level.dimension().location();
 		if (CLIENT_SESSIONS.containsKey(dimId) && !pIsPrimary) {
@@ -172,7 +180,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 			session.invasions.add(new ClientInvasion(pRenderer, pIsPrimary, pSeverity, pMobCap, pMaxSeverity, pRarity, pTier, pComponent));
 			session.update();
 		} else {
-			final ClientInvasionSession session = new ClientInvasionSession(pSessionType, pDifficulty);
+			final ClientInvasionSession session = new ClientInvasionSession(pSessionType, pDifficulty, pCustomStartMessage);
 			session.invasions.add(new ClientInvasion(pRenderer, pIsPrimary, pSeverity, pMobCap, pMaxSeverity, pRarity, pTier, pComponent));
 			session.update();
 			CLIENT_SESSIONS.put(dimId, session);

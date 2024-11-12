@@ -1,4 +1,14 @@
 #Minecraft 1.21.x
+Version 1.6.6.1B:
+- Added "mobKillLimit" Gamerule and Config Option for invasions, disabled by default.
+- Added "mobKillLimit" field for datapacks to adjust how many mobs should be killed by a player in an invasion before ending it.
+- Added Config options to change invasion start messages through the config instead of requiring a resourcepack.
+- Fixed xp drops not scaling with hyper charged mobs correctly.
+- Fixed xp drops increasing xp dropped by vanilla mobs.
+- Fixed crash with Forgified-Fabric-API on a server with Pure Suffering installed.
+- Micro-optimizations for session hashmaps.
+- Removed unused code for custom gamerule while I wait for NeoForge to add support.
+
 Version 1.6.6.0B:
 - Added the "invasionStartDelay" config option and gamerule to allow for changing the start day of when invasions can occur.
 - Added "StartCommands" & "EndCommands" to invasion severity info to allow commands to be executed at the start and end of invasions.

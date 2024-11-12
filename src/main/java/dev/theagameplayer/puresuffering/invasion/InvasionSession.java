@@ -29,16 +29,19 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 	private final MinecraftServer server;
 	private final InvasionSessionType sessionType;
 	private final InvasionDifficulty difficulty;
+	private final int mobKillLimit;
 	private final Style style;
 	private WeatherType weatherType = WeatherType.DEFAULT;
 	private int weatherChangeDelay, lightLevel;
 	private boolean stopsConversions, forceNoSleep;
+	public int mobsKilledByPlayer;
 
-	public InvasionSession(final ServerLevel pLevel, final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty) {
+	public InvasionSession(final ServerLevel pLevel, final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty, final int pMobKillLimit) {
 		this.commandSource = new CommandSourceStack(this, Vec3.atLowerCornerOf(pLevel.getSharedSpawnPos()), Vec2.ZERO, pLevel, 4, "InvasionSession", Component.literal("InvasionSession"), pLevel.getServer(), null);
 		this.server = pLevel.getServer();
 		this.sessionType = pSessionType;
 		this.difficulty = pDifficulty;
+		this.mobKillLimit = pMobKillLimit;
 		this.style = Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare());
 	}
 
@@ -52,6 +55,10 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 
 	public final InvasionDifficulty getDifficulty() {
 		return this.difficulty;
+	}
+	
+	public final int getMobKillLimit() {
+		return this.mobKillLimit;
 	}
 
 	public final Style getStyle() {
@@ -91,6 +98,13 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 			if (invasion.hasMob(pMob) > -1) return true;
 		}
 		return false;
+	}
+	
+	public final Invasion getInvasion(final Mob pMob) {
+		for (final Invasion invasion : this.invasions) {
+			if (invasion.hasMob(pMob) > -1) return invasion;
+		}
+		return null;
 	}
 
 	public final void loadMob(final Mob pMob) {
@@ -166,7 +180,8 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 	}
 
 	public static final InvasionSession load(final ServerLevel pLevel, final CompoundTag pNbt) {
-		final InvasionSession session = new InvasionSession(pLevel, InvasionSessionType.getActive(pLevel), InvasionDifficulty.values()[pNbt.getInt("Difficulty")]);
+		final InvasionSession session = new InvasionSession(pLevel, InvasionSessionType.getActive(pLevel), InvasionDifficulty.values()[pNbt.getInt("Difficulty")], pNbt.getInt("MobKillLimit"));
+		session.mobsKilledByPlayer = pNbt.getInt("MobsKilledByPlayer");
 		final ListTag invasionsNBT = pNbt.getList(session.sessionType.getDefaultName() + "Invasions", Tag.TAG_COMPOUND);
 		for (final Tag inbt : invasionsNBT) {
 			if (inbt instanceof CompoundTag nbt)
@@ -179,6 +194,8 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 		final CompoundTag nbt = new CompoundTag();
 		final ListTag invasionsNBT = new ListTag();
 		nbt.putInt("Difficulty", this.difficulty.ordinal());
+		nbt.putInt("MobKillLimit", this.mobKillLimit);
+		nbt.putInt("MobsKilledByPlayer", this.mobsKilledByPlayer);
 		for (final Invasion invasion : this.invasions)
 			invasionsNBT.add(invasion.save());
 		nbt.put(this.sessionType.getDefaultName() + "Invasions", invasionsNBT);

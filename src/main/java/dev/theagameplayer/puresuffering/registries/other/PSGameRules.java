@@ -32,9 +32,10 @@ public final class PSGameRules {
 	public static final IntegerRule INVASION_START_DELAY = new IntegerRule("invasionStartDelay", false, PSConfigValues.common.invasionStartDelay);
 	public static final IntegerRule PRIMARY_INVASION_MOB_CAP = new IntegerRule("primaryInvasionMobCap", false, PSConfigValues.common.primaryInvasionMobCap);
 	public static final IntegerRule SECONDARY_INVASION_MOB_CAP = new IntegerRule("secondaryInvasionMobCap", false, PSConfigValues.common.secondaryInvasionMobCap);
+	public static final IntegerRule MOB_KILL_LIMIT = new IntegerRule("mobKillLimit", false, PSConfigValues.common.mobKillLimit);
 
 	public static final void registerGameRules() {
-		final GameRules.Category category = GameRules.Category.MISC; //GameRules.Category.valueOf("PURE_SUFFERING");
+		final GameRules.Category category = GameRules.Category.MISC;
 		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.register(category);
 	}
 

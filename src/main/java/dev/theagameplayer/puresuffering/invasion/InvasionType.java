@@ -211,8 +211,9 @@ public final class InvasionType {
 		private final boolean forceNoSleep;
 		private final int tickDelay;
 		private final int clusterSize;
+		private final int mobKillLimit;
 
-		private SeverityInfo(final InvasionSkyRenderInfo pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize) {
+		private SeverityInfo(final InvasionSkyRenderInfo pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize, final int pMobKillLimit) {
 			this.skyRenderInfo = pSkyRenderInfo;
 			this.startCommands = pStartCommands;
 			this.endCommands = pEndCommands;
@@ -223,10 +224,11 @@ public final class InvasionType {
 			this.forceNoSleep = pForceNoSleep;
 			this.tickDelay = pTickDelay;
 			this.clusterSize = pClusterSize;
+			this.mobKillLimit = pMobKillLimit;
 		}
 
 		public final SeverityInfo.Builder deconstruct() {
-			return new SeverityInfo.Builder(this.skyRenderInfo == null ? null : this.skyRenderInfo.deconstruct(), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize);
+			return new SeverityInfo.Builder(this.skyRenderInfo == null ? null : this.skyRenderInfo.deconstruct(), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize, this.mobKillLimit);
 		}
 
 		public final InvasionSkyRenderInfo getSkyRenderInfo() {
@@ -268,6 +270,10 @@ public final class InvasionType {
 		public final int getClusterSize() {
 			return this.clusterSize;
 		}
+		
+		public final int getMobKillLimit() {
+			return this.mobKillLimit;
+		}
 
 		public static final class Builder {
 			private InvasionSkyRenderInfo.Builder skyRenderInfo = null;
@@ -279,8 +285,9 @@ public final class InvasionType {
 			private boolean forceNoSleep = false;
 			private int tickDelay = -1;
 			private int clusterSize = 1;
+			private int mobKillLimit;
 
-			private Builder(final InvasionSkyRenderInfo.Builder pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize) {
+			private Builder(final InvasionSkyRenderInfo.Builder pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize, final int pMobKillLimit) {
 				this.skyRenderInfo = pSkyRenderInfo;
 				this.startCommands = pStartCommands;
 				this.endCommands = pEndCommands;
@@ -291,6 +298,7 @@ public final class InvasionType {
 				this.forceNoSleep = pForceNoSleep;
 				this.tickDelay = pTickDelay;
 				this.clusterSize = pClusterSize;
+				this.mobKillLimit = pMobKillLimit;
 			}
 
 			private Builder() {};
@@ -348,9 +356,14 @@ public final class InvasionType {
 				this.clusterSize = pClusterSize;
 				return this;
 			}
+			
+			public final SeverityInfo.Builder withMobKillLimit(final int pMobKillLimit) {
+				this.mobKillLimit = pMobKillLimit;
+				return this;
+			}
 
 			public final SeverityInfo build(final ResourceLocation pId) {
-				return new SeverityInfo(this.skyRenderInfo == null ? InvasionSkyRenderInfo.Builder.skyRenderInfo().build(pId) : this.skyRenderInfo.build(pId), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize);
+				return new SeverityInfo(this.skyRenderInfo == null ? InvasionSkyRenderInfo.Builder.skyRenderInfo().build(pId) : this.skyRenderInfo.build(pId), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize, this.mobKillLimit);
 			}
 
 			public final JsonObject serializeToJson() {
@@ -426,6 +439,8 @@ public final class InvasionType {
 				jsonObject.addProperty("TickDelay", this.tickDelay);
 				if (this.clusterSize > 1)
 					jsonObject.addProperty("MobClusterSize", this.clusterSize);
+				if (this.mobKillLimit > 0)
+					jsonObject.addProperty("MobKillLimit", this.mobKillLimit);
 				return jsonObject;
 			}
 
@@ -540,9 +555,10 @@ public final class InvasionType {
 				final boolean forceNoSleep = pJsonObject.has("ForceNoSleep") && pJsonObject.get("ForceNoSleep").getAsBoolean();
 				final int tickDelay = pJsonObject.get("TickDelay").getAsInt();
 				final int clusterSize = pJsonObject.has("MobClusterSize") ? pJsonObject.get("MobClusterSize").getAsInt() : 1;
-				if (errored || tickDelay < 0 || clusterSize < 1)
+				final int mobKillLimit = pJsonObject.has("MobKillLimit") ? pJsonObject.get("MobKillLimit").getAsInt() : 0;
+				if (errored || tickDelay < 0 || clusterSize < 1 || mobKillLimit < 0)
 					LOGGER.error("JsonElement is incorrectly setup: " + pJsonObject.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
-				return new SeverityInfo.Builder(skyRenderInfo, startCommands, endCommands, mobSpawnList, additionalEntitiesList, mobCapPercentage, fixedMobCap, forceNoSleep, tickDelay, clusterSize);
+				return new SeverityInfo.Builder(skyRenderInfo, startCommands, endCommands, mobSpawnList, additionalEntitiesList, mobCapPercentage, fixedMobCap, forceNoSleep, tickDelay, clusterSize, mobKillLimit);
 			}
 		}
 	}

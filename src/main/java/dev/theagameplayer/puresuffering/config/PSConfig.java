@@ -23,7 +23,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
 public final class PSConfig {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
@@ -55,48 +54,49 @@ public final class PSConfig {
 		public final ModConfigSpec.IntValue invasionStartDelay;
 		public final ModConfigSpec.IntValue primaryInvasionMobCap;
 		public final ModConfigSpec.IntValue secondaryInvasionMobCap;
+		public final ModConfigSpec.IntValue mobKillLimit;
 		//Invasions
-		public final ConfigValue<List<? extends String>> invasionBlacklist;
-		public final ConfigValue<List<? extends String>> primaryWhitelist;
-		public final ConfigValue<List<? extends String>> overworldLikeDimensions;
-		public final ConfigValue<List<? extends String>> netherLikeDimensions;
-		public final ConfigValue<List<? extends String>> endLikeDimensions;
-		public final ConfigValue<List<? extends String>> hyperAggressionBlacklist;
-		public final ConfigValue<List<? extends String>> hyperChargeBlacklist;
-		public final ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
-		public final ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> invasionBlacklist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> primaryWhitelist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> overworldLikeDimensions;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> netherLikeDimensions;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> endLikeDimensions;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> hyperAggressionBlacklist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> hyperChargeBlacklist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
 		public final ModConfigSpec.DoubleValue naturalSpawnChance;
 		public final ModConfigSpec.DoubleValue hyperChargeChance;
 		public final ModConfigSpec.IntValue blessingEffectRespawnDuration;
 		public final ModConfigSpec.IntValue blessingEffectDimensionChangeDuration;
+		//Text
+		public final ModConfigSpec.ConfigValue<String> defaultInvasionStartMessage;
+		public final ModConfigSpec.ConfigValue<String> hyperInvasionStartMessage;
+		public final ModConfigSpec.ConfigValue<String> nightmareInvasionStartMessage;
+		public final ModConfigSpec.ConfigValue<String> cancelInvasionStartMessage;
 
 		private CommonConfig() {
 			final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 			builder.push("game_rules");
 			this.overrideGameRules = builder
 					.translation(CONFIG + "override_game_rules")
-					.worldRestart()
 					.comment("This will make these config options override their game rule values.", "NOTE: Can be used to help modpack creators enforce certain settings.")
 					.define("overrideGameRules", false);
 			builder.push("game_rules_boolean");
 			this.enableHyperInvasions = builder
 					.translation(CONFIG + "enable_hyper_invasions")
-					.worldRestart()
 					.comment("Should hyper invasions be able to occur?")
 					.define("enableHyperInvasions", true);
 			this.enableNightmareInvasions = builder
 					.translation(CONFIG + "enable_nightmare_invasions")
-					.worldRestart()
 					.comment("Should nightmare invasions be able to occur?", "NOTE: Hyper invasions must be enabled.")
 					.define("enableNightmareInvasions", true);
 			this.invasionAntiGrief = builder
 					.translation(CONFIG + "invasion_anti_grief")
-					.worldRestart()
 					.comment("Will disable explosions, fire, etc... from entities spawned by invasions.")
 					.define("invasionAntiGrief", false);
 			this.consistentInvasions = builder
 					.translation(CONFIG + "consistent_invasions")
-					.worldRestart()
 					.comment("Rather than the invasion occuring once in every 'rarity' days, it will instead be set to occur every 'rarity' days.")
 					.define("consistentInvasions", false);
 			this.tieredInvasions = builder
@@ -106,61 +106,54 @@ public final class PSConfig {
 					.define("tieredInvasions", true);
 			this.hyperAggression = builder
 					.translation(CONFIG + "hyper_aggression")
-					.worldRestart()
 					.comment("Hyper Aggression is what invasion mobs have to target the player from across the world, turning this off will make them use default targeting.")
 					.define("hyperAggression", true);
 			this.hyperCharge = builder
 					.translation(CONFIG + "hyper_charge")
-					.worldRestart()
 					.comment("Hyper Charge is what the buffed mobs spawned by invasions have, turning this off will disabled these buffed mobs from spawning (This also disables Hyper invasions).")
 					.define("hyperCharge", true);
 			this.forceInvasionSleeplessness = builder
 					.translation(CONFIG + "force_invasion_sleeplessness")
-					.worldRestart()
 					.comment("This determines whether players will be unable to sleep during all invasions.")
 					.define("forceInvasionSleeplessness", false);
 			this.useXPMultiplier = builder
 					.translation(CONFIG + "use_xp_multiplier")
-					.worldRestart()
 					.comment("This determines whether invasion mobs should have an xp boost per kill.")
 					.define("useXPMultiplier", true);
 			this.mobsDieAtEndOfInvasions = builder
 					.translation(CONFIG + "mobs_die_at_end_of_invasions")
-					.worldRestart()
 					.comment("Determines if invasion mobs should die when the invasions are over.", "NOTE: Can be used to reduce server lag.")
 					.define("mobsDieAtEndOfInvasions", false);
 			this.weakenedInvasionVexes = builder
 					.translation(CONFIG + "weakened_invasion_vexes")
-					.worldRestart()
 					.comment("Determines vexes in invasions have a limited lifespan.")
 					.define("weakenedInvasionVexes", true);
 			this.enableInvasionAmbience = builder
 					.translation(CONFIG + "enable_invasion_ambience")
-					.worldRestart()
 					.comment("Determines if invasion ambience sounds should occur.")
 					.define("enableInvasionAmbience", true);
 			this.notifyPlayersAboutInvasions = builder
 					.translation(CONFIG + "notify_players_about_invasions")
-					.worldRestart()
 					.comment("Determines if players be notified when invasions start.")
 					.define("notifyPlayersAboutInvasions", true);
 			builder.pop();
 			builder.push("game_rules_integer");
 			this.invasionStartDelay = builder
 					.translation(CONFIG + "invasion_start_delay")
-					.worldRestart()
 					.comment("The amount of days until an invasion can start.")
 					.defineInRange("invasionStartDelay", 1, 0, Integer.MAX_VALUE);
 			this.primaryInvasionMobCap = builder
 					.translation(CONFIG + "primary_invasion_mob_cap")
-					.worldRestart()
 					.comment("The max amount of mobs that can spawn from Primary Invasions at once.", NOTE_REDUCE_FOR_PERFORMANCE)
 					.defineInRange("primaryInvasionMobCap", 100, 0, Integer.MAX_VALUE);
 			this.secondaryInvasionMobCap = builder
 					.translation(CONFIG + "secondary_invasion_mob_cap")
-					.worldRestart()
 					.comment("The max amount of mobs that can spawn from Secondary Invasions at once.", NOTE_REDUCE_FOR_PERFORMANCE)
 					.defineInRange("secondaryInvasionMobCap", 25, 0, Integer.MAX_VALUE);
+			this.mobKillLimit = builder
+					.translation(CONFIG + "mob_kill_limit")
+					.comment("The mob kill limit for the invasion that would cause it to end after the player kills so many mobs from that invasion.", "NOTE: Setting to 0 will disable the limit, limits specified by a datapack will still apply.")
+					.defineInRange("mobKillLimit", 0, 0, Integer.MAX_VALUE);
 			builder.pop();
 			builder.pop();
 			builder.push("invasions");
@@ -247,6 +240,24 @@ public final class PSConfig {
 					.worldRestart()
 					.comment("How many ticks the Blessing Effect lasts when changing dimensions.")
 					.defineInRange("blessingEffectDimensionChangeDuration", 200, 0, Integer.MAX_VALUE);
+			builder.pop();
+			builder.push("text");
+			this.defaultInvasionStartMessage = builder
+					.translation(CONFIG + "default_invasion_start_message")
+					.comment("Start message for default invasions, leave blank to for default message.")
+					.define("defaultInvasionStartMessage", "");
+			this.hyperInvasionStartMessage = builder
+					.translation(CONFIG + "hyper_invasion_start_message")
+					.comment("Start message for hyper invasions, leave blank to for default message.")
+					.define("hyperInvasionStartMessage", "");
+			this.nightmareInvasionStartMessage = builder
+					.translation(CONFIG + "nightmare_invasion_start_message")
+					.comment("Start message for nightmare invasions, leave blank to for default message.")
+					.define("nightmareInvasionStartMessage", "");
+			this.cancelInvasionStartMessage = builder
+					.translation(CONFIG + "cancel_invasion_start_message")
+					.comment("Cancel message for invasions, leave blank to for default message.")
+					.define("cancelInvasionStartMessage", "");
 			builder.pop();
 			this.spec = builder.build();
 		}

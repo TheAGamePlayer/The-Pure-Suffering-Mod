@@ -1,6 +1,6 @@
 package dev.theagameplayer.puresuffering.world.level.saveddata;
 
-import java.util.HashMap;
+import org.codehaus.plexus.util.FastMap;
 
 import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import net.minecraft.core.Holder;
@@ -12,7 +12,7 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.saveddata.SavedData;
 
 public final class InvasionLevelData extends SavedData {
-	private static final HashMap<ServerLevel, InvasionLevelData> INVASION_DATA = new HashMap<>();
+	private static final FastMap<ServerLevel, InvasionLevelData> INVASION_DATA = new FastMap<>();
 	private final InvasionManager invasionManager;
 	private long invasionTime;
 	private int xpMult;

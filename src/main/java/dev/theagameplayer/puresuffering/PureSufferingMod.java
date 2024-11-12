@@ -111,6 +111,7 @@ public final class PureSufferingMod {
 		pForgeBus.addListener(PSLivingEvents::finalizeSpawn);
 		pForgeBus.addListener(PSLivingEvents::conversionPre);
 		pForgeBus.addListener(PSLivingEvents::conversionPost);
+		pForgeBus.addListener(PSLivingEvents::death);
 		pForgeBus.addListener(PSLivingEvents::experienceDrop);
 		pForgeBus.addListener(PSLivingEvents::mobDespawn);
 		pForgeBus.addListener(PSLivingEvents::mobSplit);

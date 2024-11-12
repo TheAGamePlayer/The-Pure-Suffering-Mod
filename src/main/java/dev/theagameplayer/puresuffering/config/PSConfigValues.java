@@ -45,6 +45,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final int invasionStartDelay = PSConfig.COMMON.invasionStartDelay.get();
 		public final int primaryInvasionMobCap = PSConfig.COMMON.primaryInvasionMobCap.get();
 		public final int secondaryInvasionMobCap = PSConfig.COMMON.secondaryInvasionMobCap.get();
+		public final int mobKillLimit = PSConfig.COMMON.mobKillLimit.get();
 		//Invasions
 		public final List<? extends String> invasionBlacklist = PSConfig.COMMON.invasionBlacklist.get();
 		public final List<? extends String> primaryWhitelist = PSConfig.COMMON.primaryWhitelist.get();
@@ -59,6 +60,11 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final double hyperChargeChance = PSConfig.COMMON.hyperChargeChance.get();
 		public final int blessingEffectRespawnDuration = PSConfig.COMMON.blessingEffectRespawnDuration.get();
 		public final int blessingEffectDimensionChangeDuration = PSConfig.COMMON.blessingEffectDimensionChangeDuration.get();
+		//Text
+		public final String defaultInvasionStartMessage = PSConfig.COMMON.defaultInvasionStartMessage.get();
+		public final String hyperInvasionStartMessage = PSConfig.COMMON.hyperInvasionStartMessage.get();
+		public final String nightmareInvasionStartMessage = PSConfig.COMMON.nightmareInvasionStartMessage.get();
+		public final String cancelInvasionStartMessage = PSConfig.COMMON.cancelInvasionStartMessage.get();
 	}
 
 	public static final class ClientValues {

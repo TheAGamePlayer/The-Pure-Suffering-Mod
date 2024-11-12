@@ -67,6 +67,7 @@ public final class Invasion implements InvasionTypeHolder {
 	private final SimpleWeightedRandomList<SpawnData> spawnPotentials = SimpleWeightedRandomList.empty();
 	private SpawnData nextSpawnData = new SpawnData();
 	private int spawnDelay;
+	public int mobsKilledByPlayer;
 
 	public Invasion(final ServerLevel pLevel, final InvasionType pInvasionType, final int pSeverity, final boolean pIsPrimary, final boolean pIsNatural, final long pStartTime, final int pIndex) {
 		final SeverityInfo info = pInvasionType.getSeverityInfo().get(pSeverity);
@@ -177,7 +178,7 @@ public final class Invasion implements InvasionTypeHolder {
 			final ServerPlayer player = players[pLevel.random.nextInt(players.length)];
 			final ChunkPos chunkPos = this.getSpawnChunk(pLevel, player);
 			for (int c = 0; c < t; ++c)
-				this.spawnClusterEntity(this.getEntitySpawnPos(pLevel, chunkPos, player, spawnInfo.getEntityType(), spawnInfo.isSurfaceSpawn()), pLevel, spawnInfo.getEntityType());
+				this.spawnAdditionalEntity(this.getEntitySpawnPos(pLevel, chunkPos, player, spawnInfo.getEntityType(), spawnInfo.isSurfaceSpawn()), pLevel, spawnInfo.getEntityType());
 		}
 	}
 
@@ -257,7 +258,7 @@ public final class Invasion implements InvasionTypeHolder {
 		return flag && SpawnPlacements.checkSpawnRules(pEntityType, pLevel, MobSpawnType.EVENT, pPos, pLevel.getRandom());
 	}
 
-	private final void spawnClusterEntity(final BlockPos pPos, final ServerLevel pLevel, final EntityType<?> pEntityType) {
+	private final void spawnAdditionalEntity(final BlockPos pPos, final ServerLevel pLevel, final EntityType<?> pEntityType) {
 		if (!Level.isInSpawnableBounds(pPos)) return;
 		final CompoundTag compoundTag = new CompoundTag();
 		compoundTag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(pEntityType).toString());
