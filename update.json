@@ -5,8 +5,8 @@
         "1.21.1-recommended": "1.6.6.1B",
         "1.21-latest": "1.6.5.0B",
         "1.21-recommended": "1.6.5.0B",
-        "1.20.6-latest": "1.6.3.1B",
-        "1.20.6-recommended": "1.6.3.1B",
+        "1.20.6-latest": "1.6.3.2B",
+        "1.20.6-recommended": "1.6.3.2B",
 		"1.20.4-latest": "1.6.2.2R",
 		"1.20.4-recommended": "1.6.2.2R",
 		"1.20.2-latest": "1.6.1.2B",
@@ -40,6 +40,7 @@
         "1.6.4.0B": "- Updated to 1.21 & fixed a typo!"
     },
     "1.20.6": {
+		"1.6.3.2B": "Readded Solar and Lunar eclipse invasions after mistakenly deleting them...",
         "1.6.3.1B": "- Fixed a bug with villager ai breaking after an invasion.",
         "1.6.3.0B": "- Updated to 1.20.6, a new spawning method, quality of life changes & bug fixes."
     },

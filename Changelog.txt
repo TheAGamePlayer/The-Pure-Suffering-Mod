@@ -62,6 +62,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.3.2B:
+- Readded Solar and Lunar eclipse invasions after mistakenly deleting them...
+
 Version 1.6.3.1B:
 - Fixed a bug with villager ai breaking after an invasion.
 
