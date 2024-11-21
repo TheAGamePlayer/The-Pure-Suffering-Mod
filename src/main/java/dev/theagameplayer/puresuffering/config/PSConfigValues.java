@@ -41,11 +41,13 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final boolean weakenedInvasionVexes = PSConfig.COMMON.weakenedInvasionVexes.get();
 		public final boolean enableInvasionAmbience = PSConfig.COMMON.enableInvasionAmbience.get();
 		public final boolean notifyPlayersAboutInvasions = PSConfig.COMMON.notifyPlayersAboutInvasions.get();
+		public final boolean zeroTickDelay = PSConfig.COMMON.zeroTickDelay.get();
 		//GameRules - Integer
 		public final int invasionStartDelay = PSConfig.COMMON.invasionStartDelay.get();
 		public final int primaryInvasionMobCap = PSConfig.COMMON.primaryInvasionMobCap.get();
 		public final int secondaryInvasionMobCap = PSConfig.COMMON.secondaryInvasionMobCap.get();
 		public final int mobKillLimit = PSConfig.COMMON.mobKillLimit.get();
+		public final int mobSpawnChunkRadius = PSConfig.COMMON.mobSpawnChunkRadius.get();
 		//Invasions
 		public final List<? extends String> invasionBlacklist = PSConfig.COMMON.invasionBlacklist.get();
 		public final List<? extends String> primaryWhitelist = PSConfig.COMMON.primaryWhitelist.get();

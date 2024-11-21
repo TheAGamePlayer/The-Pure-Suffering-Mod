@@ -292,7 +292,7 @@ public final class Invasion implements InvasionTypeHolder {
 	}
 
 	private final void delay(final ServerLevel pLevel, final int pTotalInvasions) {
-		this.spawnDelay = this.getSeverityInfo().getTickDelay()/pTotalInvasions;
+		this.spawnDelay = PSGameRules.ZERO_TICK_DELAY.get(pLevel) ? 0 : this.getSeverityInfo().getTickDelay()/pTotalInvasions;
 		this.spawnPotentials.getRandom(pLevel.random).ifPresent(entry -> {
 			this.nextSpawnData = entry.data();
 		});
@@ -345,8 +345,10 @@ public final class Invasion implements InvasionTypeHolder {
 
 	private final ChunkPos getSpawnChunk(final ServerLevel pLevel, final ServerPlayer pPlayer) {
 		final ChunkPos chunkPos = pLevel.getChunk(pPlayer.blockPosition()).getPos();
-		final int chunkX = chunkPos.x - 8 + pLevel.random.nextInt(17);
-		final int chunkZ = chunkPos.z - 8 + pLevel.random.nextInt(17);
+		final int radius = PSGameRules.MOB_SPAWN_CHUNK_RADIUS.get(pLevel);
+		final int offset = 1 + radius * 2;
+		final int chunkX = chunkPos.x - radius + pLevel.random.nextInt(offset);
+		final int chunkZ = chunkPos.z - radius + pLevel.random.nextInt(offset);
 		final boolean flag = chunkPos.x == chunkX && chunkPos.z == chunkZ;
 		final ChunkPos chunkPos1 = new ChunkPos(flag ? chunkX + this.getChunkOffset(pLevel) : chunkX, flag ? chunkZ + this.getChunkOffset(pLevel) : chunkZ);
 		return chunkPos1;

@@ -1,4 +1,8 @@
 #Minecraft 1.21.x
+Version 1.6.6.2B:
+- Added "zeroTickDelay" Gamerule and Config option to set all invasion tick delay to zero for instant spawning (Spawning goes as fast as possible without taxing the server).
+- Added "mobSpawnChunkRadius" Gamerule and Config option to all customization of how far or close invasion mobs can spawn to the player (1-8 chunks).
+
 Version 1.6.6.1B:
 - Added "mobKillLimit" Gamerule and Config Option for invasions, disabled by default.
 - Added "mobKillLimit" field for datapacks to adjust how many mobs should be killed by a player in an invasion before ending it.

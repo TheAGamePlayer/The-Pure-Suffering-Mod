@@ -50,11 +50,13 @@ public final class PSConfig {
 		public final ModConfigSpec.BooleanValue weakenedInvasionVexes;
 		public final ModConfigSpec.BooleanValue enableInvasionAmbience;
 		public final ModConfigSpec.BooleanValue notifyPlayersAboutInvasions;
+		public final ModConfigSpec.BooleanValue zeroTickDelay;
 		//GameRules - Integer
 		public final ModConfigSpec.IntValue invasionStartDelay;
 		public final ModConfigSpec.IntValue primaryInvasionMobCap;
 		public final ModConfigSpec.IntValue secondaryInvasionMobCap;
 		public final ModConfigSpec.IntValue mobKillLimit;
+		public final ModConfigSpec.IntValue mobSpawnChunkRadius;
 		//Invasions
 		public final ModConfigSpec.ConfigValue<List<? extends String>> invasionBlacklist;
 		public final ModConfigSpec.ConfigValue<List<? extends String>> primaryWhitelist;
@@ -136,6 +138,10 @@ public final class PSConfig {
 					.translation(CONFIG + "notify_players_about_invasions")
 					.comment("Determines if players be notified when invasions start.")
 					.define("notifyPlayersAboutInvasions", true);
+			this.zeroTickDelay = builder
+					.translation(CONFIG + "zero_tick_delay")
+					.comment("Determines if invasions should have zero tick delay.")
+					.define("zeroTickDelay", false);
 			builder.pop();
 			builder.push("game_rules_integer");
 			this.invasionStartDelay = builder
@@ -154,6 +160,10 @@ public final class PSConfig {
 					.translation(CONFIG + "mob_kill_limit")
 					.comment("The mob kill limit for the invasion that would cause it to end after the player kills so many mobs from that invasion.", "NOTE: Setting to 0 will disable the limit, limits specified by a datapack will still apply.")
 					.defineInRange("mobKillLimit", 0, 0, Integer.MAX_VALUE);
+			this.mobSpawnChunkRadius = builder
+					.translation(CONFIG + "mob_spawn_chunk_radius")
+					.comment("Maximum amount of chunks an invasion mob can spawn away from the player.")
+					.defineInRange("mobSpawnChunkRadius", 8, 1, 8);
 			builder.pop();
 			builder.pop();
 			builder.push("invasions");

@@ -28,11 +28,13 @@ public final class PSGameRules {
 	public static final BooleanRule WEAKENED_INVASION_VEXES = new BooleanRule("weakenedInvasionVexes", false, PSConfigValues.common.weakenedInvasionVexes);
 	public static final BooleanRule ENABLE_INVASION_AMBIENCE = new BooleanRule("enableInvasionAmbience", false, PSConfigValues.common.enableInvasionAmbience);
 	public static final BooleanRule NOTIFY_PLAYERS_ABOUT_INVASIONS = new BooleanRule("notifyPlayersAboutInvasions", false, PSConfigValues.common.notifyPlayersAboutInvasions);
+	public static final BooleanRule ZERO_TICK_DELAY = new BooleanRule("zeroTickDelay", false, PSConfigValues.common.zeroTickDelay);
 
 	public static final IntegerRule INVASION_START_DELAY = new IntegerRule("invasionStartDelay", false, PSConfigValues.common.invasionStartDelay);
 	public static final IntegerRule PRIMARY_INVASION_MOB_CAP = new IntegerRule("primaryInvasionMobCap", false, PSConfigValues.common.primaryInvasionMobCap);
 	public static final IntegerRule SECONDARY_INVASION_MOB_CAP = new IntegerRule("secondaryInvasionMobCap", false, PSConfigValues.common.secondaryInvasionMobCap);
 	public static final IntegerRule MOB_KILL_LIMIT = new IntegerRule("mobKillLimit", false, PSConfigValues.common.mobKillLimit);
+	public static final IntegerRule MOB_SPAWN_CHUNK_RADIUS = new IntegerRule("mobSpawnChunkRadius", false, PSConfigValues.common.mobSpawnChunkRadius);
 
 	public static final void registerGameRules() {
 		final GameRules.Category category = GameRules.Category.MISC;
