@@ -13,11 +13,11 @@ public final class InvasionFogRenderInfo {
 	private final float[][] fRGB;
 	private final float[] rgb;
 	
-	public InvasionFogRenderInfo(final ResourceLocation idIn, final boolean[] changesIn, final float[][] fRGBIn, final float[] rgbIn) {
-		this.id = idIn;
-		this.changes = changesIn;
-		this.fRGB = fRGBIn;
-		this.rgb = rgbIn;
+	public InvasionFogRenderInfo(final ResourceLocation pId, final boolean[] pChanges, final float[][] pFRGB, final float[] pRGB) {
+		this.id = pId;
+		this.changes = pChanges;
+		this.fRGB = pFRGB;
+		this.rgb = pRGB;
 	}
 	
 	public final InvasionFogRenderInfo.Builder deconstruct() {
@@ -36,16 +36,16 @@ public final class InvasionFogRenderInfo {
 		return this.changes[0];
 	}
 	
-	public final float[] getFlickerRGBOffset(final int indexIn) {
-		return this.fRGB[indexIn];
+	public final float[] getFlickerRGBOffset(final int pIndex) {
+		return this.fRGB[pIndex];
 	}
 	
 	public final int getFlickerRGBSize() {
 		return this.fRGB.length;
 	}
 	
-	public final float getRGBOffset(final int valueIn) {
-		return this.rgb[valueIn];
+	public final float getRGBOffset(final int pValue) {
+		return this.rgb[pValue];
 	}
 
 	@Override
@@ -58,10 +58,10 @@ public final class InvasionFogRenderInfo {
 		private float[][] fRGB = new float[0][5];
 		private float[] rgb = new float[3];
 		
-		private Builder(final boolean[] changesIn, final float[][] fRGBIn, final float[] rgbIn) {
-			this.changes = changesIn;
-			this.fRGB = fRGBIn;
-			this.rgb = rgbIn;
+		private Builder(final boolean[] pChanges, final float[][] pFRGB, final float[] pRGB) {
+			this.changes = pChanges;
+			this.fRGB = pFRGB;
+			this.rgb = pRGB;
 		}
 		
 		private Builder() {};
@@ -70,40 +70,40 @@ public final class InvasionFogRenderInfo {
 			return new InvasionFogRenderInfo.Builder();
 		}
 		
-		public final InvasionFogRenderInfo.Builder withFlickerRGB(final float redIn, final float greenIn, final float blueIn, final int minDelayIn, final int maxDelayIn) {
+		public final InvasionFogRenderInfo.Builder withFlickerRGB(final float pRed, final float pGreen, final float pBlue, final int pMinDelay, final int pMaxDelay) {
 			final int l = this.fRGB.length;
 			final float[][] fRGB = new float[l + 1][5];
-			for (int i1 = 0; i1 < l; i1++) {
-				for (int i2 = 0; i2 < 5; i2++)
+			for (int i1 = 0; i1 < l; ++i1) {
+				for (int i2 = 0; i2 < 5; ++i2)
 					fRGB[i1][i2] = this.fRGB[i1][i2];
 			}
 			this.fRGB = fRGB;
-			this.fRGB[l][0] = redIn;
-			this.fRGB[l][1] = greenIn;
-			this.fRGB[l][2] = blueIn;
-			this.fRGB[l][3] = minDelayIn;
-			this.fRGB[l][4] = maxDelayIn;
+			this.fRGB[l][0] = pRed;
+			this.fRGB[l][1] = pGreen;
+			this.fRGB[l][2] = pBlue;
+			this.fRGB[l][3] = pMinDelay;
+			this.fRGB[l][4] = pMaxDelay;
 			this.changes[1] = true;
 			return this;
 		}
 		
-		public final InvasionFogRenderInfo.Builder withRGB(final float redIn, final float greenIn, final float blueIn) {
-			this.rgb[0] = redIn;
-			this.rgb[1] = greenIn;
-			this.rgb[2] = blueIn;
+		public final InvasionFogRenderInfo.Builder withRGB(final float pRed, final float pGreen, final float pBlue) {
+			this.rgb[0] = pRed;
+			this.rgb[1] = pGreen;
+			this.rgb[2] = pBlue;
 			this.changes[0] = true;
 			return this;
 		}
 		
-		public final InvasionFogRenderInfo build(final ResourceLocation idIn) {
-			return new InvasionFogRenderInfo(idIn, this.changes, this.fRGB, this.rgb);
+		public final InvasionFogRenderInfo build(final ResourceLocation pId) {
+			return new InvasionFogRenderInfo(pId, this.changes, this.fRGB, this.rgb);
 		}
 		
 		public final JsonObject serializeToJson() {
 			final JsonObject jsonObject = new JsonObject();
 			if (this.changes[1]) {
 				final JsonArray a1 = new JsonArray();
-				for (int i = 0; i < this.fRGB.length; i++) {
+				for (int i = 0; i < this.fRGB.length; ++i) {
 					final JsonArray a2 = new JsonArray();
 					a2.add(this.fRGB[i][0]);
 					a2.add(this.fRGB[i][1]);
@@ -124,16 +124,16 @@ public final class InvasionFogRenderInfo {
 			return jsonObject.entrySet().isEmpty() ? null : jsonObject;
 		}
 		
-		public final static InvasionFogRenderInfo.Builder fromJson(final JsonObject jsonObjectIn) {
+		public final static InvasionFogRenderInfo.Builder fromJson(final JsonObject pJsonObject) {
 			final boolean[] changes = new boolean[2];
-			changes[0] = jsonObjectIn.has("RGBOffset");
-			changes[1] = jsonObjectIn.has("FlickerRGBOffset");
-			final JsonElement fRGBElement = changes[1] ? jsonObjectIn.get("FlickerRGBOffset") : null;
+			changes[0] = pJsonObject.has("RGBOffset");
+			changes[1] = pJsonObject.has("FlickerRGBOffset");
+			final JsonElement fRGBElement = changes[1] ? pJsonObject.get("FlickerRGBOffset") : null;
 			float[][] fRGB = new float[0][5];
 			if (fRGBElement != null && fRGBElement.isJsonArray() && !fRGBElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a1 = fRGBElement.getAsJsonArray();
 				fRGB = new float[a1.size()][5];
-				for (int i = 0; i < a1.size(); i++) {
+				for (int i = 0; i < a1.size(); ++i) {
 					final JsonElement e = a1.get(i);
 					if (e.isJsonArray() && !e.getAsJsonArray().isEmpty()) {
 						final JsonArray a2 = e.getAsJsonArray();
@@ -145,7 +145,7 @@ public final class InvasionFogRenderInfo {
 					}
 				}
 			}
-			final JsonElement rgbElement = changes[0] ? jsonObjectIn.get("RGBOffset") : null;
+			final JsonElement rgbElement = changes[0] ? pJsonObject.get("RGBOffset") : null;
 			final float[] rgb = new float[3];
 			if (rgbElement != null && rgbElement.isJsonArray() && !rgbElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a = rgbElement.getAsJsonArray();
@@ -156,38 +156,38 @@ public final class InvasionFogRenderInfo {
 			return new InvasionFogRenderInfo.Builder(changes, fRGB, rgb);
 		}
 		
-		public final void serializeToNetwork(final FriendlyByteBuf bufIn) {
-			bufIn.writeBoolean(this.changes[0]);
-			bufIn.writeBoolean(this.changes[1]);
-			bufIn.writeInt(this.fRGB.length);
-			for (int i = 0; i < this.fRGB.length; i++) {
-				bufIn.writeFloat(this.fRGB[i][0]);
-				bufIn.writeFloat(this.fRGB[i][1]);
-				bufIn.writeFloat(this.fRGB[i][2]);
-				bufIn.writeFloat(this.fRGB[i][3]);
-				bufIn.writeFloat(this.fRGB[i][4]);
+		public final void serializeToNetwork(final FriendlyByteBuf pBuf) {
+			pBuf.writeBoolean(this.changes[0]);
+			pBuf.writeBoolean(this.changes[1]);
+			pBuf.writeInt(this.fRGB.length);
+			for (int i = 0; i < this.fRGB.length; ++i) {
+				pBuf.writeFloat(this.fRGB[i][0]);
+				pBuf.writeFloat(this.fRGB[i][1]);
+				pBuf.writeFloat(this.fRGB[i][2]);
+				pBuf.writeFloat(this.fRGB[i][3]);
+				pBuf.writeFloat(this.fRGB[i][4]);
 			}
-			bufIn.writeFloat(this.rgb[0]);
-			bufIn.writeFloat(this.rgb[1]);
-			bufIn.writeFloat(this.rgb[2]);
+			pBuf.writeFloat(this.rgb[0]);
+			pBuf.writeFloat(this.rgb[1]);
+			pBuf.writeFloat(this.rgb[2]);
 		}
 		
-		public final static InvasionFogRenderInfo.Builder fromNetwork(final FriendlyByteBuf bufIn) {
+		public final static InvasionFogRenderInfo.Builder fromNetwork(final FriendlyByteBuf pBuf) {
 			final boolean[] changes = new boolean[2];
-			changes[0] = bufIn.readBoolean();
-			changes[1] = bufIn.readBoolean();
-			final float[][] fRGB = new float[bufIn.readInt()][5];
-			for (int i = 0; i < fRGB.length; i++) {
-				fRGB[i][0] = bufIn.readFloat();
-				fRGB[i][1] = bufIn.readFloat();
-				fRGB[i][2] = bufIn.readFloat();
-				fRGB[i][3] = bufIn.readFloat();
-				fRGB[i][4] = bufIn.readFloat();
+			changes[0] = pBuf.readBoolean();
+			changes[1] = pBuf.readBoolean();
+			final float[][] fRGB = new float[pBuf.readInt()][5];
+			for (int i = 0; i < fRGB.length; ++i) {
+				fRGB[i][0] = pBuf.readFloat();
+				fRGB[i][1] = pBuf.readFloat();
+				fRGB[i][2] = pBuf.readFloat();
+				fRGB[i][3] = pBuf.readFloat();
+				fRGB[i][4] = pBuf.readFloat();
 			}
 			final float[] rgb = new float[3];
-			rgb[0] = bufIn.readFloat();
-			rgb[1] = bufIn.readFloat();
-			rgb[2] = bufIn.readFloat();
+			rgb[0] = pBuf.readFloat();
+			rgb[1] = pBuf.readFloat();
+			rgb[2] = pBuf.readFloat();
 			return new InvasionFogRenderInfo.Builder(changes, fRGB, rgb);
 		}
 	}

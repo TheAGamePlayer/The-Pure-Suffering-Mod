@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.config.PSConfigValues;
-import dev.theagameplayer.puresuffering.network.PSPacketHandler;
-import dev.theagameplayer.puresuffering.network.packet.UpdateGameRulePacket;
+import dev.theagameplayer.puresuffering.network.UpdateGameRulePacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameRules;
@@ -28,27 +27,32 @@ public final class PSGameRules {
 	public static final BooleanRule MOBS_DIE_AT_END_OF_INVASIONS = new BooleanRule("mobsDieAtEndOfInvasions", false, PSConfigValues.common.mobsDieAtEndOfInvasions);
 	public static final BooleanRule WEAKENED_INVASION_VEXES = new BooleanRule("weakenedInvasionVexes", false, PSConfigValues.common.weakenedInvasionVexes);
 	public static final BooleanRule ENABLE_INVASION_AMBIENCE = new BooleanRule("enableInvasionAmbience", false, PSConfigValues.common.enableInvasionAmbience);
+	public static final BooleanRule NOTIFY_PLAYERS_ABOUT_INVASIONS = new BooleanRule("notifyPlayersAboutInvasions", false, PSConfigValues.common.notifyPlayersAboutInvasions);
+	public static final BooleanRule ZERO_TICK_DELAY = new BooleanRule("zeroTickDelay", false, PSConfigValues.common.zeroTickDelay);
 
+	public static final IntegerRule INVASION_START_DELAY = new IntegerRule("invasionStartDelay", false, PSConfigValues.common.invasionStartDelay);
 	public static final IntegerRule PRIMARY_INVASION_MOB_CAP = new IntegerRule("primaryInvasionMobCap", false, PSConfigValues.common.primaryInvasionMobCap);
 	public static final IntegerRule SECONDARY_INVASION_MOB_CAP = new IntegerRule("secondaryInvasionMobCap", false, PSConfigValues.common.secondaryInvasionMobCap);
+	public static final IntegerRule MOB_KILL_LIMIT = new IntegerRule("mobKillLimit", false, PSConfigValues.common.mobKillLimit);
+	public static final IntegerRule MOB_SPAWN_CHUNK_RADIUS = new IntegerRule("mobSpawnChunkRadius", false, PSConfigValues.common.mobSpawnChunkRadius);
 
 	public static final void registerGameRules() {
 		final GameRules.Category category = GameRules.Category.valueOf("PURE_SUFFERING");
 		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.register(category);
 	}
 
-	public static final PSGameRule<?> fromString(final String nameIn) {
+	public static final PSGameRule<?> fromString(final String pName) {
 		for (final PSGameRule<?> gameRule : GAME_RULES)
-			if (gameRule.name.equals(nameIn)) return gameRule;
+			if (gameRule.name.equals(pName)) return gameRule;
 		return null;
 	}
 
-	public static final void syncToConfig(final MinecraftServer serverIn) {
-		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.syncToConfig(serverIn);
+	public static final void syncToConfig(final MinecraftServer pServer) {
+		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.syncToConfig(pServer);
 	}
 
-	public static final void syncToServer(final ServerPlayer playerIn) {
-		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.syncToServer(playerIn);
+	public static final void syncToServer(final ServerPlayer pPlayer) {
+		for (final PSGameRule<?> gameRule : GAME_RULES) gameRule.syncToServer(pPlayer);
 	}
 
 	public static abstract class PSGameRule<T extends GameRules.Value<T>> {
@@ -59,35 +63,35 @@ public final class PSGameRules {
 		private final boolean updatesClient;
 		protected GameRules.Key<T> key;
 
-		private PSGameRule(final String nameIn, final GameRules.Type<T> typeIn, final BiConsumer<MinecraftServer, PSGameRule<T>> resyncToConfigIn, final BiConsumer<ServerPlayer, PSGameRule<T>> resyncToServerIn, final boolean updatesClientIn) {
-			this.name = nameIn;
-			this.type = typeIn;
-			this.resyncToConfig = resyncToConfigIn;
-			this.resyncToServer = resyncToServerIn;
-			this.updatesClient = updatesClientIn;
+		private PSGameRule(final String pName, final GameRules.Type<T> pType, final BiConsumer<MinecraftServer, PSGameRule<T>> pResyncToConfig, final BiConsumer<ServerPlayer, PSGameRule<T>> pResyncToServer, final boolean pUpdatesClient) {
+			this.name = pName;
+			this.type = pType;
+			this.resyncToConfig = pResyncToConfig;
+			this.resyncToServer = pResyncToServer;
+			this.updatesClient = pUpdatesClient;
 			GAME_RULES.add(this);
 		}
 
-		public final T getRule(final GameRules gameRulesIn) {
-			return gameRulesIn.getRule(this.key);
+		public final T getRule(final GameRules pGameRules) {
+			return pGameRules.getRule(this.key);
 		}
 
-		public final void register(final GameRules.Category categoryIn) {
-			this.key = GameRules.register(PureSufferingMod.MODID + ":" + this.name, categoryIn, this.type);
+		public final void register(final GameRules.Category pCategory) {
+			this.key = GameRules.register(PureSufferingMod.MODID + ":" + this.name, pCategory, this.type);
 		}
 
-		public final void syncToConfig(final MinecraftServer serverIn) {
-			this.resyncToConfig.accept(serverIn, this);
+		public final void syncToConfig(final MinecraftServer pServer) {
+			this.resyncToConfig.accept(pServer, this);
 		}
 
-		public final void syncToServer(final ServerPlayer playerIn) {
+		public final void syncToServer(final ServerPlayer pPlayer) {
 			if (this.updatesClient)
-				this.resyncToServer.accept(playerIn, this);
+				this.resyncToServer.accept(pPlayer, this);
 		}
 
 		@Override
-		public final boolean equals(final Object objIn) {
-			return this.name.equals(objIn);
+		public final boolean equals(final Object pObj) {
+			return this.name.equals(pObj);
 		}
 
 		@Override
@@ -99,34 +103,34 @@ public final class PSGameRules {
 	public static final class BooleanRule extends PSGameRule<GameRules.BooleanValue> {
 		private final boolean defaultValue;
 
-		private BooleanRule(final String nameIn, final boolean updatesClientIn, final boolean valueIn) {
-			super(nameIn, updatesClientIn ? GameRules.BooleanValue.create(valueIn, (server, value) -> {
-				PSPacketHandler.sendToAllClients(new UpdateGameRulePacket(fromString(nameIn), value.get()));
-			}) : GameRules.BooleanValue.create(valueIn), (server, gameRule) -> gameRule.getRule(server.getGameRules()).set(valueIn, server), (player, gameRule) -> {
-				PSPacketHandler.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
-			}, updatesClientIn);
-			this.defaultValue = valueIn;
+		private BooleanRule(final String pName, final boolean pUpdatesClient, final boolean pValue) {
+			super(pName, pUpdatesClient ? GameRules.BooleanValue.create(pValue, (server, value) -> {
+				PSPackets.sendToAllClients(new UpdateGameRulePacket(fromString(pName), value.get()));
+			}) : GameRules.BooleanValue.create(pValue), (server, gameRule) -> gameRule.getRule(server.getGameRules()).set(pValue, server), (player, gameRule) -> {
+				PSPackets.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
+			}, pUpdatesClient);
+			this.defaultValue = pValue;
 		}
 
-		public final boolean get(final Level levelIn) {
-			return PSConfigValues.common.overrideGameRules ? this.defaultValue : levelIn.getGameRules().getBoolean(this.key);
+		public final boolean get(final Level pLevel) {
+			return PSConfigValues.common.overrideGameRules ? this.defaultValue : pLevel.getGameRules().getBoolean(this.key);
 		}
 	}
 
 	public static final class IntegerRule extends PSGameRule<GameRules.IntegerValue> {
 		private final int defaultValue;
 
-		private IntegerRule(final String nameIn, final boolean updatesClientIn, final int valueIn) {
-			super(nameIn, updatesClientIn ? GameRules.IntegerValue.create(valueIn, (server, value) -> {
-				PSPacketHandler.sendToAllClients(new UpdateGameRulePacket(fromString(nameIn), value.get()));
-			}) : GameRules.IntegerValue.create(valueIn), (server, gameRule) -> gameRule.getRule(server.getGameRules()).set(valueIn, server), (player, gameRule) -> {
-				PSPacketHandler.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
-			}, updatesClientIn);
-			this.defaultValue = valueIn;
+		private IntegerRule(final String pName, final boolean pUpdatesClient, final int pValue) {
+			super(pName, pUpdatesClient ? GameRules.IntegerValue.create(pValue, (server, value) -> {
+				PSPackets.sendToAllClients(new UpdateGameRulePacket(fromString(pName), value.get()));
+			}) : GameRules.IntegerValue.create(pValue), (server, gameRule) -> gameRule.getRule(server.getGameRules()).set(pValue, server), (player, gameRule) -> {
+				PSPackets.sendToClient(new UpdateGameRulePacket(gameRule, gameRule.getRule(player.server.getGameRules()).get()), player);
+			}, pUpdatesClient);
+			this.defaultValue = pValue;
 		}
 
-		public final int get(final Level levelIn) {
-			return PSConfigValues.common.overrideGameRules ? this.defaultValue : levelIn.getGameRules().getInt(this.key);
+		public final int get(final Level pLevel) {
+			return PSConfigValues.common.overrideGameRules ? this.defaultValue : pLevel.getGameRules().getInt(this.key);
 		}
 	}
 }

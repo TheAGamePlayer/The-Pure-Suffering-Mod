@@ -12,8 +12,8 @@ import net.minecraft.commands.Commands;
 import net.minecraftforge.event.RegisterCommandsEvent;
 
 public final class PSCommands {
-	public static final void registerCommands(final RegisterCommandsEvent eventIn) {
-		eventIn.getDispatcher().register(Commands.literal(PureSufferingMod.MODID)
+	public static final void registerCommands(final RegisterCommandsEvent pEvent) {
+		pEvent.getDispatcher().register(Commands.literal(PureSufferingMod.MODID)
 				.then(ClearInvasionsCommand.register())
 				.then(AddInvasionsCommand.register())
 				.then(RemoveInvasionsCommand.register())

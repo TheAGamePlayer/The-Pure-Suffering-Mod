@@ -3,6 +3,7 @@ buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        maven { url = 'https://maven.blamejared.com' }
         mavenCentral()
     }
     dependencies {
@@ -65,11 +66,17 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 mixin {
     add sourceSets.main, "puresuffering.refmap.json"
 }
-//Mod Repositories - None Atm
+//Mod Repositories
+repositories {
+	maven { //Game Stages
+		url 'https://maven.blamejared.com'
+	}
+}
 //Mod Dependencies
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:' + "${mixin_version}" + ':processor'
+    compileOnly fg.deobf("net.darkhax.gamestages:GameStages-Forge-1.20.1:15.0.2")
 }
 //Mod Jar
 tasks.named('jar', Jar).configure {

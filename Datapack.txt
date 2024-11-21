@@ -25,6 +25,8 @@ Rarity: (Integer 0+)
 - How rare your invasion is, higher numbers are more rare.
 Tier: (Integer 0+)
 - The Tier of your invasion, increased numbers occurring after so many difficulty bumps.
+GameStages: (Optional - String Array - 1.20.1 Only)
+- GameStages required to unlock the invasion.
 StopConversions: (Optional - Boolean)
 - Will determine if invasion mobs will be unable to convert into another hostile mob.
 InvasionTime: (String)
@@ -118,6 +120,14 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - Green color offset to the default fog color (Float -1.0 - 1.0).
         - Blue color offset to the default fog color (Float -1.0 - 1.0).
     }
+    StartCommands: { (StringList)
+        - Commands that execute at the start of an invasion.
+        - Example "/time add 1000".
+    }
+    EndCommands: { (StringList)
+        - Commands that execute at the end of an invasion.
+        - Example "/time add 1000".
+    }
     MobSpawnList: (List of mobs spawned by the invasion) {
         EntityType: (ResourceLocation-String)
         - ID of the mob for this spawn entry
@@ -128,10 +138,56 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - Least amount of mobs that can spawn in a group.
         MaxCount: (Integer)
         - Most amount of mobs that can spawn in a group.
-        IgnoreSpawnerRules: (Optional - Boolean)
+        IgnoreSpawnRules: (Optional - Boolean)
         - If true, this entity will use default mob spawning rules instead of it's specialized rules.
         ForceDespawn: (Optional - Boolean)
         - If true. this entity will be forced to despawn at the end of an invasion.
+        AcceptableBiomes: (Optional - List of biome ids or biome tags, use a '#' to specify a biome tag)
+        - What biomes this mob can spawn in when this invasion occurs, keeping this empty will result in all biomes being acceptable.
+        - Example "minecraft:plains" to specify a biome or "#minecraft:is_overworld" to specify a tag
+        NBTTags: { (Optional - NBTList)
+            - This applies to the mob's vanilla entity data.
+            - Entity data is only applied once when the mob initially spawns.
+            - Can only override existing values, cannot create new ones.
+            Id: (Integer)
+            - Type number depending on type of tag
+            - BOOLEAN = 0
+            - BYTE = 1
+            - SHORT = 2
+            - INT = 3
+            - LONG = 4
+            - FLOAT = 5
+            - DOUBLE = 6
+            - STRING = 7
+            - BYTE_ARRAY = 8
+            - INT_ARRAY = 9
+            - LONG_ARRAY = 10
+            Name: (String)
+            - Name of the tag
+            Value: (Depends on Id)
+            - Type value associated with the tag's type/id number
+        }
+        PersistentTags: { (Optional - NBTList)
+            - This applies to the mob's persistent data not vanilla entity data.
+            - Can override existing values or create new ones.
+            Id: (Integer)
+            - Type number depending on type of tag
+            - BOOLEAN = 0
+            - BYTE = 1
+            - SHORT = 2
+            - INT = 3
+            - LONG = 4
+            - FLOAT = 5
+            - DOUBLE = 6
+            - STRING = 7
+            - BYTE_ARRAY = 8
+            - INT_ARRAY = 9
+            - LONG_ARRAY = 10
+            Name: (String)
+            - Name of the tag
+            Value: (Depends on Id)
+            - Type value associated with the tag's type/id number
+        }
     }
     AdditionalEntitiesList: (List of Entities to spawn that aren't mobs) {
         EntityType: (ResourceLocation-String)
@@ -162,6 +218,9 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
     ClusterSize: (Optional - Integer 1+)
     - The amount of mobs spawn in a cluster per chunk picked by the invasion.
     - Defaults to 1.
+    MobKillLimit: (Optional - Integer 0+)
+    - The amount of mobs a player needs to kill before the invasion is ended.
+    - By setting it to 0 it will default to turning the feature off.
 }
 Dimensions: (List of Strings)
 - The Ids of every dimension this invasion can occur in.

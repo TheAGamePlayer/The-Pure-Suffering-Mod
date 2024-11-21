@@ -145,20 +145,20 @@ public final class RemoveInvasionsCommand {
 		}))));
 	}
 
-	private static final <ITH extends InvasionTypeHolder> boolean contains(final Iterable<ITH> sessionTypeIn, final InvasionType invasionTypeIn) {
-		for (final ITH invasion : sessionTypeIn) {
-			if (invasion.getType() == invasionTypeIn) return true;
+	private static final <ITH extends InvasionTypeHolder> boolean contains(final Iterable<ITH> pSessionType, final InvasionType pInvasionType) {
+		for (final ITH invasion : pSessionType) {
+			if (invasion.getType() == pInvasionType) return true;
 		}
 		return false;
 	}
 
-	private static final <ITH extends InvasionTypeHolder> ITH getInvasion(final Iterable<ITH> sessionTypeIn, final CommandContext<CommandSourceStack> ctxIn, final String argIn) throws CommandSyntaxException {
-		final ResourceLocation resourceLocation = ctxIn.getArgument(argIn, ResourceLocation.class);
+	private static final <ITH extends InvasionTypeHolder> ITH getInvasion(final Iterable<ITH> pSessionType, final CommandContext<CommandSourceStack> pCtx, final String pArg) throws CommandSyntaxException {
+		final ResourceLocation resourceLocation = pCtx.getArgument(pArg, ResourceLocation.class);
 		final InvasionType invasionType = PSReloadListeners.getInvasionTypeManager().getInvasionType(resourceLocation);
 		if (invasionType == null) {
 			throw ERROR_UNKNOWN_INVASION_TYPE.create(resourceLocation);
 		} else {
-			for (final ITH invasion : sessionTypeIn) {
+			for (final ITH invasion : pSessionType) {
 				if (invasion.getType() == invasionType)
 					return invasion;
 			}

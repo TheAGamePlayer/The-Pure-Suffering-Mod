@@ -111,45 +111,45 @@ public final class AddInvasionsCommand {
 				.then(Commands.literal("random").executes(ctx -> addRandomInvasion(ctx))));
 	}
 
-	private static final ArgumentBuilder<CommandSourceStack, ?> literalPrimary(final String nameIn, final boolean isPrimaryIn) {
-		final ArgumentBuilder<CommandSourceStack, ?> main = Commands.literal(nameIn);
-		return isPrimaryIn ?  main.then(Commands.argument("difficulty", InvasionDifficultyArgument.difficulty()).suggests(SUGGEST_INVASION_DIFFICULTIES).then(literalDifficulty(true))) : main.then(literalDifficulty(false));
+	private static final ArgumentBuilder<CommandSourceStack, ?> literalPrimary(final String pName, final boolean pIsPrimary) {
+		final ArgumentBuilder<CommandSourceStack, ?> main = Commands.literal(pName);
+		return pIsPrimary ?  main.then(Commands.argument("difficulty", InvasionDifficultyArgument.difficulty()).suggests(SUGGEST_INVASION_DIFFICULTIES).then(literalDifficulty(true))) : main.then(literalDifficulty(false));
 	}
 
-	private static final ArgumentBuilder<CommandSourceStack, ?> literalDifficulty(final boolean isPrimaryIn) {
-		return Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(isPrimaryIn ? SUGGEST_PRIMARY_INVASION_TYPES : SUGGEST_SECONDARY_INVASION_TYPES)
-				.then(Commands.argument("severityMethod", InvasionMethodArgument.method()).suggests(isPrimaryIn ? SUGGEST_PRIMARY_INVASION_METHODS : SUGGEST_SECONDARY_INVASION_METHODS)
-						.then(Commands.argument("severity", IntegerArgumentType.integer(1)).suggests(SUGGEST_SEVERITY).executes(ctx -> addInvasion(ctx, true, isPrimaryIn))).executes(ctx -> addInvasion(ctx, false, isPrimaryIn)));
+	private static final ArgumentBuilder<CommandSourceStack, ?> literalDifficulty(final boolean pIsPrimary) {
+		return Commands.argument("invasionType", ResourceLocationArgument.id()).suggests(pIsPrimary ? SUGGEST_PRIMARY_INVASION_TYPES : SUGGEST_SECONDARY_INVASION_TYPES)
+				.then(Commands.argument("severityMethod", InvasionMethodArgument.method()).suggests(pIsPrimary ? SUGGEST_PRIMARY_INVASION_METHODS : SUGGEST_SECONDARY_INVASION_METHODS)
+						.then(Commands.argument("severity", IntegerArgumentType.integer(1)).suggests(SUGGEST_SEVERITY).executes(ctx -> addInvasion(ctx, true, pIsPrimary))).executes(ctx -> addInvasion(ctx, false, pIsPrimary)));
 	}
 
-	private static final int addInvasion(final CommandContext<CommandSourceStack> ctxIn, final boolean setSeverityIn, final boolean isPrimaryIn) throws CommandSyntaxException {
-		final ResourceLocation resourceLocation = ctxIn.getArgument("invasionType", ResourceLocation.class);
+	private static final int addInvasion(final CommandContext<CommandSourceStack> pCtx, final boolean pSetSeverity, final boolean pIsPrimary) throws CommandSyntaxException {
+		final ResourceLocation resourceLocation = pCtx.getArgument("invasionType", ResourceLocation.class);
 		final InvasionType invasionType = PSReloadListeners.getInvasionTypeManager().getInvasionType(resourceLocation);
 		if (invasionType == null) {
 			throw ERROR_UNKNOWN_INVASION_TYPE.create(resourceLocation);
 		} else {
-			final ServerLevel level = ctxIn.getSource().getLevel();
-			final InvasionSessionType sessionType = ctxIn.getArgument("sessionType", InvasionSessionType.class);
+			final ServerLevel level = pCtx.getSource().getLevel();
+			final InvasionSessionType sessionType = pCtx.getArgument("sessionType", InvasionSessionType.class);
 			if ((level.dimensionType().hasFixedTime() && sessionType != InvasionSessionType.FIXED) || (!level.dimensionType().hasFixedTime() && sessionType == InvasionSessionType.FIXED)) throw ERROR_INVALID_SESSION_TYPE.create();
-			final InvasionMethod method = ctxIn.getArgument("severityMethod", InvasionMethod.class);
-			if (setSeverityIn && method != InvasionMethod.SET) throw ERROR_INVALID_METHOD_1.create(method);
-			if (!setSeverityIn && method == InvasionMethod.SET) throw ERROR_INVALID_METHOD_2.create();
-			if (isPrimaryIn && !getPrimaryInvasionTypes(level, sessionType).toList().contains(resourceLocation)) throw ERROR_INVALID_INVASION_TYPE.create(invasionType.getComponent().getString());
-			final QueuedInvasionList queuedList = isPrimaryIn ? InvasionLevelData.get(level).getInvasionManager().setQueued(sessionType, ctxIn.getArgument("difficulty", InvasionDifficulty.class)) : InvasionLevelData.get(level).getInvasionManager().getQueued(sessionType);
-			if (!isPrimaryIn && !getSecondaryInvasionTypes(level, sessionType, queuedList).toList().contains(resourceLocation)) throw ERROR_INVALID_INVASION_TYPE.create(invasionType.getComponent().getString());
+			final InvasionMethod method = pCtx.getArgument("severityMethod", InvasionMethod.class);
+			if (pSetSeverity && method != InvasionMethod.SET) throw ERROR_INVALID_METHOD_1.create(method);
+			if (!pSetSeverity && method == InvasionMethod.SET) throw ERROR_INVALID_METHOD_2.create();
+			if (pIsPrimary && !getPrimaryInvasionTypes(level, sessionType).toList().contains(resourceLocation)) throw ERROR_INVALID_INVASION_TYPE.create(invasionType.getComponent().getString());
+			final QueuedInvasionList queuedList = pIsPrimary ? InvasionLevelData.get(level).getInvasionManager().setQueued(sessionType, pCtx.getArgument("difficulty", InvasionDifficulty.class)) : InvasionLevelData.get(level).getInvasionManager().getQueued(sessionType);
+			if (!pIsPrimary && !getSecondaryInvasionTypes(level, sessionType, queuedList).toList().contains(resourceLocation)) throw ERROR_INVALID_INVASION_TYPE.create(invasionType.getComponent().getString());
 			final InvasionDifficulty difficulty = queuedList.getDifficulty();
-			if (isPrimaryIn && !difficulty.isAllowed(level)) throw ERROR_INVALID_DIFFICULTY.create(difficulty.getTranslation());
-			final int severity = method == InvasionMethod.RANDOM ? level.random.nextInt(invasionType.getMaxSeverity()) : Mth.clamp(method == InvasionMethod.MAX ? invasionType.getMaxSeverity() : IntegerArgumentType.getInteger(ctxIn, "severity"), 1, invasionType.getMaxSeverity()) - 1;
-			final BuildInfo invasion = new BuildInfo(invasionType, difficulty.isHyper() ? invasionType.getMaxSeverity() - 1 : severity, isPrimaryIn);
+			if (pIsPrimary && !difficulty.isAllowed(level)) throw ERROR_INVALID_DIFFICULTY.create(difficulty.getTranslation());
+			final int severity = method == InvasionMethod.RANDOM ? level.random.nextInt(invasionType.getMaxSeverity()) : Mth.clamp(method == InvasionMethod.MAX ? invasionType.getMaxSeverity() : IntegerArgumentType.getInteger(pCtx, "severity"), 1, invasionType.getMaxSeverity()) - 1;
+			final BuildInfo invasion = new BuildInfo(invasionType, difficulty.isHyper() ? invasionType.getMaxSeverity() - 1 : severity, pIsPrimary);
 			queuedList.add(invasion);
-			ctxIn.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success." + (isPrimaryIn ? "primary" : "secondary"), difficulty.isHyper() ? difficulty.getTranslation() + " " : "", sessionType.getTranslation(), invasionType.getComponent()).withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+			pCtx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success." + (pIsPrimary ? "primary" : "secondary"), difficulty.isHyper() ? difficulty.getTranslation() + " " : "", sessionType.getTranslation(), invasionType.getComponent()).withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 			return 0;
 		}
 	}
 
-	private static final int addRandomInvasion(final CommandContext<CommandSourceStack> ctxIn) throws CommandSyntaxException {
-		final InvasionSessionType sessionType = ctxIn.getArgument("sessionType", InvasionSessionType.class);
-		final ServerLevel level = ctxIn.getSource().getLevel();
+	private static final int addRandomInvasion(final CommandContext<CommandSourceStack> pCtx) throws CommandSyntaxException {
+		final InvasionSessionType sessionType = pCtx.getArgument("sessionType", InvasionSessionType.class);
+		final ServerLevel level = pCtx.getSource().getLevel();
 		final QueuedInvasionList queuedList = InvasionLevelData.get(level).getInvasionManager().getQueued(sessionType);
 		final boolean isPrimary = queuedList == null || queuedList.isEmpty();
 		final List<InvasionType> list = PSReloadListeners.getInvasionTypeManager().getAllInvasionTypes().filter(it -> {
@@ -167,12 +167,12 @@ public final class AddInvasionsCommand {
 		if (isPrimary) { //Primary
 			int total = 0;
 			final int[] ranges = new int[InvasionDifficulty.values().length];
-			for (int i = 0; i < ranges.length; i++) {
+			for (int i = 0; i < ranges.length; ++i) {
 				total += InvasionDifficulty.values().length - i;
 				ranges[i] = total;
 			}
 			final int value = random.nextInt(total) + 1;
-			for (int i = ranges.length - 1; i > -1; i--) {
+			for (int i = ranges.length - 1; i > -1; --i) {
 				final int range = ranges[i];
 				if (value >= range) {
 					difficulty[0] = InvasionDifficulty.values()[i];
@@ -188,12 +188,12 @@ public final class AddInvasionsCommand {
 			final BuildInfo invasion = new BuildInfo(invasionType, severity, false);
 			queuedList.add(invasion);
 		}
-		ctxIn.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success." + (isPrimary ? "primary" : "secondary"), difficulty[0].isHyper() ? difficulty[0].getTranslation() + " " : "", sessionType.getTranslation(), invasionType.getComponent()).withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
+		pCtx.getSource().sendSuccess(() -> Component.translatable("commands.puresuffering.add.success." + (isPrimary ? "primary" : "secondary"), difficulty[0].isHyper() ? difficulty[0].getTranslation() + " " : "", sessionType.getTranslation(), invasionType.getComponent()).withStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)), true);
 		return 0;
 	}
 
-	private static final boolean containsDayChangingInvasion(final QueuedInvasionList queuedListIn) {
-		for (final BuildInfo invasion : queuedListIn) {
+	private static final boolean containsDayChangingInvasion(final QueuedInvasionList pQueuedList) {
+		for (final BuildInfo invasion : pQueuedList) {
 			final InvasionType it = invasion.getType();
 			if (it.getInvasionTime() != InvasionTime.NIGHT && it.getTimeModifier() == TimeModifier.DAY_TO_NIGHT)
 				return true;
@@ -201,8 +201,8 @@ public final class AddInvasionsCommand {
 		return false;
 	}
 
-	private static final boolean containsNightChangingInvasion(final QueuedInvasionList queuedListIn) {
-		for (final BuildInfo invasion : queuedListIn) {
+	private static final boolean containsNightChangingInvasion(final QueuedInvasionList pQueuedList) {
+		for (final BuildInfo invasion : pQueuedList) {
 			final InvasionType it = invasion.getType();
 			if (it.getInvasionTime() != InvasionTime.DAY && it.getTimeModifier() == TimeModifier.NIGHT_TO_DAY)
 				return true;
@@ -210,19 +210,19 @@ public final class AddInvasionsCommand {
 		return false;
 	}
 	
-	private static final Stream<ResourceLocation> getPrimaryInvasionTypes(final ServerLevel levelIn, final InvasionSessionType sessionTypeIn) {
+	private static final Stream<ResourceLocation> getPrimaryInvasionTypes(final ServerLevel pLevel, final InvasionSessionType pSessionType) {
 		return PSReloadListeners.getInvasionTypeManager().getAllInvasionTypes().filter(it -> {
-			final boolean flag = it.getDimensions().contains(levelIn.dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY;
-			return sessionTypeIn.isAcceptableTime(it, false) && flag;
+			final boolean flag = it.getDimensions().contains(pLevel.dimension().location()) && it.getInvasionPriority() != InvasionPriority.SECONDARY_ONLY;
+			return pSessionType.isAcceptableTime(it, false) && flag;
 		}).map(InvasionType::getId);
 	}
 	
-	private static final Stream<ResourceLocation> getSecondaryInvasionTypes(final ServerLevel levelIn, final InvasionSessionType sessionTypeIn, final QueuedInvasionList queuedListIn) {
+	private static final Stream<ResourceLocation> getSecondaryInvasionTypes(final ServerLevel pLevel, final InvasionSessionType pSessionType, final QueuedInvasionList pQueuedList) {
 		return PSReloadListeners.getInvasionTypeManager().getAllInvasionTypes().filter(it -> {
-			final boolean flag = it.getDimensions().contains(levelIn.dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY;
-			switch (sessionTypeIn) {
-			case DAY: return sessionTypeIn.isAcceptableTime(it, containsDayChangingInvasion(queuedListIn)) && flag && (!containsDayChangingInvasion(queuedListIn) || sessionTypeIn.canBeChanged(it));
-			case NIGHT: return sessionTypeIn.isAcceptableTime(it, containsNightChangingInvasion(queuedListIn)) && flag && (!containsNightChangingInvasion(queuedListIn) || sessionTypeIn.canBeChanged(it));
+			final boolean flag = it.getDimensions().contains(pLevel.dimension().location()) && it.getInvasionPriority() != InvasionPriority.PRIMARY_ONLY;
+			switch (pSessionType) {
+			case DAY: return pSessionType.isAcceptableTime(it, containsDayChangingInvasion(pQueuedList)) && flag && (!containsDayChangingInvasion(pQueuedList) || pSessionType.canBeChanged(it));
+			case NIGHT: return pSessionType.isAcceptableTime(it, containsNightChangingInvasion(pQueuedList)) && flag && (!containsNightChangingInvasion(pQueuedList) || pSessionType.canBeChanged(it));
 			default: return flag;
 			}
 		}).map(InvasionType::getId);

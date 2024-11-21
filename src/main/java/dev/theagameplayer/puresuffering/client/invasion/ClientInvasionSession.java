@@ -16,6 +16,7 @@ import dev.theagameplayer.puresuffering.invasion.InvasionSessionType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -25,6 +26,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 	private final ArrayList<ClientInvasion> invasions = new ArrayList<>();
 	private final InvasionSessionType sessionType;
 	private final InvasionDifficulty difficulty;
+	private final String customStartMessage;
 	private final Style style;
 	private final InvasionSkyRenderer invasionSkyRenderer;
 	private final ClientEffectsRenderer clientEffectsRenderer;
@@ -36,12 +38,13 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 	private int startTime = 40; //Day Time doesn't always sync, so this is necessary
 	private double xpMult;
 
-	public ClientInvasionSession(final InvasionSessionType sessionTypeIn, final InvasionDifficulty difficultyIn) {
-		this.sessionType = sessionTypeIn;
-		this.difficulty = difficultyIn;
-		this.style = Style.EMPTY.withBold(difficultyIn.isHyper()).withItalic(difficultyIn.isNightmare());
-		this.invasionSkyRenderer = new InvasionSkyRenderer(difficultyIn);
-		this.clientEffectsRenderer = new ClientEffectsRenderer(difficultyIn);
+	public ClientInvasionSession(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty, final String pCustomStartMessage) {
+		this.sessionType = pSessionType;
+		this.difficulty = pDifficulty;
+		this.customStartMessage = pCustomStartMessage;
+		this.style = Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare());
+		this.invasionSkyRenderer = new InvasionSkyRenderer(pDifficulty);
+		this.clientEffectsRenderer = new ClientEffectsRenderer(pDifficulty);
 	}
 
 	public final ClientInvasion getPrimary() {
@@ -56,6 +59,10 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		return this.difficulty;
 	}
 	
+	public final MutableComponent getStartMessage(final String pDefaultMessage) {
+		return this.customStartMessage.isBlank() ? Component.translatable(pDefaultMessage) : Component.literal(this.customStartMessage);
+	}
+	
 	public final Style getStyle() {
 		return this.style;
 	}
@@ -68,8 +75,8 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		return this.clientEffectsRenderer;
 	}
 
-	public final List<InvasionSkyRenderInfo> getRenderersOf(final Predicate<InvasionSkyRenderInfo> ofIn) {
-		return this.invasions.stream().map(ClientInvasion::getSkyRenderInfo).filter(ofIn).toList();
+	public final List<InvasionSkyRenderInfo> getRenderersOf(final Predicate<InvasionSkyRenderInfo> pOf) {
+		return this.invasions.stream().map(ClientInvasion::getSkyRenderInfo).filter(pOf).toList();
 	}
 
 	private final void update() {
@@ -77,7 +84,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		this.fogRGB = new float[2][3];
 		this.brightness = new float[2];
 		if (this.difficulty.isNightmare()) {
-			for (int i = 0; i < 3; i++) this.fogRGB[0][i] = -1.0F;
+			for (int i = 0; i < 3; ++i) this.fogRGB[0][i] = -1.0F;
 			this.brightness[0] = 1.0F;
 			this.lightLevel = 15;
 		} else {
@@ -85,7 +92,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 			if (!fogColorRenders.isEmpty()) {
 				for (final InvasionSkyRenderInfo render : fogColorRenders) {
 					final InvasionFogRenderInfo fogRender = render.getFogRenderInfo();
-					for (int i = 0; i < 3; i++) 
+					for (int i = 0; i < 3; ++i) 
 						this.fogRGB[0][i] += fogRender.getRGBOffset(i) / fogColorRenders.size();
 				}
 			}
@@ -106,22 +113,22 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		}
 	}
 
-	public final void tick(final ClientLevel levelIn, final long dayTimeIn) {
-		final RandomSource random = levelIn.getRandom();
-		this.invasions.get((int)(levelIn.getGameTime() % this.invasions.size())).tick(random, dayTimeIn);
-		InvasionMusicManager.tickActive(this.difficulty, random, dayTimeIn);
-		if (PSConfigValues.client.useSkyBoxRenderer) this.invasionSkyRenderer.tick(dayTimeIn);
-		if (PSConfigValues.client.enableSkyEffects) this.clientEffectsRenderer.tick(random, dayTimeIn, this.startTime);
+	public final void tick(final ClientLevel pLevel, final long pDayTime) {
+		final RandomSource random = pLevel.getRandom();
+		this.invasions.get((int)(pLevel.getGameTime() % this.invasions.size())).tick(random, pDayTime);
+		InvasionMusicManager.tickActive(this.difficulty, random, pDayTime);
+		if (PSConfigValues.client.useSkyBoxRenderer) this.invasionSkyRenderer.tick(pDayTime);
+		if (PSConfigValues.client.enableSkyEffects) this.clientEffectsRenderer.tick(random, pDayTime, this.startTime);
 		this.fogRGB[1] = this.fogRGB[0].clone();
 		for (final ClientInvasion invasion : this.invasions)
 			invasion.flickerFogRGB(this.fogRGB[1]);
-		ClientTransitionHandler.getFogColor(this.fogRGB[1], dayTimeIn);
+		ClientTransitionHandler.getFogColor(this.fogRGB[1], pDayTime);
 		this.brightness[1] = this.brightness[0];
 		for (final ClientInvasion invasion : this.invasions)
 			this.brightness[1] = invasion.flickerBrightness(this.brightness[1]);
-		this.brightness[1] = ClientTransitionHandler.getBrightness(this.brightness[1], dayTimeIn);
-		this.darkness = ClientTransitionHandler.getLightTextureDarkness(dayTimeIn);
-		if (this.startTime < 40) this.startTime++;
+		this.brightness[1] = ClientTransitionHandler.getBrightness(this.brightness[1], pDayTime);
+		this.darkness = ClientTransitionHandler.getLightTextureDarkness(pDayTime);
+		if (this.startTime < 40) ++this.startTime;
 	}
 
 	public final float[] getFogRGB() {
@@ -140,8 +147,8 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		return this.darkness;
 	}
 	
-	public final int getLightLevelOrDefault(final int lightLevelIn) {
-		return this.lightLevel > -1 ? this.lightLevel : lightLevelIn;
+	public final int getLightLevelOrDefault(final int pLightLevel) {
+		return this.lightLevel > -1 ? this.lightLevel : pLightLevel;
 	}
 
 	public final int getStartTime() {
@@ -156,35 +163,35 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 		return this.xpMult;
 	}
 
-	public final void setXPMultiplier(final double xpMultIn) {
-		this.xpMult = xpMultIn;
+	public final void setXPMultiplier(final double pXPMult) {
+		this.xpMult = pXPMult;
 	}
 
-	public static final ClientInvasionSession get(final ClientLevel levelIn) {
-		return levelIn == null ? null : CLIENT_SESSIONS.get(levelIn.dimension().location());
+	public static final ClientInvasionSession get(final ClientLevel pLevel) {
+		return pLevel == null ? null : CLIENT_SESSIONS.get(pLevel.dimension().location());
 	}
 
-	public static final void add(final InvasionSessionType sessionTypeIn, final InvasionDifficulty difficultyIn, final InvasionSkyRenderInfo rendererIn, final boolean isPrimaryIn, final int severityIn, final int mobCapIn, final int maxSeverityIn, final int rarityIn, final int tierIn, final Component componentIn) {
+	public static final void add(final InvasionSessionType pSessionType, final InvasionDifficulty pDifficulty, final InvasionSkyRenderInfo pRenderer, final boolean pIsPrimary, final int pSeverity, final int pMobCap, final int pMaxSeverity, final int pRarity, final int pTier, final Component pComponent, final String pCustomStartMessage) {
 		final Minecraft mc = Minecraft.getInstance();
 		final ResourceLocation dimId = mc.level.dimension().location();
-		if (CLIENT_SESSIONS.containsKey(dimId) && !isPrimaryIn) {
+		if (CLIENT_SESSIONS.containsKey(dimId) && !pIsPrimary) {
 			final ClientInvasionSession session = CLIENT_SESSIONS.get(dimId);
-			session.invasions.add(new ClientInvasion(rendererIn, isPrimaryIn, severityIn, mobCapIn, maxSeverityIn, rarityIn, tierIn, componentIn));
+			session.invasions.add(new ClientInvasion(pRenderer, pIsPrimary, pSeverity, pMobCap, pMaxSeverity, pRarity, pTier, pComponent));
 			session.update();
 		} else {
-			final ClientInvasionSession session = new ClientInvasionSession(sessionTypeIn, difficultyIn);
-			session.invasions.add(new ClientInvasion(rendererIn, isPrimaryIn, severityIn, mobCapIn, maxSeverityIn, rarityIn, tierIn, componentIn));
+			final ClientInvasionSession session = new ClientInvasionSession(pSessionType, pDifficulty, pCustomStartMessage);
+			session.invasions.add(new ClientInvasion(pRenderer, pIsPrimary, pSeverity, pMobCap, pMaxSeverity, pRarity, pTier, pComponent));
 			session.update();
 			CLIENT_SESSIONS.put(dimId, session);
 		}
 	}
 
-	public static final void remove(final InvasionSkyRenderInfo rendererIn) {
+	public static final void remove(final InvasionSkyRenderInfo pRenderer) {
 		final Minecraft mc = Minecraft.getInstance();
 		final ResourceLocation dimId = mc.level.dimension().location();
 		final ClientInvasionSession session = CLIENT_SESSIONS.get(dimId);
 		if (session == null) return;
-		session.invasions.removeIf(inv -> inv.getSkyRenderInfo().equals(rendererIn));
+		session.invasions.removeIf(inv -> inv.getSkyRenderInfo().equals(pRenderer));
 		if (session.invasions.isEmpty()) {
 			CLIENT_SESSIONS.remove(dimId);
 			return;

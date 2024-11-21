@@ -11,7 +11,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class PSMobEffects {
-	public static final DeferredRegister<MobEffect> MOB_EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, PureSufferingMod.MODID);
+	public static final DeferredRegister<MobEffect> MOB_EFFECT = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, PureSufferingMod.MODID);
 
-	public static final RegistryObject<BlessingMobEffect> BLESSING = MOB_EFFECTS.register("blessing", () -> new BlessingMobEffect(MobEffectCategory.BENEFICIAL, Color.WHITE.getRGB()));
+	public static final RegistryObject<BlessingMobEffect> BLESSING = MOB_EFFECT.register("blessing", () -> new BlessingMobEffect(MobEffectCategory.BENEFICIAL, Color.WHITE.getRGB()));
 }

@@ -7,11 +7,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class PSActivities {
-	public static final DeferredRegister<Activity> ACTIVITIES = DeferredRegister.create(ForgeRegistries.ACTIVITIES, PureSufferingMod.MODID);
+	public static final DeferredRegister<Activity> ACTIVITY = DeferredRegister.create(ForgeRegistries.ACTIVITIES, PureSufferingMod.MODID);
 
 	public static final RegistryObject<Activity> INVASION = register("invasion");
 	
-	private static final RegistryObject<Activity> register(final String nameIn) {
-		return ACTIVITIES.register(nameIn, () -> new Activity(nameIn));
+	private static final RegistryObject<Activity> register(final String pName) {
+		return ACTIVITY.register(pName, () -> new Activity(pName));
 	}
 }

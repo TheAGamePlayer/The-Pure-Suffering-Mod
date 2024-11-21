@@ -19,16 +19,16 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 
 public final class PSMusicSoundInstance extends SimpleSoundInstance { //For MusicManager
-	public PSMusicSoundInstance(final SoundEvent soundEventIn) {
-		super(soundEventIn.getLocation(), SoundSource.MUSIC, 1.0F, 1.0F, SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
+	public PSMusicSoundInstance(final SoundEvent pSoundEvent) {
+		super(pSoundEvent.getLocation(), SoundSource.MUSIC, 1.0F, 1.0F, SoundInstance.createUnseededRandom(), false, 0, SoundInstance.Attenuation.NONE, 0.0D, 0.0D, 0.0D, true);
 	}
 	
-	public PSMusicSoundInstance(final SoundEvent soundEventIn, final SoundSource sourceIn, final float volumeIn, final float pitchIn, final RandomSource randomIn, final double xIn, final double yIn, final double zIn) {
-		super(soundEventIn, sourceIn, volumeIn, pitchIn, randomIn, xIn, yIn, zIn);
+	public PSMusicSoundInstance(final SoundEvent pSoundEvent, final SoundSource pSource, final float pVolume, final float pPitch, final RandomSource pRandom, final double pX, final double pY, final double pZ) {
+		super(pSoundEvent, pSource, pVolume, pPitch, pRandom, pX, pY, pZ);
 	}
 
 	@Override
-	public final CompletableFuture<AudioStream> getStream(final SoundBufferLibrary soundBuffersIn, final Sound soundIn, final boolean loopingIn) {
+	public final CompletableFuture<AudioStream> getStream(final SoundBufferLibrary pSoundBuffers, final Sound pSound, final boolean pLooping) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				return new OggAudioStream(Files.newInputStream(InvasionMusicManager.getMusic(this.location)));

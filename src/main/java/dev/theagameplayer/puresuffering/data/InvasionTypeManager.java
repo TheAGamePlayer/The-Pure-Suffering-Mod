@@ -21,6 +21,7 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -32,19 +33,21 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	private static final Gson GSON = (new GsonBuilder()).create();
 	private final HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
 	private final Registry<LevelStem> dimensions;
+	private final Registry<Biome> biomes;
 
-	public InvasionTypeManager(final Registry<LevelStem> dimensionsIn) {
+	public InvasionTypeManager(final Registry<LevelStem> pDimension, final Registry<Biome> pBiomes) {
 		super(GSON, "invasion_types");
-		this.dimensions = dimensionsIn;
+		this.dimensions = pDimension;
+		this.biomes = pBiomes;
 	}
 
 	@Override
-	protected final void apply(final Map<ResourceLocation, JsonElement> objectsIn, final ResourceManager resourceManagerIn, final ProfilerFiller profilerIn) {
+	protected final void apply(final Map<ResourceLocation, JsonElement> pObjects, final ResourceManager pResourceManager, final ProfilerFiller pProfiler) {
 		this.invasionTypeMap.clear();
-		for (final Map.Entry<ResourceLocation, JsonElement> entry : objectsIn.entrySet()) {
+		for (final Map.Entry<ResourceLocation, JsonElement> entry : pObjects.entrySet()) {
 			try {
 				final JsonObject jsonObject = GsonHelper.convertToJsonObject(entry.getValue(), "invasion_type");
-				final InvasionType invasionType = InvasionType.Builder.fromJson(this.dimensions, jsonObject).build(entry.getKey());
+				final InvasionType invasionType = InvasionType.Builder.fromJson(this.dimensions, this.biomes, jsonObject).build(entry.getKey());
 				if (invasionType == null) {
 					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met.", entry.getKey());
 					return;
@@ -66,26 +69,26 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 	}
 
 	@Nullable
-	public final InvasionType getInvasionType(final ResourceLocation idIn) {
-		return this.invasionTypeMap.get(idIn);
+	public final InvasionType getInvasionType(final ResourceLocation pId) {
+		return this.invasionTypeMap.get(pId);
 	}
 
 	public final Stream<InvasionType> getAllInvasionTypes() {
 		return this.invasionTypeMap.values().stream();
 	}
 
-	public final ArrayList<InvasionType> getInvasionTypesOf(final Predicate<InvasionType> ofIn) {
+	public final ArrayList<InvasionType> getInvasionTypesOf(final Predicate<InvasionType> pOf) {
 		final ArrayList<InvasionType> invasionList = new ArrayList<>();
 		for (final InvasionType invasionType : this.invasionTypeMap.values()) {
-			if (ofIn.test(invasionType))
+			if (pOf.test(invasionType))
 				invasionList.add(invasionType);
 		}
 		return invasionList;
 	}
 
-	public final boolean verifyInvasion(final String idIn) {
+	public final boolean verifyInvasion(final String pId) {
 		for (final ResourceLocation id : this.invasionTypeMap.keySet()) {
-			if (id.toString().equals(idIn))
+			if (id.toString().equals(pId))
 				return true;
 		}
 		return false;

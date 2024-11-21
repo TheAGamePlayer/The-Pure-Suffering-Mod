@@ -2,7 +2,7 @@
 	"block.minecraft.bed.invasion": "A strange force keeps you from sleeping...",
 
 	"effect.puresuffering.blessing": "Blessing",
-	
+
 	"commands.puresuffering.session_type.invalid": "[PureSuffering] Invasion Session Type is invalid for this dimension!",
 	"commands.puresuffering.invasion_difficulty.invalid": "[PureSuffering] Invasion Difficulty %s is not enabled!",
 	"commands.puresuffering.invasion_type.invasionTypeNotFound": "[PureSuffering] No Invasion Type was found by the name '%1$s'",
@@ -61,16 +61,26 @@
 	"gamerule.puresuffering:weakenedInvasionVexes.description": "Determines vexes in invasions have a limited lifespan.",
 	"gamerule.puresuffering:enableInvasionAmbience": "Enable Invasion Ambience",
 	"gamerule.puresuffering:enableInvasionAmbience.description": "Determines if invasion ambience sounds should occur.",
-	
+	"gamerule.puresuffering:notifyPlayersAboutInvasions": "Notify Players About Invasions",
+	"gamerule.puresuffering:notifyPlayersAboutInvasions.description": "Determines if players be notified when invasions start.",
+	"gamerule.puresuffering:zeroTickDelay": "Zero Tick Delay",
+	"gamerule.puresuffering:zeroTickDelay.description": "Determines if invasions should have zero tick delay.",
+
+	"gamerule.puresuffering:invasionStartDelay": "Invasion Start Delay",
+	"gamerule.puresuffering:invasionStartDelay.description": "The amount of days before an invasion can start.",
 	"gamerule.puresuffering:primaryInvasionMobCap": "Primary Invasion Mob Cap",
 	"gamerule.puresuffering:primaryInvasionMobCap.description": "The max amount of mobs that can spawn from Primary Invasions at once.",
 	"gamerule.puresuffering:secondaryInvasionMobCap": "Secondary Invasion Mob Cap",
 	"gamerule.puresuffering:secondaryInvasionMobCap.description": "The max amount of mobs that can spawn from Secondary Invasions at once.",
+	"gamerule.puresuffering:mobKillLimit": "Mob Kill Limit",
+	"gamerule.puresuffering:mobKillLimit.description": "The mob kill limit for the invasion that would cause it to end after the player kills so many mobs from that invasion.",
+	"gamerule.puresuffering:mobSpawnChunkRadius": "Mob Spawn Chunk Radius",
+	"gamerule.puresuffering:mobSpawnChunkRadius.description": "Maximum amount of chunks an invasion mob can spawn away from the player (1 Min, 8 Max).",
 
 	"puresuffering.invasionDifficulty.default": "Default",
 	"puresuffering.invasionDifficulty.hyper": "Hyper",
 	"puresuffering.invasionDifficulty.nightmare": "Nightmare",
-	
+
 	"puresuffering.invasionSessionType.day": "Day",
 	"puresuffering.invasionSessionType.night": "Night",
 	"puresuffering.invasionSessionType.fixed": "Fixed",
@@ -110,9 +120,9 @@
 	"invasion.puresuffering.wither": "Wither",
 	"invasion.puresuffering.end_game": "End Game",
 	"invasion.puresuffering.end_pest": "Pest",
-	
+
 	"puresuffering.toast.music": "Playing Invasion Music: ",
-	
+
 	"puresuffering.subtitle.default_invasion_start": "Default Invasion Start",
 	"puresuffering.subtitle.hyper_invasion_start": "Hyper Invasion Start",
 	"puresuffering.subtitle.nightmare_invasion_start": "Nightmare Invasion Start",
@@ -120,7 +130,15 @@
 	"puresuffering.subtitle.inform_invasion": "Inform Invasion",
 	"puresuffering.subtitle.music": "Invasion Music",
 	"puresuffering.subtitle.invasion_ambience": "Invasion Ambience",
-	
+
+	"puresuffering.configuration.game_rules": "Game Rules",
+	"puresuffering.configuration.game_rules_boolean": "Boolean",
+	"puresuffering.configuration.game_rules_integer": "Integer",
+	"puresuffering.configuration.invasions": "Invasions",
+	"puresuffering.configuration.text": "Text",
+	"puresuffering.configuration.rendering": "Rendering",
+	"puresuffering.configuration.sound": "Sound",
+
 	"puresuffering.config.override_game_rules": "Override Game Rules",
 	"puresuffering.config.enable_hyper_invasions": "Enable Hyper Invasions",
 	"puresuffering.config.enable_nightmare_invasions": "Enable Nightmare Invasions",
@@ -134,10 +152,15 @@
 	"puresuffering.config.mobs_die_at_end_of_invasions": "Mobs Die at End of Invasions",
 	"puresuffering.config.weakened_invasion_vexes": "Weakened Invasion Vexes",
 	"puresuffering.config.enable_invasion_ambience": "Enable Invasion Ambience",
-	
+	"puresuffering.config.notify_players_about_invasions": "Notify Players About Invasions",
+	"puresuffering.config.zero_tick_delay": "Zero Tick Delay",
+
+	"puresuffering.config.invasion_start_delay": "Invasion Start Delay",
 	"puresuffering.config.primary_invasion_mob_cap": "Primary Invasion Mob Cap",
 	"puresuffering.config.secondary_invasion_mob_cap": "Secondary Invasion Mob Cap",
-	
+	"puresuffering.config.mob_kill_limit": "Mob Kill Limit",
+	"puresuffering.config.mob_spawn_chunk_radius": "Mob Spawn Chunk Radius",
+
 	"puresuffering.config.invasion_blacklist": "Invasion Blacklist",
 	"puresuffering.config.primary_whitelist": "Primary Whitelist",
 	"puresuffering.config.overworld_like_dimensions": "Overworld-Like Dimensions",
@@ -151,7 +174,12 @@
 	"puresuffering.config.hyper_charge_chance": "Hyper Charge Chance",
 	"puresuffering.config.blessing_effect_respawn_duration": "Blessing Effect Respawn Duration",
 	"puresuffering.config.blessing_effect_dimension_change_duration": "Blessing Effect Dimension Change Duration",
-	
+
+	"puresuffering.config.default_invasion_start_message": "Default Invasion Start Message",
+	"puresuffering.config.hyper_invasion_start_message": "Hyper Invasion Start Message",
+	"puresuffering.config.nightmare_invasion_start_message": "Nightmare Invasion Start Message",
+	"puresuffering.config.cancel_invasion_start_message": "Cancel Invasion Start Message",
+
 	"puresuffering.config.use_sky_box_renderer": "Use Sky Box Renderer",
 	"puresuffering.config.can_invasions_change_brightness": "Can Invasions Change Brightness",
 	"puresuffering.config.enable_invasion_start_effects": "Enable Invasion Start Effects",
@@ -161,9 +189,9 @@
 	"puresuffering.config.min_vortex_particle_lifespan": "Min Vortex Particle Lifespan",
 	"puresuffering.config.max_vortex_particles_lifespan": "Max Vortex Particle Lifespan",
 	"puresuffering.config.vortex_particle_delay": "Vortex Particle Delay",
-	
+
 	"puresuffering.config.use_invasion_sound_effects": "Use Invasion Sound Effects",
-	
+
 	"puresuffering.config.day_invasion_rarity": "Day Invasion Rarity",
 	"puresuffering.config.night_invasion_rarity": "Night Invasion Rarity",
 	"puresuffering.config.fixed_invasion_rarity": "Fixed Invasion Rarity",

@@ -27,16 +27,16 @@ public final class InvasionSessionTypeArgument implements ArgumentType<InvasionS
 	}
 
 	@Override
-	public final InvasionSessionType parse(final StringReader readerIn) throws CommandSyntaxException {
-		final String name = readerIn.readUnquotedString();
+	public final InvasionSessionType parse(final StringReader pReader) throws CommandSyntaxException {
+		final String name = pReader.readUnquotedString();
 		final InvasionSessionType sessionType = InvasionSessionType.valueOf(name.toUpperCase());
-		if (sessionType == null) throw ERROR_INVALID.createWithContext(readerIn, name);
+		if (sessionType == null) throw ERROR_INVALID.createWithContext(pReader, name);
 		return sessionType;
 	}
 
 	@Override
-	public final <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> ctxIn, final SuggestionsBuilder suggestionsBuilderIn) {
-		return SharedSuggestionProvider.suggest(Stream.of(InvasionSessionType.values()).map(InvasionSessionType::toString), suggestionsBuilderIn);
+	public final <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> pCtx, final SuggestionsBuilder pSuggestionsBuilder) {
+		return SharedSuggestionProvider.suggest(Stream.of(InvasionSessionType.values()).map(InvasionSessionType::toString), pSuggestionsBuilder);
 	}
 
 	@Override

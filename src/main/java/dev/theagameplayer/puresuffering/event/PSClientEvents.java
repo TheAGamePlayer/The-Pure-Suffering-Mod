@@ -35,7 +35,7 @@ public final class PSClientEvents {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 
 	@SuppressWarnings("unchecked")
-	public static final void addLayers(final EntityRenderersEvent.AddLayers eventIn) { //TODO: Redo for mobs not using a mob renderer
+	public static final void addLayers(final EntityRenderersEvent.AddLayers pEvent) { //TODO: Redo for mobs not using a mob renderer
 		final List<EntityType<? extends Mob>> entityTypes = List.copyOf(
 				ForgeRegistries.ENTITY_TYPES.getValues().stream()
 				.filter(et -> DefaultAttributes.hasSupplier(et) && et.getCategory() == MobCategory.MONSTER)
@@ -44,7 +44,7 @@ public final class PSClientEvents {
 		entityTypes.forEach(et -> {
 			MobRenderer<Mob, EntityModel<Mob>> renderer = null;
 			try {
-				renderer = eventIn.getRenderer(et);
+				renderer = pEvent.getRenderer(et);
 			} catch (final Exception eIn) {
 				LOGGER.warn("HyperChargeLayer failed to apply to " + ForgeRegistries.ENTITY_TYPES.getKey(et) + ", perhaps renderer is not instance of MobRenderer?");
 			}
@@ -53,49 +53,47 @@ public final class PSClientEvents {
 		});
 	}
 
-	public static final void loggedIn(final ClientPlayerNetworkEvent.LoggingIn eventIn) {
-		PSConfigValues.resyncClient();
+	public static final void loggedIn(final ClientPlayerNetworkEvent.LoggingIn pEvent) {
 		InvasionMusicManager.reloadMusic();
 	}
 
-	public static final void loggedOut(final ClientPlayerNetworkEvent.LoggingOut eventIn) {
-		PSConfigValues.resyncClient();
+	public static final void loggedOut(final ClientPlayerNetworkEvent.LoggingOut pEvent) {
 		ClientInvasionSession.clear();
 	}
 
-	public static final void debugText(final CustomizeGuiOverlayEvent.DebugText eventIn) {
+	public static final void debugText(final CustomizeGuiOverlayEvent.DebugText pEvent) {
 		final Minecraft mc = Minecraft.getInstance();
 		if (!mc.options.renderDebug) return;
 		final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
-		eventIn.getLeft().add("");
-		eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Invasions: " + (session == null ? 0 : session.size()));
-		eventIn.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Invasion XP Multiplier: " + (session == null ? 0 : session.getXPMultiplier()) + "x");
+		pEvent.getLeft().add("");
+		pEvent.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Current Invasions: " + (session == null ? 0 : session.size()));
+		pEvent.getLeft().add(ChatFormatting.RED + "[PureSuffering]" + ChatFormatting.RESET + " Invasion XP Multiplier: " + (session == null ? 0 : session.getXPMultiplier()) + "x");
 	}
 
-	public static final void renderLevelStage(final RenderLevelStageEvent eventIn) {
-		if (!PSConfigValues.client.enableSkyEffects || eventIn.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
+	public static final void renderLevelStage(final RenderLevelStageEvent pEvent) {
+		if (!PSConfigValues.client.enableSkyEffects || pEvent.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY) return;
 		final Minecraft mc = Minecraft.getInstance();
 		final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 		if (session == null) return;
-		session.getClientEffectsRenderer().render(eventIn.getPoseStack(), eventIn.getPartialTick());
+		session.getClientEffectsRenderer().render(pEvent.getPoseStack(), pEvent.getPartialTick());
 	}
 
-	public static final void screenInitPre(final ScreenEvent.Init.Pre eventIn) {
-		if (eventIn.getScreen() instanceof CreateWorldScreen createWorldScreen)
+	public static final void screenInitPre(final ScreenEvent.Init.Pre pEvent) {
+		if (pEvent.getScreen() instanceof CreateWorldScreen createWorldScreen)
 			createWorldScreen.getUiState().setDifficulty(Difficulty.HARD);
 	}
 
-	public static final void fogColors(final ViewportEvent.ComputeFogColor eventIn) { //Render Tick
-		final FogType fogType = eventIn.getCamera().getFluidInCamera();
+	public static final void fogColors(final ViewportEvent.ComputeFogColor pEvent) { //Render Tick
+		final FogType fogType = pEvent.getCamera().getFluidInCamera();
 		if (fogType != FogType.NONE && fogType != FogType.WATER) return;
-		final Entity entity = eventIn.getCamera().getEntity();
-		if (FogRenderer.getPriorityFogFunction(entity, (float)eventIn.getPartialTick()) != null) return;
+		final Entity entity = pEvent.getCamera().getEntity();
+		if (FogRenderer.getPriorityFogFunction(entity, (float)pEvent.getPartialTick()) != null) return;
 		final Minecraft mc = Minecraft.getInstance();
 		final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 		if (session == null) return;
 		final float[] rgb = session.getFogRGB();
-		eventIn.setRed(eventIn.getRed() + rgb[0]);
-		eventIn.setGreen(eventIn.getGreen() + rgb[1]);
-		eventIn.setBlue(eventIn.getBlue() + rgb[2]);
+		pEvent.setRed(pEvent.getRed() + rgb[0]);
+		pEvent.setGreen(pEvent.getGreen() + rgb[1]);
+		pEvent.setBlue(pEvent.getBlue() + rgb[2]);
 	}
 }

@@ -3,31 +3,32 @@ package dev.theagameplayer.puresuffering.util.invasion;
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
 public final class ClientInvasionHandler {
-	public static final float handleSkyDarken(final float resultIn, final ClientLevel levelIn) { //Render Tick
-		final ClientInvasionSession session = ClientInvasionSession.get(levelIn);
-		if (session == null) return resultIn;
-		return Mth.clamp(resultIn - session.getBrightness(), 0.0F, 1.0F);
+	public static final float handleSkyDarken(final float pResult, final ClientLevel pLevel) { //Render Tick
+		final ClientInvasionSession session = ClientInvasionSession.get(pLevel);
+		if (session == null) return pResult;
+		return Mth.clamp(pResult - session.getBrightness(), 0.0F, 1.0F);
 	}
 
-	public static final boolean handleBrightLightmap(final boolean resultIn, final ClientLevel levelIn) { //Render Tick
-		final ClientInvasionSession session = ClientInvasionSession.get(levelIn);
-		if (session == null) return resultIn;
+	public static final boolean handleBrightLightmap(final boolean pResult, final ClientLevel pLevel) { //Render Tick
+		final ClientInvasionSession session = ClientInvasionSession.get(pLevel);
+		if (session == null) return pResult;
 		if (session.getDifficulty().isNightmare()) return false;
-		if (session.isBrightnessUnchanged()) return resultIn;
+		if (session.isBrightnessUnchanged()) return pResult;
 		return false;
 	}
 	
-	public static final int handleSkyBrightness(final int resultIn, final ClientLevel levelIn) { //Render Tick
-		final ClientInvasionSession session = ClientInvasionSession.get(levelIn);
-		if (session == null) return resultIn;
-		return session.getLightLevelOrDefault(resultIn);
+	public static final int handleSkyBrightness(final int pResult, final Level pLevel) { //Render Tick
+		final ClientInvasionSession session = ClientInvasionSession.get((ClientLevel)pLevel);
+		if (session == null) return pResult;
+		return session.getLightLevelOrDefault(pResult);
 	}
 	
-	public static final float handleDarknessScale(final float resultIn, final ClientLevel levelIn) { //Render Tick
-		final ClientInvasionSession session = ClientInvasionSession.get(levelIn);
-		if (session == null || !session.getDifficulty().isNightmare()) return resultIn;
-		return Math.max(0.0F, resultIn + session.getDarkness());
+	public static final float handleDarknessScale(final float pResult, final ClientLevel pLevel) { //Render Tick
+		final ClientInvasionSession session = ClientInvasionSession.get(pLevel);
+		if (session == null || !session.getDifficulty().isNightmare()) return pResult;
+		return Math.max(0.0F, pResult + session.getDarkness());
 	}
 }

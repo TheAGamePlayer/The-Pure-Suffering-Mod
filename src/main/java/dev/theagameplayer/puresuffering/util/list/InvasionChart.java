@@ -12,17 +12,17 @@ public final class InvasionChart {
 	private final ArrayList<InvasionRange> rangeList = new ArrayList<>();
 	private float total = 0.0F;
 	
-	public InvasionChart(final boolean isPrimaryIn, final Predicate<InvasionType> ofIn) {
-		this.invasionList.addAll(PSReloadListeners.getInvasionTypeManager().getInvasionTypesOf(ofIn));
+	public InvasionChart(final boolean pIsPrimary, final Predicate<InvasionType> pOf) {
+		this.invasionList.addAll(PSReloadListeners.getInvasionTypeManager().getInvasionTypesOf(pOf));
 		this.calcInvasionRanges();
-		if (isPrimaryIn) USED_LIST.clear();
+		if (pIsPrimary) USED_LIST.clear();
 	}
 	
-	public final InvasionType getInvasionInRange(final float numberIn) {
+	public final InvasionType getInvasionInRange(final float pNumber) {
 		this.invasionList.removeIf(it -> USED_LIST.contains(it));
 		this.calcInvasionRanges();
 		for (final InvasionRange range : this.rangeList) {
-			if (range.inRange(numberIn)) {
+			if (range.inRange(pNumber)) {
 				USED_LIST.add(range.invasionType);
 				return range.invasionType;
 			}
@@ -54,14 +54,14 @@ public final class InvasionChart {
 		private final InvasionType invasionType;
 		private float min, max;
 		
-		private InvasionRange(final InvasionType invasionTypeIn, final float minIn, final float maxIn) {
-			this.invasionType = invasionTypeIn;
-			this.min = minIn;
-			this.max = maxIn;
+		private InvasionRange(final InvasionType pInvasionType, final float pMin, final float pMax) {
+			this.invasionType = pInvasionType;
+			this.min = pMin;
+			this.max = pMax;
 		}
 		
-		private final boolean inRange(final float numberIn) {
-			return numberIn < this.max && numberIn >= this.min;
+		private final boolean inRange(final float pNumber) {
+			return pNumber < this.max && pNumber >= this.min;
 		}
 		
 		@Override

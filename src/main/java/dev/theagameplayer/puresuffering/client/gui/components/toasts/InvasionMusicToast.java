@@ -1,6 +1,5 @@
 package dev.theagameplayer.puresuffering.client.gui.components.toasts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
@@ -22,36 +21,34 @@ public final class InvasionMusicToast implements Toast {
 	private final MutableComponent name;
 	private final int color1, color2;
 
-	public InvasionMusicToast(final String nameIn, final InvasionDifficulty difficultyIn) {
+	public InvasionMusicToast(final String pName, final InvasionDifficulty pDifficulty) {
 		final Minecraft mc = Minecraft.getInstance();
-		final ArrayList<RecordItem> records = new ArrayList<>();
-		mc.level.registryAccess().registryOrThrow(Registries.ITEM).forEach(item -> {
-			if (item instanceof RecordItem recordItem)
-				records.add(recordItem);
-		});
-		this.recordItem = new ItemStack(records.get(mc.level.random.nextInt(records.size())));
-		this.name = Component.literal(nameIn);
-		this.color1 = difficultyIn.getColor(true);
-		this.color2 = difficultyIn.getColor(false);
+		final RecordItem[] records = mc.level.registryAccess().registryOrThrow(Registries.ITEM).stream().filter(item -> {
+			return item instanceof RecordItem;
+		}).toArray(RecordItem[]::new);
+		this.recordItem = new ItemStack(records[mc.level.random.nextInt(records.length)]);
+		this.name = Component.literal(pName);
+		this.color1 = pDifficulty.getColor(true);
+		this.color2 = pDifficulty.getColor(false);
 	}
 
 	@Override
-	public final Visibility render(final GuiGraphics graphicsIn, final ToastComponent componentIn, final long ticksIn) {
-		final Minecraft mc = componentIn.getMinecraft();
-		graphicsIn.blit(TEXTURE, 0, 0, 0, 0, this.width(), this.height());
-		if (ticksIn < 1500L) {
-			final int i = Mth.floor(Mth.clamp((float)(1500L - ticksIn) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;
-			graphicsIn.drawString(mc.font, MUSIC_TEXT, 30, 11, this.color1 | i, false);
+	public final Visibility render(final GuiGraphics pGuiGraphics, final ToastComponent pToastComponent, final long pTimeSinceLastVisible) {
+		final Minecraft mc = pToastComponent.getMinecraft();
+		pGuiGraphics.blit(TEXTURE, 0, 0, 0, 0, this.width(), this.height());
+		if (pTimeSinceLastVisible < 1500L) {
+			final int i = Mth.floor(Mth.clamp((float)(1500L - pTimeSinceLastVisible) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 67108864;
+			pGuiGraphics.drawString(mc.font, MUSIC_TEXT, 30, 11, this.color1 | i, false);
 		} else {
 			final List<FormattedCharSequence> list = mc.font.split(this.name, 125);
-			final int i = Mth.floor(Mth.clamp((float)(ticksIn - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | 67108864;
-            int l = this.height()/2 - list.size() * 9/2;
-            for (final FormattedCharSequence formattedCharSequence : list) {
-            	graphicsIn.drawString(mc.font, formattedCharSequence, 30, l, this.color2 | i, false);
-            	l += 9;
-            }
+			final int i = Mth.floor(Mth.clamp((float)(pTimeSinceLastVisible - 1500L) / 300.0F, 0.0F, 1.0F) * 252.0F) << 24 | 67108864;
+	        int l = this.height()/2 - list.size() * 9/2;
+	        for (final FormattedCharSequence formattedCharSequence : list) {
+	        	pGuiGraphics.drawString(mc.font, formattedCharSequence, 30, l, this.color2 | i, false);
+	        	l += 9;
+	        }
 		}
-		graphicsIn.renderFakeItem(this.recordItem, 8, 8);
-		return (double)ticksIn >= 5000.0D * componentIn.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+		pGuiGraphics.renderFakeItem(this.recordItem, 8, 8);
+		return (double)pTimeSinceLastVisible >= 5000.0D * pToastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
 	}
 }

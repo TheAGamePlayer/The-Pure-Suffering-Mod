@@ -13,15 +13,15 @@ public final class InvasionSoundHandler {
 	private static boolean hasEfx, setUp;
 	private static int aux, effect;
 
-	public static final void playSound(final int idIn, final float decayIn) {
+	public static final void playSound(final int pId, final float pDecay) {
 		if (!setUp) setUpEffects();
 		if (!hasEfx) return;
 		final int a = aux;
 		final int e = effect;
 		EXTEfx.alEffecti(e, EXTEfx.AL_EFFECT_TYPE, EXTEfx.AL_EFFECT_EAXREVERB);
-		EXTEfx.alEffectf(e, EXTEfx.AL_EAXREVERB_DECAY_TIME, decayIn);
+		EXTEfx.alEffectf(e, EXTEfx.AL_EAXREVERB_DECAY_TIME, pDecay);
 		EXTEfx.alAuxiliaryEffectSloti(a, EXTEfx.AL_EFFECTSLOT_EFFECT, e);
-		AL11.alSource3i(idIn, EXTEfx.AL_AUXILIARY_SEND_FILTER, a, 0, EXTEfx.AL_FILTER_NULL);
+		AL11.alSource3i(pId, EXTEfx.AL_AUXILIARY_SEND_FILTER, a, 0, EXTEfx.AL_FILTER_NULL);
 	}
 
 	public static final void setUpEffects() { //Must be called when sound is being played

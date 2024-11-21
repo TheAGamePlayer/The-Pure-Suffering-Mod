@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 
 public final class PSOverworldInvasionTypes implements Consumer<Consumer<InvasionType>> {
 	@Override
-	public final void accept(final Consumer<InvasionType> consumerIn) {
+	public final void accept(final Consumer<InvasionType> pConsumer) {
 		InvasionType.Builder.invasionType().withRarity(6).withTier(1).withInvasionTime(InvasionTime.DAY).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_BOOSTED).withTimeModifier(TimeModifier.DAY_TO_NIGHT).withTimeChangeability(TimeChangeability.ONLY_DAY).withDayNightCycleRequirement(DayNightCycleRequirement.NEEDS_CYCLE).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderInfo(
 						InvasionSkyRenderInfo.Builder.skyRenderInfo().withFog(InvasionFogRenderInfo.Builder.fogRenderer()
@@ -50,7 +50,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				.withTickDelay(18)
 				.setMobCapMultiplier(1.0F))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "solar_eclipse");
+		.save(pConsumer, "solar_eclipse");
 		InvasionType.Builder.invasionType().withRarity(6).withTier(1).withInvasionTime(InvasionTime.NIGHT).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_BOOSTED).withTimeModifier(TimeModifier.NONE).withTimeChangeability(TimeChangeability.ONLY_NIGHT).withDayNightCycleRequirement(DayNightCycleRequirement.NEEDS_CYCLE).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderInfo(
 						InvasionSkyRenderInfo.Builder.skyRenderInfo().withFog(InvasionFogRenderInfo.Builder.fogRenderer()
@@ -80,7 +80,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				.withTickDelay(15)
 				.setMobCapMultiplier(1.0F))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "lunar_eclipse");
+		.save(pConsumer, "lunar_eclipse");
 		InvasionType.Builder.invasionType().withRarity(9).withTier(2).withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_BOOSTED).withTimeModifier(TimeModifier.DAY_TO_NIGHT).withWeatherType(WeatherType.THUNDER).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderInfo(
 						InvasionSkyRenderInfo.Builder.skyRenderInfo().withFog(InvasionFogRenderInfo.Builder.fogRenderer()
@@ -116,7 +116,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				.withClusterSize(10)
 				.setMobCapMultiplier(1.0F))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "super_storm");
+		.save(pConsumer, "super_storm");
 		InvasionType.Builder.invasionType().withRarity(12).withTier(3).withConversionsStopped().withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withTimeModifier(TimeModifier.DAY_TO_NIGHT).withWeatherType(WeatherType.CLEAR).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderInfo(
 						InvasionSkyRenderInfo.Builder.skyRenderInfo().withFog(InvasionFogRenderInfo.Builder.fogRenderer()
@@ -167,7 +167,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				.withTickDelay(9)
 				.setMobCapMultiplier(1.0F))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "hell_on_earth");
+		.save(pConsumer, "hell_on_earth");
 		InvasionType.Builder.invasionType().withRarity(17).withTier(3).withInvasionTime(InvasionTime.BOTH).withInvasionPriority(InvasionPriority.PRIMARY_ONLY).withSpawningSystem(SpawningSystem.BIOME_MIXED).withTimeModifier(TimeModifier.DAY_TO_NIGHT).withWeatherType(WeatherType.UNSTABLE).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().skyRenderInfo(
 						InvasionSkyRenderInfo.Builder.skyRenderInfo().withFog(InvasionFogRenderInfo.Builder.fogRenderer()
@@ -270,7 +270,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				.withTickDelay(6)
 				.setMobCapMultiplier(1.0F))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "worlds_end");
+		.save(pConsumer, "worlds_end");
 		InvasionType.Builder.invasionType().withInvasionTime(InvasionTime.NIGHT).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.6F).withTickDelay(30).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 12, 1, 3)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.7F).withTickDelay(24).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 12, 1, 4), new InvasionSpawnerData(EntityType.ZOMBIE_VILLAGER, 1, 1, 1)),
@@ -278,7 +278,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.9F).withTickDelay(12).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 12, 3, 8), new InvasionSpawnerData(EntityType.ZOMBIE_VILLAGER, 1, 1, 3)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(6).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 12, 4, 10), new InvasionSpawnerData(EntityType.ZOMBIE_VILLAGER, 1, 2, 4)))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "zombie");
+		.save(pConsumer, "zombie");
 		InvasionType.Builder.invasionType().withRarity(1).withInvasionTime(InvasionTime.NIGHT).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.6F).withTickDelay(24).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 1, 2), new InvasionSpawnerData(EntityType.HUSK, 2, 1, 1), new InvasionSpawnerData(EntityType.SKELETON, 4, 1, 2), new InvasionSpawnerData(EntityType.STRAY, 1, 1, 1)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.7F).withTickDelay(20).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 1, 3), new InvasionSpawnerData(EntityType.HUSK, 2, 1, 2), new InvasionSpawnerData(EntityType.SKELETON, 4, 1, 3), new InvasionSpawnerData(EntityType.STRAY, 1, 1, 2)),
@@ -286,7 +286,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.9F).withTickDelay(12).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 2, 5), new InvasionSpawnerData(EntityType.HUSK, 2, 2, 3), new InvasionSpawnerData(EntityType.SKELETON, 4, 2, 5), new InvasionSpawnerData(EntityType.STRAY, 1, 2, 3)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(8).mobSpawnList(new InvasionSpawnerData(EntityType.ZOMBIE, 5, 3, 7), new InvasionSpawnerData(EntityType.HUSK, 2, 2, 4), new InvasionSpawnerData(EntityType.SKELETON, 4, 3, 6), new InvasionSpawnerData(EntityType.STRAY, 1, 2, 4)))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "undead");
+		.save(pConsumer, "undead");
 		InvasionType.Builder.invasionType().withInvasionTime(InvasionTime.NIGHT).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.6F).withTickDelay(30).mobSpawnList(new InvasionSpawnerData(EntityType.SPIDER, 3, 1, 2)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.7F).withTickDelay(24).mobSpawnList(new InvasionSpawnerData(EntityType.SPIDER, 3, 1, 3), new InvasionSpawnerData(EntityType.CAVE_SPIDER, 1, 1, 1)),
@@ -294,7 +294,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.9F).withTickDelay(12).mobSpawnList(new InvasionSpawnerData(EntityType.SPIDER, 3, 2, 5), new InvasionSpawnerData(EntityType.CAVE_SPIDER, 1, 1, 3)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(6).mobSpawnList(new InvasionSpawnerData(EntityType.SPIDER, 3, 3, 7), new InvasionSpawnerData(EntityType.CAVE_SPIDER, 1, 2, 4)))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "arachnophobia");
+		.save(pConsumer, "arachnophobia");
 		InvasionType.Builder.invasionType().withRarity(3).withTier(1).withInvasionTime(InvasionTime.NIGHT).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.2F).withTickDelay(45).mobSpawnList(new InvasionSpawnerData(EntityType.PILLAGER, 13, 1, 2), new InvasionSpawnerData(EntityType.VINDICATOR, 8, 1, 1), new InvasionSpawnerData(EntityType.WITCH, 10, 1, 1)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.4F).withTickDelay(36).mobSpawnList(new InvasionSpawnerData(EntityType.PILLAGER, 13, 1, 3), new InvasionSpawnerData(EntityType.VINDICATOR, 8, 1, 1), new InvasionSpawnerData(EntityType.WITCH, 10, 1, 2), new InvasionSpawnerData(EntityType.RAVAGER, 3, 1, 1)),
@@ -302,7 +302,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.8F).withTickDelay(18).mobSpawnList(new InvasionSpawnerData(EntityType.PILLAGER, 13, 2, 5), new InvasionSpawnerData(EntityType.VINDICATOR, 8, 1, 3), new InvasionSpawnerData(EntityType.WITCH, 10, 1, 4), new InvasionSpawnerData(EntityType.RAVAGER, 3, 1, 2), new InvasionSpawnerData(EntityType.EVOKER, 5, 1, 2)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(9).mobSpawnList(new InvasionSpawnerData(EntityType.PILLAGER, 13, 2, 5), new InvasionSpawnerData(EntityType.VINDICATOR, 8, 1, 4), new InvasionSpawnerData(EntityType.WITCH, 10, 1, 4), new InvasionSpawnerData(EntityType.RAVAGER, 3, 1, 2), new InvasionSpawnerData(EntityType.EVOKER, 5, 1, 3), new InvasionSpawnerData(EntityType.ILLUSIONER, 1, 1, 1, false, true)))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "mega_raid");
+		.save(pConsumer, "mega_raid");
 		InvasionType.Builder.invasionType().withRarity(1).withInvasionTime(InvasionTime.NIGHT).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.2F).withTickDelay(32).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 1, 3), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 1, 1)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.4F).withTickDelay(26).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 2, 4), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 1, 2)),
@@ -310,7 +310,7 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.8F).withTickDelay(14).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 3, 6), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 2, 5)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(1.0F).withTickDelay(8).mobSpawnList(new InvasionSpawnerData(EntityType.SILVERFISH, 3, 3, 8), new InvasionSpawnerData(EntityType.ENDERMITE, 1, 2, 6)))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "pest");
+		.save(pConsumer, "pest");
 		InvasionType.Builder.invasionType().withRarity(3).withTier(2).withInvasionTime(InvasionTime.NIGHT).withInvasionPriority(InvasionPriority.SECONDARY_ONLY).severityInfo(
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.3F).withTickDelay(35).mobSpawnList(new InvasionSpawnerData(EntityType.SLIME, 7, 1, 1, true, true)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.4F).withTickDelay(30).mobSpawnList(new InvasionSpawnerData(EntityType.SLIME, 7, 1, 2, true, true)),
@@ -318,6 +318,6 @@ public final class PSOverworldInvasionTypes implements Consumer<Consumer<Invasio
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.6F).withTickDelay(20).mobSpawnList(new InvasionSpawnerData(EntityType.SLIME, 7, 2, 4, true, true), new InvasionSpawnerData(EntityType.MAGMA_CUBE, 1, 1, 1, false, true)),
 				InvasionType.SeverityInfo.Builder.severityInfo().setMobCapMultiplier(0.7F).withTickDelay(15).mobSpawnList(new InvasionSpawnerData(EntityType.SLIME, 7, 2, 5, true, true), new InvasionSpawnerData(EntityType.MAGMA_CUBE, 1, 1, 2, false, true)))
 		.dimensions(Level.OVERWORLD.location())
-		.save(consumerIn, "slime_time");
+		.save(pConsumer, "slime_time");
 	}
 }

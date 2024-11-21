@@ -73,5 +73,4 @@ public final class ClearInvasionsCommand {
 			return 0;
 		})));
 	}
-
 }

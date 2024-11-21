@@ -16,12 +16,12 @@ import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 
 public final class PSEntityEvents {
-	public static final void joinLevel(final EntityJoinLevelEvent eventIn) {
-		if (eventIn.getLevel().isClientSide()) return;
-		final Entity entity = eventIn.getEntity();
+	public static final void joinLevel(final EntityJoinLevelEvent pEvent) {
+		if (pEvent.getLevel().isClientSide()) return;
+		final Entity entity = pEvent.getEntity();
 		if (entity instanceof Mob mob) {
-			if (eventIn.loadedFromDisk()) {
-				final ServerLevel level = (ServerLevel)eventIn.getLevel();
+			if (pEvent.loadedFromDisk()) {
+				final ServerLevel level = (ServerLevel)pEvent.getLevel();
 				final InvasionLevelData ilData = InvasionLevelData.get(level);
 				if (ilData != null) {
 					final InvasionSession session =  ilData.getInvasionManager().getActiveSession(level);
@@ -38,16 +38,16 @@ public final class PSEntityEvents {
 			owner = traceableEntity.getOwner();
 		if (owner != null && owner.getPersistentData().contains(Invasion.ANTI_GRIEF))
 			entity.getPersistentData().putBoolean(Invasion.ANTI_GRIEF, owner.getPersistentData().getBoolean(Invasion.ANTI_GRIEF));
-		if (PSGameRules.WEAKENED_INVASION_VEXES.get(eventIn.getLevel()) && entity instanceof Vex vex) {
+		if (PSGameRules.WEAKENED_INVASION_VEXES.get(pEvent.getLevel()) && entity instanceof Vex vex) {
 			if (owner != null && owner.getPersistentData().contains(Invasion.INVASION_MOB))
-				vex.setLimitedLife(25 + eventIn.getLevel().getRandom().nextInt(65)); //Attempt to fix lag & spawn camping with vexes
+				vex.setLimitedLife(25 + pEvent.getLevel().getRandom().nextInt(65)); //Attempt to fix lag & spawn camping with vexes
 		}
 	}
 
-	public static final void mobGriefing(final EntityMobGriefingEvent eventIn) {
-		final Entity entity = eventIn.getEntity();
+	public static final void mobGriefing(final EntityMobGriefingEvent pEvent) {
+		final Entity entity = pEvent.getEntity();
 		if (!PSGameRules.INVASION_ANTI_GRIEF.get(entity.level())) return;
 		if (entity.getPersistentData().contains(Invasion.ANTI_GRIEF))
-			eventIn.setResult(Result.DENY);
+			pEvent.setResult(Result.DENY);
 	}
 }

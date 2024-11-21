@@ -20,23 +20,23 @@ public final class HyperChargeLayer<M extends Mob, EM extends EntityModel<M>> ex
 	private static final ResourceLocation HYPER_CHARGE_LOCATION2 = PureSufferingMod.namespace("textures/entity/charged_armor2.png");
 	private final EM model;
 	
-	public HyperChargeLayer(final MobRenderer<M, EM> rendererIn) {
-		super(rendererIn);
-		this.model = rendererIn.getModel();
+	public HyperChargeLayer(final MobRenderer<M, EM> pRenderer) {
+		super(pRenderer);
+		this.model = pRenderer.getModel();
 	}
 
 	@Override
-	public final void render(final PoseStack poseStackIn, final MultiBufferSource bufferIn, final int packedLightIn, final M mobIn, final float limbSwingIn, final float limbSwingAmountIn, final float partialTicksIn, final float ageInTicksIn, final float netHeadYawIn, final float headPitchIn) {
-		if (mobIn instanceof PSInvasionMob invasionMob && invasionMob.psGetHyperCharge() > 0) {
+	public final void render(final PoseStack pPoseStack, final MultiBufferSource pBuffer, final int pPackedLight, final M pMob, final float pLimbSwing, final float pLimbSwingAmount, final float pPartialTicks, final float pAgeInTicks, final float pNetHeadYaw, final float pHeadPitch) {
+		if (pMob instanceof PSInvasionMob invasionMob && invasionMob.psGetHyperCharge() > 0) {
 			final EntityModel<M> entityModel = this.model;
 			final int hyperCharge = invasionMob.psGetHyperCharge();
-			final float tick = (float)mobIn.tickCount + partialTicksIn;
+			final float tick = (float)pMob.tickCount + pPartialTicks;
 			final float argb = 0.2F * hyperCharge;
-			entityModel.prepareMobModel(mobIn, limbSwingIn, limbSwingAmountIn, partialTicksIn);
+			entityModel.prepareMobModel(pMob, pLimbSwing, pLimbSwingAmount, pPartialTicks);
 			this.getParentModel().copyPropertiesTo(entityModel);
-			final VertexConsumer vertexConsumer = bufferIn.getBuffer(RenderType.energySwirl(hyperCharge < 4 ? HYPER_CHARGE_LOCATION1 : HYPER_CHARGE_LOCATION2, Mth.sin(tick * 0.007854F * hyperCharge), tick * (0.01F * hyperCharge) % 1.0F));
-			entityModel.setupAnim(mobIn, limbSwingIn, limbSwingAmountIn, ageInTicksIn, netHeadYawIn, headPitchIn);
-			entityModel.renderToBuffer(poseStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, argb, argb, argb, argb);
+			final VertexConsumer vertexConsumer = pBuffer.getBuffer(RenderType.energySwirl(hyperCharge < 4 ? HYPER_CHARGE_LOCATION1 : HYPER_CHARGE_LOCATION2, Mth.sin(tick * 0.007854F * hyperCharge), tick * (0.01F * hyperCharge) % 1.0F));
+			entityModel.setupAnim(pMob, pLimbSwing, pLimbSwingAmount, pAgeInTicks, pNetHeadYaw, pHeadPitch);
+			entityModel.renderToBuffer(pPoseStack, vertexConsumer, pPackedLight, OverlayTexture.NO_OVERLAY, argb, argb, argb, argb);
 		}
 	}
 }

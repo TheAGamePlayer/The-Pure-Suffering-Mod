@@ -7,12 +7,12 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 
 public final class PSEntityPlacements {
-	public static final void registerSpawnPlacements(final SpawnPlacementRegisterEvent eventIn) {
+	public static final void registerSpawnPlacements(final SpawnPlacementRegisterEvent pEvent) {
 		//Piglin Brutes & Zoglins have no spawn logic by default
-		eventIn.register(EntityType.PIGLIN_BRUTE, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (et, level, mobSpawnType, pos, random) -> {
+		pEvent.register(EntityType.PIGLIN_BRUTE, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (et, level, mobSpawnType, pos, random) -> {
 			return !level.getBlockState(pos.below()).is(Blocks.NETHER_WART_BLOCK);
 		}, SpawnPlacementRegisterEvent.Operation.OR);
-		eventIn.register(EntityType.ZOGLIN, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (et, level, mobSpawnType, pos, random) -> {
+		pEvent.register(EntityType.ZOGLIN, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (et, level, mobSpawnType, pos, random) -> {
 			return !level.getBlockState(pos.below()).is(Blocks.NETHER_WART_BLOCK);
 		}, SpawnPlacementRegisterEvent.Operation.OR);
 	}

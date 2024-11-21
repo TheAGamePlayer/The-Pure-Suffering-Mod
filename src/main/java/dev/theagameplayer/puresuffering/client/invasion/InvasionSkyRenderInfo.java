@@ -25,21 +25,21 @@ public final class InvasionSkyRenderInfo {
 	private final int lightLevel;
 	private final float[] rgb;
 
-	public InvasionSkyRenderInfo(final ResourceLocation idIn, final InvasionFogRenderInfo fogRendererIn, final float sunMoonAlphaIn, final ResourceLocation sunIn, final ResourceLocation moonIn, final ResourceLocation fixedSkyIn, final boolean[] changesIn, final float[] fVisibilityIn, final float[] fBrightnessIn, final float[][] fRGBIn, final float weatherVisibilityIn, final float brightnessIn, final int lightLevelIn, final float[] rgbIn) {
-		this.id = idIn;
-		this.fogRenderer = fogRendererIn;
-		this.sunMoonAlpha = sunMoonAlphaIn;
-		this.sun = sunIn;
-		this.moon = moonIn;
-		this.fixedSky = fixedSkyIn;
-		this.changes = changesIn;
-		this.fVisibility = fVisibilityIn;
-		this.fBrightness = fBrightnessIn;
-		this.fRGB = fRGBIn;
-		this.weatherVisibility = weatherVisibilityIn;
-		this.brightness = brightnessIn;
-		this.lightLevel = lightLevelIn;
-		this.rgb = rgbIn;
+	public InvasionSkyRenderInfo(final ResourceLocation pId, final InvasionFogRenderInfo pFogRenderer, final float pSunMoonAlpha, final ResourceLocation pSun, final ResourceLocation pMoon, final ResourceLocation pFixedSky, final boolean[] pChanges, final float[] pFVisibility, final float[] pFBrightness, final float[][] pFRGB, final float pWeatherVisibility, final float pBrightness, final int pLightLevel, final float[] pRGB) {
+		this.id = pId;
+		this.fogRenderer = pFogRenderer;
+		this.sunMoonAlpha = pSunMoonAlpha;
+		this.sun = pSun;
+		this.moon = pMoon;
+		this.fixedSky = pFixedSky;
+		this.changes = pChanges;
+		this.fVisibility = pFVisibility;
+		this.fBrightness = pFBrightness;
+		this.fRGB = pFRGB;
+		this.weatherVisibility = pWeatherVisibility;
+		this.brightness = pBrightness;
+		this.lightLevel = pLightLevel;
+		this.rgb = pRGB;
 	}
 
 	public final InvasionSkyRenderInfo.Builder deconstruct() {
@@ -154,20 +154,20 @@ public final class InvasionSkyRenderInfo {
 		private int lightLevel = -1;
 		private float[] rgb = new float[3];
 
-		private Builder(final InvasionFogRenderInfo.Builder fogRendererIn, final float sunMoonAlphaIn, @Nullable final ResourceLocation sunIn, @Nullable final ResourceLocation moonIn, @Nullable final ResourceLocation fixedSkyIn, final boolean[] changesIn, final float[] fVisibilityIn, final float[] fBrightnessIn, final float[][] fRGBIn, final float weatherVisibilityIn, final float brightnessIn, final int lightLevelIn, final float[] rgbIn) {
-			this.fogRenderer = fogRendererIn;
-			this.sunMoonAlpha = sunMoonAlphaIn;
-			this.sun = sunIn;
-			this.moon = moonIn;
-			this.fixedSky = fixedSkyIn;
-			this.changes = changesIn;
-			this.fVisibility = fVisibilityIn;
-			this.fBrightness = fBrightnessIn;
-			this.fRGB = fRGBIn;
-			this.weatherVisibility = weatherVisibilityIn;
-			this.brightness = brightnessIn;
-			this.lightLevel = lightLevelIn;
-			this.rgb = rgbIn;
+		private Builder(final InvasionFogRenderInfo.Builder pFogRenderer, final float pSunMoonAlpha, @Nullable final ResourceLocation pSun, @Nullable final ResourceLocation pMoon, @Nullable final ResourceLocation pFixedSky, final boolean[] pChanges, final float[] pFVisibility, final float[] pFBrightness, final float[][] pFRGB, final float pWeatherVisibility, final float pBrightness, final int pLightLevel, final float[] pRGB) {
+			this.fogRenderer = pFogRenderer;
+			this.sunMoonAlpha = pSunMoonAlpha;
+			this.sun = pSun;
+			this.moon = pMoon;
+			this.fixedSky = pFixedSky;
+			this.changes = pChanges;
+			this.fVisibility = pFVisibility;
+			this.fBrightness = pFBrightness;
+			this.fRGB = pFRGB;
+			this.weatherVisibility = pWeatherVisibility;
+			this.brightness = pBrightness;
+			this.lightLevel = pLightLevel;
+			this.rgb = pRGB;
 		}
 
 		private Builder() {};
@@ -176,94 +176,94 @@ public final class InvasionSkyRenderInfo {
 			return new InvasionSkyRenderInfo.Builder();
 		}
 
-		public final InvasionSkyRenderInfo.Builder withFog(final InvasionFogRenderInfo.Builder fogRendererIn) {
-			this.fogRenderer = fogRendererIn;
+		public final InvasionSkyRenderInfo.Builder withFog(final InvasionFogRenderInfo.Builder pFogRenderer) {
+			this.fogRenderer = pFogRenderer;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo.Builder withSunMoonAlpha(final float sunMoonAlphaIn) {
-			this.sunMoonAlpha = sunMoonAlphaIn;
+		public final InvasionSkyRenderInfo.Builder withSunMoonAlpha(final float pSunMoonAlpha) {
+			this.sunMoonAlpha = pSunMoonAlpha;
 			this.changes[6] = true;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo.Builder sunTexture(final ResourceLocation sunTextureIn) {
-			this.sun = sunTextureIn;
+		public final InvasionSkyRenderInfo.Builder sunTexture(final ResourceLocation pSunTexture) {
+			this.sun = pSunTexture;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo.Builder moonTexture(final ResourceLocation moonTextureIn) {
-			this.moon = moonTextureIn;
+		public final InvasionSkyRenderInfo.Builder moonTexture(final ResourceLocation pMoonTexture) {
+			this.moon = pMoonTexture;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo.Builder fixedSkyTexture(final ResourceLocation fixedTextureIn) {
-			this.fixedSky = fixedTextureIn;
+		public final InvasionSkyRenderInfo.Builder fixedSkyTexture(final ResourceLocation pFixedTexture) {
+			this.fixedSky = pFixedTexture;
 			return this;
 		}
 		
-		public final InvasionSkyRenderInfo.Builder withFlickerVisibility(final float minVisibilityIn, final float maxVisibilityIn, final int minDelayIn, final int maxDelayIn) {
-			this.fVisibility[0] = minVisibilityIn;
-			this.fVisibility[1] = maxVisibilityIn;
-			this.fVisibility[2] = minDelayIn;
-			this.fVisibility[3] = maxDelayIn;
+		public final InvasionSkyRenderInfo.Builder withFlickerVisibility(final float pMinVisibility, final float pMaxVisibility, final int pMinDelay, final int pMaxDelay) {
+			this.fVisibility[0] = pMinVisibility;
+			this.fVisibility[1] = pMaxVisibility;
+			this.fVisibility[2] = pMinDelay;
+			this.fVisibility[3] = pMaxDelay;
 			this.changes[5] = true;
 			return this;
 		}
 		
-		public final InvasionSkyRenderInfo.Builder withFlickerBrightness(final float minBrightnessIn, final float maxBrightnessIn, final int minDelayIn, final int maxDelayIn) {
+		public final InvasionSkyRenderInfo.Builder withFlickerBrightness(final float minBrightnessIn, final float maxBrightnessIn, final int pMinDelay, final int pMaxDelay) {
 			this.fBrightness[0] = minBrightnessIn;
 			this.fBrightness[1] = maxBrightnessIn;
-			this.fBrightness[2] = minDelayIn;
-			this.fBrightness[3] = maxDelayIn;
+			this.fBrightness[2] = pMinDelay;
+			this.fBrightness[3] = pMaxDelay;
 			this.changes[4] = true;
 			return this;
 		}
 		
-		public final InvasionSkyRenderInfo.Builder withFlickerRGB(final float redIn, final float greenIn, final float blueIn, final int minDelayIn, final int maxDelayIn) {
+		public final InvasionSkyRenderInfo.Builder withFlickerRGB(final float pRed, final float pGreen, final float pBlue, final int pMinDelay, final int pMaxDelay) {
 			final int l = this.fRGB.length;
 			final float[][] fRGB = new float[l + 1][5];
-			for (int i1 = 0; i1 < l; i1++) {
-				for (int i2 = 0; i2 < 5; i2++)
+			for (int i1 = 0; i1 < l; ++i1) {
+				for (int i2 = 0; i2 < 5; ++i2)
 					fRGB[i1][i2] = this.fRGB[i1][i2];
 			}
 			this.fRGB = fRGB;
-			this.fRGB[l][0] = redIn;
-			this.fRGB[l][1] = greenIn;
-			this.fRGB[l][2] = blueIn;
-			this.fRGB[l][3] = minDelayIn;
-			this.fRGB[l][4] = maxDelayIn;
+			this.fRGB[l][0] = pRed;
+			this.fRGB[l][1] = pGreen;
+			this.fRGB[l][2] = pBlue;
+			this.fRGB[l][3] = pMinDelay;
+			this.fRGB[l][4] = pMaxDelay;
 			this.changes[3] = true;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo.Builder weatherVisibility(final float weatherVisibilityIn) {
-			this.weatherVisibility = weatherVisibilityIn;
+		public final InvasionSkyRenderInfo.Builder weatherVisibility(final float pWeatherVisibility) {
+			this.weatherVisibility = pWeatherVisibility;
 			this.changes[2] = true;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo.Builder withSkyBrightness(final float brightnessIn) {
-			this.brightness = brightnessIn;
+		public final InvasionSkyRenderInfo.Builder withSkyBrightness(final float pBrightness) {
+			this.brightness = pBrightness;
 			this.changes[1] = true;
 			return this;
 		}
 		
-		public final InvasionSkyRenderInfo.Builder withLightLevel(final int lightLevelIn) {
-			this.lightLevel = lightLevelIn;
+		public final InvasionSkyRenderInfo.Builder withLightLevel(final int pLightLevel) {
+			this.lightLevel = pLightLevel;
 			return this;
 		}
 		
-		public final InvasionSkyRenderInfo.Builder withRGB(final float redIn, final float greenIn, final float blueIn) {
-			this.rgb[0] = redIn;
-			this.rgb[1] = greenIn;
-			this.rgb[2] = blueIn;
+		public final InvasionSkyRenderInfo.Builder withRGB(final float pRed, final float pGreen, final float pBlue) {
+			this.rgb[0] = pRed;
+			this.rgb[1] = pGreen;
+			this.rgb[2] = pBlue;
 			this.changes[0] = true;
 			return this;
 		}
 
-		public final InvasionSkyRenderInfo build(final ResourceLocation idIn) {
-			return new InvasionSkyRenderInfo(idIn, this.fogRenderer.build(idIn), this.sunMoonAlpha, this.sun, this.moon, this.fixedSky, this.changes, this.fVisibility, this.fBrightness, this.fRGB, this.weatherVisibility, this.brightness, this.lightLevel, this.rgb);
+		public final InvasionSkyRenderInfo build(final ResourceLocation pId) {
+			return new InvasionSkyRenderInfo(pId, this.fogRenderer.build(pId), this.sunMoonAlpha, this.sun, this.moon, this.fixedSky, this.changes, this.fVisibility, this.fBrightness, this.fRGB, this.weatherVisibility, this.brightness, this.lightLevel, this.rgb);
 		}
 
 		public final JsonObject serializeToJson() {
@@ -297,7 +297,7 @@ public final class InvasionSkyRenderInfo {
 			}
 			if (this.changes[3]) {
 				final JsonArray a1 = new JsonArray();
-				for (int i = 0; i < this.fRGB.length; i++) {
+				for (int i = 0; i < this.fRGB.length; ++i) {
 					final JsonArray a2 = new JsonArray();
 					a2.add(this.fRGB[i][0]);
 					a2.add(this.fRGB[i][1]);
@@ -324,21 +324,21 @@ public final class InvasionSkyRenderInfo {
 			return jsonObject.entrySet().isEmpty() ? null : jsonObject;
 		}
 
-		public static final InvasionSkyRenderInfo.Builder fromJson(final JsonObject jsonObjectIn) {
-			final InvasionFogRenderInfo.Builder fogRenderer = jsonObjectIn.has("FogRenderInfo") ? InvasionFogRenderInfo.Builder.fromJson(jsonObjectIn.get("FogRenderInfo").getAsJsonObject()) : InvasionFogRenderInfo.Builder.fogRenderer();
+		public static final InvasionSkyRenderInfo.Builder fromJson(final JsonObject pJsonObject) {
+			final InvasionFogRenderInfo.Builder fogRenderer = pJsonObject.has("FogRenderInfo") ? InvasionFogRenderInfo.Builder.fromJson(pJsonObject.get("FogRenderInfo").getAsJsonObject()) : InvasionFogRenderInfo.Builder.fogRenderer();
 			final boolean[] changes = new boolean[7];
-			changes[0] = jsonObjectIn.has("RGBOffset");
-			changes[1] = jsonObjectIn.has("Brightness");
-			changes[2] = jsonObjectIn.has("WeatherVisibility");
-			changes[3] = jsonObjectIn.has("FlickerRGBOffset");
-			changes[4] = jsonObjectIn.has("FlickerBrightness");
-			changes[5] = jsonObjectIn.has("FlickerVisibility");
-			changes[6] = jsonObjectIn.has("SunMoonAlpha");
-			final float sunMoonAlpha = changes[6] ? jsonObjectIn.get("SunMoonAlpha").getAsFloat() : 1.0F;
-			final ResourceLocation sun = sunMoonAlpha > 0 && jsonObjectIn.has("SunTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("SunTexture").getAsString()) : null;
-			final ResourceLocation moon = sunMoonAlpha > 0 && jsonObjectIn.has("MoonTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("MoonTexture").getAsString()) : null;
-			final ResourceLocation fixedSky = jsonObjectIn.has("FixedSkyTexture") ? ResourceLocation.tryParse(jsonObjectIn.get("FixedSkyTexture").getAsString()) : null;
-			final JsonElement fVisibilityElement = changes[5] ? jsonObjectIn.get("FlickerVisibility") : null;
+			changes[0] = pJsonObject.has("RGBOffset");
+			changes[1] = pJsonObject.has("Brightness");
+			changes[2] = pJsonObject.has("WeatherVisibility");
+			changes[3] = pJsonObject.has("FlickerRGBOffset");
+			changes[4] = pJsonObject.has("FlickerBrightness");
+			changes[5] = pJsonObject.has("FlickerVisibility");
+			changes[6] = pJsonObject.has("SunMoonAlpha");
+			final float sunMoonAlpha = changes[6] ? pJsonObject.get("SunMoonAlpha").getAsFloat() : 1.0F;
+			final ResourceLocation sun = sunMoonAlpha > 0 && pJsonObject.has("SunTexture") ? ResourceLocation.tryParse(pJsonObject.get("SunTexture").getAsString()) : null;
+			final ResourceLocation moon = sunMoonAlpha > 0 && pJsonObject.has("MoonTexture") ? ResourceLocation.tryParse(pJsonObject.get("MoonTexture").getAsString()) : null;
+			final ResourceLocation fixedSky = pJsonObject.has("FixedSkyTexture") ? ResourceLocation.tryParse(pJsonObject.get("FixedSkyTexture").getAsString()) : null;
+			final JsonElement fVisibilityElement = changes[5] ? pJsonObject.get("FlickerVisibility") : null;
 			final float[] fVisibility = new float[4];
 			if (fVisibilityElement != null && fVisibilityElement.isJsonArray() && !fVisibilityElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a = fVisibilityElement.getAsJsonArray();
@@ -347,7 +347,7 @@ public final class InvasionSkyRenderInfo {
 				fVisibility[2] = a.get(2).getAsFloat();
 				fVisibility[3] = a.get(3).getAsFloat();
 			}
-			final JsonElement fBrightnessElement = changes[4] ? jsonObjectIn.get("FlickerBrightness") : null;
+			final JsonElement fBrightnessElement = changes[4] ? pJsonObject.get("FlickerBrightness") : null;
 			final float[] fBrightness = new float[4];
 			if (fBrightnessElement != null && fBrightnessElement.isJsonArray() && !fBrightnessElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a = fBrightnessElement.getAsJsonArray();
@@ -356,12 +356,12 @@ public final class InvasionSkyRenderInfo {
 				fBrightness[2] = a.get(2).getAsFloat();
 				fBrightness[3] = a.get(3).getAsFloat();
 			}
-			final JsonElement fRGBElement = changes[3] ? jsonObjectIn.get("FlickerRGBOffset") : null;
+			final JsonElement fRGBElement = changes[3] ? pJsonObject.get("FlickerRGBOffset") : null;
 			float[][] fRGB = new float[0][5];
 			if (fRGBElement != null && fRGBElement.isJsonArray() && !fRGBElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a1 = fRGBElement.getAsJsonArray();
 				fRGB = new float[a1.size()][5];
-				for (int i = 0; i < a1.size(); i++) {
+				for (int i = 0; i < a1.size(); ++i) {
 					final JsonElement e = a1.get(i);
 					if (e.isJsonArray() && !e.getAsJsonArray().isEmpty()) {
 						final JsonArray a2 = e.getAsJsonArray();
@@ -373,10 +373,10 @@ public final class InvasionSkyRenderInfo {
 					}
 				}
 			}
-			final float weatherVisibility = changes[2] ? jsonObjectIn.get("WeatherVisibility").getAsFloat() : 0.0F;
-			final float brightness = changes[1] ? 1.0F - jsonObjectIn.get("Brightness").getAsFloat() : 1.0F;
-			final int lightLevel = jsonObjectIn.has("LightLevel") ? Mth.clamp(15 - jsonObjectIn.get("LightLevel").getAsInt(), 0, 15) : -1;
-			final JsonElement rgbElement = changes[0] ? jsonObjectIn.get("RGBOffset") : null;
+			final float weatherVisibility = changes[2] ? pJsonObject.get("WeatherVisibility").getAsFloat() : 0.0F;
+			final float brightness = changes[1] ? 1.0F - pJsonObject.get("Brightness").getAsFloat() : 1.0F;
+			final int lightLevel = pJsonObject.has("LightLevel") ? Mth.clamp(15 - pJsonObject.get("LightLevel").getAsInt(), 0, 15) : -1;
+			final JsonElement rgbElement = changes[0] ? pJsonObject.get("RGBOffset") : null;
 			final float[] rgb = new float[3];
 			if (rgbElement != null && rgbElement.isJsonArray() && !rgbElement.getAsJsonArray().isEmpty()) {
 				final JsonArray a = rgbElement.getAsJsonArray();
@@ -387,98 +387,98 @@ public final class InvasionSkyRenderInfo {
 			return new InvasionSkyRenderInfo.Builder(fogRenderer, sunMoonAlpha, sun, moon, fixedSky, changes, fVisibility, fBrightness, fRGB, weatherVisibility, brightness, lightLevel, rgb);
 		}
 
-		public final void serializeToNetwork(final FriendlyByteBuf bufIn) {
-			this.fogRenderer.serializeToNetwork(bufIn);
-			bufIn.writeBoolean(this.changes[0]);
-			bufIn.writeBoolean(this.changes[1]);
-			bufIn.writeBoolean(this.changes[2]);
-			bufIn.writeBoolean(this.changes[3]);
-			bufIn.writeBoolean(this.changes[4]);
-			bufIn.writeBoolean(this.changes[5]);
-			bufIn.writeBoolean(this.changes[6]);
-			bufIn.writeFloat(this.sunMoonAlpha);
+		public final void serializeToNetwork(final FriendlyByteBuf pBuf) {
+			this.fogRenderer.serializeToNetwork(pBuf);
+			pBuf.writeBoolean(this.changes[0]);
+			pBuf.writeBoolean(this.changes[1]);
+			pBuf.writeBoolean(this.changes[2]);
+			pBuf.writeBoolean(this.changes[3]);
+			pBuf.writeBoolean(this.changes[4]);
+			pBuf.writeBoolean(this.changes[5]);
+			pBuf.writeBoolean(this.changes[6]);
+			pBuf.writeFloat(this.sunMoonAlpha);
 			if (this.sunMoonAlpha > 0) {
-				bufIn.writeBoolean(this.sun != null);
+				pBuf.writeBoolean(this.sun != null);
 				if (this.sun != null)
-					bufIn.writeResourceLocation(this.sun);
-				bufIn.writeBoolean(this.moon != null);
+					pBuf.writeResourceLocation(this.sun);
+				pBuf.writeBoolean(this.moon != null);
 				if (this.moon != null)
-					bufIn.writeResourceLocation(this.moon);
+					pBuf.writeResourceLocation(this.moon);
 			}
-			bufIn.writeBoolean(this.fixedSky != null);
+			pBuf.writeBoolean(this.fixedSky != null);
 			if (this.fixedSky != null)
-				bufIn.writeResourceLocation(this.fixedSky);
-			bufIn.writeFloat(this.fVisibility[0]);
-			bufIn.writeFloat(this.fVisibility[1]);
-			bufIn.writeFloat(this.fVisibility[2]);
-			bufIn.writeFloat(this.fVisibility[3]);
-			bufIn.writeFloat(this.fBrightness[0]);
-			bufIn.writeFloat(this.fBrightness[1]);
-			bufIn.writeFloat(this.fBrightness[2]);
-			bufIn.writeFloat(this.fBrightness[3]);
-			bufIn.writeInt(this.fRGB.length);
-			for (int i = 0; i < this.fRGB.length; i++) {
-				bufIn.writeFloat(this.fRGB[i][0]);
-				bufIn.writeFloat(this.fRGB[i][1]);
-				bufIn.writeFloat(this.fRGB[i][2]);
-				bufIn.writeFloat(this.fRGB[i][3]);
-				bufIn.writeFloat(this.fRGB[i][4]);
+				pBuf.writeResourceLocation(this.fixedSky);
+			pBuf.writeFloat(this.fVisibility[0]);
+			pBuf.writeFloat(this.fVisibility[1]);
+			pBuf.writeFloat(this.fVisibility[2]);
+			pBuf.writeFloat(this.fVisibility[3]);
+			pBuf.writeFloat(this.fBrightness[0]);
+			pBuf.writeFloat(this.fBrightness[1]);
+			pBuf.writeFloat(this.fBrightness[2]);
+			pBuf.writeFloat(this.fBrightness[3]);
+			pBuf.writeInt(this.fRGB.length);
+			for (int i = 0; i < this.fRGB.length; ++i) {
+				pBuf.writeFloat(this.fRGB[i][0]);
+				pBuf.writeFloat(this.fRGB[i][1]);
+				pBuf.writeFloat(this.fRGB[i][2]);
+				pBuf.writeFloat(this.fRGB[i][3]);
+				pBuf.writeFloat(this.fRGB[i][4]);
 			}
-			bufIn.writeFloat(this.weatherVisibility);
-			bufIn.writeFloat(this.brightness);
-			bufIn.writeInt(this.lightLevel);
-			bufIn.writeFloat(this.rgb[0]);
-			bufIn.writeFloat(this.rgb[1]);
-			bufIn.writeFloat(this.rgb[2]);
+			pBuf.writeFloat(this.weatherVisibility);
+			pBuf.writeFloat(this.brightness);
+			pBuf.writeInt(this.lightLevel);
+			pBuf.writeFloat(this.rgb[0]);
+			pBuf.writeFloat(this.rgb[1]);
+			pBuf.writeFloat(this.rgb[2]);
 		}
 
-		public static final InvasionSkyRenderInfo.Builder fromNetwork(final FriendlyByteBuf bufIn) {
-			final InvasionFogRenderInfo.Builder fogRenderer = InvasionFogRenderInfo.Builder.fromNetwork(bufIn);
+		public static final InvasionSkyRenderInfo.Builder fromNetwork(final FriendlyByteBuf pBuf) {
+			final InvasionFogRenderInfo.Builder fogRenderer = InvasionFogRenderInfo.Builder.fromNetwork(pBuf);
 			final boolean[] changes = new boolean[7];
-			changes[0] = bufIn.readBoolean();
-			changes[1] = bufIn.readBoolean();
-			changes[2] = bufIn.readBoolean();
-			changes[3] = bufIn.readBoolean();
-			changes[4] = bufIn.readBoolean();
-			changes[5] = bufIn.readBoolean();
-			changes[6] = bufIn.readBoolean();
-			final float sunMoonAlpha = bufIn.readFloat();
+			changes[0] = pBuf.readBoolean();
+			changes[1] = pBuf.readBoolean();
+			changes[2] = pBuf.readBoolean();
+			changes[3] = pBuf.readBoolean();
+			changes[4] = pBuf.readBoolean();
+			changes[5] = pBuf.readBoolean();
+			changes[6] = pBuf.readBoolean();
+			final float sunMoonAlpha = pBuf.readFloat();
 			ResourceLocation sun = null;
 			ResourceLocation moon = null;
 			ResourceLocation fixedSky = null;
 			if (sunMoonAlpha > 0) {
-				if (bufIn.readBoolean())
-					sun = bufIn.readResourceLocation();
-				if (bufIn.readBoolean())
-					moon = bufIn.readResourceLocation();
+				if (pBuf.readBoolean())
+					sun = pBuf.readResourceLocation();
+				if (pBuf.readBoolean())
+					moon = pBuf.readResourceLocation();
 			}
-			if (bufIn.readBoolean())
-				fixedSky = bufIn.readResourceLocation();
+			if (pBuf.readBoolean())
+				fixedSky = pBuf.readResourceLocation();
 			final float[] fVisibility = new float[4];
-			fVisibility[0] = bufIn.readFloat();
-			fVisibility[1] = bufIn.readFloat();
-			fVisibility[2] = bufIn.readFloat();
-			fVisibility[3] = bufIn.readFloat();
+			fVisibility[0] = pBuf.readFloat();
+			fVisibility[1] = pBuf.readFloat();
+			fVisibility[2] = pBuf.readFloat();
+			fVisibility[3] = pBuf.readFloat();
 			final float[] fBrightness = new float[4];
-			fBrightness[0] = bufIn.readFloat();
-			fBrightness[1] = bufIn.readFloat();
-			fBrightness[2] = bufIn.readFloat();
-			fBrightness[3] = bufIn.readFloat();
-			final float[][] fRGB = new float[bufIn.readInt()][5];
+			fBrightness[0] = pBuf.readFloat();
+			fBrightness[1] = pBuf.readFloat();
+			fBrightness[2] = pBuf.readFloat();
+			fBrightness[3] = pBuf.readFloat();
+			final float[][] fRGB = new float[pBuf.readInt()][5];
 			for (int i = 0; i < fRGB.length; i++) {
-				fRGB[i][0] = bufIn.readFloat();
-				fRGB[i][1] = bufIn.readFloat();
-				fRGB[i][2] = bufIn.readFloat();
-				fRGB[i][3] = bufIn.readFloat();
-				fRGB[i][4] = bufIn.readFloat();
+				fRGB[i][0] = pBuf.readFloat();
+				fRGB[i][1] = pBuf.readFloat();
+				fRGB[i][2] = pBuf.readFloat();
+				fRGB[i][3] = pBuf.readFloat();
+				fRGB[i][4] = pBuf.readFloat();
 			}
-			final float weatherVisibility = bufIn.readFloat();
-			final float brightness = bufIn.readFloat();
-			final int lightLevel = bufIn.readInt();
+			final float weatherVisibility = pBuf.readFloat();
+			final float brightness = pBuf.readFloat();
+			final int lightLevel = pBuf.readInt();
 			final float[] rgb = new float[3];
-			rgb[0] = bufIn.readFloat();
-			rgb[1] = bufIn.readFloat();
-			rgb[2] = bufIn.readFloat();
+			rgb[0] = pBuf.readFloat();
+			rgb[1] = pBuf.readFloat();
+			rgb[2] = pBuf.readFloat();
 			return new InvasionSkyRenderInfo.Builder(fogRenderer, sunMoonAlpha, sun, moon, fixedSky, changes, fVisibility, fBrightness, fRGB, weatherVisibility, brightness, lightLevel, rgb);
 		}
 	}

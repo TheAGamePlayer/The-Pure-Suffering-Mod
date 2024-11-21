@@ -23,13 +23,13 @@ public final class InvasionTypesProvider implements DataProvider {
 	private final List<Consumer<Consumer<InvasionType>>> tabs = List.of(new PSOverworldInvasionTypes(), new PSNetherInvasionTypes(), new PSEndInvasionTypes(), new PSMultiDimInvasionTypes());
 	private final CompletableFuture<HolderLookup.Provider> registries;
 
-	public InvasionTypesProvider(final PackOutput packOutputIn, final CompletableFuture<HolderLookup.Provider> lookupProviderIn) {
-		this.pathProvider = packOutputIn.createPathProvider(PackOutput.Target.DATA_PACK, "invasion_types");
-		this.registries = lookupProviderIn;
+	public InvasionTypesProvider(final PackOutput pPackOutput, final CompletableFuture<HolderLookup.Provider> pLookupProvider) {
+		this.pathProvider = pPackOutput.createPathProvider(PackOutput.Target.DATA_PACK, "invasion_types");
+		this.registries = pLookupProvider;
 	}
 
 	@Override
-	public final CompletableFuture<?> run(final CachedOutput cacheIn) {
+	public final CompletableFuture<?> run(final CachedOutput pCache) {
 		return this.registries.thenCompose(path -> {
 			final HashSet<ResourceLocation> set = new HashSet<>();
 			final ArrayList<CompletableFuture<?>> list = new ArrayList<>();
@@ -38,15 +38,11 @@ public final class InvasionTypesProvider implements DataProvider {
 					throw new IllegalStateException("Duplicate invasion type " + invasionType.getId());
 				} else {
 					final Path path1 = this.pathProvider.json(invasionType.getId());
-					list.add(DataProvider.saveStable(cacheIn, invasionType.deconstruct().serializeToJson(), path1));
+					list.add(DataProvider.saveStable(pCache, invasionType.deconstruct().serializeToJson(), path1));
 				}
 			};
-			for (final Consumer<Consumer<InvasionType>> consumer1 : this.tabs) {
-				consumer1.accept(consumer);
-			}
-			return CompletableFuture.allOf(list.toArray((p_253393_) -> {
-				return new CompletableFuture[p_253393_];
-			}));
+			for (final Consumer<Consumer<InvasionType>> consumer1 : this.tabs) consumer1.accept(consumer);
+			return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
 		});
 	}
 

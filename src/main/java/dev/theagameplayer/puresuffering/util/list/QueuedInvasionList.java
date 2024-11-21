@@ -14,8 +14,8 @@ public class QueuedInvasionList implements Iterable<BuildInfo> {
 	private final ArrayList<BuildInfo> invasions = new ArrayList<>();
 	private final InvasionDifficulty difficulty;
 	
-	public QueuedInvasionList(final InvasionDifficulty difficultyIn) {
-		this.difficulty = difficultyIn;
+	public QueuedInvasionList(final InvasionDifficulty pDifficulty) {
+		this.difficulty = pDifficulty;
 	}
 	
 	public final BuildInfo getPrimary() {
@@ -26,12 +26,12 @@ public class QueuedInvasionList implements Iterable<BuildInfo> {
 		return this.difficulty;
 	}
 	
-	public static final QueuedInvasionList load(final ServerLevel levelIn, final CompoundTag nbtIn) {
-		final QueuedInvasionList list = new QueuedInvasionList(InvasionDifficulty.values()[nbtIn.getInt("Difficulty")]);
-		final ListTag invasionsNBT = nbtIn.getList("Invasions", Tag.TAG_COMPOUND);
+	public static final QueuedInvasionList load(final ServerLevel pLevel, final CompoundTag pNbt) {
+		final QueuedInvasionList list = new QueuedInvasionList(InvasionDifficulty.values()[pNbt.getInt("Difficulty")]);
+		final ListTag invasionsNBT = pNbt.getList("Invasions", Tag.TAG_COMPOUND);
 		for (final Tag inbt : invasionsNBT) {
 			if (inbt instanceof CompoundTag nbt)
-				list.add(BuildInfo.load(levelIn, nbt));
+				list.add(BuildInfo.load(pLevel, nbt));
 		}
 		return list;
 	}
@@ -46,12 +46,12 @@ public class QueuedInvasionList implements Iterable<BuildInfo> {
 		return nbt;
 	}
 	
-	public final void add(final BuildInfo invasionIn) {
-		this.invasions.add(invasionIn);
+	public final void add(final BuildInfo pInvasion) {
+		this.invasions.add(pInvasion);
 	}
 	
-	public final void remove(final BuildInfo invasionIn) {
-		this.invasions.remove(invasionIn);
+	public final void remove(final BuildInfo pInvasion) {
+		this.invasions.remove(pInvasion);
 	}
 	
 	//Array List Functions
@@ -63,8 +63,8 @@ public class QueuedInvasionList implements Iterable<BuildInfo> {
     	return this.invasions.isEmpty();
     }
 	
-    public final BuildInfo get(final int indexIn) {
-    	return this.invasions.get(indexIn);
+    public final BuildInfo get(final int pIndex) {
+    	return this.invasions.get(pIndex);
     }
 	
     @Override
