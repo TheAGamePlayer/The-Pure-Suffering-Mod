@@ -25,6 +25,8 @@ Rarity: (Integer 0+)
 - How rare your invasion is, higher numbers are more rare.
 Tier: (Integer 0+)
 - The Tier of your invasion, increased numbers occurring after so many difficulty bumps.
+GameStages: (Optional - String Array - 1.20.1 Only)
+- GameStages required to unlock the invasion.
 StopConversions: (Optional - Boolean)
 - Will determine if invasion mobs will be unable to convert into another hostile mob.
 InvasionTime: (String)
