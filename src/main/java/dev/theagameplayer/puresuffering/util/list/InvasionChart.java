@@ -54,10 +54,10 @@ public final class InvasionChart {
 		private final InvasionType invasionType;
 		private float min, max;
 		
-		private InvasionRange(final InvasionType invasionTypeIn, final float minIn, final float maxIn) {
-			this.invasionType = invasionTypeIn;
-			this.min = minIn;
-			this.max = maxIn;
+		private InvasionRange(final InvasionType pInvasionType, final float pMin, final float pMax) {
+			this.invasionType = pInvasionType;
+			this.min = pMin;
+			this.max = pMax;
 		}
 		
 		private final boolean inRange(final float pNumber) {
