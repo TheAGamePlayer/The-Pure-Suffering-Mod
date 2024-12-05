@@ -620,6 +620,11 @@ public final class InvasionType {
 			this.tier = pTier;
 			return this;
 		}
+		
+		public final InvasionType.Builder withGameStages(final String... pGameStages) {
+			this.gameStages = pGameStages;
+			return this;
+		}
 
 		public final InvasionType.Builder withConversionsStopped() {
 			this.stopConversions = true;
@@ -689,7 +694,7 @@ public final class InvasionType {
 			final JsonObject jsonObject = new JsonObject();
 			jsonObject.addProperty("Rarity", this.rarity + 1);
 			jsonObject.addProperty("Tier", this.tier + 1);
-			if (this.gameStages.length > 0) {
+			if (this.gameStages != null && this.gameStages.length > 0) {
 				final JsonArray jsonArray = new JsonArray();
 				for (final String gs : this.gameStages)
 					jsonArray.add(gs);

@@ -134,7 +134,7 @@ public final class InvasionManager {
 	}
 	
 	private final boolean playerHasGameStage(final InvasionType pInvasionType, final ServerLevel pLevel) {
-		for (final ServerPlayer player : pLevel.getPlayers(player -> !player.isAlive() && !player.isSpectator())) {
+		for (final ServerPlayer player : pLevel.getPlayers(player -> player.isAlive() && !player.isSpectator())) {
 			if (GameStageHelper.hasAllOf(player, pInvasionType.getGameStages())) return true;
 		}
 		return false;

@@ -19,7 +19,7 @@ public final class MobMixin implements PSInvasionMob {
 	private MobTagData[] ps_mobDataTags = new MobTagData[0];
 
 	@Inject(at = @At("RETURN"), method = "defineSynchedData()V")
-	private final void defineSynchedData(final CallbackInfo callbackIn) {
+	private final void defineSynchedData(final CallbackInfo pCallback) {
 		((Mob)(Object)this).getEntityData().define(PS_HYPER_CHARGE, 0);
 	}
 

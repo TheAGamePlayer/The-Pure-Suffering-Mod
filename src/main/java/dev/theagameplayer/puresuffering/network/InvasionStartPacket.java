@@ -43,9 +43,9 @@ public final class InvasionStartPacket implements CustomPacketPayload {
 			final InvasionDifficulty difficulty = session == null ? null : session.getDifficulty();
 			if (PSConfigValues.client.useInvasionSoundEffects)
 				mc.player.playSound(difficulty == null ? PSSoundEvents.CANCEL_INVASION.get() : difficulty.getStartSound());
+			if (session == null) return;
 			InvasionStartTimer.timer = new InvasionStartTimer(difficulty, session, pPacket.notifyPlayers);
-			if (session == null || !PSConfigValues.client.enableInvasionStartEffects) return;
-			session.setStartTimer();
+			if (PSConfigValues.client.enableInvasionStartEffects) session.setStartTimer();
 		}
 	}
 }
