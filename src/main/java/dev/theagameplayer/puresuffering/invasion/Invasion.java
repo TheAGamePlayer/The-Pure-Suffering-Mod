@@ -24,6 +24,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -204,8 +205,9 @@ public final class Invasion implements InvasionTypeHolder {
 			//Spawn Mob Group (Same Mob)
 			final InvasionSpawnerData spawners = mobs.get(pLevel.random.nextInt(mobs.size()));
 			final int groupSize = pLevel.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-			this.nextSpawnData.getEntityToSpawn().putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(spawners.type).toString());
 			final CompoundTag compoundTag = this.nextSpawnData.getEntityToSpawn();
+			final boolean isModified = this.getSeverityInfo().getEntityNBTTags() != null || spawners.nbtTags != null;
+			compoundTag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(spawners.type).toString());
 			final Optional<EntityType<?>> optional = EntityType.by(compoundTag);
 			if (!optional.isPresent()) {
 				this.delay(pLevel, pTotalInvasions);
@@ -224,10 +226,11 @@ public final class Invasion implements InvasionTypeHolder {
 						return;
 					}
 					entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), pLevel.random.nextFloat() * 360.0F, 0.0F);
+					if (isModified) entity.load(entity.saveWithoutId(spawners.parseNBT(this.getSeverityInfo().getEntityNBTTags())));
 					if (entity instanceof Mob mob) {
 						if (!EventHooks.checkSpawnPosition(mob, pLevel, MobSpawnType.EVENT)) continue;
-						if (this.nextSpawnData.getEntityToSpawn().size() == 1 && this.nextSpawnData.getEntityToSpawn().contains("id", Tag.TAG_STRING))
-							this.spawnInvasionMob(pLevel, pDifficulty, mob, spawners.ignoreSpawnRules, spawners.forceDespawn || PSGameRules.MOBS_DIE_AT_END_OF_INVASIONS.get(pLevel), spawners.nbtTags, spawners.persistentTags);
+						if (compoundTag.size() == 1 && compoundTag.contains("id", Tag.TAG_STRING))
+							this.spawnInvasionMob(pLevel, pDifficulty, mob, spawners.ignoreSpawnRules, spawners.forceDespawn || PSGameRules.MOBS_DIE_AT_END_OF_INVASIONS.get(pLevel), spawners.persistentTags);
 					}
 					if (!pLevel.tryAddFreshEntityWithPassengers(entity)) {
 						this.delay(pLevel, pTotalInvasions);
@@ -251,11 +254,14 @@ public final class Invasion implements InvasionTypeHolder {
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked") //It is checked ;)
 	private final boolean isValidLocation(final ServerLevel pLevel, final EntityType<?> pEntityType, final BlockPos pPos, final boolean pIgnoreSpawnRules) {
-		final boolean flag = pPos != null && pEntityType.getCategory() == MobCategory.MONSTER && SpawnPlacements.getPlacementType(pEntityType).isSpawnPositionOk(pLevel, pPos, pEntityType);
-		if (pIgnoreSpawnRules) return flag && Mob.checkMobSpawnRules((EntityType<? extends Mob>)pEntityType, pLevel, MobSpawnType.EVENT, pPos, pLevel.getRandom());
-		return flag && SpawnPlacements.checkSpawnRules(pEntityType, pLevel, MobSpawnType.EVENT, pPos, pLevel.getRandom());
+		final boolean flag = pPos != null && pEntityType.getCategory() == MobCategory.MONSTER && SpawnPlacements.getPlacementType(pEntityType).isSpawnPositionOk(pLevel, pPos, pEntityType) && checkDefaultSpawnRules(pLevel, pEntityType, pPos);
+		return pIgnoreSpawnRules ? flag : flag && SpawnPlacements.checkSpawnRules(pEntityType, pLevel, MobSpawnType.EVENT, pPos, pLevel.getRandom());
+	}
+	
+	private final boolean checkDefaultSpawnRules(final ServerLevel pLevel, final EntityType<?> pEntityType, final BlockPos pPos) {
+		final BlockPos below = pPos.below();
+		return Monster.isDarkEnoughToSpawn(pLevel, pPos, pLevel.getRandom()) && pLevel.getBlockState(below).isValidSpawn(pLevel, below, pEntityType);
 	}
 
 	private final void spawnAdditionalEntity(final BlockPos pPos, final ServerLevel pLevel, final EntityType<?> pEntityType) {
@@ -273,17 +279,15 @@ public final class Invasion implements InvasionTypeHolder {
 		pLevel.tryAddFreshEntityWithPassengers(entity);
 	}
 
-	private final void spawnInvasionMob(final ServerLevel pLevel, final InvasionDifficulty pDifficulty, final Mob pMob, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final MobTagData[] pNBTTags, final MobTagData[] pPersistentTags) {
+	private final void spawnInvasionMob(final ServerLevel pLevel, final InvasionDifficulty pDifficulty, final Mob pMob, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final MobTagData[] pPersistentTags) {
 		boolean hyperCharged = PSGameRules.HYPER_CHARGE.get(pLevel) && !PSConfigValues.common.hyperChargeBlacklist.contains(pMob.getType().getDescriptionId()) && (pDifficulty.isHyper() || pLevel.random.nextDouble() < PSConfigValues.common.hyperChargeChance * (double)(this.severity + 1)/this.invasionType.getMaxSeverity());
 		final CompoundTag persistentData = pMob.getPersistentData();
 		persistentData.putInt(INVASION_MOB, this.toExtendedString().hashCode());
 		persistentData.putBoolean(ANTI_GRIEF, pIgnoreSpawnRules);
 		persistentData.putIntArray(DESPAWN_LOGIC, new int[pForceDespawn ? 6 : 4]);
 		if (pForceDespawn) persistentData.getIntArray(DESPAWN_LOGIC)[5] = 100 + pLevel.random.nextInt(101);
-		if (pMob instanceof PSInvasionMob invasionMob) {
-			invasionMob.applyNBTTags(pNBTTags);
-			if (hyperCharged) invasionMob.psSetHyperCharge(pDifficulty.getHyperCharge(pLevel, this.invasionType.getTier(), this.isNatural));
-		}
+		if (pMob instanceof PSInvasionMob invasionMob && hyperCharged)
+			invasionMob.psSetHyperCharge(pDifficulty.getHyperCharge(pLevel, this.invasionType.getTier(), this.isNatural));
 		for (final MobTagData tag : pPersistentTags) tag.addTagToMob(persistentData);
 		EventHooks.finalizeMobSpawn(pMob, pLevel, pLevel.getCurrentDifficultyAt(pMob.blockPosition()), MobSpawnType.EVENT, null);
 		this.invasionMobs.add(new MobInfo(pMob.getUUID(), false));

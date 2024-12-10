@@ -3,10 +3,16 @@ package dev.theagameplayer.puresuffering.invasion.data;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import dev.theagameplayer.puresuffering.PureSufferingMod;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.Weight;
 import net.minecraft.util.random.WeightedEntry;
@@ -15,23 +21,25 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 
 public final class InvasionSpawnerData extends WeightedEntry.IntrusiveBase { //From MobSpawnSettings$SpawnerData
+	private static final Logger LOGGER = PureSufferingMod.LOGGER;
 	public final EntityType<?> type;
 	public final int minCount;
 	public final int maxCount;
 	public final boolean ignoreSpawnRules;
 	public final boolean forceDespawn;
 	public final ResourceLocation[] acceptableBiomes;
-	public final MobTagData[] nbtTags, persistentTags;
+	public final String nbtTags;
+	public final MobTagData[] persistentTags;
 
 	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount) {
-		this(pType, pWeight, pMinCount, pMaxCount, false, false, new ResourceLocation[0], new MobTagData[0], new MobTagData[0]);
+		this(pType, pWeight, pMinCount, pMaxCount, false, false, new ResourceLocation[0], null, new MobTagData[0]);
 	}
 	
 	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn) {
-		this(pType, pWeight, pMinCount, pMaxCount, pIgnoreSpawnRules, pForceDespawn, new ResourceLocation[0], new MobTagData[0], new MobTagData[0]);
+		this(pType, pWeight, pMinCount, pMaxCount, pIgnoreSpawnRules, pForceDespawn, new ResourceLocation[0], null, new MobTagData[0]);
 	}
 
-	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final ResourceLocation[] pAcceptableBiomes, final MobTagData[] pNBTTags, final MobTagData[] pPersistentTags) {
+	public InvasionSpawnerData(final EntityType<?> pType, final int pWeight, final int pMinCount, final int pMaxCount, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final ResourceLocation[] pAcceptableBiomes, final String pNBTTags, final MobTagData[] pPersistentTags) {
 		super(Weight.of(pWeight));
 		if (pType == null || pType.getCategory() == MobCategory.MISC) throw new NullPointerException("Spawning an entity type of null or of a 'Misc' category will result in undefined behavior.");
 		this.type = pType;
@@ -43,16 +51,25 @@ public final class InvasionSpawnerData extends WeightedEntry.IntrusiveBase { //F
 		this.nbtTags = pNBTTags;
 		this.persistentTags = pPersistentTags;
 	}
+	
+	public final CompoundTag parseNBT(final String pEntityNBTTags) {
+		try {
+			return new TagParser(new StringReader(pEntityNBTTags == null ? this.nbtTags : pEntityNBTTags)).readStruct();
+		} catch (final CommandSyntaxException e) {
+			LOGGER.error("This is likely caused by incorrect nbt in a datapack!", e);
+			return null;
+		}
+	}
 
 	@Override
 	public String toString() {
-		return EntityType.getKey(this.type) + "*(" + this.minCount + "-" + this.maxCount + "):" + this.getWeight() + ", " + this.ignoreSpawnRules + ", " + this.forceDespawn + ", " + this.acceptableBiomes + ", " + this.nbtTags + ", " + this.persistentTags;
+		return EntityType.getKey(this.type) + "(" + this.minCount + "-" + this.maxCount + "):" + this.getWeight() + ", " + this.ignoreSpawnRules + ", " + this.forceDespawn + ", " + this.acceptableBiomes + ", " + this.nbtTags + ", " + this.persistentTags;
 	}
 
 	public static final ArrayList<InvasionSpawnerData> convertSpawners(final List<MobSpawnSettings.SpawnerData> pList) {
 		final ArrayList<InvasionSpawnerData> spawners = new ArrayList<>(pList.size());
 		for (final MobSpawnSettings.SpawnerData spawner : pList)
-			spawners.add(new InvasionSpawnerData(spawner.type, spawner.getWeight().asInt(), spawner.minCount, spawner.maxCount, false, false, new ResourceLocation[0], new MobTagData[0], new MobTagData[0]));
+			spawners.add(new InvasionSpawnerData(spawner.type, spawner.getWeight().asInt(), spawner.minCount, spawner.maxCount, false, false, new ResourceLocation[0], null, new MobTagData[0]));
 		return spawners;
 	}
 
