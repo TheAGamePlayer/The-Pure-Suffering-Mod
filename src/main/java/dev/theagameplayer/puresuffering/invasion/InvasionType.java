@@ -210,6 +210,7 @@ public final class InvasionType {
 	public static final class SeverityInfo {
 		private final InvasionSkyRenderInfo skyRenderInfo;
 		private final String[] startCommands, endCommands;
+		private final String entityNBTTags;
 		private final InvasionSpawnerData[] mobSpawnList;
 		private final AdditionalEntitySpawnData[] additionalEntitiesList;
 		private final float mobCapPercentage;
@@ -219,10 +220,11 @@ public final class InvasionType {
 		private final int clusterSize;
 		private final int mobKillLimit;
 
-		private SeverityInfo(final InvasionSkyRenderInfo pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize, final int pMobKillLimit) {
+		private SeverityInfo(final InvasionSkyRenderInfo pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final String pEntityNBTTags, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize, final int pMobKillLimit) {
 			this.skyRenderInfo = pSkyRenderInfo;
 			this.startCommands = pStartCommands;
 			this.endCommands = pEndCommands;
+			this.entityNBTTags = pEntityNBTTags;
 			this.mobSpawnList = pMobSpawnList;
 			this.additionalEntitiesList = pAdditionalEntitiesList;
 			this.mobCapPercentage = pMobCapPercentage;
@@ -234,7 +236,7 @@ public final class InvasionType {
 		}
 
 		public final SeverityInfo.Builder deconstruct() {
-			return new SeverityInfo.Builder(this.skyRenderInfo == null ? null : this.skyRenderInfo.deconstruct(), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize, this.mobKillLimit);
+			return new SeverityInfo.Builder(this.skyRenderInfo == null ? null : this.skyRenderInfo.deconstruct(), this.startCommands, this.endCommands, this.entityNBTTags, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize, this.mobKillLimit);
 		}
 
 		public final InvasionSkyRenderInfo getSkyRenderInfo() {
@@ -247,6 +249,10 @@ public final class InvasionType {
 		
 		public final String[] getEndCommands() {
 			return this.endCommands;
+		}
+		
+		public final String getEntityNBTTags() {
+			return this.entityNBTTags;
 		}
 
 		public final InvasionSpawnerData[] getMobSpawnList() {
@@ -284,6 +290,7 @@ public final class InvasionType {
 		public static final class Builder {
 			private InvasionSkyRenderInfo.Builder skyRenderInfo = null;
 			private String[] startCommands, endCommands;
+			private String entityNBTTags;
 			private InvasionSpawnerData[] mobSpawnList;
 			private AdditionalEntitySpawnData[] additionalEntitiesList;
 			private float mobCapPercentage = 1.0F;
@@ -293,10 +300,11 @@ public final class InvasionType {
 			private int clusterSize = 1;
 			private int mobKillLimit;
 
-			private Builder(final InvasionSkyRenderInfo.Builder pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize, final int pMobKillLimit) {
+			private Builder(final InvasionSkyRenderInfo.Builder pSkyRenderInfo, final String[] pStartCommands, final String[] pEndCommands, final String pEntityNBTTags, final InvasionSpawnerData[] pMobSpawnList, final AdditionalEntitySpawnData[] pAdditionalEntitiesList, final float pMobCapPercentage, final int pFixedMobCap, final boolean pForceNoSleep, final int pTickDelay, final int pClusterSize, final int pMobKillLimit) {
 				this.skyRenderInfo = pSkyRenderInfo;
 				this.startCommands = pStartCommands;
 				this.endCommands = pEndCommands;
+				this.entityNBTTags = pEntityNBTTags;
 				this.mobSpawnList = pMobSpawnList;
 				this.additionalEntitiesList = pAdditionalEntitiesList;
 				this.mobCapPercentage = pMobCapPercentage;
@@ -325,6 +333,11 @@ public final class InvasionType {
 
 			public final SeverityInfo.Builder endCommands(final String... pEndCommands) {
 				this.endCommands = pEndCommands;
+				return this;
+			}
+			
+			public final SeverityInfo.Builder entityNBTTags(final String pEntityNBTTags) {
+				this.entityNBTTags = pEntityNBTTags;
 				return this;
 			}
 
@@ -369,7 +382,7 @@ public final class InvasionType {
 			}
 
 			public final SeverityInfo build(final ResourceLocation pId) {
-				return new SeverityInfo(this.skyRenderInfo == null ? InvasionSkyRenderInfo.Builder.skyRenderInfo().build(pId) : this.skyRenderInfo.build(pId), this.startCommands, this.endCommands, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize, this.mobKillLimit);
+				return new SeverityInfo(this.skyRenderInfo == null ? InvasionSkyRenderInfo.Builder.skyRenderInfo().build(pId) : this.skyRenderInfo.build(pId), this.startCommands, this.endCommands, this.entityNBTTags, this.mobSpawnList, this.additionalEntitiesList, this.mobCapPercentage, this.fixedMobCap, this.forceNoSleep, this.tickDelay, this.clusterSize, this.mobKillLimit);
 			}
 
 			public final JsonObject serializeToJson() {
@@ -388,6 +401,8 @@ public final class InvasionType {
 						jsonArray2.add(cmd);
 					jsonObject.add("EndCommands", jsonArray2);
 				}
+				if (this.entityNBTTags != null)
+					jsonObject.addProperty("EntityNBTTags", this.entityNBTTags);
 				if (this.mobSpawnList != null) {
 					final JsonArray jsonArray = new JsonArray();
 					for (final InvasionSpawnerData spawnInfo : this.mobSpawnList) {
@@ -406,17 +421,13 @@ public final class InvasionType {
 								jsonArray3.add(id.toString());
 							jsonObject3.add("AcceptableBiomes", jsonArray3);
 						}
-						if (spawnInfo.nbtTags.length > 0) {
-							final JsonArray jsonArray4 = new JsonArray();
-							for (final MobTagData tag : spawnInfo.nbtTags)
-								jsonArray4.add(tag.addTagToJson());
-							jsonObject3.add("NBTTags", jsonArray4);
-						}
+						if (spawnInfo.nbtTags != null)
+							jsonObject3.addProperty("NBTTags", spawnInfo.nbtTags);
 						if (spawnInfo.persistentTags.length > 0) {
-							final JsonArray jsonArray5 = new JsonArray();
+							final JsonArray jsonArray4 = new JsonArray();
 							for (final MobTagData tag : spawnInfo.persistentTags)
-								jsonArray5.add(tag.addTagToJson());
-							jsonObject3.add("PersistentTags", jsonArray5);
+								jsonArray4.add(tag.addTagToJson());
+							jsonObject3.add("PersistentTags", jsonArray4);
 						}
 						jsonArray.add(jsonObject3);
 					}
@@ -475,6 +486,7 @@ public final class InvasionType {
 						endCommands[c] = e5.getAsString();
 					}
 				}
+				final String entityNBTTags = pJsonObject.has("EntityNBTTags") ? pJsonObject.get("EntityNBTTags").getAsString() : null;
 				final InvasionSpawnerData[] mobSpawnList = new InvasionSpawnerData[pJsonObject.has("MobSpawnList") ? pJsonObject.get("MobSpawnList").getAsJsonArray().size() : 0];
 				final JsonElement mobSpawnListElement = pJsonObject.getAsJsonArray("MobSpawnList");
 				if (mobSpawnListElement != null) {
@@ -491,7 +503,7 @@ public final class InvasionType {
 								final boolean ignoreSpawnRules = jObject.has("IgnoreSpawnRules") && jObject.get("IgnoreSpawnRules").getAsBoolean();
 								final boolean forceDespawn = jObject.has("ForceDespawn") && jObject.get("ForceDespawn").getAsBoolean();
 								final ArrayList<ResourceLocation> acceptableBiomes = new ArrayList<>(jObject.has("AcceptableBiomes") ? jObject.get("AcceptableBiomes").getAsJsonArray().size() : 0);
-								final MobTagData[] nbtTags = new MobTagData[jObject.has("NBTTags") ? jObject.get("NBTTags").getAsJsonArray().size() : 0];
+								final String nbtTags = jObject.has("NBTTags") ? jObject.get("NBTTags").getAsString() : null;
 								final MobTagData[] persistentTags = new MobTagData[jObject.has("PersistentTags") ? jObject.get("PersistentTags").getAsJsonArray().size() : 0];
 								if (jObject.has("AcceptableBiomes")) {
 									for (int b = 0, size = jObject.get("AcceptableBiomes").getAsJsonArray().size(); b < size; ++b) {
@@ -506,13 +518,6 @@ public final class InvasionType {
 										} else {
 											acceptableBiomes.add(id);
 										}
-									}
-								}
-								if (jObject.has("NBTTags")) {
-									for (int t = 0; t < nbtTags.length; ++t) {
-										final JsonElement e2 = jObject.get("NBTTags").getAsJsonArray().get(t);
-										if (!e2.isJsonObject()) continue;
-										nbtTags[t] = MobTagData.addTagData(e2.getAsJsonObject());
 									}
 								}
 								if (jObject.has("PersistentTags")) {
@@ -564,7 +569,7 @@ public final class InvasionType {
 				final int mobKillLimit = pJsonObject.has("MobKillLimit") ? pJsonObject.get("MobKillLimit").getAsInt() : 0;
 				if (errored || tickDelay < 0 || clusterSize < 1 || mobKillLimit < 0)
 					LOGGER.error("JsonElement is incorrectly setup: " + pJsonObject.toString() + ". Therefore InvasionType wasn't registered! Most likely a datapack error?");
-				return new SeverityInfo.Builder(skyRenderInfo, startCommands, endCommands, mobSpawnList, additionalEntitiesList, mobCapPercentage, fixedMobCap, forceNoSleep, tickDelay, clusterSize, mobKillLimit);
+				return new SeverityInfo.Builder(skyRenderInfo, startCommands, endCommands, entityNBTTags, mobSpawnList, additionalEntitiesList, mobCapPercentage, fixedMobCap, forceNoSleep, tickDelay, clusterSize, mobKillLimit);
 			}
 		}
 	}

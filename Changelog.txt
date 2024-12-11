@@ -1,4 +1,9 @@
 #Minecraft 1.21.x
+Version 1.6.6.4B:
+- All invasion mobs now follow light level spawning rules used by monster entities.
+- Redid entity nbt modification for mobs in datapacks.
+- Slight optimization to make invasions that change the skybox drop fps less.
+
 Version 1.6.6.3B:
 - Fixed invasions crashing when triggered too quickly in succession.
 
@@ -46,7 +51,7 @@ Version 1.6.5.4B:
 - Slight optimizations for config creation and value lookups.
 
 Version 1.6.5.3B:
-- Fixed dedicated servers crashing.
+- Fixed dedicated servers crashdrop fps less.ing.
 
 Version 1.6.5.2B:
 - Changed the way invasions are ticked to rely less on multi-threading.
@@ -69,6 +74,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.6.4R-LTS1:
+- Backport of 1.6.6.4B.
+
 Version 1.6.6.3R-LTS1:
 - Backport of 1.6.6.3B.
 - GameStages support fixed.

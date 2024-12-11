@@ -1,7 +1,6 @@
 package dev.theagameplayer.puresuffering.world.entity;
 
 import dev.theagameplayer.puresuffering.PureSufferingMod;
-import dev.theagameplayer.puresuffering.invasion.data.InvasionSpawnerData.MobTagData;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -13,8 +12,6 @@ public interface PSInvasionMob { //Add "PS" to avoid compatibility problems
     abstract int psGetHyperCharge();
     
     abstract void psSetHyperCharge(final int pHyperCharge);
-    
-    abstract void applyNBTTags(final MobTagData[] pNBTTags);
     
     public static void applyHyperEffects(final Mob pMob) {
 		hyperAttribute(pMob, Attributes.MAX_HEALTH, 0.375D);

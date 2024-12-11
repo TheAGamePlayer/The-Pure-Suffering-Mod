@@ -110,7 +110,9 @@ public final class InvasionSkyRenderer {
 	
 	public final void tick(final long pDayTime) {
 		if (this.noTick) return;
-		this.rgb[1] = this.rgb[0].clone();
+		this.rgb[1][0] = this.rgb[0][0];
+		this.rgb[1][1] = this.rgb[0][1];
+		this.rgb[1][2] = this.rgb[0][2];
 		for (final ClientInvasion invasion : this.invasions)
 			invasion.flickerSkyRGB(this.rgb[1]);
 		ClientTransitionHandler.getSkyColor(this.rgb[1], pDayTime);
