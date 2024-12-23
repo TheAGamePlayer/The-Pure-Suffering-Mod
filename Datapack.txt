@@ -132,6 +132,7 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
     - Format like in the /summon command.
     - Overrides default nbt data for invasion mobs.
     - Global value that applies to all mobs spawned by the invasion.
+    - Example "{NoAI:1}" would disable ai for all mobs by default.
     MobSpawnList: (List of mobs spawned by the invasion) {
         EntityType: (ResourceLocation-String)
         - ID of the mob for this spawn entry
@@ -153,6 +154,7 @@ SeverityInfo: (List of info for each severity of this invasion, every entry is 1
         - Format like in the /summon command.
         - Overrides default nbt data for invasion mobs and nbt data specified by the "EntityNBTTags" value.
         - Specific value that applies to this entity type for the invasion.
+        - Example "{NoAI:1}" would disable ai for all mobs of this type.
         PersistentTags: { (Optional - NBTList)
             - This applies to the mob's persistent data not vanilla entity data.
             - Can override existing values or create new ones.

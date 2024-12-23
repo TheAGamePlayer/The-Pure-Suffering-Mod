@@ -30,7 +30,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public final class InvasionTypeManager extends SimpleJsonResourceReloadListener {
 	private static final Logger LOGGER = PureSufferingMod.LOGGER;
-	private static final Gson GSON = (new GsonBuilder()).create();
+	private static final Gson GSON = new GsonBuilder().create();
 	private final HashMap<ResourceLocation, InvasionType> invasionTypeMap = new HashMap<>();
 	private final Registry<LevelStem> dimensions;
 	private final Registry<Biome> biomes;
@@ -50,10 +50,10 @@ public final class InvasionTypeManager extends SimpleJsonResourceReloadListener 
 				final InvasionType invasionType = InvasionType.Builder.fromJson(this.dimensions, this.biomes, jsonObject).build(entry.getKey());
 				if (invasionType == null) {
 					LOGGER.debug("Skipping loading invasion type {} as it's conditions were not met.", entry.getKey());
-					return;
+					continue;
 				} else if (PSConfigValues.common.invasionBlacklist.contains(entry.getKey().toString())) {
 					LOGGER.debug("Skipping loading invasion type {} as it is blacklisted.", entry.getKey());
-					return;
+					continue;
 				}
 				if (this.invasionTypeMap.containsKey(entry.getKey())) {
 					if (!invasionType.overridesExisting()) continue;
