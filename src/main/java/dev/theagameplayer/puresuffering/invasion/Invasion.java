@@ -33,6 +33,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
@@ -205,8 +206,8 @@ public final class Invasion implements InvasionTypeHolder {
 			//Spawn Mob Group (Same Mob)
 			final InvasionSpawnerData spawners = mobs.get(pLevel.random.nextInt(mobs.size()));
 			final int groupSize = pLevel.random.nextInt(spawners.maxCount - spawners.minCount + 1) + spawners.minCount;
-			final CompoundTag compoundTag = this.nextSpawnData.getEntityToSpawn();
 			final boolean isModified = this.getSeverityInfo().getEntityNBTTags() != null || spawners.nbtTags != null;
+			final CompoundTag compoundTag = this.nextSpawnData.getEntityToSpawn();
 			compoundTag.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(spawners.type).toString());
 			final Optional<EntityType<?>> optional = EntityType.by(compoundTag);
 			if (!optional.isPresent()) {
@@ -226,7 +227,20 @@ public final class Invasion implements InvasionTypeHolder {
 						return;
 					}
 					entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), pLevel.random.nextFloat() * 360.0F, 0.0F);
-					if (isModified) entity.load(entity.saveWithoutId(spawners.parseNBT(this.getSeverityInfo().getEntityNBTTags())));
+					if (isModified) {
+						final CompoundTag modifiedTag = spawners.parseNBT(this.getSeverityInfo().getEntityNBTTags());
+						entity.load(entity.saveWithoutId(modifiedTag));
+						if (modifiedTag.contains("Passengers", Tag.TAG_LIST)) {
+			                final ListTag listTag = modifiedTag.getList("Passengers", Tag.TAG_COMPOUND);
+			                for (int i = 0; i < listTag.size(); ++i) {
+			                    final Entity passenger = EntityType.loadEntityRecursive(listTag.getCompound(i), pLevel, e -> {
+									e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.getYRot(), e.getXRot());
+									return e;
+								});
+			                    if (entity != null) passenger.startRiding(entity, true);
+			                }
+			            }
+					}
 					if (entity instanceof Mob mob) {
 						if (!EventHooks.checkSpawnPosition(mob, pLevel, MobSpawnType.EVENT)) continue;
 						if (compoundTag.size() == 1 && compoundTag.contains("id", Tag.TAG_STRING))
@@ -240,8 +254,7 @@ public final class Invasion implements InvasionTypeHolder {
 				}
 			}
 		}
-		if (flag1)
-			this.delay(pLevel, pTotalInvasions);
+		if (flag1) this.delay(pLevel, pTotalInvasions);
 		return;
 	}
 
@@ -280,15 +293,35 @@ public final class Invasion implements InvasionTypeHolder {
 	}
 
 	private final void spawnInvasionMob(final ServerLevel pLevel, final InvasionDifficulty pDifficulty, final Mob pMob, final boolean pIgnoreSpawnRules, final boolean pForceDespawn, final MobTagData[] pPersistentTags) {
-		boolean hyperCharged = PSGameRules.HYPER_CHARGE.get(pLevel) && !PSConfigValues.common.hyperChargeBlacklist.contains(pMob.getType().getDescriptionId()) && (pDifficulty.isHyper() || pLevel.random.nextDouble() < PSConfigValues.common.hyperChargeChance * (double)(this.severity + 1)/this.invasionType.getMaxSeverity());
+		boolean hyperCharged = PSGameRules.HYPER_CHARGE.get(pLevel) && !PSConfigValues.common.hyperChargeBlacklist.contains(BuiltInRegistries.ENTITY_TYPE.getKey(pMob.getType()).toString()) && (pDifficulty.isHyper() || pLevel.random.nextDouble() < PSConfigValues.common.hyperChargeChance * (double)(this.severity + 1)/this.invasionType.getMaxSeverity());
 		final CompoundTag persistentData = pMob.getPersistentData();
 		persistentData.putInt(INVASION_MOB, this.toExtendedString().hashCode());
 		persistentData.putBoolean(ANTI_GRIEF, pIgnoreSpawnRules);
 		persistentData.putIntArray(DESPAWN_LOGIC, new int[pForceDespawn ? 6 : 4]);
 		if (pForceDespawn) persistentData.getIntArray(DESPAWN_LOGIC)[5] = 100 + pLevel.random.nextInt(101);
-		if (pMob instanceof PSInvasionMob invasionMob && hyperCharged)
-			invasionMob.psSetHyperCharge(pDifficulty.getHyperCharge(pLevel, this.invasionType.getTier(), this.isNatural));
-		for (final MobTagData tag : pPersistentTags) tag.addTagToMob(persistentData);
+		if (pMob instanceof PSInvasionMob invasionMob && hyperCharged) {
+			final int charge = pDifficulty.getHyperCharge(pLevel, this.invasionType.getTier(), this.isNatural);
+			invasionMob.psSetHyperCharge(charge);
+			for (final Entity entity : pMob.getPassengers()) {
+				if (entity instanceof PSInvasionMob passenger) 
+					passenger.psSetHyperCharge(charge);
+				final CompoundTag passengerData = entity.getPersistentData();
+				passengerData.putInt(INVASION_MOB, this.toExtendedString().hashCode());
+				passengerData.putBoolean(ANTI_GRIEF, pIgnoreSpawnRules);
+				passengerData.putIntArray(DESPAWN_LOGIC, new int[pForceDespawn ? 6 : 4]);
+				this.invasionMobs.add(new MobInfo(entity.getUUID(), false));
+			}
+		} else {
+			for (final Entity entity : pMob.getPassengers())  {
+				final CompoundTag passengerData = entity.getPersistentData();
+				passengerData.putInt(INVASION_MOB, this.toExtendedString().hashCode());
+				passengerData.putBoolean(ANTI_GRIEF, pIgnoreSpawnRules);
+				passengerData.putIntArray(DESPAWN_LOGIC, new int[pForceDespawn ? 6 : 4]);
+				this.invasionMobs.add(new MobInfo(entity.getUUID(), false));
+			}
+		}
+		for (final MobTagData tag : pPersistentTags) 
+			tag.addTagToMob(persistentData);
 		EventHooks.finalizeMobSpawn(pMob, pLevel, pLevel.getCurrentDifficultyAt(pMob.blockPosition()), MobSpawnType.EVENT, null);
 		this.invasionMobs.add(new MobInfo(pMob.getUUID(), false));
 		PSPackets.sendToClientsIn(new InvasionMobParticlesPacket(pDifficulty, pMob.position()), pLevel);

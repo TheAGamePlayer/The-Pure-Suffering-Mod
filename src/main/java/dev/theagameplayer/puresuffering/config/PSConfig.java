@@ -406,7 +406,7 @@ public final class PSConfig {
 				this.invasionDifficultyRarity[d] = builder
 						.translation(CONFIG + difficulty + "_invasion_rarity")
 						.worldRestart()
-						.comment("How often should " + difficulty.getDefaultName() + " Invasions occur.")
+						.comment("How often should " + difficulty.getDefaultName() + " Invasions occur.", "NOTE: Changes will only take effect after the next " + difficulty.getDefaultName() + " invasion occurs or a new world is started.")
 						.defineInRange(difficulty + "InvasionRarity", values[1][d], 1, Integer.MAX_VALUE);
 			}
 			this.spec = builder.build();

@@ -53,7 +53,7 @@ public final class PSTickEvents {
 		}
 	}
 	
-	public static final void entityTickPost(final EntityTickEvent.Pre pEvent) {
+	public static final void entityTickPost(final EntityTickEvent.Post pEvent) {
 		if (pEvent.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
 			final CompoundTag persistentData = mob.getPersistentData();
 			if (persistentData.contains(Invasion.DESPAWN_LOGIC)) {
