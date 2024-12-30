@@ -1,7 +1,5 @@
 package dev.theagameplayer.puresuffering.event;
 
-import java.util.List;
-
 import dev.theagameplayer.puresuffering.client.InvasionStartTimer;
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.client.sounds.InvasionMusicManager;
@@ -9,20 +7,22 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.registries.other.PSEntityPredicates;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
+import dev.theagameplayer.puresuffering.world.entity.ai.behavior.StartAttackingInvasion;
 import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.Zoglin;
+import net.minecraft.world.entity.monster.breeze.Breeze;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.warden.Warden;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
@@ -52,7 +52,7 @@ public final class PSTickEvents {
 			invasionManager.tick(level);
 		}
 	}
-	
+
 	public static final void entityTickPost(final EntityTickEvent.Post pEvent) {
 		if (pEvent.getEntity() instanceof Mob mob && mob.level() instanceof ServerLevel level) {
 			final CompoundTag persistentData = mob.getPersistentData();
@@ -68,8 +68,8 @@ public final class PSTickEvents {
 					++despawnLogic[3];
 				}
 			}
-			if (persistentData.contains(Invasion.INVASION_MOB) && PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(mob.getType().getDescriptionId()) && (mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive())) {
-				final ServerPlayer player = getNearestPlayer(level, mob.position());
+			if (persistentData.contains(Invasion.INVASION_MOB) && PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).toString()) && (mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive())) {
+				final ServerPlayer player = StartAttackingInvasion.getNearestPlayer(level, mob.position());
 				if (player == null) {
 					mob.setTarget(null);
 					return;
@@ -87,24 +87,13 @@ public final class PSTickEvents {
 					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, Invasion.TRANSITION_TIME);
 				} else if (mob instanceof Warden warden) { //Warden requires special method due to anger logic
 					warden.increaseAngerAt(player, 80, !player.equals(warden.getTarget())); //Golems will be a weakness to invasion Wardens. Fix Maybe?
+				} else if (mob instanceof Breeze) { //TODO: fix the breeze
+					mob.getBrain().eraseMemory(MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+					mob.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_TARGET, player, Invasion.TRANSITION_TIME);
 				} else {
 					mob.setTarget(player);
 				}
 			}
 		}
-	}
-	
-	private static final ServerPlayer getNearestPlayer(final ServerLevel pLevel, final Vec3 pPos) {
-		ServerPlayer target = null;
-		double dist = -1.0F;
-		final List<ServerPlayer> players = pLevel.getPlayers(PSEntityPredicates.HYPER_AGGRESSION);
-		for (final ServerPlayer player : players) {
-			final double d = player.distanceToSqr(pPos);
-			if (dist < 0.0F || d < dist) {
-				dist = d;
-				target = player;
-			}
-		}
-		return target;
 	}
 }
