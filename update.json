@@ -1,12 +1,12 @@
 {
 	"homepage": "https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod",
 	"promos": {
-        "1.21.1-latest": "1.6.6.5B",
-        "1.21.1-recommended": "1.6.6.5B",
-        "1.21-latest": "1.6.5.0B",
-        "1.21-recommended": "1.6.5.0B",
-        "1.20.6-latest": "1.6.3.2B",
-        "1.20.6-recommended": "1.6.3.2B",
+		"1.21.1-latest": "1.6.6.6R",
+		"1.21.1-recommended": "1.6.6.6R",
+		"1.21-latest": "1.6.5.0B",
+		"1.21-recommended": "1.6.5.0B",
+		"1.20.6-latest": "1.6.3.2B",
+		"1.20.6-recommended": "1.6.3.2B",
 		"1.20.4-latest": "1.6.2.2R",
 		"1.20.4-recommended": "1.6.2.2R",
 		"1.20.2-latest": "1.6.1.2B",
@@ -24,46 +24,48 @@
 		"1.16.5-latest": "1.3.1.1R",
 		"1.16.5-recommended": "1.3.1.1R"
 	},
-    "1.21.1": {
+	"1.21.1": {
+		"1.6.6.6R": "- Fixed a broken config option and added support for breeze targeting if another mod wants to fix the breeze.",
 		"1.6.6.5B": "- Datapack tweaks, fixed legacy issue with blacklisting invasions and blacklisting hyper charged mobs.",
 		"1.6.6.4B": "- Datapack tweaks, small rendering optimization, and changed spawning rules for balancing.",
 		"1.6.6.3B": "- Fixed invasions crashing when they are triggered too quickly in succession.",
 		"1.6.6.2B": "- 2 new config options.",
 		"1.6.6.1B": "- Bug fixes, community requested features, and a crash fix with Forgified-Fabric.",
-        "1.6.6.0B": "- Bug fixes, datapack improvements, and performance improvements.",
-        "1.6.5.7B": "- Bug fixes and improvements to the music system.",
-        "1.6.5.6B": "- Fixed crash creating a dimension mid-game (Now requires a reload for invasions to start in the dimension).",
-        "1.6.5.5B": "- Attempt 2 at fixing the AE2 crash.",
-        "1.6.5.4B": "- Fixed AE2 compat crash, config updating issues, and did some small optimizations to fetching config values.",
-        "1.6.5.3B": "- Fixed dedicated servers crashing.",
-        "1.6.5.2B": "- Bug fixes, optimizations, and finally added the in-game config menu!",
-        "1.6.5.1B": "- Updated to 1.21.1."
-    },
-    "1.21": {
-        "1.6.5.0B": "- Fixed a bug with villager ai breaking after an invasion & added new 1.21 mobs into invasions.",
-        "1.6.4.0B": "- Updated to 1.21 & fixed a typo!"
-    },
-    "1.20.6": {
-		"1.6.3.2B": "Readded Solar and Lunar eclipse invasions after mistakenly deleting them...",
-        "1.6.3.1B": "- Fixed a bug with villager ai breaking after an invasion.",
-        "1.6.3.0B": "- Updated to 1.20.6, a new spawning method, quality of life changes & bug fixes."
-    },
+		"1.6.6.0B": "- Bug fixes, datapack improvements, and performance improvements.",
+		"1.6.5.7B": "- Bug fixes and improvements to the music system.",
+		"1.6.5.6B": "- Fixed crash creating a dimension mid-game (Now requires a reload for invasions to start in the dimension).",
+		"1.6.5.5B": "- Attempt 2 at fixing the AE2 crash.",
+		"1.6.5.4B": "- Fixed AE2 compat crash, config updating issues, and did some small optimizations to fetching config values.",
+		"1.6.5.3B": "- Fixed dedicated servers crashing.",
+		"1.6.5.2B": "- Bug fixes, optimizations, and finally added the in-game config menu!",
+		"1.6.5.1B": "- Updated to 1.21.1."
+	},
+	"1.21": {
+		"1.6.5.0B": "- Fixed a bug with villager ai breaking after an invasion & added new 1.21 mobs into invasions.",
+		"1.6.4.0B": "- Updated to 1.21 & fixed a typo!"
+	},
+	"1.20.6": {
+		"1.6.3.2B": "- Readded Solar and Lunar eclipse invasions after mistakenly deleting them...",
+		"1.6.3.1B": "- Fixed a bug with villager ai breaking after an invasion.",
+		"1.6.3.0B": "- Updated to 1.20.6, a new spawning method, quality of life changes & bug fixes."
+	},
 	"1.20.4": {
-        "1.6.2.2R": "- Fixed a bug with villager ai breaking after an invasion.",
-        "1.6.2.1R": "- Fixed music toast not rendering correctly.",
+		"1.6.2.2R": "- Fixed a bug with villager ai breaking after an invasion.",
+		"1.6.2.1R": "- Fixed music toast not rendering correctly.",
 		"1.6.2.0R": "- Updated to 1.20.4 & Moved to NeoForge!"
 	},
 	"1.20.2": {
-        "1.6.1.2B": "- Fixed a bug with villager ai breaking after an invasion.",
+		"1.6.1.2B": "- Fixed a bug with villager ai breaking after an invasion.",
 		"1.6.1.1B": "- Issues solved in 1.6.0.4R, but for 1.20.2.",
 		"1.6.1.0B": "- Updated to 1.20.2."
 	},
 	"1.20.1": {
+		"1.6.6.6R-LTS1": "Backport of 1.6.6.6R",
 		"1.6.6.5R-LTS1": "Backport of 1.6.6.5B",
 		"1.6.6.4R-LTS1": "Backport of 1.6.6.4B",
 		"1.6.6.3R-LTS1": "Backport of 1.6.6.3B and fixed Game Stages support.",
 		"1.6.6.2R-LTS1": "Backport of 1.6.6.2B with Game Stages support.",
-        "1.6.0.5R": "- Fixed a bug with villager ai breaking after an invasion.",
+		"1.6.0.5R": "- Fixed a bug with villager ai breaking after an invasion.",
 		"1.6.0.4R": "- A couple of fixes to avoid crashing worlds.",
 		"1.6.0.3R": "- Fixed a bug where another mod crashing will cause invasion mobs to not load properly, thus redirecting the crash to Pure Suffering.",
 		"1.6.0.2R": "- Fixed a bug with villagers and small optimization tweaks.",
@@ -104,3 +106,4 @@
 		"1.1.0B": "- Added new Invasion XP System.\n- Fix Auto Agro"
 	}
 }
+

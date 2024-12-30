@@ -26,6 +26,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent.LevelTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class PSTickEvents {
 	public static final void levelTickPost(final LevelTickEvent pEvent) {
@@ -70,7 +71,7 @@ public final class PSTickEvents {
 					++despawnLogic[3];
 				}
 			}
-			if (persistentData.contains(Invasion.INVASION_MOB) && PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(mob.getType().getDescriptionId()) && (mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive())) {
+			if (persistentData.contains(Invasion.INVASION_MOB) && PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(ForgeRegistries.ENTITY_TYPES.getKey(mob.getType()).toString()) && (mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive())) {
 				final ServerPlayer player = getNearestPlayer(level, mob.position());
 				if (player == null) {
 					mob.setTarget(null);

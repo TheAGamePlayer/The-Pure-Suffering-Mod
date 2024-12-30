@@ -130,7 +130,7 @@ public final class Invasion implements InvasionTypeHolder {
 		}
 		return -1;
 	}
-	
+
 	public final boolean hasSameInvasion(final Mob pMob) {
 		final CompoundTag persistentData = pMob.getPersistentData();
 		return persistentData.contains(INVASION_MOB) && persistentData.getInt(INVASION_MOB) == this.toExtendedString().hashCode();
@@ -231,15 +231,15 @@ public final class Invasion implements InvasionTypeHolder {
 						final CompoundTag modifiedTag = spawners.parseNBT(this.getSeverityInfo().getEntityNBTTags());
 						entity.load(entity.saveWithoutId(modifiedTag));
 						if (modifiedTag.contains("Passengers", Tag.TAG_LIST)) {
-			                final ListTag listTag = modifiedTag.getList("Passengers", Tag.TAG_COMPOUND);
-			                for (int i = 0; i < listTag.size(); ++i) {
-			                    final Entity passenger = EntityType.loadEntityRecursive(listTag.getCompound(i), pLevel, e -> {
+							final ListTag listTag = modifiedTag.getList("Passengers", Tag.TAG_COMPOUND);
+							for (int i = 0; i < listTag.size(); ++i) {
+								final Entity passenger = EntityType.loadEntityRecursive(listTag.getCompound(i), pLevel, e -> {
 									e.moveTo(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ(), e.getYRot(), e.getXRot());
 									return e;
 								});
-			                    if (entity != null) passenger.startRiding(entity, true);
-			                }
-			            }
+								if (entity != null) passenger.startRiding(entity, true);
+							}
+						}
 					}
 					if (entity instanceof Mob mob) {
 						if (!ForgeEventFactory.checkSpawnPosition(mob, pLevel, MobSpawnType.EVENT)) continue;
@@ -266,12 +266,12 @@ public final class Invasion implements InvasionTypeHolder {
 		}
 		return false;
 	}
-	
+
 	private final boolean isValidLocation(final ServerLevel pLevel, final EntityType<?> pEntityType, final BlockPos pPos, final boolean pIgnoreSpawnRules) {
 		final boolean flag = pPos != null && pEntityType.getCategory() == MobCategory.MONSTER && SpawnPlacements.getPlacementType(pEntityType).canSpawnAt(pLevel, pPos, pEntityType) && checkDefaultSpawnRules(pLevel, pEntityType, pPos);
 		return pIgnoreSpawnRules ? flag : flag && SpawnPlacements.checkSpawnRules(pEntityType, pLevel, MobSpawnType.EVENT, pPos, pLevel.getRandom());
 	}
-	
+
 	private final boolean checkDefaultSpawnRules(final ServerLevel pLevel, final EntityType<?> pEntityType, final BlockPos pPos) {
 		final BlockPos below = pPos.below();
 		return Monster.isDarkEnoughToSpawn(pLevel, pPos, pLevel.getRandom()) && pLevel.getBlockState(below).isValidSpawn(pLevel, below, pEntityType);
