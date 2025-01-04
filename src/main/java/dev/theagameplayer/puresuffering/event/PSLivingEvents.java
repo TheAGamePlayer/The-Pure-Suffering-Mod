@@ -23,8 +23,7 @@ import net.minecraftforge.eventbus.api.Event.Result;
 
 public final class PSLivingEvents {
 	public static final void finalizeSpawn(final FinalizeSpawn pEvent) {
-		final Mob mob = pEvent.getEntity();
-		if (pEvent.getSpawnType() != MobSpawnType.NATURAL || mob.getClassification(false) != MobCategory.MONSTER) return;
+		if (pEvent.getSpawnType() != MobSpawnType.NATURAL || pEvent.getEntity().getPersistentData().contains(Invasion.INVASION_MOB)) return;
 		final ServerLevel level = (ServerLevel)pEvent.getLevel();
 		if (PSConfigValues.common.naturalSpawnChance > level.random.nextDouble()) return;
 		final InvasionSession session = InvasionLevelData.get(level).getInvasionManager().getActiveSession(level);

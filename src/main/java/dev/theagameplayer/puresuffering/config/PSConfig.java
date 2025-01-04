@@ -172,7 +172,7 @@ public final class PSConfig {
 					.translation(CONFIG + "invasion_blacklist")
 					.worldRestart()
 					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (swap '' with quotation marks)")
-					.define("invasionBlacklist", List.of(), string -> {
+					.defineList("invasionBlacklist", List.of(), string -> {
 						return string != "";
 					});
 			this.primaryWhitelist = builder
