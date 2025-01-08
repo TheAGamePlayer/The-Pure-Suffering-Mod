@@ -107,7 +107,7 @@ public final class ClientInvasionSession implements Iterable<ClientInvasion> {
 				final int ll = invasion.getSkyRenderInfo().getLightLevel();
 				if (ll < 0) continue;
 				lightLevel += ll;
-				lc++;
+				++lc;
 			}
 			this.lightLevel = lc > 0 ? lightLevel/lc : -0;
 		}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionType.WeatherType;
 import dev.theagameplayer.puresuffering.network.AddInvasionPacket;
 import dev.theagameplayer.puresuffering.network.ClearInvasionsPacket;
@@ -113,7 +114,7 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 		}
 	}
 
-	private final void update() {
+	private final void update(final ServerLevel pLevel) {
 		this.weatherType = WeatherType.DEFAULT;
 		this.stopsConversions = false;
 		this.forceNoSleep = this.difficulty.isNightmare();
@@ -124,10 +125,10 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 			this.stopsConversions |= invasion.getType().stopsConversions();
 			this.forceNoSleep |= invasion.getSeverityInfo().forcesNoSleep();
 			if (this.difficulty.isNightmare()) continue;
-			final int ll = invasion.getSeverityInfo().getSkyRenderInfo().getLightLevel();
+			final int ll = PSConfigValues.LEVELS.get(pLevel).zeroLightLevelDuringInvasions ? 15 : invasion.getSeverityInfo().getSkyRenderInfo().getLightLevel();
 			if (ll < 0) continue;
 			lightLevel += ll;
-			lc++;
+			++lc;
 		}
 		this.lightLevel = this.difficulty.isNightmare() ? 15 : (lc > 0 ? lightLevel/lc : -1);
 	}
@@ -158,12 +159,12 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 				pLevel.setWeatherParameters(type < 2 ? time : 0, type < 2 ? 0 : time, type == 2, type > 2);
 				this.weatherChangeDelay = time;
 			} else {
-				this.weatherChangeDelay--;
+				--this.weatherChangeDelay;
 			}
 			break;
 		}
 		}
-		this.invasions.get((int)(pLevel.getDayTime() % this.invasions.size())).tick(pLevel, this.difficulty, this.invasions.size());
+		this.invasions.get((int)(pLevel.getDayTime() % this.invasions.size())).tick(pLevel, this.invasions.size());
 		return false;
 	}
 
@@ -180,12 +181,13 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 	}
 
 	public static final InvasionSession load(final ServerLevel pLevel, final CompoundTag pNbt) {
-		final InvasionSession session = new InvasionSession(pLevel, InvasionSessionType.getActive(pLevel), InvasionDifficulty.values()[pNbt.getInt("Difficulty")], pNbt.getInt("MobKillLimit"));
+		final InvasionDifficulty difficulty = InvasionDifficulty.values()[pNbt.getInt("Difficulty")];
+		final InvasionSession session = new InvasionSession(pLevel, InvasionSessionType.getActive(pLevel), difficulty, pNbt.getInt("MobKillLimit"));
 		session.mobsKilledByPlayer = pNbt.getInt("MobsKilledByPlayer");
 		final ListTag invasionsNBT = pNbt.getList(session.sessionType.getDefaultName() + "Invasions", Tag.TAG_COMPOUND);
 		for (final Tag inbt : invasionsNBT) {
 			if (inbt instanceof CompoundTag nbt)
-				session.add(pLevel, Invasion.load(pLevel, nbt), true);
+				session.add(pLevel, Invasion.load(pLevel, difficulty, nbt), true);
 		}
 		return session;
 	}
@@ -209,7 +211,7 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 			for (final String cmd : pInvasion.getSeverityInfo().getStartCommands())
 				this.server.getCommands().performPrefixedCommand(this.commandSource, cmd);
 		}
-		this.update();
+		this.update(pLevel);
 		PSPackets.sendToClientsIn(new AddInvasionPacket(this.sessionType, this.difficulty, pInvasion), pLevel);
 	}
 
@@ -221,7 +223,7 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 		for (final String cmd : pInvasion.getSeverityInfo().getEndCommands())
 			this.server.getCommands().performPrefixedCommand(this.commandSource, cmd);
 		this.invasions.remove(pInvasion);
-		this.update();
+		this.update(pLevel);
 		PSPackets.sendToClientsIn(new RemoveInvasionPacket(pInvasion.getSeverityInfo().getSkyRenderInfo()), pLevel);
 	}
 
@@ -236,7 +238,7 @@ public final class InvasionSession implements Iterable<Invasion>, CommandSource 
 
 	public final void updateClient(final ServerPlayer playerIn) {
 		PSPackets.sendToClient(new ClearInvasionsPacket(), playerIn);
-		for (int index = 0; index < this.invasions.size(); index++) {
+		for (int index = 0; index < this.invasions.size(); ++index) {
 			final Invasion invasion = this.invasions.get(index);
 			PSPackets.sendToClient(new AddInvasionPacket(this.sessionType, this.difficulty, invasion), playerIn);
 		}

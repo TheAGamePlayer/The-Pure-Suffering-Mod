@@ -96,6 +96,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final int[] cancelInvasionRarity;
 		public final int[] maxInvasions;
 		public final int[] tierIncreaseDelay;
+		public final boolean zeroLightLevelDuringInvasions;
 
 		private LevelValues(final ServerLevel pLevel) {
 			final PSConfig.LevelConfig config = PSConfig.LEVELS.get(pLevel.dimension().location());
@@ -117,6 +118,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 			}
 			for (int d = 0; d < difficultyLength; ++d)
 				this.invasionDifficultyRarity[d] = config.invasionDifficultyRarity[d].get();
+			this.zeroLightLevelDuringInvasions = config.zeroLightLevelDuringInvasions.get();
 		}
 	}
 }

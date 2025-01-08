@@ -354,6 +354,7 @@ public final class PSConfig {
 		public final ForgeConfigSpec.IntValue[] cancelInvasionRarity;
 		public final ForgeConfigSpec.IntValue[] maxInvasions;
 		public final ForgeConfigSpec.IntValue[] tierIncreaseDelay;
+		public final ForgeConfigSpec.BooleanValue zeroLightLevelDuringInvasions;
 		
 		private LevelConfig(final ResourceLocation pDimension, final LevelStem pLevelStem) {
 			final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -410,6 +411,11 @@ public final class PSConfig {
 						.comment("How often should " + difficulty.getDefaultName() + " Invasions occur.", "NOTE: Changes will only take effect after the next " + difficulty.getDefaultName() + " invasion occurs or a new world is started.")
 						.defineInRange(difficulty + "InvasionRarity", values[1][d], 1, Integer.MAX_VALUE);
 			}
+			this.zeroLightLevelDuringInvasions = builder
+					.translation(CONFIG + "zero_light_level_during_invasions")
+					.worldRestart()
+					.comment("Sets the light level to zero during invasions in this dimension.", "NOTE: Does not affect brightness.")
+					.define("zeroLightLevelDuringInvasions", false);
 			this.spec = builder.build();
 		}
 	}
