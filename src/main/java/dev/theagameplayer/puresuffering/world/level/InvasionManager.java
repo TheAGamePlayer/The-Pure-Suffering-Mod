@@ -87,7 +87,7 @@ public final class InvasionManager {
 								if (invasionType == null || invasionType.getMaxSeverity() < 1) break;
 								if (inv == 0) this.sessions[index] = new InvasionSession(pLevel, sessionType, difficulty, PSGameRules.MOB_KILL_LIMIT.get(pLevel));
 								final int severity = difficulty.isHyper() ? invasionType.getMaxSeverity() - 1 : random.nextInt(Mth.clamp(PSGameRules.TIERED_INVASIONS.get(pLevel) ? (int)(days/tierIncreaseDelay - invasionType.getTier()) + 1 : invasionType.getMaxSeverity(), 1, inv == 0 ? invasionType.getMaxSeverity() : this.getSecondarySeverityCap(invasionType, index)));
-								final Invasion invasion = new Invasion(pLevel, invasionType, severity, inv == 0, true, pLevel.getDayTime(), inv);
+								final Invasion invasion = new Invasion(pLevel, invasionType, severity, inv == 0, true, pLevel.getDayTime(), inv, difficulty);
 								this.sessions[index].add(pLevel, invasion, false);
 								LOGGER.info("Invasion " + (inv + 1) + ": " + invasionType + " - " + (severity + 1));
 								isTimeModified[0] |= sessionType.canModifyTime(invasionType);
@@ -99,9 +99,10 @@ public final class InvasionManager {
 			}
 		} else {
 			LOGGER.info("Setting Queued " + this.queuedInvasions[index].getDifficulty().getDefaultName() + " " + sessionType.getDefaultName() + " Invasions: [");
-			this.sessions[index] = new InvasionSession(pLevel, sessionType, this.queuedInvasions[index].getDifficulty(), PSGameRules.MOB_KILL_LIMIT.get(pLevel));
+			final InvasionDifficulty difficulty = this.queuedInvasions[index].getDifficulty();
+			this.sessions[index] = new InvasionSession(pLevel, sessionType, difficulty, PSGameRules.MOB_KILL_LIMIT.get(pLevel));
 			for (int q = 0; q < this.queuedInvasions[index].size(); ++q) {
-				final Invasion invasion = this.queuedInvasions[index].get(q).build(pLevel, q);
+				final Invasion invasion = this.queuedInvasions[index].get(q).build(pLevel, difficulty, q);
 				this.sessions[index].add(pLevel, invasion, false);
 				LOGGER.info("Invasion " + (q + 1) + ": " + invasion.getType() + " - " + (invasion.getSeverity() + 1));
 			}

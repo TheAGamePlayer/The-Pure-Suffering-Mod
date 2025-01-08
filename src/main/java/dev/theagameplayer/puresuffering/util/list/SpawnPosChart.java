@@ -28,6 +28,20 @@ public final class SpawnPosChart {
 		}
 		return pPlayerPosY;
 	}
+	
+	public static final int getYInRange2(final ArrayList<Integer> pYList, final ArrayList<Integer> pYList2, final int pPlayerPosY, final float pNumber) {
+		final SpawnPosChart chart = new SpawnPosChart(pYList, pPlayerPosY);
+		for (final YRange range : chart.rangeList) {
+			if (range.inRange(pNumber))
+				return range.y;
+		}
+		final SpawnPosChart chart2 = new SpawnPosChart(pYList2, pPlayerPosY);
+		for (final YRange range : chart2.rangeList) {
+			if (range.inRange(pNumber))
+				return range.y;
+		}
+		return pPlayerPosY;
+	}
 
 	@Override
 	public final String toString() {

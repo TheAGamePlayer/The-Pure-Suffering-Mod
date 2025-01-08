@@ -208,5 +208,6 @@
 	"puresuffering.config.max_fixed_invasions": "Max Fixed Invasions",
 	"puresuffering.config.day_tier_increase_delay": "Day Tier Increase Delay",
 	"puresuffering.config.night_tier_increase_delay": "Night Tier Increase Delay",
-	"puresuffering.config.fixed_tier_increase_delay": "Fixed Tier Increase Delay"
+	"puresuffering.config.fixed_tier_increase_delay": "Fixed Tier Increase Delay",
+	"puresuffering.config.zero_light_level_during_invasions": "Zero Light Level During Invasions"
 }

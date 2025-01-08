@@ -353,6 +353,7 @@ public final class PSConfig {
 		public final ModConfigSpec.IntValue[] cancelInvasionRarity;
 		public final ModConfigSpec.IntValue[] maxInvasions;
 		public final ModConfigSpec.IntValue[] tierIncreaseDelay;
+		public final ModConfigSpec.BooleanValue zeroLightLevelDuringInvasions;
 		
 		private LevelConfig(final ResourceLocation pDimension, final LevelStem pLevelStem) {
 			final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -399,7 +400,7 @@ public final class PSConfig {
 						.translation(CONFIG + sessionType + "_tier_increase_delay")
 						.worldRestart()
 						.comment("How many days should pass when the " + sessionType.getDefaultName() + " Invasion Tier increases.")
-						.defineInRange(sessionType + "TierIncreaseDelay", values[2][st], 1, Integer.MAX_VALUE);
+						.defineInRange(sessionType + "TierIncreaseDelay", values[2][st], 0, Integer.MAX_VALUE);
 			}
 			for (int d = 0; d < difficultyLength; ++d) {
 				final InvasionDifficulty difficulty = InvasionDifficulty.values()[d + 1];
@@ -409,6 +410,11 @@ public final class PSConfig {
 						.comment("How often should " + difficulty.getDefaultName() + " Invasions occur.", "NOTE: Changes will only take effect after the next " + difficulty.getDefaultName() + " invasion occurs or a new world is started.")
 						.defineInRange(difficulty + "InvasionRarity", values[1][d], 1, Integer.MAX_VALUE);
 			}
+			this.zeroLightLevelDuringInvasions = builder
+					.translation(CONFIG + "zero_light_level_during_invasions")
+					.worldRestart()
+					.comment("Sets the light level to zero during invasions in this dimension.", "NOTE: Does not affect brightness.")
+					.define("zeroLightLevelDuringInvasions", false);
 			this.spec = builder.build();
 		}
 	}
