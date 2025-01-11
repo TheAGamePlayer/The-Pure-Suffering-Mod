@@ -96,7 +96,7 @@ public final class AddInvasionsCommand {
 			throw ERROR_UNKNOWN_INVASION_TYPE.create(resourceLocation);
 		} else {
 			final String[] severities = new String[invasionType.getMaxSeverity()];
-			for (int s = 0; s < severities.length; s++)
+			for (int s = 0; s < severities.length; ++s)
 				severities[s] = Integer.toString(s + 1);
 			return SharedSuggestionProvider.suggest(severities, suggestionsBuilder);
 		}

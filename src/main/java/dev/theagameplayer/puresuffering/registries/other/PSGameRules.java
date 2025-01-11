@@ -113,7 +113,7 @@ public final class PSGameRules {
 		}
 
 		public final boolean get(final Level pLevel) {
-			return PSConfigValues.common.overrideGameRules ? this.defaultValue : pLevel.getGameRules().getBoolean(this.key);
+			return PSConfigValues.common.overrideGameRules && this != ENABLE_INVASIONS ? this.defaultValue : pLevel.getGameRules().getBoolean(this.key);
 		}
 	}
 
