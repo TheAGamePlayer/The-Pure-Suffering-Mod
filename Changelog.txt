@@ -103,6 +103,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.7.1R-LTS1:
+- Backport of 1.6.7.1R.
+
 Version 1.6.7.0R-LTS1:
 - Backport of 1.6.7.0R.
 
