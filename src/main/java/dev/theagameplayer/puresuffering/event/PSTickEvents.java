@@ -1,5 +1,7 @@
 package dev.theagameplayer.puresuffering.event;
 
+import java.util.List;
+
 import dev.theagameplayer.puresuffering.client.InvasionStartTimer;
 import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.client.sounds.InvasionMusicManager;
@@ -7,7 +9,6 @@ import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.registries.other.PSEntityPredicates;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
-import dev.theagameplayer.puresuffering.world.entity.ai.behavior.StartAttackingInvasion;
 import dev.theagameplayer.puresuffering.world.level.InvasionManager;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.monster.breeze.Breeze;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.monster.warden.Warden;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
@@ -69,7 +71,7 @@ public final class PSTickEvents {
 				}
 			}
 			if (persistentData.contains(Invasion.INVASION_MOB) && PSGameRules.HYPER_AGGRESSION.get(level) && !PSConfigValues.common.hyperAggressionBlacklist.contains(BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).toString()) && (mob.getLastHurtByMob() == null || !mob.getLastHurtByMob().isAlive())) {
-				final ServerPlayer player = StartAttackingInvasion.getNearestPlayer(level, mob.position());
+				final ServerPlayer player = getNearestPlayer(level, mob.position());
 				if (player == null) {
 					mob.setTarget(null);
 					return;
@@ -95,5 +97,19 @@ public final class PSTickEvents {
 				}
 			}
 		}
+	}
+	
+	private static final ServerPlayer getNearestPlayer(final ServerLevel pLevel, final Vec3 pPos) {
+		ServerPlayer target = null;
+		double dist = -1.0F;
+		final List<ServerPlayer> players = pLevel.getPlayers(PSEntityPredicates.HYPER_AGGRESSION);
+		for (final ServerPlayer player : players) {
+			final double d = player.distanceToSqr(pPos);
+			if (dist < 0.0F || d < dist) {
+				dist = d;
+				target = player;
+			}
+		}
+		return target;
 	}
 }
