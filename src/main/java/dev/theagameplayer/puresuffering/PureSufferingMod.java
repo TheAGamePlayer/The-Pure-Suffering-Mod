@@ -13,7 +13,6 @@ import dev.theagameplayer.puresuffering.event.PSEntityEvents;
 import dev.theagameplayer.puresuffering.event.PSLevelEvents;
 import dev.theagameplayer.puresuffering.event.PSLivingEvents;
 import dev.theagameplayer.puresuffering.event.PSPlayerEvents;
-import dev.theagameplayer.puresuffering.event.PSServerEvents;
 import dev.theagameplayer.puresuffering.event.PSTickEvents;
 import dev.theagameplayer.puresuffering.registries.PSActivities;
 import dev.theagameplayer.puresuffering.registries.PSCommandArgumentTypes;
@@ -117,8 +116,7 @@ public final class PureSufferingMod {
 		pForgeBus.addListener(PSPlayerEvents::playerChangeDimension);
 		//Level
 		pForgeBus.addListener(PSLevelEvents::explosionStart);
-		//Server
-		pForgeBus.addListener(PSServerEvents::serverStarting);
+		pForgeBus.addListener(PSLevelEvents::load);
 		//Tick
 		pForgeBus.addListener(PSTickEvents::levelTickPost);
 		pForgeBus.addListener(PSTickEvents::entityTickPost);

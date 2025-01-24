@@ -119,7 +119,7 @@ public final class InvasionMusicManager {
 				mIndex %= hyperList.size();
 				final PSMusicInfo info = hyperList.get(mIndex);
 				music = new PSMusicSoundInstance(SoundEvent.createVariableRangeEvent(info.id));
-				mIndex++;
+				++mIndex;
 				soundManager.play(music);
 				mc.getToasts().addToast(new InvasionMusicToast(info.name, pDifficulty));
 			}
