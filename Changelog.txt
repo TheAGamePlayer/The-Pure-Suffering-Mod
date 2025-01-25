@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.7.3R:
+- Fixed vanilla nbt overriding invasion mob nbt.
+
 Version 1.6.7.2R:
 - Fixed generating new dimensions mid-game crashing the game.
 - Micro optimization for ticking invasion music.
@@ -107,6 +110,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.7.3R-LTS1:
+- Backport of 1.6.7.3R
+
 Version 1.6.7.2R-LTS1:
 - Backport of 1.6.7.2R.
 
