@@ -232,7 +232,7 @@ public final class Invasion implements InvasionTypeHolder {
 					entity.moveTo(entity.getX(), entity.getY(), entity.getZ(), pLevel.random.nextFloat() * 360.0F, 0.0F);
 					if (isModified) {
 						final CompoundTag modifiedTag = spawners.parseNBT(this.getSeverityInfo().getEntityNBTTags());
-						entity.load(entity.saveWithoutId(modifiedTag));
+						entity.load(entity.saveWithoutId(new CompoundTag()).merge(modifiedTag));
 						if (modifiedTag.contains("Passengers", Tag.TAG_LIST)) {
 							final ListTag listTag = modifiedTag.getList("Passengers", Tag.TAG_COMPOUND);
 							for (int i = 0; i < listTag.size(); ++i) {
