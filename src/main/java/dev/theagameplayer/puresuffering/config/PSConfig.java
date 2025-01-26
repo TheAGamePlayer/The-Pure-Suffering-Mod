@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
-
 import org.apache.logging.log4j.Logger;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -434,8 +432,8 @@ public final class PSConfig {
 		if (pIsClient) registerConfig(CLIENT.spec, psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml"));
 	}
 
-	public static final void initLevelConfig(final Entry<ResourceKey<LevelStem>, LevelStem> pLevelStem) {
-		final ResourceLocation dimLoc = pLevelStem.getKey().location();
+	public static final void initLevelConfig(final ResourceKey<?> pKey, LevelStem pLevelStem) {
+		final ResourceLocation dimLoc = pKey.location();
 		if (LEVELS.containsKey(dimLoc)) return;
 		final String levelFileName = dimLoc.toDebugFileName();
 		final Path configPath = FMLPaths.CONFIGDIR.get();
@@ -448,7 +446,7 @@ public final class PSConfig {
 		} catch (final IOException exception) {
 			LOGGER.error("Failed to create puresuffering dimensions config directory!", exception);
 		}
-		final LevelConfig config = new LevelConfig(dimLoc, pLevelStem.getValue());
+		final LevelConfig config = new LevelConfig(dimLoc, pLevelStem);
 		LEVELS.put(dimLoc, config);
 		registerConfig(config.spec, psLevelConfigPath.resolve(levelFileName + "-level.toml"));
 	}

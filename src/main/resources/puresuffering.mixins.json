@@ -6,7 +6,7 @@
 	"mixins": [
 		"GameRulesCategoryMixin",
 		"LevelMixin",
-		"MinecraftServerMixin",
+		"MappedRegistryMixin",
 		"MobMixin",
 		"SensorMixin",
 		"VillagerMixin",
