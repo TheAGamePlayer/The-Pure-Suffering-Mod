@@ -6,8 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map.Entry;
-
 import org.apache.logging.log4j.Logger;
 import org.codehaus.plexus.util.FastMap;
 
@@ -433,9 +431,9 @@ public final class PSConfig {
 		if (pIsClient) pModContainer.registerConfig(ModConfig.Type.CLIENT, CLIENT.spec, psConfigPath.resolve(PureSufferingMod.MODID + "-client.toml").toString());
 	}
 
-	public static final void initLevelConfig(final Entry<ResourceKey<LevelStem>, LevelStem> pLevelStem) {
+	public static final void initLevelConfig(final ResourceKey<?> pKey, LevelStem pLevelStem) {
 		if (PureSufferingMod.MC == null) return;
-		final ResourceLocation dimLoc = pLevelStem.getKey().location();
+		final ResourceLocation dimLoc = pKey.location();
 		if (LEVELS.containsKey(dimLoc)) return;
 		final String levelFileName = dimLoc.toDebugFileName();
 		final Path configPath = FMLPaths.CONFIGDIR.get();
@@ -448,7 +446,7 @@ public final class PSConfig {
 		} catch (final IOException exception) {
 			LOGGER.error("Failed to create puresuffering dimensions config directory!", exception);
 		}
-		final LevelConfig config = new LevelConfig(dimLoc, pLevelStem.getValue());
+		final LevelConfig config = new LevelConfig(dimLoc, pLevelStem);
 		LEVELS.put(dimLoc, config);
 		PureSufferingMod.MC.registerConfig(ModConfig.Type.SERVER, config.spec, psLevelConfigPath.resolve(levelFileName + "-level.toml").toString());
 	}

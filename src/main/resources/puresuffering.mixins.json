@@ -5,7 +5,7 @@
 	"refmap": "puresuffering.refmap.json",
 	"mixins": [
 		"LevelMixin",
-		"MinecraftServerMixin",
+		"MappedRegistryMixin",
 		"MobMixin",
 		"SensorMixin",
 		"VillagerMixin",
