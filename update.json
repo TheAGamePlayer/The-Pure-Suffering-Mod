@@ -11,8 +11,8 @@
 		"1.20.4-recommended": "1.6.2.2R",
 		"1.20.2-latest": "1.6.1.2B",
 		"1.20.2-recommended": "1.6.1.2B",
-		"1.20.1-latest": "1.6.7.1R-LTS1",
-		"1.20.1-recommended": "1.6.7.1R-LTS1",
+		"1.20.1-latest": "1.6.7.4R-LTS2",
+		"1.20.1-recommended": "1.6.7.4R-LTS2",
 		"1.19.4-latest": "1.4.3.0R",
 		"1.19.4-recommended": "1.4.3.0R",
 		"1.19.3-latest": "1.4.2.0R",
@@ -66,6 +66,7 @@
 		"1.6.1.0B": "- Updated to 1.20.2."
 	},
 	"1.20.1": {
+		"1.6.7.4R-LTS2": "Fixed crash with previous backport.",
 		"1.6.7.4R-LTS1": "Backport of 1.6.7.4R",
 		"1.6.7.3R-LTS1": "Backport of 1.6.7.3R",
 		"1.6.7.2R-LTS1": "Backport of 1.6.7.2R",
