@@ -15,7 +15,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 
 @Mixin(MappedRegistry.class)
 public final class MappedRegistryMixin<T> {
-	@Inject(at = @At("HEAD"), method = "Lnet/minecraft/core/MappedRegistry;register(Lnet/minecraft/resources/ResourceKey;Ljava/lang/Object;Lcom/mojang/serialization/Lifecycle;)Lnet/minecraft/core/Holder$Reference;")
+	@Inject(at = @At("HEAD"), method = "Lnet/minecraft/core/MappedRegistry;register(Lnet/minecraft/resources/ResourceKey;Ljava/lang/Object;Lcom/mojang/serialization/Lifecycle;)Lnet/minecraft/core/Holder$Reference;", cancellable = true)
 	private final void register(final ResourceKey<T> pKey, final T pValue, final Lifecycle pLifecycle, final CallbackInfoReturnable<Holder.Reference<T>> pCallbackInfo) {
 		if (pValue instanceof LevelStem stem)
 			PSConfig.initLevelConfig(pKey, stem);
