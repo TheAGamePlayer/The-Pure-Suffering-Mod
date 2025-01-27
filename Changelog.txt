@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.7.5R:
+- Fixed crashing on startup.
+
 Version 1.6.7.4R:
 - Another attempt at fixing creating new dimensions mid-game crashing the game.
 
@@ -113,8 +116,8 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
-Version 1.6.7.4R-LTS2:
-- Fixed crash with previous backport.
+Version 1.6.7.5R-LTS1:
+- Backport of 1.6.7.5R.
 
 Version 1.6.7.4R-LTS1:
 - Backport of 1.6.7.4R.
