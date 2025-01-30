@@ -2,12 +2,12 @@
 
 A Minecraft Invasion Mod that started off as a fun side-project. Invasions will spawn every few days or so, increasing in severity and tiers as time goes on within your Minecraft World.
 
-Version 1.6.7.5R is now available!
-Version 1.6.7.5R-LTS1 is also available!
+Version 1.6.8.0R is now available!
+Version 1.6.8.0R-LTS1 is also available!
 
 Curseforge: https://www.curseforge.com/minecraft/mc-mods/the-pure-suffering-mod
 
-Discord: https://discord.gg/WAgx39BG
+Discord: https://discord.gg/5NCMbGfnta
 
 Pure Suffering Mutant Monsters Datapack Github: https://github.com/TheAGamePlayer/PSMM-Datapack
 

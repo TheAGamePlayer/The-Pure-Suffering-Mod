@@ -27,7 +27,7 @@ public final class SendInvasionAmbiencePacket implements CustomPacketPayload {
 
 		private static final void handlePacket(final SendInvasionAmbiencePacket pPacket, final Supplier<Context> pCtx) {
 			final Minecraft mc = Minecraft.getInstance();
-			mc.player.playSound(PSSoundEvents.INVASION_AMBIENCE.get(), 1.0F, mc.level.random.nextFloat() * 0.2F - 0.1F);
+			mc.player.playSound(PSSoundEvents.INVASION_AMBIENCE.get(), 3.0F, mc.level.random.nextFloat() * 0.2F - 0.1F);
 		}
 	}
 }

@@ -41,22 +41,18 @@ public final class AddInvasionPacket implements CustomPacketPayload {
 		this.rarity = pRarity;
 		this.tier = pTier;
 		this.component = pComponent;
-		if (pDifficulty == null) {
-			this.customStartMessage = PSConfigValues.common.cancelInvasionStartMessage;
-		} else {
-			switch(pDifficulty) {
-			case DEFAULT:
-				this.customStartMessage = PSConfigValues.common.defaultInvasionStartMessage;
-				break;
-			case HYPER:
-				this.customStartMessage = PSConfigValues.common.hyperInvasionStartMessage;
-				break;
-			case NIGHTMARE:
-				this.customStartMessage = PSConfigValues.common.nightmareInvasionStartMessage;
-				break;
-			default:
-				this.customStartMessage = "";
-			}
+		switch(pDifficulty) {
+		case DEFAULT:
+			this.customStartMessage = PSConfigValues.common.defaultInvasionStartMessage;
+			break;
+		case HYPER:
+			this.customStartMessage = PSConfigValues.common.hyperInvasionStartMessage;
+			break;
+		case NIGHTMARE:
+			this.customStartMessage = PSConfigValues.common.nightmareInvasionStartMessage;
+			break;
+		default:
+			this.customStartMessage = "";
 		}
 	}
 
@@ -81,7 +77,7 @@ public final class AddInvasionPacket implements CustomPacketPayload {
 		final InvasionSkyRenderInfo renderer = InvasionSkyRenderInfo.Builder.fromNetwork(pBuf).build(pBuf.readResourceLocation());
 		return new AddInvasionPacket(sessionType, difficulty, renderer, pBuf.readBoolean(), pBuf.readInt(), pBuf.readInt(), pBuf.readInt(), pBuf.readInt(), pBuf.readInt(), pBuf.readComponent(), pBuf.readUtf());
 	}
-	
+
 	public static final class Handler {
 		public static final boolean handle(final AddInvasionPacket pPacket, final Supplier<Context> pCtx) {
 			pCtx.get().enqueueWork(() -> {

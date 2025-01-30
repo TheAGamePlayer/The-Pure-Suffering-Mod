@@ -16,17 +16,25 @@ import net.minecraftforge.network.NetworkEvent.Context;
 
 public final class InvasionStartPacket implements CustomPacketPayload {
 	private final boolean notifyPlayers;
+	private final String cancelMessage;
 
 	public InvasionStartPacket(final boolean pNotifyPlayers) {
 		this.notifyPlayers = pNotifyPlayers;
+		this.cancelMessage = PSConfigValues.common.cancelInvasionStartMessage;
+	}
+	
+	private InvasionStartPacket(final boolean pNotifyPlayers, final String pCancelMessage) {
+		this.notifyPlayers = pNotifyPlayers;
+		this.cancelMessage = pCancelMessage;
 	}
 	
 	public final void write(final FriendlyByteBuf pBuf) {
 		pBuf.writeBoolean(this.notifyPlayers);
+		pBuf.writeUtf(this.cancelMessage);
 	}
 
 	public static final InvasionStartPacket read(final FriendlyByteBuf pBuf) {
-		return new InvasionStartPacket(pBuf.readBoolean());
+		return new InvasionStartPacket(pBuf.readBoolean(), pBuf.readUtf());
 	}
 	
 	public static final class Handler {
@@ -42,10 +50,9 @@ public final class InvasionStartPacket implements CustomPacketPayload {
 			final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 			final InvasionDifficulty difficulty = session == null ? null : session.getDifficulty();
 			if (PSConfigValues.client.useInvasionSoundEffects)
-				mc.player.playSound(difficulty == null ? PSSoundEvents.CANCEL_INVASION.get() : difficulty.getStartSound());
-			if (session == null) return;
-			InvasionStartTimer.timer = new InvasionStartTimer(difficulty, session, pPacket.notifyPlayers);
-			if (PSConfigValues.client.enableInvasionStartEffects) session.setStartTimer();
+				mc.player.playSound(difficulty == null ? PSSoundEvents.CANCEL_INVASION.get() : difficulty.getStartSound(), 5.0F, 1.0F);
+			InvasionStartTimer.timer = new InvasionStartTimer(difficulty, session, pPacket.notifyPlayers, pPacket.cancelMessage);
+			if (session != null && PSConfigValues.client.enableInvasionStartEffects) session.setStartTimer();
 		}
 	}
 }

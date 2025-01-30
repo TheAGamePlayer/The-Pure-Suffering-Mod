@@ -8,20 +8,23 @@ import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.util.invasion.InvasionText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
 public final class InvasionStartTimer {
 	public static InvasionStartTimer timer;
 	private final ArrayList<DelayInfo> delays = new ArrayList<>();
 
-	public InvasionStartTimer(final InvasionDifficulty pDifficulty, final ClientInvasionSession pSession, final boolean pNotifyPlayers) {
+	public InvasionStartTimer(final InvasionDifficulty pDifficulty, final ClientInvasionSession pSession, final boolean pNotifyPlayers, final String pCancelMessage) {
 		this.delays.add(new DelayInfo(session -> { //2.5 seconds
 			if (!pNotifyPlayers) return;
-			if (pDifficulty == null) {
-				Minecraft.getInstance().getChatListener().handleSystemMessage(pSession.getStartMessage("invasion.puresuffering.start.cancel").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), false);
-			} else if (session != null) {
-				Minecraft.getInstance().getChatListener().handleSystemMessage(pSession.getStartMessage("invasion.puresuffering.start." + pDifficulty).withStyle(Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare()).withColor(pDifficulty.getColor(true))), false);
+			if (session == null) {
+				final MutableComponent component = pCancelMessage.isBlank() ? Component.translatable("invasion.puresuffering.start.cancel") : Component.literal(pCancelMessage);
+				Minecraft.getInstance().getChatListener().handleSystemMessage(component.withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)), false);
+				return;
 			}
+			Minecraft.getInstance().getChatListener().handleSystemMessage(pSession.getStartMessage("invasion.puresuffering.start." + pDifficulty).withStyle(Style.EMPTY.withBold(pDifficulty.isHyper()).withItalic(pDifficulty.isNightmare()).withColor(pDifficulty.getColor(true))), false);
 		}, 50));
 		this.delays.add(new DelayInfo(session -> { //3.25 seconds
 			if (!pNotifyPlayers) return;
@@ -43,11 +46,11 @@ public final class InvasionStartTimer {
 		});
 		if (timer.delays.isEmpty()) timer = null;
 	}
-	
+
 	private static final class DelayInfo {
 		private final Consumer<ClientInvasionSession> info;
 		private int delay;
-		
+
 		private DelayInfo(final Consumer<ClientInvasionSession> pInfo, final int pDelay) {
 			this.info = pInfo;
 			this.delay = pDelay;
