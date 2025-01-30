@@ -22,7 +22,7 @@ public final class SendInvasionAmbiencePacket implements CustomPacketPayload {
 		if (pCtx.flow().isServerbound()) return;
 		pCtx.enqueueWork(() -> {
 			final Minecraft mc = Minecraft.getInstance();
-			mc.player.playSound(PSSoundEvents.INVASION_AMBIENCE.get(), 1.0F, mc.level.random.nextFloat() * 0.2F - 0.1F);
+			mc.player.playSound(PSSoundEvents.INVASION_AMBIENCE.get(), 3.0F, mc.level.random.nextFloat() * 0.2F - 0.1F);
 		});
 	}
 

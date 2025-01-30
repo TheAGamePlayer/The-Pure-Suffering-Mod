@@ -42,22 +42,18 @@ public final class AddInvasionPacket implements CustomPacketPayload {
 		this.rarity = pRarity;
 		this.tier = pTier;
 		this.component = pComponent;
-		if (pDifficulty == null) {
-			this.customStartMessage = PSConfigValues.common.cancelInvasionStartMessage;
-		} else {
-			switch(pDifficulty) {
-			case DEFAULT:
-				this.customStartMessage = PSConfigValues.common.defaultInvasionStartMessage;
-				break;
-			case HYPER:
-				this.customStartMessage = PSConfigValues.common.hyperInvasionStartMessage;
-				break;
-			case NIGHTMARE:
-				this.customStartMessage = PSConfigValues.common.nightmareInvasionStartMessage;
-				break;
-			default:
-				this.customStartMessage = "";
-			}
+		switch(pDifficulty) {
+		case DEFAULT:
+			this.customStartMessage = PSConfigValues.common.defaultInvasionStartMessage;
+			break;
+		case HYPER:
+			this.customStartMessage = PSConfigValues.common.hyperInvasionStartMessage;
+			break;
+		case NIGHTMARE:
+			this.customStartMessage = PSConfigValues.common.nightmareInvasionStartMessage;
+			break;
+		default:
+			this.customStartMessage = "";
 		}
 	}
 

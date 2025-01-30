@@ -36,7 +36,7 @@ public final class SendInvasionsPacket implements CustomPacketPayload {
 		pCtx.enqueueWork(() -> {
 			final Minecraft mc = Minecraft.getInstance();
 			if (PSConfigValues.client.useInvasionSoundEffects && pPacket.isNatural)
-				mc.player.playSound(PSSoundEvents.INFORM_INVASION.get());
+				mc.player.playSound(PSSoundEvents.INFORM_INVASION.get(), 3.0F, 1.0F);
 			final ClientInvasionSession session = ClientInvasionSession.get(mc.level);
 			if (session != null) {
 				mc.getChatListener().handleSystemMessage(InvasionText.create(pPacket.isNatural ? "invasion.puresuffering.inform" : "commands.puresuffering.query.invasions", pPacket.isNatural ? ChatFormatting.GRAY : ChatFormatting.GOLD, session).withStyle(session.getStyle()), false);
