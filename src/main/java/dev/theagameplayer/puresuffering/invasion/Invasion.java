@@ -271,7 +271,7 @@ public final class Invasion implements InvasionTypeHolder {
 	}
 
 	private final boolean isValidLocation(final ServerLevel pLevel, final EntityType<?> pEntityType, final BlockPos pPos, final boolean pIgnoreSpawnRules) {
-		final boolean flag = pPos != null && pEntityType.getCategory() == MobCategory.MONSTER && SpawnPlacements.getPlacementType(pEntityType).isSpawnPositionOk(pLevel, pPos, pEntityType) && checkDefaultSpawnRules(pLevel, pEntityType, pPos);
+		final boolean flag = pPos != null && SpawnPlacements.getPlacementType(pEntityType).isSpawnPositionOk(pLevel, pPos, pEntityType) && checkDefaultSpawnRules(pLevel, pEntityType, pPos);
 		return pIgnoreSpawnRules ? flag : flag && SpawnPlacements.checkSpawnRules(pEntityType, pLevel, MobSpawnType.EVENT, pPos, pLevel.getRandom());
 	}
 

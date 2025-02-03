@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.8.1R:
+- Fixed non-Monster invasion mobs not spawning (primarily for datapacks).
+
 Version 1.6.8.0R:
 - Fixed invasion cancel messages not appearing.
 - Fixed rare crash when entering a dimension on the tick an invasion is being cancelled.
@@ -123,6 +126,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.8.1R-LTS1:
+- Backport of 1.6.8.1R.
+
 Version 1.6.8.0R-LTS1:
 - Backport of 1.6.8.0R.
 
