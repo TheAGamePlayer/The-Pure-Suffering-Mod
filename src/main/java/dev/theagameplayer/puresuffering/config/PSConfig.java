@@ -65,6 +65,7 @@ public final class PSConfig {
 		public final ModConfigSpec.ConfigValue<List<? extends String>> hyperChargeBlacklist;
 		public final ModConfigSpec.ConfigValue<List<? extends String>> modBiomeBoostedBlacklist;
 		public final ModConfigSpec.ConfigValue<List<? extends String>> mobBiomeBoostedBlacklist;
+		public final ModConfigSpec.ConfigValue<List<? extends String>> invasionAntiGriefExceptions;
 		public final ModConfigSpec.DoubleValue naturalSpawnChance;
 		public final ModConfigSpec.DoubleValue hyperChargeChance;
 		public final ModConfigSpec.IntValue blessingEffectRespawnDuration;
@@ -169,16 +170,12 @@ public final class PSConfig {
 					.translation(CONFIG + "invasion_blacklist")
 					.worldRestart()
 					.comment("List of Invasions that can't occur.", "Ex: 'puresuffering:solar_eclipse', 'puresuffering:phantom_zone' (swap '' with quotation marks)")
-					.defineList("invasionBlacklist", List.of(), String::new, string -> {
-						return string != "";
-					});
+					.defineList("invasionBlacklist", List.of(), String::new, string -> string != "");
 			this.primaryWhitelist = builder
 					.translation(CONFIG + "primary_whitelist")
 					.worldRestart()
 					.comment("List of Invasions that can be primary invasions.", "NOTE: The Invasion's Priority cannot be labeled as Secondary Only!", "Ex: 'puresuffering:solar_eclipse', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("primaryWhitelist", List.of(), String::new, string -> {
-						return string != "";
-					});
+					.defineList("primaryWhitelist", List.of(), String::new, string -> string != "");
 			this.overworldLikeDimensions = builder
 					.translation(CONFIG + "overworld_like_dimensions")
 					.worldRestart()
@@ -190,44 +187,37 @@ public final class PSConfig {
 					.translation(CONFIG + "nether_like_dimensions")
 					.worldRestart()
 					.comment("List of Dimensions that should use Nether Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("netherLikeDimensions", List.of(), String::new, string -> {
-						return string != "";
-					});
+					.defineList("netherLikeDimensions", List.of(), String::new, string -> string != "");
 			this.endLikeDimensions = builder
 					.translation(CONFIG + "end_like_dimensions")
 					.worldRestart()
 					.comment("List of Dimensions that should use End Invasions.", "NOTE: May not work with randomly generated dimensions! (RFTools/Mystcraft)", "Ex: 'twilightforest:twilight_forest', 'lostcities:lostcity' (swap '' with quotation marks)")
-					.defineList("endLikeDimensions", List.of(), String::new, string -> {
-						return string != "";
-					});
+					.defineList("endLikeDimensions", List.of(), String::new, string -> string != "");
 			this.hyperAggressionBlacklist = builder
 					.translation(CONFIG + "hyper_aggression_blacklist")
 					.worldRestart()
 					.comment("List of mobs that won't be hyper aggressive towards the player. (If setting is turned on)")
-					.defineList("hyperAggressionBlacklist", List.of("minecraft:vex"), String::new, string -> {
-						return string != "";
-					});
+					.defineList("hyperAggressionBlacklist", List.of("minecraft:vex"), String::new, string -> string != "");
 			this.hyperChargeBlacklist = builder
 					.translation(CONFIG + "hyper_charge_blacklist")
 					.worldRestart()
 					.comment("List of mobs that can't be hyper charged. (If setting is turned on)")
-					.defineList("hyperChargeBlacklist", List.of("minecraft:vex"), String::new, string -> {
-						return string != "";
-					});
+					.defineList("hyperChargeBlacklist", List.of("minecraft:vex"), String::new, string -> string != "");
 			this.modBiomeBoostedBlacklist = builder
 					.translation(CONFIG + "mod_biome_boosted_blacklist")
 					.worldRestart()
 					.comment("List of mods that won't be allowed to have their mobs spawn in Biome Boosted Invasions.", "Ex: 'twilightforest', 'mutantbeasts'")
-					.defineList("modBiomeBoostedBlacklist", List.of(), String::new, string -> {
-						return string != "";
-					});
+					.defineList("modBiomeBoostedBlacklist", List.of(), String::new, string -> string != "");
 			this.mobBiomeBoostedBlacklist = builder
 					.translation(CONFIG + "mob_biome_boosted_blacklist")
 					.worldRestart()
-					.comment("List of mobs that won't be allowed to spawn in Biome Boosted Invasions.", "Ex: 'minecraft:enderman', 'mutantbeasts:mutant_creeper'")
-					.defineList("mobBiomeBoostedBlacklist", List.of(), String::new, string -> {
-						return string != "";
-					});
+					.comment("List of mobs that won't be allowed to spawn in Biome Boosted Invasions.", "Ex: 'minecraft:enderman', 'mutantmonsters:mutant_creeper'")
+					.defineList("mobBiomeBoostedBlacklist", List.of(), String::new, string -> string != "");
+			this.invasionAntiGriefExceptions = builder
+					.translation(CONFIG + "invasion_anti_grief_exceptions")
+					.worldRestart()
+					.comment("List of invasion mobs that won't have anti-grief applied to them when the gamerule in active.", "Ex: 'mutantmonsters:mutant_creeper', 'mutantmonsters:creeper_minion'")
+					.defineList("invasionAntiGriefExceptions", List.of(), String::new, string -> string != "");
 			this.naturalSpawnChance = builder
 					.translation(CONFIG + "natural_spawn_chance")
 					.worldRestart()

@@ -1,10 +1,12 @@
 package dev.theagameplayer.puresuffering.event;
 
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionSession;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
 import dev.theagameplayer.puresuffering.world.entity.PSInvasionMob;
 import dev.theagameplayer.puresuffering.world.level.saveddata.InvasionLevelData;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -45,7 +47,7 @@ public final class PSEntityEvents {
 
 	public static final void mobGriefing(final EntityMobGriefingEvent pEvent) {
 		final Entity entity = pEvent.getEntity();
-		if (!PSGameRules.INVASION_ANTI_GRIEF.get(entity.level())) return;
+		if (!PSGameRules.INVASION_ANTI_GRIEF.get(entity.level()) || PSConfigValues.common.invasionAntiGriefExceptions.contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())) return;
 		if (entity.getPersistentData().contains(Invasion.ANTI_GRIEF))
 			pEvent.setCanGrief(false);
 	}
