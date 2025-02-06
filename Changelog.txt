@@ -1,4 +1,8 @@
 #Minecraft 1.21.x
+Version 1.6.8.2R:
+- Fixed invasion creepers not exploding with Anti-Grief turned on.
+- Added "invasionAntiGriefExceptions" config option.
+
 Version 1.6.8.1R:
 - Fixed non-Monster invasion mobs not spawning (primarily for datapacks).
 
@@ -126,6 +130,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.8.2R-LTS1:
+- Backport of 1.6.8.2R.
+
 Version 1.6.8.1R-LTS1:
 - Backport of 1.6.8.1R.
 

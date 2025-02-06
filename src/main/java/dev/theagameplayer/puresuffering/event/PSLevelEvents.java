@@ -8,15 +8,22 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class PSLevelEvents {
 	public static final void explosionStart(final ExplosionEvent.Start pEvent) { //Ghast balls hit by the player will no longer create fire with Anti-Grief
-		final Entity entity = pEvent.getExplosion().getDirectSourceEntity();
+		final Explosion explosion = pEvent.getExplosion();
+		final Entity entity = explosion.getDirectSourceEntity();
 		if (entity == null || !PSGameRules.INVASION_ANTI_GRIEF.get(pEvent.getLevel())) return;
-		if (entity.getPersistentData().contains(Invasion.ANTI_GRIEF)) pEvent.setCanceled(true);
+		if (entity.getPersistentData().contains(Invasion.ANTI_GRIEF) && !PSConfigValues.common.invasionAntiGriefExceptions.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString())) {
+			if (explosion.fire) explosion.fire = false;
+			if (explosion.blockInteraction == Explosion.BlockInteraction.DESTROY || explosion.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY)
+				explosion.blockInteraction = Explosion.BlockInteraction.KEEP;
+		}
 	}
 	
 	public static final void load(final LevelEvent.Load pEvent) {

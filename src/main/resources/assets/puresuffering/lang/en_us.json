@@ -170,6 +170,7 @@
 	"puresuffering.config.hyper_charge_blacklist": "Hyper Charge Blacklist",
 	"puresuffering.config.mod_biome_boosted_blacklist": "Mod Biome Boosted Blacklist",
 	"puresuffering.config.mob_biome_boosted_blacklist": "Mob Biome Boosted Blacklist",
+	"puresuffering.config.invasion_anti_grief_exceptions": "Invasion Anti-Grief Exceptions",
 	"puresuffering.config.natural_spawn_chance": "Natural Spawn Chance",
 	"puresuffering.config.hyper_charge_chance": "Hyper Charge Chance",
 	"puresuffering.config.blessing_effect_respawn_duration": "Blessing Effect Respawn Duration",

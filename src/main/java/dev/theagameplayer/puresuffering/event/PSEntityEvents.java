@@ -1,5 +1,6 @@
 package dev.theagameplayer.puresuffering.event;
 
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import dev.theagameplayer.puresuffering.invasion.InvasionSession;
 import dev.theagameplayer.puresuffering.registries.other.PSGameRules;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.monster.Vex;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityMobGriefingEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class PSEntityEvents {
 	public static final void joinLevel(final EntityJoinLevelEvent pEvent) {
@@ -46,7 +48,7 @@ public final class PSEntityEvents {
 
 	public static final void mobGriefing(final EntityMobGriefingEvent pEvent) {
 		final Entity entity = pEvent.getEntity();
-		if (!PSGameRules.INVASION_ANTI_GRIEF.get(entity.level())) return;
+		if (!PSGameRules.INVASION_ANTI_GRIEF.get(entity.level()) || PSConfigValues.common.invasionAntiGriefExceptions.contains(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString())) return;
 		if (entity.getPersistentData().contains(Invasion.ANTI_GRIEF))
 			pEvent.setResult(Result.DENY);
 	}

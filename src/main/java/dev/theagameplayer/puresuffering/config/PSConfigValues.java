@@ -63,6 +63,7 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final List<? extends String> hyperChargeBlacklist = PSConfig.COMMON.hyperChargeBlacklist.get();
 		public final List<? extends String> modBiomeBoostedBlacklist = PSConfig.COMMON.modBiomeBoostedBlacklist.get();
 		public final List<? extends String> mobBiomeBoostedBlacklist = PSConfig.COMMON.mobBiomeBoostedBlacklist.get();
+		public final List<? extends String> invasionAntiGriefExceptions = PSConfig.COMMON.invasionAntiGriefExceptions.get();
 		public final double naturalSpawnChance = PSConfig.COMMON.naturalSpawnChance.get();
 		public final double hyperChargeChance = PSConfig.COMMON.hyperChargeChance.get();
 		public final int blessingEffectRespawnDuration = PSConfig.COMMON.blessingEffectRespawnDuration.get();
