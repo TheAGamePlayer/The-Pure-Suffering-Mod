@@ -1,4 +1,7 @@
 #Minecraft 1.21.x
+Version 1.6.8.3R:
+- Fixed Pure Suffering crashing when a mod adds a mob with broken ai.
+
 Version 1.6.8.2R:
 - Fixed invasion creepers not exploding with Anti-Grief turned on.
 - Added "invasionAntiGriefExceptions" config option.
@@ -130,6 +133,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.8.3R-LTS1:
+- Backport of 1.6.8.3R.
+
 Version 1.6.8.2R-LTS1:
 - Backport of 1.6.8.2R.
 

@@ -407,6 +407,7 @@ public final class Invasion implements InvasionTypeHolder {
 		} else if (pNav.path != null && !pNav.path.isDone() && playerPos.equals(pNav.targetPos)) {
 			return null;
 		} else {
+			if (pNav.pathFinder == null) return null;
 			pNav.level.getProfiler().push("pathfind");
 			final BlockPos blockPos = pNav.mob.blockPosition().above();
 			final int i = (int)(range + 16.0F);
