@@ -25,7 +25,7 @@
 		"1.16.5-recommended": "1.3.1.1R"
 	},
 	"1.21.1": {
-		"1.6.8.4R": "- Added 2 new music config options and fixed crashing with distant horizons & other mods on modern 1.20.1 forge editions.",
+		"1.6.8.4R": "- Added 2 new music config options and fixed crashing with distant horizons & other mods on modern neoforge editions.",
 		"1.6.8.3R": "- Fixed Pure Suffering crashing when a mod adds a mob with broken ai.",
 		"1.6.8.2R": "- Fixed invasion creepers not exploding with Anti-Grief turned on and added 'invasionAntiGriefExceptions' config option.",
 		"1.6.8.1R": "- Fixed non-Monster invasion mobs not spawning (primarily for datapacks).",
@@ -72,7 +72,7 @@
 		"1.6.1.0B": "- Updated to 1.20.2."
 	},
 	"1.20.1": {
-		"1.6.8.4R-LTS1": "Backport of 1.6.8.4R",
+		"1.6.8.4R-LTS1": "Backport of 1.6.8.4R & fixed crashing with distant horizons & other mods on modern forge editions.",
 		"1.6.8.3R-LTS1": "Backport of 1.6.8.3R",
 		"1.6.8.2R-LTS1": "Backport of 1.6.8.2R",
 		"1.6.8.1R-LTS1": "Backport of 1.6.8.1R",
