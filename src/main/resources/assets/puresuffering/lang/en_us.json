@@ -192,6 +192,8 @@
 	"puresuffering.config.vortex_particle_delay": "Vortex Particle Delay",
 
 	"puresuffering.config.use_invasion_sound_effects": "Use Invasion Sound Effects",
+	"puresuffering.config.disable_non_ps_music": "Disable Non-PS Music",
+	"puresuffering.config.ignore_ps_music_transitions": "Ignore PS Music Transitions",
 
 	"puresuffering.config.day_invasion_rarity": "Day Invasion Rarity",
 	"puresuffering.config.night_invasion_rarity": "Night Invasion Rarity",

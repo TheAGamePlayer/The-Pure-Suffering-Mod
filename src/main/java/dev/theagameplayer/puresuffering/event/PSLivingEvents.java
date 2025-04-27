@@ -128,7 +128,7 @@ public final class PSLivingEvents {
 		}
 	}
 
-	/*public static final void mobSplit(final MobSplitEvent pEvent) { TODO: NEOFORGE EXCLUSIVE FEATURE ;-;
+	/*public static final void mobSplit(final MobSplitEvent pEvent) { TODO: NEOFORGE EXCLUSIVE FEATURE waiting on forge to fix ;-;
 		final Mob parent = pEvent.getParent();
 		final CompoundTag persistentData = parent.getPersistentData();
 		for (final Mob child : pEvent.getChildren()) {

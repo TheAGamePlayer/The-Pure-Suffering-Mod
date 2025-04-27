@@ -55,7 +55,7 @@ public final class PureSufferingMod {
 	}
 	
 	public static final ResourceLocation namespace(final String pName) {
-		return new ResourceLocation(MODID, pName);
+		return ResourceLocation.fromNamespaceAndPath(MODID, pName);
 	}
 	
 	private final void createConfig(final IEventBus pModEventBus) {

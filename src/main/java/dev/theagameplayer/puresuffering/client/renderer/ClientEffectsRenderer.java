@@ -25,7 +25,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.dimension.DimensionType;
 
 public final class ClientEffectsRenderer {
-	private static final ResourceLocation TEXTURE = new ResourceLocation("forge", "textures/white.png");
+	private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("forge", "textures/white.png");
 	private final ArrayList<SoundRing> soundRings = new ArrayList<>();
 	private final ArrayList<VortexParticle> vortexParticles = new ArrayList<>();
 	private final InvasionDifficulty difficulty;

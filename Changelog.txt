@@ -1,4 +1,9 @@
 #Minecraft 1.21.x
+Version 1.6.8.4R:
+- Added "disableNonPSMusic" config option to disable music not associated with pure suffering.
+- Added "ignorePSMusicTransitions" config option to disable the fade-in and fade-out effects for pure suffering music.
+- Fixed crashing with Distant Horizons and other mods when used with modern 1.20.1 Minecraft Forge editions.
+
 Version 1.6.8.3R:
 - Fixed Pure Suffering crashing when a mod adds a mob with broken ai.
 
@@ -133,6 +138,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.8.4R-LTS1:
+- Backport of 1.6.8.4R.
+
 Version 1.6.8.3R-LTS1:
 - Backport of 1.6.8.3R.
 

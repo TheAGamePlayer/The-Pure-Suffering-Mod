@@ -5,6 +5,7 @@ import dev.theagameplayer.puresuffering.client.invasion.ClientInvasionSession;
 import dev.theagameplayer.puresuffering.client.resources.sounds.PSMusicSoundInstance;
 import dev.theagameplayer.puresuffering.client.sounds.InvasionMusicManager;
 import dev.theagameplayer.puresuffering.client.sounds.InvasionSoundHandler;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.registries.PSSoundEvents;
 import net.minecraft.client.Minecraft;
@@ -20,7 +21,7 @@ public final class PSClientSoundEvents {
 	public static final void playSound(final PlaySoundEvent pEvent) {
 		final SoundInstance sound = pEvent.getOriginalSound();
 		if (sound == null || !sound.canPlaySound()) return;
-		if (sound.getSource() == SoundSource.MUSIC && InvasionMusicManager.playingMusic() && !sound.getLocation().getNamespace().equals(PureSufferingMod.MUSICID)) {
+		if (sound.getSource() == SoundSource.MUSIC && (PSConfigValues.client.disableNonPSMusic || InvasionMusicManager.playingMusic()) && !sound.getLocation().getNamespace().equals(PureSufferingMod.MUSICID)) {
 			pEvent.setSound(null);
 			return;
 		}

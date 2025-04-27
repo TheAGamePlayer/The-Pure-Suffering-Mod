@@ -35,9 +35,9 @@ import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.Vec3;
 
 public final class InvasionSkyRenderer {
-	private static final ResourceLocation DEFAULT_SUN = new ResourceLocation("textures/environment/sun.png");
-	private static final ResourceLocation DEFAULT_MOON = new ResourceLocation("textures/environment/moon_phases.png");
-	private static final ResourceLocation DEFAULT_END_SKY = new ResourceLocation("textures/environment/end_sky.png");
+	private static final ResourceLocation DEFAULT_SUN = ResourceLocation.withDefaultNamespace("textures/environment/sun.png");
+	private static final ResourceLocation DEFAULT_MOON = ResourceLocation.withDefaultNamespace("textures/environment/moon_phases.png");
+	private static final ResourceLocation DEFAULT_END_SKY = ResourceLocation.withDefaultNamespace("textures/environment/end_sky.png");
 	private final SkyType skyType;
 	private final InvasionDifficulty difficulty;
 	private final boolean noTick;
