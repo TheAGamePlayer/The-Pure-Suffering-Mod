@@ -83,6 +83,8 @@ public abstract class PSConfigValues { //Exists so that the config file doesn't 
 		public final int vortexParticleDelay = PSConfig.CLIENT.vortexParticleDelay.get();
 		//Sound
 		public final boolean useInvasionSoundEffects = PSConfig.CLIENT.useInvasionSoundEffects.get();
+		public final boolean disableNonPSMusic = PSConfig.CLIENT.disableNonPSMusic.get();
+		public final boolean ignorePSMusicTransitions = PSConfig.CLIENT.ignorePSMusicTransitions.get();
 	}
 
 	public static final class LevelValues {

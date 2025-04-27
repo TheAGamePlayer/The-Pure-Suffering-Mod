@@ -277,6 +277,8 @@ public final class PSConfig {
 		public final ModConfigSpec.IntValue vortexParticleDelay;
 
 		public final ModConfigSpec.BooleanValue useInvasionSoundEffects;
+		public final ModConfigSpec.BooleanValue disableNonPSMusic;
+		public final ModConfigSpec.BooleanValue ignorePSMusicTransitions;
 
 		private ClientConfig() {
 			final ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
@@ -323,6 +325,14 @@ public final class PSConfig {
 					.translation(CONFIG + "use_invasion_sound_effects")
 					.comment("Should the sound effects signaling invasion be used?")
 					.define("useInvasionSoundEffects", true);
+			this.disableNonPSMusic = builder
+					.translation(CONFIG + "disable_non_ps_music")
+					.comment("Will disable music not created by Pure Suffering, the music volume slider must be set above 0 however.")
+					.define("disableNonPSMusic", false);
+			this.ignorePSMusicTransitions = builder
+					.translation(CONFIG + "ignore_ps_music_transitions")
+					.comment("Will disable the fade in and out effects of Pure Suffering music.")
+					.define("ignorePSMusicTransitions", false);
 			builder.pop();
 			this.spec = builder.build();
 		}

@@ -15,6 +15,7 @@ import com.mojang.blaze3d.audio.Channel;
 import dev.theagameplayer.puresuffering.PureSufferingMod;
 import dev.theagameplayer.puresuffering.client.gui.components.toasts.InvasionMusicToast;
 import dev.theagameplayer.puresuffering.client.resources.sounds.PSMusicSoundInstance;
+import dev.theagameplayer.puresuffering.config.PSConfigValues;
 import dev.theagameplayer.puresuffering.invasion.InvasionDifficulty;
 import dev.theagameplayer.puresuffering.invasion.Invasion;
 import net.minecraft.client.Minecraft;
@@ -112,7 +113,7 @@ public final class InvasionMusicManager {
 			}
 			if (music != null && soundManager.isActive(music)) {
 				if (channel == null) return;
-				channel.setVolume(Math.min((float)(12000L - pDayTime)/Invasion.HALF_TRANSITION, mc.options.getSoundSourceVolume(SoundSource.MUSIC)));
+				channel.setVolume(PSConfigValues.client.ignorePSMusicTransitions ? mc.options.getSoundSourceVolume(SoundSource.MUSIC) : Math.min((float)(12000L - pDayTime)/Invasion.HALF_TRANSITION, mc.options.getSoundSourceVolume(SoundSource.MUSIC)));
 			} else if (pDayTime > Invasion.HALF_TRANSITION && pDayTime < 12000L - Invasion.HALF_TRANSITION) {
 				final ArrayList<PSMusicInfo> hyperList = PS_MUSIC.get(pDifficulty);
 				if (mIndex == -1) mIndex = pRandom.nextInt(hyperList.size());
