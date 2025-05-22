@@ -50,12 +50,14 @@ public final class PSConfig {
 		public final ForgeConfigSpec.BooleanValue enableInvasionAmbience;
 		public final ForgeConfigSpec.BooleanValue notifyPlayersAboutInvasions;
 		public final ForgeConfigSpec.BooleanValue zeroTickDelay;
+		public final ForgeConfigSpec.BooleanValue noInvasionsDuringFirstEnderDragonFight;
 		//GameRules - Integer
 		public final ForgeConfigSpec.IntValue invasionStartDelay;
 		public final ForgeConfigSpec.IntValue primaryInvasionMobCap;
 		public final ForgeConfigSpec.IntValue secondaryInvasionMobCap;
 		public final ForgeConfigSpec.IntValue mobKillLimit;
 		public final ForgeConfigSpec.IntValue mobSpawnChunkRadius;
+		public final ForgeConfigSpec.IntValue noSpawnMobsBlockRadius;
 		//Invasions
 		public final ForgeConfigSpec.ConfigValue<List<? extends String>> invasionBlacklist;
 		public final ForgeConfigSpec.ConfigValue<List<? extends String>> primaryWhitelist;
@@ -142,6 +144,10 @@ public final class PSConfig {
 					.translation(CONFIG + "zero_tick_delay")
 					.comment("Determines if invasions should have zero tick delay.")
 					.define("zeroTickDelay", false);
+			this.noInvasionsDuringFirstEnderDragonFight = builder
+					.translation(CONFIG + "no_invasions_during_first_ender_dragon_fight")
+					.comment("Determines if invasions should occur during the first ender dragon boss fight.")
+					.define("noInvasionsDuringFirstEnderDragonFight", false);
 			builder.pop();
 			builder.push("game_rules_integer");
 			this.invasionStartDelay = builder
@@ -164,6 +170,10 @@ public final class PSConfig {
 					.translation(CONFIG + "mob_spawn_chunk_radius")
 					.comment("Maximum amount of chunks an invasion mob can spawn away from the player.")
 					.defineInRange("mobSpawnChunkRadius", 8, 1, 8);
+			this.noSpawnMobsBlockRadius = builder
+					.translation(CONFIG + "no_spawn_mobs_block_radius")
+					.comment("How many blocks around the player are invasion mobs not allowed to spawn.")
+					.defineInRange("noSpawnMobsBlockRadius", 16, 1, 256);
 			builder.pop();
 			builder.pop();
 			builder.push("invasions");

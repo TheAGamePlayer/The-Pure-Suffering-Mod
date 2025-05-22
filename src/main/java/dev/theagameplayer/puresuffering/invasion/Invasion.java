@@ -428,7 +428,9 @@ public final class Invasion implements InvasionTypeHolder {
 		final int z = pChunkPos.getMinBlockZ() + pLevel.random.nextInt(16);
 		final ArrayList<Integer> posList = new ArrayList<>(); //Smart Spawning
 		final ArrayList<Integer> posList2 = new ArrayList<>(); //Dumb Spawning
+		final int radius = Mth.square(PSGameRules.NO_SPAWN_MOBS_BLOCK_RADIUS.get(pLevel));
 		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 97; y < yMax; ++y) {
+			if (pPlayer.distanceToSqr(x, y, z) < radius) continue;
 			final BlockPos pos = new BlockPos(x, y, z);
 			if (pEntityType == null ? !pLevel.getBlockState(pos).isAir() && pLevel.getBlockState(pos.above()).isPathfindable(pLevel, pos.above(), PathComputationType.AIR) : SpawnPlacements.getPlacementType(pEntityType).canSpawnAt(pLevel, pos, pEntityType)) {
 				posList2.add(y);
@@ -437,7 +439,9 @@ public final class Invasion implements InvasionTypeHolder {
 					e.moveTo(x, pos.getY(), z, e.getYRot(), e.getXRot());
 					return e;
 				});
-				if (entity instanceof Mob mob) {
+				if (entity == null) {
+					continue;
+				} else if (entity instanceof Mob mob) {
 					final PathNavigation navigation = mob.getNavigation();
 					if (navigation != null && this.testPath(navigation, pPlayer, 0, pos) != null)
 						posList.add(y);
@@ -453,7 +457,9 @@ public final class Invasion implements InvasionTypeHolder {
 		final int z = pChunkPos.getMinBlockZ() + pLevel.random.nextInt(16);
 		final ArrayList<Integer> posList = new ArrayList<>(); //Smart Spawning
 		final ArrayList<Integer> posList2 = new ArrayList<>(); //Dumb Spawning
+		final int radius = Mth.square(PSGameRules.NO_SPAWN_MOBS_BLOCK_RADIUS.get(pLevel));
 		for (int y = pPlayer.getBlockY() - 96, yMax = pPlayer.getBlockY() + 97; y < yMax; ++y) {
+			if (pPlayer.distanceToSqr(x, y, z) < radius) continue;
 			final BlockPos pos = new BlockPos(x, y, z);
 			if (pEntity == null ? !pLevel.getBlockState(pos).isAir() && pLevel.getBlockState(pos.above()).isPathfindable(pLevel, pos.above(), PathComputationType.AIR) : SpawnPlacements.getPlacementType(pEntity.getType()).canSpawnAt(pLevel, pos, pEntity.getType())) {
 				posList2.add(y);

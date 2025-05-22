@@ -1,4 +1,10 @@
 #Minecraft 1.21.x
+Version 1.6.8.5R:
+- Added "noInvasionsDuringFirstEnderDragonFight" gamerule & config option to disable invasions occurring during the first Ender Dragon boss fight.
+- Added "noSpawnMobsBlockRadius" gamerule & config option to determine how close invasion mobs can spawn to the player.
+- Fixed invasion mobs spawning too close to the player if mobs and the player were in separate chunks.
+- Fixed some modded invasion mobs crashing while trying to test a spawn location for valid placement.
+
 Version 1.6.8.4R:
 - Added "disableNonPSMusic" config option to disable music not associated with pure suffering.
 - Added "ignorePSMusicTransitions" config option to disable the fade-in and fade-out effects for pure suffering music.
@@ -138,6 +144,9 @@ Version 1.6.4.0B:
 - Fixed an error in the en_us lang file.
 
 #Minecraft 1.20.x
+Version 1.6.8.5R-LTS1:
+- Backport of 1.6.8.5R.
+
 Version 1.6.8.4R-LTS1:
 - Backport of 1.6.8.4R.
 - Fixed crashing with Distant Horizons and other mods when used with modern Forge versions.
