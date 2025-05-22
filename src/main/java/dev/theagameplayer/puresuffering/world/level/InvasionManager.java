@@ -136,7 +136,7 @@ public final class InvasionManager {
 	}
 
 	private final int calcInvasionCount(final ServerLevel pLevel, final InvasionDifficulty pDifficulty, final RandomSource pRandom, final long pDays, final int pMaxInvasions) {
-		return pDays > PSGameRules.INVASION_START_DELAY.get(pLevel) - 1 && pMaxInvasions > 0 ? pDifficulty.getInvasionCount(pRandom, pMaxInvasions) : 0;
+		return pDays > PSGameRules.INVASION_START_DELAY.get(pLevel) - 1 && pMaxInvasions > 0 && (!PSGameRules.NO_INVASIONS_DURING_FIRST_ENDER_DRAGON_FIGHT.get(pLevel) || pLevel.getDragonFight() == null || pLevel.getDragonFight().hasPreviouslyKilledDragon()) ? pDifficulty.getInvasionCount(pRandom, pMaxInvasions) : 0;
 	}
 
 	private final InvasionType getInvasionType(final InvasionChart pInvasionChart, final RandomSource pRandom) {

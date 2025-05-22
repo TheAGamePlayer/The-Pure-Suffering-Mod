@@ -65,6 +65,8 @@
 	"gamerule.puresuffering:notifyPlayersAboutInvasions.description": "Determines if players be notified when invasions start.",
 	"gamerule.puresuffering:zeroTickDelay": "Zero Tick Delay",
 	"gamerule.puresuffering:zeroTickDelay.description": "Determines if invasions should have zero tick delay.",
+	"gamerule.puresuffering:noInvasionsDuringFirstEnderDragonFight" : "No Invasions During First Ender Dragon Fight",
+	"gamerule.puresuffering:noInvasionsDuringFirstEnderDragonFight.description": "Determines if invasions should occur during the first ender dragon boss fight.",
 	
 	"gamerule.puresuffering:invasionStartDelay": "Invasion Start Delay",
 	"gamerule.puresuffering:invasionStartDelay.description": "The amount of days before an invasion can start.",
@@ -76,6 +78,8 @@
 	"gamerule.puresuffering:mobKillLimit.description": "The mob kill limit for the invasion that would cause it to end after the player kills so many mobs from that invasion.",
 	"gamerule.puresuffering:mobSpawnChunkRadius": "Mob Spawn Chunk Radius",
 	"gamerule.puresuffering:mobSpawnChunkRadius.description": "Maximum amount of chunks an invasion mob can spawn away from the player (1 Min, 8 Max).",
+	"gamerule.puresuffering:noSpawnMobsBlockRadius": "No Spawn Mobs Block Radius",
+	"gamerule.puresuffering:noSpawnMobsBlockRadius.description": "How many blocks around the player are invasion mobs not allowed to spawn.",
 
 	"puresuffering.invasionDifficulty.default": "Default",
 	"puresuffering.invasionDifficulty.hyper": "Hyper",
@@ -154,12 +158,14 @@
 	"puresuffering.config.enable_invasion_ambience": "Enable Invasion Ambience",
 	"puresuffering.config.notify_players_about_invasions": "Notify Players About Invasions",
 	"puresuffering.config.zero_tick_delay": "Zero Tick Delay",
+	"puresuffering.config.no_invasions_during_first_ender_dragon_fight": "No Invasions During First Ender Dragon Fight",
 	
 	"puresuffering.config.invasion_start_delay": "Invasion Start Delay",
 	"puresuffering.config.primary_invasion_mob_cap": "Primary Invasion Mob Cap",
 	"puresuffering.config.secondary_invasion_mob_cap": "Secondary Invasion Mob Cap",
 	"puresuffering.config.mob_kill_limit": "Mob Kill Limit",
 	"puresuffering.config.mob_spawn_chunk_radius": "Mob Spawn Chunk Radius",
+	"puresuffering.config.no_spawn_mobs_block_radius": "No Spawn Mobs Block Radius",
 	
 	"puresuffering.config.invasion_blacklist": "Invasion Blacklist",
 	"puresuffering.config.primary_whitelist": "Primary Whitelist",
